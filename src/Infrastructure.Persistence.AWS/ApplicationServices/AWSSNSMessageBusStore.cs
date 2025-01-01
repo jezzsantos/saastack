@@ -40,7 +40,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         if (regionEndpoint.Exists())
         {
             var remoteClient = new AmazonSimpleNotificationServiceClient(credentials, regionEndpoint);
-            return new AWSSNSMessageBusStore(recorder, settings, remoteClient, options,
+            return new AWSSNSMessageBusStore(recorder, remoteClient, options,
                 queueSubscriber);
         }
 
@@ -50,12 +50,12 @@ public class AWSSNSMessageBusStore : IMessageBusStore
                 ServiceURL = AWSConstants.LocalStackServiceUrl,
                 AuthenticationRegion = RegionEndpoint.USEast1.SystemName
             });
-        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, options,
+        return new AWSSNSMessageBusStore(recorder, localStackClient, options,
             queueSubscriber);
     }
 
 #if TESTINGONLY
-    public static AWSSNSMessageBusStore Create(IRecorder recorder, IConfigurationSettings settings,
+    public static AWSSNSMessageBusStore Create(IRecorder recorder,
         AWSSNSMessageBusStoreOptions options, string localStackServiceUrl)
     {
         var credentials = new AnonymousAWSCredentials();
@@ -69,12 +69,12 @@ public class AWSSNSMessageBusStore : IMessageBusStore
             ? AWSSQSQueueStore.Create(recorder, localStackServiceUrl)
             : null;
 
-        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, options,
+        return new AWSSNSMessageBusStore(recorder, localStackClient, options,
             queueSubscriber);
     }
 #endif
 
-    private AWSSNSMessageBusStore(IRecorder recorder, IConfigurationSettings settings,
+    private AWSSNSMessageBusStore(IRecorder recorder,
         IAmazonSimpleNotificationService serviceClient, AWSSNSMessageBusStoreOptions options,
         AWSSQSQueueStore? queueSubscriber)
     {

@@ -4,6 +4,7 @@ using Common.Recording;
 using Infrastructure.Hosting.Common;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
@@ -18,43 +19,13 @@ namespace Infrastructure.Worker.Api.IntegrationTests.AzureFunctions;
 public class AllAzureFunctionSpecs : ICollectionFixture<AzureFunctionHostSetup>;
 
 [UsedImplicitly]
-public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
+public class AzureFunctionHostSetup : IApiWorkerSpec, IAsyncLifetime
 {
+    private readonly AzuriteStorageEmulator _azurite = new();
+    
     private static readonly TimeSpan FunctionTriggerWaitLatency = TimeSpan.FromSeconds(5);
     private IHost? _host;
     private Action<IServiceCollection>? _overridenTestingDependencies;
-
-    public AzureFunctionHostSetup()
-    {
-        var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
-            .AddJsonFile("appsettings.Testing.json", true)
-            .AddJsonFile("appsettings.Testing.local.json", true)
-            .Build());
-        var recorder = NoOpRecorder.Instance;
-        QueueStore = AzureStorageAccountQueueStore.Create(recorder, settings);
-        MessageBusStore = AzureServiceBusStore.Create(recorder, settings);
-        AzureStorageAccountBase.InitializeAllTests();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (_host.Exists())
-            {
-                _host.StopAsync().GetAwaiter().GetResult();
-                _host.Dispose();
-            }
-
-            AzureStorageAccountBase.CleanupAllTests();
-        }
-    }
 
     public TService GetRequiredService<TService>()
         where TService : notnull
@@ -67,16 +38,16 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
         return _host.Services.GetRequiredService<TService>();
     }
 
-    public IMessageBusStore MessageBusStore { get; }
+    public IMessageBusStore MessageBusStore { get; private set; } = null!;
 
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
     {
         _overridenTestingDependencies = overrideDependencies;
     }
 
-    public IQueueStore QueueStore { get; }
+    public IQueueStore QueueStore { get; private set; } = null!;
 
-    public void Start()
+    public void StartHost()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration(builder =>
@@ -101,6 +72,32 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
     public void WaitForQueueProcessingToComplete()
     {
         Thread.Sleep(FunctionTriggerWaitLatency);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _azurite.StartAsync();
+
+        var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
+            .AddJsonFile("appsettings.Testing.json", true)
+            .AddJsonFile("appsettings.Testing.local.json", true)
+            .Build());
+
+        var recorder = NoOpRecorder.Instance;
+        var connectionString = _azurite.GetConnectionString();
+        QueueStore = AzureStorageAccountQueueStore.Create(recorder, connectionString);
+        MessageBusStore = AzureServiceBusStore.Create(recorder, settings);
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _azurite.StopAsync();
+
+        if (_host.Exists())
+        {
+            await _host.StopAsync();
+            _host.Dispose();
+        }
     }
 }
 

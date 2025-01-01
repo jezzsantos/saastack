@@ -1,19 +1,42 @@
+using DotNet.Testcontainers.Containers;
+using Testcontainers.LocalStack;
+
 namespace IntegrationTesting.Persistence.Common;
 
 /// <summary>
-///     An emulator for running LocalStack for integration testing.
+///     An emulator for running Azurite Storage Emulator for integration testing.
 /// </summary>
-public static class AWSLocalStackEmulator
+public class AWSLocalStackEmulator
 {
-    private static readonly string ContainerName = "localstack-main";
+    private const string DockerImageName = "localstack/localstack:stable";
 
-    public static void Shutdown()
+    private readonly LocalStackContainer _localStack = new LocalStackBuilder()
+        .WithImage(DockerImageName)
+        .Build();
+
+    public string GetConnectionString()
     {
-        DockerImageEmulator.Shutdown();
+        if (!IsRunning())
+        {
+            throw new InvalidOperationException(
+                "LocalStack emulator must be started before getting the connection string.");
+        }
+
+        return _localStack.GetConnectionString();
     }
 
-    public static void Start()
+    private bool IsRunning()
     {
-        DockerImageEmulator.Start(ContainerName);
+        return _localStack.State == TestcontainersStates.Running;
+    }
+
+    public async Task StartAsync()
+    {
+        await _localStack.StartAsync();
+    }
+
+    public async Task StopAsync()
+    {
+        await _localStack.DisposeAsync();
     }
 }

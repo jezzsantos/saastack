@@ -1,8 +1,8 @@
 using Common.Recording;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
-using Testcontainers.Azurite;
 using Xunit;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
@@ -14,13 +14,7 @@ public class AzureStorageAccountSpecs : ICollectionFixture<AzureStorageAccountSp
 [UsedImplicitly]
 public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 {
-    private const string DockerImageName = "mcr.microsoft.com/azure-storage/azurite:latest";
-
-    private readonly AzuriteContainer _azurite = new AzuriteBuilder()
-        .WithImage(DockerImageName)
-        .WithInMemoryPersistence()
-        .Build();
-
+    private readonly AzuriteStorageEmulator _azurite = new();
     public IBlobStore BlobStore { get; private set; } = null!;
 
     public IQueueStore QueueStore { get; private set; } = null!;
@@ -37,6 +31,6 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _azurite.DisposeAsync();
+        await _azurite.StopAsync();
     }
 }

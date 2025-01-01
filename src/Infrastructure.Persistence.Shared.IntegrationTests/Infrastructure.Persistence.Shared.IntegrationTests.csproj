@@ -18,9 +18,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
-        <PackageReference Include="Testcontainers.Azurite" Version="4.1.0" />
         <PackageReference Include="Testcontainers.EventStoreDb" Version="4.1.0" />
-        <PackageReference Include="Testcontainers.LocalStack" Version="4.1.0" />
         <PackageReference Include="Testcontainers.MsSql" Version="4.1.0" />
     </ItemGroup>
 

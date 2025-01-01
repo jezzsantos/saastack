@@ -1,8 +1,8 @@
 using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Persistence.AWS.ApplicationServices;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
-using Testcontainers.LocalStack;
 using Xunit;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests.AWS;
@@ -13,26 +13,23 @@ public class AWSAccountSpecs : ICollectionFixture<AWSAccountSpecSetup>;
 [UsedImplicitly]
 public class AWSAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 {
-    private const string DockerImageName = "localstack/localstack:stable";
+    private readonly AWSLocalStackEmulator _localStack = new();
 
-    private readonly LocalStackContainer _localStack = new LocalStackBuilder()
-        .WithImage(DockerImageName)
-        .Build();
+    public AWSSNSMessageBusStore MessageBusStore { get; private set; } = null!;
 
-    public AWSSNSMessageBusStore MessageBusStore { get; set; } = null!;
+    public string[] MessageBusStoreTestQueues { get; private set; } = null!;
 
-    public string[] MessageBusStoreTestQueues { get; set; } = null!;
-
-    public AWSSQSQueueStore QueueStore { get; set; } = null!;
+    public AWSSQSQueueStore QueueStore { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
         await _localStack.StartAsync();
 
 #if TESTINGONLY
-        QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, _localStack.GetConnectionString());
-        MessageBusStore = AWSSNSMessageBusStore.Create(NoOpRecorder.Instance, Settings,
-            new AWSSNSMessageBusStoreOptions(SubscriberType.Queue), _localStack.GetConnectionString());
+        var connectionString = _localStack.GetConnectionString();
+        QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, connectionString);
+        MessageBusStore = AWSSNSMessageBusStore.Create(NoOpRecorder.Instance,
+            new AWSSNSMessageBusStoreOptions(SubscriberType.Queue), connectionString);
 #endif
         var store = QueueStore.As<AWSSQSQueueStore>();
         var queue1 = store.CreateQueueAsync("messagebus_queue1", CancellationToken.None).GetAwaiter().GetResult();
@@ -42,6 +39,6 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _localStack.DisposeAsync();
+        await _localStack.StopAsync();
     }
 }
