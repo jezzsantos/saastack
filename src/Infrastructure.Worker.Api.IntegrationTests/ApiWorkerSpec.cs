@@ -47,6 +47,7 @@ public abstract class ApiWorkerSpec<TSetup> : IClassFixture<TSetup>, IDisposable
     {
         if (disposing)
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             if (Setup is IDisposable disposable)
             {
                 disposable.Dispose();
