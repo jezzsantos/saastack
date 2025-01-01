@@ -102,9 +102,15 @@ In the GitHub project, you would define the following variables or secrets:
 
 **Required**. A comma-delimited list of glob patterns that identify all the `appsettings.json` files to be processed, relative to the root of the repository. Default `**/appsettings.json`.
 
-### `environment`
+### `secrets`
 
-Optional. The name of the environment (in the GitHub repository) from which the variables and secrets should be substituted. Default would mean only variables/secrets from the top level GitHub project.
+**Required**. This must have this specific value in the YML file: `${{ toJSON(secrets)}}`.
+
+> Note: Due to limitations imposed by GitHub (which are very sensible), it is not otherwise possible for this action to read the actual secrets from the GitHub repository. 
+
+### `variables`
+
+**Required**. This must have this specific value in the YML file: `${{ toJSON(vars)}}`.
 
 ## Outputs
 
@@ -115,8 +121,15 @@ All variables, in all files found by the `files` input, will be substituted with
 ## Example usage
 
 ```yaml
-uses: actions/saastack-variable-substitution
-with:
-  files: '**/appsettings.json, **/appsettings.Azure.json, **/appsettings.AWS.json, **/appsettings.Deploy.json'
-  environment: 'Production'
+jobs:
+  build:
+    runs-on: windows-latest
+    environment: 'YourDeploymentEnvironment'
+    steps:
+      - name: Variable Substitution
+        uses: ./src/Tools.GitHubActions/VariableSubstitution
+        with:
+          files: '**/appsettings.json'
+          variables: ${{ toJSON(vars)}}
+          secrets: ${{ toJSON(secrets)}}
 ```

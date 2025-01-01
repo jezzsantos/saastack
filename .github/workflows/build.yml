@@ -20,15 +20,17 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
-      - name: Build Custom Actions
+      - name: Build Custom Actions (Tools.GitHubActions project)
         run: |
           cd src/Tools.GitHubActions/VariableSubstitution
           npm ci --cache .npm --prefer-offline
+          npm run build
       - name: Variable Substitution
         uses: ./src/Tools.GitHubActions/VariableSubstitution
         with:
-          files: '**/appsettings.json,**/appsettings.Deploy.json'
-          environment: ''
+          files: '**/appsettings.json,**/appsettings.Azure.json,**/appsettings.AWS.json,**/appsettings.Deploy.json'
+          variables: ${{ toJSON(vars)}}
+          secrets: ${{ toJSON(secrets)}}
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
