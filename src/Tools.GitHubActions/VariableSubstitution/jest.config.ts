@@ -25,7 +25,7 @@ const config: Config = {
     // collectCoverageFrom: undefined,
 
     // The directory where Jest should output its coverage files
-    coverageDirectory: "coverage",
+    coverageDirectory: "../../TestResults/githubactions/variablesubstitution",
 
     // An array of regexp pattern strings used to skip coverage collection
     // coveragePathIgnorePatterns: [
@@ -103,7 +103,10 @@ const config: Config = {
     // projects: undefined,
 
     // Use this configuration option to add custom reporters to Jest
-    // reporters: undefined,
+    reporters: ["default", ["jest-junit", {
+        outputDirectory: "../../TestResults/githubactions/variablesubstitution",
+        outputName: "junit.xml"
+    }]],
 
     // Automatically reset mock state before every test
     // resetMocks: false,

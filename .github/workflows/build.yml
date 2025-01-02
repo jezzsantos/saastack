@@ -90,6 +90,13 @@ jobs:
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
           npm run test:ci
+      - name: Test VariableSubstitution (GitHubAction)
+        continue-on-error: false
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
+          npm run test:ci
       - name: Testing Report
         uses: dorny/test-reporter@v1.7.0
         if: success() || failure()

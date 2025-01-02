@@ -1,6 +1,6 @@
 import {ConfigurationSets} from "./configurationSets";
-import {ILogger} from "./Logger";
-import {IGlobPatternParser} from "./GlobPatternParser";
+import {ILogger} from "./logger";
+import {IGlobPatternParser} from "./globPatternParser";
 
 describe('ConfigurationSets', () => {
     const logger: jest.Mocked<ILogger> = {
