@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import {ConfigurationSets} from "./configurationSets";
 import {Logger} from "./logger";
 import {GlobPatternParser} from "./globPatternParser";
+import {AppSettingsJsonFileReader} from "./appSettingsJsonFileReader";
 
 run().then();
 
@@ -21,13 +22,20 @@ async function run() {
         const variables = JSON.parse(variablesParam);
 
         const globParser = new GlobPatternParser();
-        const configurationSets = await ConfigurationSets.create(logger, globParser, filesParam);
+        const jsonFileReader = new AppSettingsJsonFileReader();
+        const configurationSets = await ConfigurationSets.create(logger, globParser, jsonFileReader, filesParam);
         if (configurationSets.hasNone) {
-            logger.info('Skipping variable substitution');
+            logger.info('No settings files found, skipping variable substitution');
+            return;
         } else {
-            // Get the JSON webhook payload for the event that triggered the workflow
-            // const payload = JSON.stringify(github.context.payload, undefined, 2);
-            // core.info(`The event payload: ${payload}`);
+            const verified = configurationSets.verifyConfiguration();
+            if (!verified) {
+                return;
+            }
+
+            //TODO: Substitute: walk each configuration set, for each settings file:
+            // 1. substitute the variables with the values from the variables/secrets (in-memory), then
+            // 2. write those (in-memory) files to disk (in their original locations). 
         }
     } catch (error: unknown) {
         let message = "An unknown error occurred while processing the settings files";

@@ -1,18 +1,77 @@
 import * as path from "node:path";
 import {ILogger} from "./logger";
 import {IGlobPatternParser} from "./globPatternParser";
+import {ISettingsFile, SettingsFile} from "./settingsFile";
+import {IAppSettingsJsonFileReader} from "./appSettingsJsonFileReader";
 
-interface ConfigurationSet {
-    HostProjectPath: string;
-    SettingFiles: string[];
-    RequiredVariables: string[];
+interface IConfigurationSet {
+    readonly hostProjectPath: string;
+    readonly settingFiles: ISettingsFile[];
+    readonly requiredVariables: string[];
+    readonly definedVariables: string[];
+
+    accumulateRequiredVariables(variables: string[]): void;
+
+    accumulateDefinedVariables(variables: string[]): void;
 }
 
-export class ConfigurationSets {
-    sets: ConfigurationSet[] = [];
+class ConfigurationSet implements IConfigurationSet {
+    constructor(hostProjectPath: string, settingFiles: ISettingsFile[]) {
+        this._hostProjectPath = hostProjectPath;
+        this._settingFiles = settingFiles;
+        this._requiredVariables = [];
+        this._definedVariables = [];
+    }
 
-    private constructor(sets: ConfigurationSet[]) {
+    _hostProjectPath: string;
+
+    get hostProjectPath(): string {
+        return this._hostProjectPath;
+    }
+
+    _settingFiles: ISettingsFile[];
+
+    get settingFiles(): ISettingsFile[] {
+        return this._settingFiles;
+    }
+
+    _requiredVariables: string[];
+
+    get requiredVariables(): string[] {
+        return this._requiredVariables;
+    }
+
+    _definedVariables: string[];
+
+    get definedVariables(): string[] {
+        return this._definedVariables;
+    }
+
+    accumulateRequiredVariables(variables: string[]) {
+        for (const variable of variables) {
+            if (!this._requiredVariables.includes(variable)) {
+                this._requiredVariables.push(variable);
+            }
+        }
+    }
+
+    accumulateDefinedVariables(variables: string[]) {
+        for (const variable of variables) {
+            if (!this._definedVariables.includes(variable)) {
+                this._definedVariables.push(variable);
+            }
+        }
+    }
+}
+
+
+export class ConfigurationSets {
+    sets: IConfigurationSet[] = [];
+    private logger: ILogger;
+
+    private constructor(logger: ILogger, sets: IConfigurationSet[]) {
         this.sets = sets;
+        this.logger = logger;
     }
 
     get hasNone(): boolean {
@@ -23,37 +82,86 @@ export class ConfigurationSets {
         return this.sets.length;
     }
 
-    public static async create(logger: ILogger, globParser: IGlobPatternParser, globPattern: string): Promise<ConfigurationSets> {
+    public static async create(logger: ILogger, globParser: IGlobPatternParser, jsonFileReader: IAppSettingsJsonFileReader, globPattern: string): Promise<ConfigurationSets> {
         const matches = globPattern.length > 0 ? globPattern.split(',') : [];
 
         const files = await globParser.parseFiles(matches);
         if (files.length === 0) {
             logger.warning(`No settings files found in this repository, using the glob patterns: ${globPattern}`);
-            return new ConfigurationSets([]);
+            return new ConfigurationSets(logger, []);
         }
 
         const sets: ConfigurationSet[] = [];
-        files.forEach(file => {
-            const hostProjectPath: string = path.dirname(file);
-            const requiredVariables: string[] = []; //TODO: we need to harvest the required properties from the JSON file (if they exist)
+        for (const file of files) {
+            await ConfigurationSets.accumulateFilesIntoSets(jsonFileReader, sets, file);
+        }
 
-            const set = sets.find(x => x.HostProjectPath.includes(hostProjectPath));
-            if (set) {
-                set.SettingFiles.push(file);
-            } else {
-                const settingFiles: string[] = [file];
-                sets.push({
-                    HostProjectPath: hostProjectPath,
-                    SettingFiles: settingFiles,
-                    RequiredVariables: requiredVariables
-                });
+        for (const set of sets) {
+            ConfigurationSets.accumulateAllVariablesForSet(set);
+        }
+
+        const allFiles = sets.map(set => `${set.hostProjectPath}:\n\t\t${set.settingFiles.map(file => path.basename(file.path)).join(',\n\t\t')}`).join(',\n\t');
+        logger.info(`Found settings files, in these hosts:\n\t${allFiles}`);
+
+        return new ConfigurationSets(logger, sets);
+    }
+
+    private static async accumulateFilesIntoSets(jsonFileReader: IAppSettingsJsonFileReader, sets: ConfigurationSet[], file: string) {
+
+        const hostProjectPath: string = path.dirname(file);
+
+        const set = sets.find(set => set.hostProjectPath.includes(hostProjectPath));
+        if (set) {
+            const setting = await SettingsFile.create(jsonFileReader, file);
+            set.settingFiles.push(setting);
+
+        } else {
+            const setting = await SettingsFile.create(jsonFileReader, file);
+            const settingFiles: ISettingsFile[] = [setting];
+            sets.push(new ConfigurationSet(hostProjectPath, settingFiles));
+        }
+    }
+
+    private static accumulateAllVariablesForSet(set: ConfigurationSet) {
+
+        const files = set.settingFiles;
+        for (const file of files) {
+            set.accumulateDefinedVariables(file.variables);
+            if (file.hasRequired) {
+                set.accumulateRequiredVariables(file.requiredVariables);
             }
-        });
+        }
+    }
 
+    verifyConfiguration(): boolean {
+        if (this.sets.length === 0) {
+            return true;
+        }
 
-        const allFiles = sets.map(set => `${set.HostProjectPath}:\n\t\t${set.SettingFiles.map(file => path.basename(file)).join(',\n\t\t')}`).join(',\n\t');
-        logger.info(`Found settings files:\n\t${allFiles}`);
+        let setsVerified = true;
+        for (const set of this.sets) {
+            this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}'`);
+            let setVerified = true;
+            for (const requiredVariable of set.requiredVariables) {
+                if (!set.definedVariables.includes(requiredVariable)) {
+                    setVerified = false;
+                    this.logger.error(`Required variable '${requiredVariable}' is not defined in any of the settings files of this host!`);
+                }
+            }
 
-        return new ConfigurationSets(sets);
+            if (!setVerified) {
+                this.logger.error(`Verification of host '${set.hostProjectPath}' failed, there is at least one missing required variable!`);
+                setsVerified = false;
+            } else {
+                this.logger.info(`Verification of host '${set.hostProjectPath}' completed successfully`);
+            }
+
+        }
+
+        if (!setsVerified) {
+            this.logger.error("Verification of the settings files failed! there are missing required variables in at least one of the hosts!");
+        }
+
+        return setsVerified;
     }
 }
