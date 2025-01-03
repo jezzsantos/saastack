@@ -138,6 +138,7 @@ export class ConfigurationSets {
             return true;
         }
 
+        this.logger.info("Verifying of all settings files, in all hosts");
         let isAllSetsVerified = true;
         for (const set of this.sets) {
             this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}'`);
