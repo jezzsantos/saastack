@@ -15,8 +15,9 @@ async function run() {
         const filesParam = core.getInput('files', {required: true});
         const secretsParam = core.getInput('secrets', {required: true});
         const variablesParam = core.getInput('variables', {required: true});
+        const authorName = github.context.repo.owner;
         const projectName = github.context.repo.repo;
-        logger.info(`Scanning settings files:'${filesParam}', in GitHub project ${projectName}'`);
+        logger.info(`Scanning settings files: '${filesParam}', in GitHub project '${authorName}/${projectName}'`);
 
         const gitHubSecrets = (secretsParam !== null && secretsParam !== undefined ? JSON.parse(secretsParam) : {}) ?? {};
         const gitHubEnvironmentVariables = (variablesParam !== null && variablesParam !== undefined ? JSON.parse(variablesParam) : {}) ?? {};
@@ -25,7 +26,7 @@ async function run() {
         const jsonFileReader = new AppSettingsJsonFileReader();
         const configurationSets = await ConfigurationSets.create(logger, globParser, jsonFileReader, filesParam);
         if (configurationSets.hasNone) {
-            logger.info('No settings files found, skipping variable substitution');
+            logger.info('No settings files found in this repository, skipping variable substitution altogether');
             return;
         } else {
             const verified = configurationSets.verifyConfiguration(gitHubEnvironmentVariables, gitHubSecrets);
