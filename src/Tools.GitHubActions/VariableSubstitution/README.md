@@ -135,3 +135,5 @@ jobs:
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
 ```
+
+> Note: That you should specify the name of the deployment environment that you have set up in your GitHub project, on the job itself. When you do, all secrets and variables from that environment, plus those form the GitHub repository (plus those from your GitHub organization).

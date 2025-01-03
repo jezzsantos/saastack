@@ -392,6 +392,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{2B24670B-EFAC-4779-B6BA-B34C17D3D39D}"
 	ProjectSection(SolutionItems) = preProject
 		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		..\.github\workflows\deploy.yml = ..\.github\workflows\deploy.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IAC", "IAC", "{596C8F37-52D2-402A-AD31-62B3DCB3A3E0}"
