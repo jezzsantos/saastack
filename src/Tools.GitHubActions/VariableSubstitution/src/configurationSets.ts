@@ -87,7 +87,7 @@ export class ConfigurationSets {
 
         const files = await globParser.parseFiles(matches);
         if (files.length === 0) {
-            logger.warning(`No settings files found in this repository, using the glob patterns: ${globPattern}`);
+            logger.warning(`No settings files found in this repository, applying the glob patterns: ${globPattern}`);
             return new ConfigurationSets(logger, []);
         }
 
@@ -133,35 +133,53 @@ export class ConfigurationSets {
         }
     }
 
-    verifyConfiguration(): boolean {
+    verifyConfiguration(gitHubVariables: any, gitHubSecrets: any): boolean {
         if (this.sets.length === 0) {
             return true;
         }
 
-        let setsVerified = true;
+        let isAllSetsVerified = true;
         for (const set of this.sets) {
             this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}'`);
-            let setVerified = true;
+            let isSetVerified = true;
             for (const requiredVariable of set.requiredVariables) {
                 if (!set.definedVariables.includes(requiredVariable)) {
-                    setVerified = false;
-                    this.logger.error(`Required variable '${requiredVariable}' is not defined in any of the settings files of this host!`);
+                    this.logger.warning(`Required variable '${requiredVariable}' is not yet defined in any of the settings files of this host! Consider either defining it in one of the settings files of this host, OR remove it from the '${SettingsFile.RequiredProperty}' section of the settings files in this host`);
+                } else {
+                    const gitHubVariableName = this.calculateGitHubVariableName(requiredVariable);
+                    if (!this.isDefinedInGitHubVariables(gitHubVariables, gitHubSecrets, gitHubVariableName)) {
+                        isSetVerified = false;
+                        this.logger.error(`Required GitHub environment variable (or secret) '${gitHubVariableName}' (alias: '${requiredVariable}') has not been defined in the environment variables (or secrets) of this GitHub project!`);
+                    }
                 }
             }
 
-            if (!setVerified) {
-                this.logger.error(`Verification of host '${set.hostProjectPath}' failed, there is at least one missing required variable!`);
-                setsVerified = false;
+            if (!isSetVerified) {
+                this.logger.error(`Verification settings files in host: '${set.hostProjectPath}' -> Failed! there is at least one missing required environment variable or secret in this GitHub project`);
+                isAllSetsVerified = false;
             } else {
-                this.logger.info(`Verification of host '${set.hostProjectPath}' completed successfully`);
+                this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}' -> Successful!`);
             }
 
         }
 
-        if (!setsVerified) {
-            this.logger.error("Verification of the settings files failed! there are missing required variables in at least one of the hosts!");
+        if (!isAllSetsVerified) {
+            this.logger.error("Verification of all settings files, in all hosts: -> Failed! there are missing required variables in at least one of the hosts. See errors above");
+        } else {
+            this.logger.info("Verification of all settings files, in all hosts: -> Successful!");
         }
 
-        return setsVerified;
+        return isAllSetsVerified;
+    }
+
+    private isDefinedInGitHubVariables(gitHubVariables: any, gitHubSecrets: any, name: string): boolean {
+
+        return gitHubVariables.hasOwnProperty(name) || gitHubSecrets.hasOwnProperty(name);
+    }
+
+    private calculateGitHubVariableName(requiredVariable: string) {
+        return requiredVariable
+            .toUpperCase()
+            .replace(/[-:.]/g, '_');
     }
 }

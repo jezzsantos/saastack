@@ -26,7 +26,7 @@ describe('ConfigurationSets', () => {
             expect(sets.hasNone).toBe(true);
             expect(globParser.parseFiles).toHaveBeenCalledWith([]);
             expect(jsonFileReader.readAppSettingsFile).not.toHaveBeenCalled();
-            expect(logger.warning).toHaveBeenCalledWith('No settings files found in this repository, using the glob patterns: ');
+            expect(logger.warning).toHaveBeenCalledWith('No settings files found in this repository, applying the glob patterns: ');
         });
 
         it('should create a single set, when has one file at the root', async () => {
@@ -123,11 +123,23 @@ describe('ConfigurationSets', () => {
             jsonFileReader.readAppSettingsFile
                 .mockResolvedValueOnce({
                     "aname1": "avalue",
-                    "Required": ["arequired1", "arequired2"]
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired1", "arequired2"]
+                            }
+                        ]
+                    }
                 })
                 .mockResolvedValueOnce({
                     "aname2": "avalue",
-                    "Required": ["arequired2", "arequired3"]
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired2", "arequired3"]
+                            }
+                        ]
+                    }
                 });
 
             const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
@@ -159,7 +171,7 @@ describe('ConfigurationSets', () => {
 
             const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
 
-            const result = sets.verifyConfiguration();
+            const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(true)
         });
@@ -179,13 +191,13 @@ describe('ConfigurationSets', () => {
 
             const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
 
-            const result = sets.verifyConfiguration();
+            const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verification of host 'apath' completed successfully`);
+            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
         });
 
-        it('should return false, when the set contains required variable, and not exists', async () => {
+        it('should return true, but warn, when the set defines required variable, but no variable exists to substitute', async () => {
 
             const globParser: jest.Mocked<IGlobPatternParser> = {
                 parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
@@ -196,20 +208,57 @@ describe('ConfigurationSets', () => {
             jsonFileReader.readAppSettingsFile
                 .mockResolvedValueOnce({
                     "aname": "avalue",
-                    "Required": ["arequired"]
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired"]
+                            }
+                        ]
+                    }
                 });
 
             const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
 
-            const result = sets.verifyConfiguration();
+            const result = sets.verifyConfiguration({}, {});
+
+            expect(result).toBe(true);
+            expect(logger.warning).toHaveBeenCalledWith(`Required variable 'arequired' is not yet defined in any of the settings files of this host! Consider either defining it in one of the settings files of this host, OR remove it from the 'Required' section of the settings files in this host`);
+            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
+        });
+
+        it('should return false, when the set defines required variable, but no variable/secret exists in GitHub', async () => {
+
+            const globParser: jest.Mocked<IGlobPatternParser> = {
+                parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
+            };
+            const jsonFileReader: jest.Mocked<IAppSettingsJsonFileReader> = {
+                readAppSettingsFile: jest.fn()
+            };
+            jsonFileReader.readAppSettingsFile
+                .mockResolvedValueOnce({
+                    "arequired-arequired": {
+                        "aname": "avalue"
+                    },
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired-arequired:aname"]
+                            }
+                        ]
+                    }
+                });
+
+            const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
+
+            const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(false);
             expect(logger.info).not.toHaveBeenCalledWith(`Verification of host 'apath' completed successfully`);
-            expect(logger.error).toHaveBeenCalledWith(`Required variable 'arequired' is not defined in any of the settings files of this host!`);
-            expect(logger.error).toHaveBeenCalledWith(`Verification of host 'apath' failed, there is at least one missing required variable!`);
+            expect(logger.error).toHaveBeenCalledWith(`Required GitHub environment variable (or secret) 'AREQUIRED_AREQUIRED_ANAME' (alias: 'arequired-arequired:aname') has not been defined in the environment variables (or secrets) of this GitHub project!`);
+            expect(logger.error).toHaveBeenCalledWith(`Verification settings files in host: 'apath' -> Failed! there is at least one missing required environment variable or secret in this GitHub project`);
         });
 
-        it('should return true, when the set contains required variable, and exists', async () => {
+        it('should return true, when the set defines required variable, and variable exists in GitHub', async () => {
 
             const globParser: jest.Mocked<IGlobPatternParser> = {
                 parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
@@ -219,17 +268,54 @@ describe('ConfigurationSets', () => {
             };
             jsonFileReader.readAppSettingsFile
                 .mockResolvedValueOnce({
-                    "aname": "avalue",
-                    "Required": ["aname"]
+                    "arequired-arequired": {
+                        "aname": "avalue"
+                    },
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired-arequired:aname"]
+                            }
+                        ]
+                    }
                 });
 
             const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
 
-            const result = sets.verifyConfiguration();
+            const result = sets.verifyConfiguration({"AREQUIRED_AREQUIRED_ANAME": "avalue"}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verification of host 'apath' completed successfully`);
+            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
         });
 
+        it('should return true, when the set defines required variable, and secret exists in GitHub', async () => {
+
+            const globParser: jest.Mocked<IGlobPatternParser> = {
+                parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
+            };
+            const jsonFileReader: jest.Mocked<IAppSettingsJsonFileReader> = {
+                readAppSettingsFile: jest.fn()
+            };
+            jsonFileReader.readAppSettingsFile
+                .mockResolvedValueOnce({
+                    "arequired-arequired": {
+                        "aname": "avalue"
+                    },
+                    "Deploy": {
+                        "Required": [
+                            {
+                                "Keys": ["arequired-arequired:aname"]
+                            }
+                        ]
+                    }
+                });
+
+            const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
+
+            const result = sets.verifyConfiguration({}, {"AREQUIRED_AREQUIRED_ANAME": "avalue"});
+
+            expect(result).toBe(true);
+            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
+        });
     });
 });

@@ -19,7 +19,7 @@ This action also relies on the variables/secrets defined in the GitHub project, 
 
 ### Source Code
 
-This action depends on the definition of a set of "required" settings defined in one of your `appsettings.json` files.
+This action depends on the definition of a set of "Required" settings defined in one of your `appsettings.json` files.
 
 For example,
 
@@ -29,15 +29,15 @@ For example,
     "Notes": "Lists the required configuration keys that must be overwritten (by the GitHub configuration action) when we deploy this host",
     "Required": [
       {
-        "description": "General settings from appsettings.json",
-        "keys": [
+        "Description": "General settings from appsettings.json",
+        "Keys": [
           "ApplicationServices:Persistence:Kurrent:ConnectionString",
           "Hosts:WebsiteHost:BaseUrl"
         ]
       },
       {
-        "description": "Azure specific settings from appsettings.Azure.json",
-        "keys": [
+        "Description": "Azure specific settings from appsettings.Azure.json",
+        "Keys": [
           "ApplicationInsights:ConnectionString",
           "ApplicationServices:Persistence:SqlServer:DbServerName",
           "ApplicationServices:Persistence:SqlServer:DbCredentials",
@@ -45,9 +45,9 @@ For example,
         ]
       },
       {
-        "description": "AWS specific settings from appsettings.AWS.json",
-        "disabled": true,
-        "keys": [
+        "Description": "AWS specific settings from appsettings.AWS.json",
+        "Disabled": true,
+        "Keys": [
           "ApplicationServices:Persistence:AWS:AccessKey",
           "ApplicationServices:Persistence:AWS:SecretKey",
           "ApplicationServices:Persistence:AWS:Region",
@@ -58,9 +58,10 @@ For example,
   }
 }
 ```
-> Note: These definitions are assumed exist in your `appsettings.json` files. However, they can also exist in separate files, just used for deployment use. e.g., `appsettings.Deploy.json`.
 
-> Note: without these definitions, this action just performs variable substitution, without any verification.
+> Note: These definitions are assumed exist within your main `appsettings.json` file. Or they can also exist in separate files, just used for deployment use. e.g., `appsettings.Deploy.json`.
+> Note: Keys where `Disabled` is set to `true` will be ignored.
+> Note: without any of these "Keys" definitions, this action will just perform variable substitution, without any verification.
 
 ### GitHub Project
 

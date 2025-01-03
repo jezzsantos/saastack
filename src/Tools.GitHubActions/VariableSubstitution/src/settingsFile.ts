@@ -8,6 +8,12 @@ export interface ISettingsFile {
 }
 
 export class SettingsFile implements ISettingsFile {
+
+    public static DeployProperty: string = "Deploy";
+    public static RequiredProperty: string = "Required";
+    public static KeysProperty: string = "Keys";
+    public static DisabledProperty: string = "Disabled";
+
     private constructor(path: string, variables: string[], requiredVariables: string[]) {
         this._path = path;
         this._variables = variables;
@@ -51,10 +57,10 @@ export class SettingsFile implements ISettingsFile {
                 const element = json[key];
                 const nextPrefix = SettingsFile.createVariablePath(prefix, key);
                 if (typeof element === "object") {
-                    if (SettingsFile.isTopLevelRequiredKey(element, key, prefix)) {
-                        for (let index = 0; index < element.length; index++) {
-                            const requiredKey = element[index];
-                            requiredVariables.push(requiredKey);
+                    if (SettingsFile.isDeployRequiredKey(element, key, prefix)) {
+                        const required = SettingsFile.getDeployRequiredVariables(element);
+                        if (required.length > 0) {
+                            requiredVariables.push(...required);
                         }
                     } else {
                         SettingsFile.scrapeVariablesRecursively(element, variables, requiredVariables, nextPrefix);
@@ -73,9 +79,56 @@ export class SettingsFile implements ISettingsFile {
         return `${prefix}:${key}`;
     }
 
-    private static isTopLevelRequiredKey(element: any, key: string, prefix: string): boolean {
-        return (key === "required" || key === "Required")
-            && Array.isArray(element)
-            && prefix === "";
+    private static isDeployRequiredKey(element: any, key: string, prefix: string): boolean {
+        if (prefix !== "") {
+            return false;
+        }
+
+        if (key.toUpperCase() !== SettingsFile.DeployProperty.toUpperCase()) {
+            return false;
+        }
+
+        if (!element.hasOwnProperty(SettingsFile.RequiredProperty)) {
+            return false;
+        }
+
+
+        const required = element[SettingsFile.RequiredProperty];
+        if (!required) {
+            return false;
+        }
+
+        return Array.isArray(required);
+    }
+
+    private static getDeployRequiredVariables(element: any): string[] {
+
+        const required = element[SettingsFile.RequiredProperty];
+        if (required) {
+            if (Array.isArray(required)) {
+                let requiredVariables: string[] = [];
+                for (let index = 0; index < required.length; index++) {
+                    const requiredSection = required[index];
+
+                    if (requiredSection.hasOwnProperty(SettingsFile.KeysProperty)) {
+
+                        if (requiredSection.hasOwnProperty(SettingsFile.DisabledProperty)) {
+                            const disabled = requiredSection[SettingsFile.DisabledProperty];
+                            if (disabled) {
+                                continue;
+                            }
+                        }
+
+                        const keys = requiredSection[SettingsFile.KeysProperty];
+                        if (keys) {
+                            requiredVariables.push(...keys);
+                        }
+                    }
+                }
+                return requiredVariables;
+            }
+        }
+
+        return [];
     }
 }

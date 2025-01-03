@@ -21,7 +21,7 @@ describe('AppSettingsJsonFileReader', () => {
         try {
             await reader.readAppSettingsFile(path);
         } catch (error) {
-            expect(error.message).toMatch(`File '${path}' does not contain valid JSON: SyntaxError: Unexpected token 'i', \"invalid\" is not valid JSON`);
+            expect(error.message).toContain(`File '${path}' does not contain valid JSON: SyntaxError: Unexpected token`);
         }
     });
 

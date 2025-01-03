@@ -18,8 +18,8 @@ async function run() {
         const projectName = github.context.repo.repo;
         logger.info(`Scanning settings files:'${filesParam}', in GitHub project ${projectName}'`);
 
-        const secrets = JSON.parse(secretsParam);
-        const variables = JSON.parse(variablesParam);
+        const gitHubSecrets = (secretsParam !== null && secretsParam !== undefined ? JSON.parse(secretsParam) : {}) ?? {};
+        const gitHubEnvironmentVariables = (variablesParam !== null && variablesParam !== undefined ? JSON.parse(variablesParam) : {}) ?? {};
 
         const globParser = new GlobPatternParser();
         const jsonFileReader = new AppSettingsJsonFileReader();
@@ -28,7 +28,7 @@ async function run() {
             logger.info('No settings files found, skipping variable substitution');
             return;
         } else {
-            const verified = configurationSets.verifyConfiguration();
+            const verified = configurationSets.verifyConfiguration(gitHubEnvironmentVariables, gitHubSecrets);
             if (!verified) {
                 return;
             }
