@@ -34,9 +34,7 @@ async function run() {
                 return;
             }
 
-            //TODO: Substitute: walk each configuration set, for each settings file:
-            // 1. substitute the variables with the values from the variables/secrets (in-memory), then
-            // 2. write those (in-memory) files to disk (in their original locations). 
+            configurationSets.substituteVariables(gitHubEnvironmentVariables, gitHubSecrets);
         }
     } catch (error: unknown) {
         let message = "An unknown error occurred while processing the settings files";

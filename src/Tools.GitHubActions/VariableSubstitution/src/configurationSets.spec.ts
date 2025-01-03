@@ -194,36 +194,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
-        });
-
-        it('should return true, but warn, when the set defines required variable, but no variable exists to substitute', async () => {
-
-            const globParser: jest.Mocked<IGlobPatternParser> = {
-                parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
-            };
-            const jsonFileReader: jest.Mocked<IAppSettingsJsonFileReader> = {
-                readAppSettingsFile: jest.fn()
-            };
-            jsonFileReader.readAppSettingsFile
-                .mockResolvedValueOnce({
-                    "aname": "avalue",
-                    "Deploy": {
-                        "Required": [
-                            {
-                                "Keys": ["arequired"]
-                            }
-                        ]
-                    }
-                });
-
-            const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
-
-            const result = sets.verifyConfiguration({}, {});
-
-            expect(result).toBe(true);
-            expect(logger.warning).toHaveBeenCalledWith(`Required variable 'arequired' is not yet defined in any of the settings files of this host! Consider either defining it in one of the settings files of this host, OR remove it from the 'Required' section of the settings files in this host`);
-            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
         });
 
         it('should return false, when the set defines required variable, but no variable/secret exists in GitHub', async () => {
@@ -253,9 +224,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(false);
-            expect(logger.info).not.toHaveBeenCalledWith(`Verification of host 'apath' completed successfully`);
-            expect(logger.error).toHaveBeenCalledWith(`Required GitHub environment variable (or secret) 'AREQUIRED_AREQUIRED_ANAME' (alias: 'arequired-arequired:aname') has not been defined in the environment variables (or secrets) of this GitHub project!`);
-            expect(logger.error).toHaveBeenCalledWith(`Verification settings files in host: 'apath' -> Failed! there is at least one missing required environment variable or secret in this GitHub project`);
+            expect(logger.error).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Failed! there are missing required variables in at least one of the hosts. See errors above`);
         });
 
         it('should return true, when the set defines required variable, and variable exists in GitHub', async () => {
@@ -285,7 +254,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({"AREQUIRED_AREQUIRED_ANAME": "avalue"}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
         });
 
         it('should return true, when the set defines required variable, and secret exists in GitHub', async () => {
@@ -315,7 +284,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {"AREQUIRED_AREQUIRED_ANAME": "avalue"});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verifying settings files in host: 'apath' -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
         });
     });
 });

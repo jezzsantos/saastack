@@ -3,71 +3,11 @@ import {ILogger} from "./logger";
 import {IGlobPatternParser} from "./globPatternParser";
 import {ISettingsFile, SettingsFile} from "./settingsFile";
 import {IAppSettingsJsonFileReader} from "./appSettingsJsonFileReader";
-
-interface IConfigurationSet {
-    readonly hostProjectPath: string;
-    readonly settingFiles: ISettingsFile[];
-    readonly requiredVariables: string[];
-    readonly definedVariables: string[];
-
-    accumulateRequiredVariables(variables: string[]): void;
-
-    accumulateDefinedVariables(variables: string[]): void;
-}
-
-class ConfigurationSet implements IConfigurationSet {
-    constructor(hostProjectPath: string, settingFiles: ISettingsFile[]) {
-        this._hostProjectPath = hostProjectPath;
-        this._settingFiles = settingFiles;
-        this._requiredVariables = [];
-        this._definedVariables = [];
-    }
-
-    _hostProjectPath: string;
-
-    get hostProjectPath(): string {
-        return this._hostProjectPath;
-    }
-
-    _settingFiles: ISettingsFile[];
-
-    get settingFiles(): ISettingsFile[] {
-        return this._settingFiles;
-    }
-
-    _requiredVariables: string[];
-
-    get requiredVariables(): string[] {
-        return this._requiredVariables;
-    }
-
-    _definedVariables: string[];
-
-    get definedVariables(): string[] {
-        return this._definedVariables;
-    }
-
-    accumulateRequiredVariables(variables: string[]) {
-        for (const variable of variables) {
-            if (!this._requiredVariables.includes(variable)) {
-                this._requiredVariables.push(variable);
-            }
-        }
-    }
-
-    accumulateDefinedVariables(variables: string[]) {
-        for (const variable of variables) {
-            if (!this._definedVariables.includes(variable)) {
-                this._definedVariables.push(variable);
-            }
-        }
-    }
-}
-
+import {ConfigurationSet, IConfigurationSet} from "./configurationSet";
 
 export class ConfigurationSets {
     sets: IConfigurationSet[] = [];
-    private logger: ILogger;
+    private readonly logger: ILogger;
 
     private constructor(logger: ILogger, sets: IConfigurationSet[]) {
         this.sets = sets;
@@ -97,7 +37,7 @@ export class ConfigurationSets {
         }
 
         for (const set of sets) {
-            ConfigurationSets.accumulateAllVariablesForSet(set);
+            set.accumulateVariables();
         }
 
         const allFiles = sets.map(set => `${set.hostProjectPath}:\n\t\t${set.settingFiles.map(file => path.basename(file.path)).join(',\n\t\t')}`).join(',\n\t');
@@ -122,17 +62,6 @@ export class ConfigurationSets {
         }
     }
 
-    private static accumulateAllVariablesForSet(set: ConfigurationSet) {
-
-        const files = set.settingFiles;
-        for (const file of files) {
-            set.accumulateDefinedVariables(file.variables);
-            if (file.hasRequired) {
-                set.accumulateRequiredVariables(file.requiredVariables);
-            }
-        }
-    }
-
     verifyConfiguration(gitHubVariables: any, gitHubSecrets: any): boolean {
         if (this.sets.length === 0) {
             return true;
@@ -141,27 +70,10 @@ export class ConfigurationSets {
         this.logger.info("Verifying of all settings files, in all hosts");
         let isAllSetsVerified = true;
         for (const set of this.sets) {
-            this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}'`);
-            let isSetVerified = true;
-            for (const requiredVariable of set.requiredVariables) {
-                if (!set.definedVariables.includes(requiredVariable)) {
-                    this.logger.warning(`Required variable '${requiredVariable}' is not yet defined in any of the settings files of this host! Consider either defining it in one of the settings files of this host, OR remove it from the '${SettingsFile.RequiredProperty}' section of the settings files in this host`);
-                } else {
-                    const gitHubVariableName = this.calculateGitHubVariableName(requiredVariable);
-                    if (!this.isDefinedInGitHubVariables(gitHubVariables, gitHubSecrets, gitHubVariableName)) {
-                        isSetVerified = false;
-                        this.logger.error(`Required GitHub environment variable (or secret) '${gitHubVariableName}' (alias: '${requiredVariable}') has not been defined in the environment variables (or secrets) of this GitHub project!`);
-                    }
-                }
-            }
-
+            const isSetVerified = set.verify(this.logger, gitHubVariables, gitHubSecrets);
             if (!isSetVerified) {
-                this.logger.error(`Verification settings files in host: '${set.hostProjectPath}' -> Failed! there is at least one missing required environment variable or secret in this GitHub project`);
                 isAllSetsVerified = false;
-            } else {
-                this.logger.info(`Verifying settings files in host: '${set.hostProjectPath}' -> Successful!`);
             }
-
         }
 
         if (!isAllSetsVerified) {
@@ -173,14 +85,12 @@ export class ConfigurationSets {
         return isAllSetsVerified;
     }
 
-    private isDefinedInGitHubVariables(gitHubVariables: any, gitHubSecrets: any, name: string): boolean {
+    substituteVariables(gitHubVariables: any, gitHubSecrets: any) {
 
-        return gitHubVariables.hasOwnProperty(name) || gitHubSecrets.hasOwnProperty(name);
+        //TODO: Substitute: walk each configuration set, for each settings file:
+        // 1. substitute the variables with the values from the variables/secrets (in-memory), then
+        // 2. write those (in-memory) files to disk (in their original locations). 
+
     }
 
-    private calculateGitHubVariableName(requiredVariable: string) {
-        return requiredVariable
-            .toUpperCase()
-            .replace(/[-:.]/g, '_');
-    }
 }
