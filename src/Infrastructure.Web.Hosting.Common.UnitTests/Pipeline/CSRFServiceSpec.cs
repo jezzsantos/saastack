@@ -21,7 +21,7 @@ public class CSRFServiceSpec
         settings.Setup(s => s.GetWebsiteHostCSRFSigningSecret())
             .Returns("asecret");
 #if TESTINGONLY
-        _encryptionService = new AesEncryptionService(AesEncryptionService.CreateAesSecret());
+        _encryptionService = new AesEncryptionService(AesEncryptionService.GenerateAesSecret());
 #endif
 
         _service = new CSRFService(settings.Object, _encryptionService);

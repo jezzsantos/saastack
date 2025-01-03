@@ -73,13 +73,13 @@ public class AesEncryptionService : IEncryptionService
     }
 
 #if TESTINGONLY
-    public static string CreateAesSecret()
+    public static string GenerateAesSecret()
     {
-        CreateKeyAndIv(out var key, out var iv);
+        GenerateKeyAndIv(out var key, out var iv);
         return $"{Convert.ToBase64String(key)}{SecretKeyDelimiter}{Convert.ToBase64String(iv)}";
     }
 
-    private static void CreateKeyAndIv(out byte[] key, out byte[] iv)
+    private static void GenerateKeyAndIv(out byte[] key, out byte[] iv)
     {
         using var aes = CreateAes();
         key = aes.Key;

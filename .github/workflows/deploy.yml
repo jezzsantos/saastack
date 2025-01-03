@@ -1,0 +1,52 @@
+name: Build and Deploy
+
+on: [ push ]
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+env:
+  IS_CI_BUILD: 'true'
+  SOLUTION_PATH: 'src/SaaStack.sln'
+  TESTINGONLY_BUILD_CONFIGURATION: 'Release'
+  DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
+  DOTNET_VERSION: 8.0.302
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    environment: 'Demo'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{env.DOTNET_VERSION}}
+      - name: Restore dependencies
+        run: dotnet restore "${{env.SOLUTION_PATH}}"
+      - name: Build Custom GitHub Actions
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
+      - name: Build (Backend) for Azure Deploy
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
+      - name: Build (Backend) for AWS Deploy
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
+      - name: Build WebsiteHost (FrontEnd) for Deploy
+        run: |
+          cd src/WebsiteHost/ClientApp
+          cp .env.example .env
+          npm ci --cache .npm --prefer-offline
+          npm run build:releasefordeploy
+      - name: AppSettings Variable Substitution
+        uses: ./src/Tools.GitHubActions/VariableSubstitution
+        with:
+          files: '**/appsettings.json,**/appsettings.Azure.json,**/appsettings.AWS.json,**/appsettings.Deploy.json'
+          variables: ${{ toJSON(vars)}}
+          secrets: ${{ toJSON(secrets)}}
+      - name: Deploy to Azure
+        run: echo "Deploy to Azure" #TODO: Deploy steps to Azure

@@ -20,17 +20,6 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
-      - name: Build Custom Actions (Tools.GitHubActions project)
-        run: |
-          cd src/Tools.GitHubActions/VariableSubstitution
-          npm ci --cache .npm --prefer-offline
-          npm run build
-      - name: Variable Substitution
-        uses: ./src/Tools.GitHubActions/VariableSubstitution
-        with:
-          files: '**/appsettings.json,**/appsettings.Azure.json,**/appsettings.AWS.json,**/appsettings.Deploy.json'
-          variables: ${{ toJSON(vars)}}
-          secrets: ${{ toJSON(secrets)}}
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -45,12 +34,17 @@ jobs:
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
       - name: Build (Backend) for AWS Deploy
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
-      - name: Build WebsiteHost (FrontEnd)
+      - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
           cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
+      - name: Build Custom GitHub Actions
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
   test:
     runs-on: windows-latest
     timeout-minutes: 15
@@ -90,7 +84,7 @@ jobs:
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
           npm run test:ci
-      - name: Test VariableSubstitution (GitHubAction)
+      - name: Test Custom GitHub Actions
         continue-on-error: false
         run: |
           cd src/Tools.GitHubActions/VariableSubstitution

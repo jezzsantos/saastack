@@ -17,7 +17,7 @@ public class CSRFTokenPairSpec
     {
 #if TESTINGONLY
         _encryptionService =
-            new AesEncryptionService(AesEncryptionService.CreateAesSecret());
+            new AesEncryptionService(AesEncryptionService.GenerateAesSecret());
 #endif
     }
 

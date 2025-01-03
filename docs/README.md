@@ -30,7 +30,7 @@ As well as a code template, there is custom tooling (tailored to this codebase) 
 
 We make extensive use Roslyn Analyzers, Code Fixes and Source Generators and Architecture tests to help you and your team be highly productive in following the established patterns this codebase. And more importantly detect and fix when those principles are violated.
 
-For more details see the [Developer Tooling](design-principles/0140-developer-tooling.md) documentation.
+For more details, see the [Developer Tooling](design-principles/0140-developer-tooling.md) documentation.
 
 For example, we make it trivial to define robust REST APIs, and under the covers, the tooling converts those API definitions into MediatR-brokered minimal APIs for you. But you never have to write all that minimal API boilerplate stuff.
 
@@ -43,3 +43,10 @@ We also provide you with a number of project templates for adding the various pr
 We also give you several macros in the text editor (a.k.a. Live Templates) for creating certain kinds of classes, like DDD ValueObjects and DDD AggregateRoots, and xUnit test classes.
 
 You can see all of these things in the Platform/Tools projects.
+
+## Deployment
+
+The codebase is ready for deployment immediately, from your GitHub repository.
+Deployment can be performed by any tool set to any environment, any way you like, we just made it easy for GitHub actions.
+
+For more details, see the [Deployment](DEPLOYMENT.md) documentation.

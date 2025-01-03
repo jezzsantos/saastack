@@ -12,6 +12,16 @@ public class HMACSignerSpec
     public class GivenARequest
     {
         [Fact]
+        public void WhenGenerateKey_ThenReturnsRandomKey()
+        {
+#if TESTINGONLY
+            var result = HMACSigner.GenerateKey();
+
+            result.Should().NotBeNullOrEmpty();
+#endif
+        }
+
+        [Fact]
         public void WhenConstructedWithEmptySecret_ThenThrows()
         {
             FluentActions.Invoking(() => new HMACSigner(new TestHmacRequest(), string.Empty))

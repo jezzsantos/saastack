@@ -5,10 +5,12 @@ inputs:
     description: 'A comma-delimited list of glob patterns that identify all the `appsettings.json` files to be processed, relative to the root of the repository'
     required: true
     default: '**/appsettings.json'
-  environment:
-    description: 'The name of the environment (in the GitHub repository) from which the variables and secrets should be substituted'
-    required: false
-    default: ''
+  secrets:
+    description: 'The secrets of the GitHub repository. Must be the value: `${{ toJSON(secrets)}}`'
+    required: true
+  variables:
+    description: 'The variables of the GitHub repository (and environment). Must be the value: `${{ toJSON(vars)}}`'
+    required: true
 runs:
   using: 'node20'
   main: './built/index.js'
