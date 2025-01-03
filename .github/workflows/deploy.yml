@@ -10,7 +10,6 @@ permissions:
 env:
   IS_CI_BUILD: 'true'
   SOLUTION_PATH: 'src/SaaStack.sln'
-  TESTINGONLY_BUILD_CONFIGURATION: 'Release'
   DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
   DOTNET_VERSION: 8.0.302
 
@@ -45,7 +44,7 @@ jobs:
       - name: AppSettings Variable Substitution
         uses: ./src/Tools.GitHubActions/VariableSubstitution
         with:
-          files: '**/appsettings.json,**/appsettings.Azure.json,**/appsettings.AWS.json,**/appsettings.Deploy.json'
+          files: '**/appsettings.json,**/appsettings.Azure.json,**/appsettings.AWS.json'
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
       - name: Deploy to Azure

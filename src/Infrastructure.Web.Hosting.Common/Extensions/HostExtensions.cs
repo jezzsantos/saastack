@@ -134,7 +134,6 @@ public static class HostExtensions
 #elif HOSTEDONAWS
             appBuilder.Configuration.AddJsonFile("appsettings.AWS.json", true);
 #endif
-            appBuilder.Configuration.AddJsonFile("appsettings.Deploy.json", true);
             appBuilder.Configuration.AddJsonFile("appsettings.local.json", true);
 
             if (isMultiTenanted)

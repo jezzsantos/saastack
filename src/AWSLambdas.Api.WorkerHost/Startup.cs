@@ -20,7 +20,6 @@ public class Startup
     {
         var configurationBuilder = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", false, false)
-            .AddJsonFile("appsettings.Deploy.json", true, false)
             .AddJsonFile("appsettings.local.json", true, false)
             .AddEnvironmentVariables();
         var configuration = configurationBuilder.Build();

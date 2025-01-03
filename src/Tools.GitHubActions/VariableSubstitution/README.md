@@ -32,7 +32,7 @@ For example,
     "Notes": "Lists the required configuration keys that must be overwritten (by the GitHub configuration action) when we deploy this host",
     "Required": [
       {
-        "Description": "General settings from appsettings.json",
+        "Description": "General settings from this appsettings.json",
         "Keys": [
           "ApplicationServices:Persistence:Kurrent:ConnectionString",
           "Hosts:WebsiteHost:BaseUrl"

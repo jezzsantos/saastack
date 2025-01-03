@@ -8,7 +8,6 @@ var host = new HostBuilder()
     {
         builder
             .AddJsonFile("appsettings.json", false, false)
-            .AddJsonFile("appsettings.Deploy.json", true, false)
             .AddJsonFile("appsettings.local.json", true, false)
             .AddEnvironmentVariables();
     })

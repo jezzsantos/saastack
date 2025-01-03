@@ -6,10 +6,10 @@ inputs:
     required: true
     default: '**/appsettings.json'
   secrets:
-    description: 'The secrets of the GitHub repository. Must be the value: `${{ toJSON(secrets)}}`'
+    description: 'The secrets of the GitHub repository. Must be the value: \$\{\{ toJSON(secrets)\}\}'
     required: true
   variables:
-    description: 'The variables of the GitHub repository (and environment). Must be the value: `${{ toJSON(vars)}}`'
+    description: 'The variables of the GitHub repository (and environment). Must be the value: \$\{\{ toJSON(vars)\}\}'
     required: true
 runs:
   using: 'node20'
