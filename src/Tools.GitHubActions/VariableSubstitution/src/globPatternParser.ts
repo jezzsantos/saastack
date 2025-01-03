@@ -8,7 +8,7 @@ export class GlobPatternParser implements IGlobPatternParser {
     async parseFiles(expressions: string[]): Promise<string[]> {
         return await glob(expressions,
             {
-                ignore: ['node_modules/**', 'bin/**', 'obj/**'],
+                ignore: ['**/node_modules/**', '**/bin/**', '**/obj/**'],
                 nodir: true,
             });
     }
