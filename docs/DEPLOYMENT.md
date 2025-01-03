@@ -30,13 +30,16 @@ To deploy any of these services to the respective cloud provider, we use standar
 Each one of these services may require one or more variables/secrets to be defined in the GitHub repository.
 
 We define an environment in the GitHub project first, then we define the variables and secrets for that environment.
-The starting list of those variables and secrets are detailed in the `appsettings.json` files of each of the deployable hosts in the solution. They are defined in the `Deploy -> Required -> Keys` sections of the `appsettings.json` files.
 
-For each of these settings, we must define an equivalent variable or secret in the GitHub project.
+The initial list of those variables and secrets are detailed in the `appsettings.json` files of each of the deployable hosts in the solution. They are defined in the `Deploy -> Required -> Keys` sections of the `appsettings.json` files.
+
+> This list is not inclusive of all other variables that you may want to change for your production environment, this list is the bare minimum that are REQUIRED to be replaced for deployment. If you add other secrets/variables to your GitHub project (using the same naming convention below), they will also overwrite settings found in any `appsettings.json` files in the repository.
+
+For each of these settings (in `appsettings.json` files), we must define an equivalent environment variable or secret in the GitHub project.
 
 The naming convention is to take the fully qualified name in `appsettings.json`, and convert it to uppercase, and replace the following characters: `:`, `-` and `.` with `_`.
 
-For example:
+For example, if you had this setting in `appsettings.json`:
 ```json
 {
   "ApplicationServices": {
@@ -48,7 +51,7 @@ For example:
   }
 }
 ```
-The equivalent GitHub variable of the above setting would be: `APPLICATIONSERVICES_PERSISTENCE_KURRENT_CONNECTIONSTRING`.
+The equivalent GitHub variable/secret name of the setting above, would need to be: `APPLICATIONSERVICES_PERSISTENCE_KURRENT_CONNECTIONSTRING`.
 
 ## Variables
 
