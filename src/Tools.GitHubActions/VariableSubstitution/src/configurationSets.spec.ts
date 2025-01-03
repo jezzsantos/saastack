@@ -1,4 +1,4 @@
-import {ConfigurationSets} from "./configurationSets";
+import {ConfigurationSets, ConfigurationSetsErrors} from "./configurationSets";
 import {ILogger} from "./logger";
 import {IGlobPatternParser} from "./globPatternParser";
 import {IAppSettingsJsonFileReader} from "./appSettingsJsonFileReader";
@@ -194,7 +194,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(ConfigurationSetsErrors.verificationSucceeded());
         });
 
         it('should return false, when the set defines required variable, but no variable/secret exists in GitHub', async () => {
@@ -224,7 +224,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {});
 
             expect(result).toBe(false);
-            expect(logger.error).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Failed! there are missing required variables in at least one of the hosts. See errors above`);
+            expect(logger.error).toHaveBeenCalledWith(ConfigurationSetsErrors.verificationFailed());
         });
 
         it('should return true, when the set defines required variable, and variable exists in GitHub', async () => {
@@ -254,7 +254,7 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({"AREQUIRED_AREQUIRED_ANAME": "avalue"}, {});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(ConfigurationSetsErrors.verificationSucceeded());
         });
 
         it('should return true, when the set defines required variable, and secret exists in GitHub', async () => {
@@ -284,7 +284,46 @@ describe('ConfigurationSets', () => {
             const result = sets.verifyConfiguration({}, {"AREQUIRED_AREQUIRED_ANAME": "avalue"});
 
             expect(result).toBe(true);
-            expect(logger.info).toHaveBeenCalledWith(`Verification of all settings files, in all hosts: -> Successful!`);
+            expect(logger.info).toHaveBeenCalledWith(ConfigurationSetsErrors.verificationSucceeded());
+        });
+    });
+
+    describe('substituteVariables', () => {
+        it('should return true, when there are no sets', async () => {
+
+            const globParser: jest.Mocked<IGlobPatternParser> = {
+                parseFiles: jest.fn(_matches => Promise.resolve([])),
+            };
+            const jsonFileReader: jest.Mocked<IAppSettingsJsonFileReader> = {
+                readAppSettingsFile: jest.fn()
+            };
+
+            const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
+
+            const result = sets.substituteVariables({}, {});
+
+            expect(result).toBe(true)
+        });
+
+        it('should return true, when GitHub contains no variables or secrets', async () => {
+
+            const globParser: jest.Mocked<IGlobPatternParser> = {
+                parseFiles: jest.fn(_matches => Promise.resolve(["apath/afile1.json"])),
+            };
+            const jsonFileReader: jest.Mocked<IAppSettingsJsonFileReader> = {
+                readAppSettingsFile: jest.fn()
+            };
+            jsonFileReader.readAppSettingsFile
+                .mockResolvedValueOnce({
+                    "aname": "avalue"
+                });
+
+            const sets = await ConfigurationSets.create(logger, globParser, jsonFileReader, '');
+
+            const result = sets.substituteVariables({}, {});
+
+            expect(result).toBe(true);
+            expect(logger.info).toHaveBeenCalledWith(ConfigurationSetsErrors.substitutionSucceeded());
         });
     });
 });

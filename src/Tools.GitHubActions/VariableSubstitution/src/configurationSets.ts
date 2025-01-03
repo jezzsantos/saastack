@@ -27,7 +27,7 @@ export class ConfigurationSets {
 
         const files = await globParser.parseFiles(matches);
         if (files.length === 0) {
-            logger.warning(`No settings files found in this repository, applying the glob patterns: ${globPattern}`);
+            logger.warning(ConfigurationSetsErrors.noSettingsFound(globPattern));
             return new ConfigurationSets(logger, []);
         }
 
@@ -40,8 +40,7 @@ export class ConfigurationSets {
             set.accumulateVariables();
         }
 
-        const allFiles = sets.map(set => `${set.hostProjectPath}:\n\t\t${set.settingFiles.map(file => path.basename(file.path)).join(',\n\t\t')}`).join(',\n\t');
-        logger.info(`Found settings files, in these hosts:\n\t${allFiles}`);
+        logger.info(ConfigurationSetsErrors.foundSettingsFiles(sets));
 
         return new ConfigurationSets(logger, sets);
     }
@@ -67,7 +66,7 @@ export class ConfigurationSets {
             return true;
         }
 
-        this.logger.info("Verifying of all settings files, in all hosts");
+        this.logger.info(ConfigurationSetsErrors.startVerification());
         let isAllSetsVerified = true;
         for (const set of this.sets) {
             const isSetVerified = set.verify(this.logger, gitHubVariables, gitHubSecrets);
@@ -77,20 +76,56 @@ export class ConfigurationSets {
         }
 
         if (!isAllSetsVerified) {
-            this.logger.error("Verification of all settings files, in all hosts: -> Failed! there are missing required variables in at least one of the hosts. See errors above");
+            this.logger.error(ConfigurationSetsErrors.verificationFailed());
         } else {
-            this.logger.info("Verification of all settings files, in all hosts: -> Successful!");
+            this.logger.info(ConfigurationSetsErrors.verificationSucceeded());
         }
 
         return isAllSetsVerified;
     }
 
-    substituteVariables(gitHubVariables: any, gitHubSecrets: any) {
+    substituteVariables(gitHubVariables: any, gitHubSecrets: any): boolean {
+        if (this.sets.length === 0) {
+            return true;
+        }
 
-        //TODO: Substitute: walk each configuration set, for each settings file:
-        // 1. substitute the variables with the values from the variables/secrets (in-memory), then
-        // 2. write those (in-memory) files to disk (in their original locations). 
+        this.logger.info(ConfigurationSetsErrors.startSubstitution());
+        let isAllSetsSubstituted = true;
+        for (const set of this.sets) {
+            const isSetSubstituted = set.substitute(this.logger, gitHubVariables, gitHubSecrets);
+            if (!isSetSubstituted) {
+                isAllSetsSubstituted = false;
+            }
+        }
 
+        if (!isAllSetsSubstituted) {
+            this.logger.error(ConfigurationSetsErrors.substitutionFailed());
+        } else {
+            this.logger.info(ConfigurationSetsErrors.substitutionSucceeded());
+        }
+
+        return isAllSetsSubstituted;
     }
+}
 
+
+export class ConfigurationSetsErrors {
+    public static noSettingsFound = (globPattern: string): string => `No settings files found in this repository, applying the glob patterns: ${globPattern}`;
+    public static missingRequiredVariables = (missingVariables: Record<string, string>[]): string => {
+        let index = 0;
+        const count = missingVariables.length;
+        const presentation = missingVariables.map(pair => `${++index}. ${pair.gitHubVariableName} (alias: ${pair.requiredVariable})`).join(',\n\t\t');
+        return `\tThe following '${count}' required GitHub environment variables (or secrets) of this host have not been defined in the environment variables (or secrets) of this GitHub project:\n\t\t${presentation}`;
+    };
+    public static foundSettingsFiles = (sets: IConfigurationSet[]): string => {
+        const allFiles = sets.map(set => `${set.hostProjectPath}:\n\t\t${set.settingFiles.map(file => path.basename(file.path)).join(',\n\t\t')}`).join(',\n\t');
+        return `Found settings files, in these hosts:\n\t${allFiles}`
+    };
+
+    public static startVerification = (): string => "Verifying of all settings files, in all hosts";
+    public static verificationFailed = (): string => "Verification of all settings files, in all hosts: -> Failed! there are missing required variables in at least one of the hosts. See errors above";
+    public static verificationSucceeded = (): string => "Verification of all settings files, in all hosts: -> Successful!";
+    public static startSubstitution = (): string => "Substituting all settings in all settings files, in all hosts";
+    public static substitutionFailed = (): string => "Substitution of all settings in all settings files, in all hosts: -> Failed! See errors above";
+    public static substitutionSucceeded = (): string => "Substitution of all settings in all settings files, in all hosts: -> Successful!";
 }

@@ -10,6 +10,8 @@ export interface IConfigurationSet {
     accumulateVariables(): void;
 
     verify(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): boolean;
+
+    substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): boolean;
 }
 
 export class ConfigurationSet implements IConfigurationSet {
@@ -44,8 +46,16 @@ export class ConfigurationSet implements IConfigurationSet {
         return this._definedVariables;
     }
 
+    substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): boolean {
+        //TODO: Substitute: walk each configuration set, for each settings file:
+        // 1. substitute the variables with the values from the variables/secrets (in-memory), then
+        // 2. write those (in-memory) files to disk (in their original locations). 
+
+        return true;
+    }
+
     verify(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): boolean {
-        logger.info(`\tVerifying settings files in host: '${this.hostProjectPath}'`);
+        logger.info(ConfigurationSetErrors.startVerification(this.hostProjectPath));
         let isSetVerified = true;
         const confirmedVariables: Record<string, string>[] = [];
         const missingVariables: Record<string, string>[] = [];
@@ -66,28 +76,19 @@ export class ConfigurationSet implements IConfigurationSet {
         }
 
         if (missingVariables.length > 0) {
-            let index = 0;
-            const count = missingVariables.length;
-            const presentation = missingVariables.map(pair => `${++index}. ${pair.gitHubVariableName} (alias: ${pair.requiredVariable})`).join(',\n\t\t');
-            logger.error(`\tThe following '${count}' Required GitHub environment variables (or secrets) have not been defined in the environment variables (or secrets) of this GitHub project:\n\t\t${presentation}`);
+            logger.error(ConfigurationSetErrors.missingRequiredVariables(missingVariables));
         }
         if (redundantVariables.length > 0) {
-            let index = 0;
-            const count = redundantVariables.length;
-            const presentation = redundantVariables.map(rv => `${++index}. ${rv}`).join(',\n\t\t');
-            logger.warning(`\tThe following '${count}' Required variables are not yet defined in any of the settings files of this host! Consider either defining them in one of the settings files of this host, OR remove them from the '${SettingsFile.DeployProperty} -> ${SettingsFile.RequiredProperty} -> ${SettingsFile.KeysProperty}' section of the settings files in this host:\n\t\t${presentation}`);
+            logger.warning(ConfigurationSetErrors.redundantVariables(redundantVariables));
         }
         if (confirmedVariables.length > 0) {
-            let index = 0;
-            const presentation = confirmedVariables.map(pair => `${++index}. ${pair.gitHubVariableName} (alias: ${pair.requiredVariable})`).join(',\n\t\t');
-            const count = confirmedVariables.length;
-            logger.info(`\tThe following '${count}' Required GitHub environment variables (or secrets) have been found in the environment variables (or secrets) of this GitHub project:\n\t\t${presentation}`);
+            logger.info(ConfigurationSetErrors.foundConfirmedVariables(confirmedVariables));
         }
 
         if (!isSetVerified) {
-            logger.error(`\tVerification settings files in host: '${this.hostProjectPath}' -> Failed! there is at least one missing required environment variable or secret in this GitHub project`);
+            logger.error(ConfigurationSetErrors.verificationFailed(this.hostProjectPath));
         } else {
-            logger.info(`\tVerifying settings files in host: '${this.hostProjectPath}' -> Successful!`);
+            logger.info(ConfigurationSetErrors.verificationSucceeded(this.hostProjectPath));
         }
 
         return isSetVerified;
@@ -132,4 +133,28 @@ export class ConfigurationSet implements IConfigurationSet {
             .toUpperCase()
             .replace(/[^A-Z0-9_]/g, '_');
     }
+}
+
+export class ConfigurationSetErrors {
+    public static startVerification = (hostProjectPath: string): string => `\tVerifying settings files in host: '${hostProjectPath}'`;
+    public static missingRequiredVariables = (missingVariables: Record<string, string>[]): string => {
+        let index = 0;
+        const count = missingVariables.length;
+        const presentation = missingVariables.map(pair => `${++index}. ${pair.gitHubVariableName} (alias: ${pair.requiredVariable})`).join(',\n\t\t');
+        return `\tThe following '${count}' required GitHub environment variables (or secrets) of this host have not been defined in the environment variables (or secrets) of this GitHub project:\n\t\t${presentation}`;
+    };
+    public static redundantVariables = (redundantVariables: string[]): string => {
+        let index = 0;
+        const count = redundantVariables.length;
+        const presentation = redundantVariables.map(rv => `${++index}. ${rv}`).join(',\n\t\t');
+        return `\tThe following '${count}' required variables of this host are not yet defined in any of the settings files of this host! Consider either defining them in one of the settings files of this host, OR remove them from the '${SettingsFile.DeployProperty} -> ${SettingsFile.RequiredProperty} -> ${SettingsFile.KeysProperty}' section of the settings files in this host:\n\t\t${presentation}`;
+    };
+    public static foundConfirmedVariables = (confirmedVariables: Record<string, string>[]): string => {
+        let index = 0;
+        const presentation = confirmedVariables.map(pair => `${++index}. ${pair.gitHubVariableName} (alias: ${pair.requiredVariable})`).join(',\n\t\t');
+        const count = confirmedVariables.length;
+        return `\tThe following '${count}' required GitHub environment variables (or secrets) of this host were found in this GitHub project:\n\t\t${presentation}`;
+    };
+    public static verificationFailed = (hostProjectPath: string) => `\tVerification settings files in host: '${hostProjectPath}' -> Failed! there is at least one undefined environment variable or secret in this GitHub project`;
+    public static verificationSucceeded = (hostProjectPath: string) => `\tVerifying settings files in host: '${hostProjectPath}' -> Successful!`
 }

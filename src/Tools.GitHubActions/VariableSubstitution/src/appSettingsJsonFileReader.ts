@@ -11,15 +11,20 @@ export class AppSettingsJsonFileReader implements IAppSettingsJsonFileReader {
             const result = await fs.promises.readFile(path);
             data = Buffer.from(result);
         } catch (error) {
-            throw new Error(`File '${path}' cannot be read from disk, possibly it does not exist, or is not accessible?`);
+            throw new Error(AppSettingsJsonFileReaderErrors.fileCannotBeRead(path));
         }
 
         const raw = data.toString();
         try {
             return JSON.parse(raw);
         } catch (error) {
-            throw new Error(`File '${path}' does not contain valid JSON: ${error}`);
+            throw new Error(AppSettingsJsonFileReaderErrors.fileDoesNotContainValidJson(path, error));
         }
     }
+}
 
+export class AppSettingsJsonFileReaderErrors {
+    public static fileCannotBeRead = (path: string): string => `File '${path}' cannot be read from disk, possibly it does not exist, or is not accessible?`;
+
+    public static fileDoesNotContainValidJson = (path: string, error: any): string => `File '${path}' does not contain valid JSON: ${error}`;
 }

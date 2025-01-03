@@ -1,4 +1,4 @@
-import {AppSettingsJsonFileReader} from "./appSettingsJsonFileReader";
+import {AppSettingsJsonFileReader, AppSettingsJsonFileReaderErrors} from "./appSettingsJsonFileReader";
 
 describe('AppSettingsJsonFileReader', () => {
 
@@ -9,7 +9,7 @@ describe('AppSettingsJsonFileReader', () => {
         try {
             await reader.readAppSettingsFile('nonexistent.json');
         } catch (error) {
-            expect(error.message).toMatch("File 'nonexistent.json' cannot be read from disk, possibly it does not exist, or is not accessible?");
+            expect(error.message).toMatch(AppSettingsJsonFileReaderErrors.fileCannotBeRead("nonexistent.json"));
         }
     });
 
@@ -21,6 +21,7 @@ describe('AppSettingsJsonFileReader', () => {
         try {
             await reader.readAppSettingsFile(path);
         } catch (error) {
+            // HACK: We have a slightly different error message in CI builds!
             expect(error.message).toContain(`File '${path}' does not contain valid JSON: SyntaxError: Unexpected token`);
         }
     });
