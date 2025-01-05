@@ -311,6 +311,47 @@ describe('substitute', () => {
         expect(logger.info).toHaveBeenCalledWith(SettingsFileMessages.substitutingVariable("alevel1:alevel2:alevel3"));
         expect(logger.info).toHaveBeenCalledWith(SettingsFileMessages.substitutingSucceeded("apath"));
     })
+
+
+    it('should substitute and redact Deploy node, whenGitHub variable exists', async () => {
+
+        const reader: jest.Mocked<IAppSettingsJsonFileReaderWriter> = {
+            readAppSettingsFile: jest.fn().mockResolvedValue({
+                "alevel1": {
+                    "alevel2": {
+                        "alevel3": "avalue1"
+                    }
+                },
+                "Deploy": {
+                    "Required": [
+                        {
+                            "Keys": [
+                                "arequired1",
+                                "arequired2",
+                                "arequired3"]
+                        }
+                    ]
+                }
+            }),
+            writeAppSettingsFile: jest.fn(),
+        };
+        const file = await SettingsFile.create(reader, "apath");
+
+        await file.substitute(logger, {}, {"ALEVEL1_ALEVEL2_ALEVEL3": "avalue2"});
+
+        expect(file.path).toEqual("apath");
+        expect(reader.writeAppSettingsFile).toHaveBeenCalledWith("apath", expect.objectContaining({
+            "alevel1": {
+                "alevel2": {
+                    "alevel3": "avalue2"
+                }
+            },
+            "Deploy": expect.stringContaining("All keys substituted, and removed:")
+        }));
+        expect(logger.info).toHaveBeenCalledWith(SettingsFileMessages.substitutingVariable("alevel1:alevel2:alevel3"));
+        expect(logger.info).toHaveBeenCalledWith(SettingsFileMessages.substitutingSucceeded("apath"));
+    })
+
 });
     
     

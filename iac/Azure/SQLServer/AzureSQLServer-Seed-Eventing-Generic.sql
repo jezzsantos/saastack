@@ -20,7 +20,7 @@
 -- noinspection SqlDialectInspectionForFile
 
 USE
-    [SaaStack]
+    [saastack-sqldatabase]
 GO
 
 IF EXISTS(SELECT *
@@ -408,7 +408,7 @@ CREATE TABLE [dbo].[PasswordCredential]
     [AccountLocked]                 [bit]           NULL,
     [IsMfaEnabled]                  [bit]           NULL,
     [MfaAuthenticationExpiresAt]    [datetime]      NULL,
-    [MfaAuthenticationToken]        [nvarchar](max) NULL,
+    [MfaAuthenticationToken]        [nvarchar](100) NULL,
     [MfaCanBeDisabled]              [bit]           NULL,
     [PasswordResetToken]            [nvarchar](450) NULL,
     [RegistrationVerificationToken] [nvarchar](max) NULL,

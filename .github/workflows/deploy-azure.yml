@@ -1,6 +1,6 @@
 name: Build and Deploy Azure
 
-on: [ push ]
+on: workflow_dispatch
 
 permissions:
   contents: read
@@ -72,53 +72,50 @@ jobs:
           name: AzureFunctions.Api.WorkerHost
           path: ./publish/AzureFunctions.Api.WorkerHost
           include-hidden-files: true # HACK: see https://github.com/Azure/azure-functions-dotnet-worker/issues/1240
-# TODO: Deploy these artifacts 
-#  deploy:
-#    runs-on: windows-latest
-#    timeout-minutes: 30
-#    needs: build
-#    environment: 'Demo'
-#    steps:
-#      - name: Azure login
-#        uses: azure/login@v2
-#        with:
-#          client-id: "${{ vars.DEPLOY_AZURE_CLIENT_ID }}"
-#          tenant-id: "${{ vars.DEPLOY_AZURE_TENANT_ID }}"
-#          subscription-id: "${{ vars.DEPLOY_AZURE_SUBSCRIPTION_ID }}"
-#
-#      - name: Download ApiHost1 Artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: ApiHost1
-#          path: ./ApiHost1
-#      - name: Deploy ApiHost1
-#        uses: azure/webapps-deploy@v3
-#        with:
-#          app-name: "${{ vars.DEPLOY_APIHOST1_APP_NAME }}"
-#          package: ./ApiHost1
-#
-#      - name: Download WebsiteHost Artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: WebsiteHost
-#          path: ./WebsiteHost
-#      - name: Deploy WebsiteHost
-#        uses: azure/webapps-deploy@v3
-#        with:
-#          app-name: "${{ vars.DEPLOY_WEBSITEHOST_APP_NAME }}"
-#          package: ./WebsiteHost
-#
-#      - name: Download AzureFunctions.Api.WorkerHost Artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: AzureFunctions.Api.WorkerHost
-#          path: ./AzureFunctions.Api.WorkerHost
-#      - name: Deploy AzureFunctions.Api.WorkerHost
-#        uses: azure/webapps-deploy@v3
-#        with:
-#          app-name: "${{ vars.DEPLOY_AZUREFUNCTIONS_APP_NAME }}"
-#          package: ./AzureFunctions.Api.WorkerHost
-#
-#      - name: logout
-#        run: |
-#          az logout
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build
+    environment: 'Demo'
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.DEPLOY_AZURE_CREDENTIALS }}"
+
+      - name: Download ApiHost1 Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ApiHost1
+          path: ./ApiHost1
+      - name: Deploy ApiHost1
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "${{ vars.DEPLOY_APIHOST1_APP_NAME }}"
+          package: ./ApiHost1
+
+      - name: Download WebsiteHost Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: WebsiteHost
+          path: ./WebsiteHost
+      - name: Deploy WebsiteHost
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "${{ vars.DEPLOY_WEBSITEHOST_APP_NAME }}"
+          package: ./WebsiteHost
+
+      - name: Download AzureFunctions.Api.WorkerHost Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: AzureFunctions.Api.WorkerHost
+          path: ./AzureFunctions.Api.WorkerHost
+      - name: Deploy AzureFunctions.Api.WorkerHost
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "${{ vars.DEPLOY_AZUREFUNCTIONS_APP_NAME }}"
+          package: ./AzureFunctions.Api.WorkerHost
+
+      - name: logout
+        run: |
+          az logout

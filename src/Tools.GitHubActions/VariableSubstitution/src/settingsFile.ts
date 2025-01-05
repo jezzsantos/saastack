@@ -130,6 +130,32 @@ export class SettingsFile implements ISettingsFile {
         return Array.isArray(required);
     }
 
+    private static getDeployRequiredKey(element: any, key: string, prefix: string): any | undefined {
+        if (prefix !== "") {
+            return undefined;
+        }
+
+        if (key.toUpperCase() !== SettingsFile.DeployProperty.toUpperCase()) {
+            return undefined;
+        }
+
+        if (!element.hasOwnProperty(SettingsFile.RequiredProperty)) {
+            return undefined;
+        }
+
+
+        const required = element[SettingsFile.RequiredProperty];
+        if (!required) {
+            return undefined;
+        }
+
+        if (!Array.isArray(required)) {
+            return undefined;
+        }
+
+        return element;
+    }
+
     private static getDeployRequiredVariables(element: any): string[] {
 
         const required = element[SettingsFile.RequiredProperty];
@@ -167,7 +193,10 @@ export class SettingsFile implements ISettingsFile {
                 const element = json[key];
                 const fullyQualifiedVariableName = SettingsFile.CalculateFullyQualifiedVariableName(prefix, key);
                 if (typeof element === "object") {
-                    if (!SettingsFile.isDeployRequiredKey(element, key, prefix)) {
+                    let deployKey = SettingsFile.getDeployRequiredKey(element, key, prefix);
+                    if (deployKey) {
+                        json[key] = SettingsFileMessages.redactedDeployMessage();
+                    } else {
                         SettingsFile.assignVariablesRecursively(logger, gitHubVariables, gitHubSecrets, element, fullyQualifiedVariableName);
                     }
                 } else {
@@ -203,6 +232,10 @@ export class SettingsFileMessages {
     public static readonly substitutingStarted = (path: string) => `\t\tSubstituting values into settings file '${path}'`;
     public static readonly substitutingSucceeded = (path: string) => `\t\tSubstituting values into settings file '${path}' -> Successful!`;
     public static readonly substitutingVariable = (fullyQualifiedVariableName: string) => `\t\t\tSubstituted '${fullyQualifiedVariableName}' with new value from GitHub environment variable or secret`;
-
     public static unknownError = (path: string, error: any): string => `\t\tUnexpected error '${error}' substituting GitHub environment variables or secrets into setting file: '${path}'`;
+    public static redactedDeployMessage = () => {
+        const now = new Date().toISOString();
+        return `All keys substituted, and removed: '${now}'`;
+    };
+
 }

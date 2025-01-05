@@ -23,15 +23,30 @@
 -- noinspection SqlDialectInspectionForFile
 
 USE
-    [SaaStack]
+    [saastack-sqldatabase]
 GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[Booking]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[Booking]
+    DROP TABLE [dbo].[DomainEvent]
 GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[ProjectionCheckpoints]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[ProjectionCheckpoints]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[WebhookNotificationAudits]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[WebhookNotificationAudits]
+GO
+
 
 SET ANSI_NULLS ON
 GO
@@ -39,26 +54,63 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[Booking]
+
+CREATE TABLE [dbo].[DomainEvent]
 (
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
     [IsDeleted]          [bit]           NULL,
-    [BorrowerId]         [nvarchar](100) NULL,
-    [CarId]              [nvarchar](100) NULL,
-    [End]                [datetime]      NULL,
-    [OrganizationId]     [nvarchar](100) NULL,
-    [Start]              [datetime]      NULL,
+    [Data]               [nvarchar](max) NULL,
+    [EventType]          [nvarchar](max) NULL,
+    [Metadata]           [nvarchar](max) NULL,
+    [RootAggregateType]  [nvarchar](max) NULL,
+    [StreamName] [nvarchar](450) NULL,
+    [Version]            [int]           NULL,
 ) ON [PRIMARY]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[Booking]
+    ON [dbo].[DomainEvent]
         (
          [Id]
             );
-CREATE INDEX OrganizationId
-    ON [dbo].[Booking]
+
+CREATE TABLE [dbo].[ProjectionCheckpoints]
+(
+    [Id]                 [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc] [datetime]      NULL,
+    [IsDeleted]          [bit]           NULL,
+    [Position]           [int]           NULL,
+    [StreamName]         [nvarchar](450) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[ProjectionCheckpoints]
         (
-         [OrganizationId]
+         [Id]
+            );
+CREATE INDEX StreamName
+    ON [dbo].[ProjectionCheckpoints]
+        (
+         [StreamName]
+            );
+
+CREATE TABLE [dbo].[WebhookNotificationAudits]
+(
+    [Id]                 [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc] [datetime]      NULL,
+    [IsDeleted]          [bit]           NULL,
+    [EventId]            [nvarchar](max) NULL,
+    [EventType]          [nvarchar](max) NULL,
+    [JsonContent]        [nvarchar](max) NULL,
+    [Source]             [nvarchar](max) NULL,
+    [Status]             [nvarchar](max) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[WebhookNotificationAudits]
+        (
+         [Id]
             );

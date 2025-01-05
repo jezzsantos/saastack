@@ -395,15 +395,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{2B24670B-EFAC-
 		..\.github\workflows\deploy-azure.yml = ..\.github\workflows\deploy-azure.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IAC", "IAC", "{596C8F37-52D2-402A-AD31-62B3DCB3A3E0}"
-	ProjectSection(SolutionItems) = preProject
-		..\iac\AzureSQLServer-Seed-Eventing-Core.sql = ..\iac\AzureSQLServer-Seed-Eventing-Core.sql
-		..\iac\AzureSQLServer-Seed-Eventing-Generic.sql = ..\iac\AzureSQLServer-Seed-Eventing-Generic.sql
-		..\iac\AzureSQLServer-Seed-EventStore.sql = ..\iac\AzureSQLServer-Seed-EventStore.sql
-		..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql
-		..\iac\AzureSQLServer-Seed-Snapshotting-Generic.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Generic.sql
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiHost1.IntegrationTests", "ApiHost1.IntegrationTests\ApiHost1.IntegrationTests.csproj", "{E7B97607-58EA-4357-B649-E48A6F719A3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTesting.Website.Common", "IntegrationTesting.Website.Common\IntegrationTesting.Website.Common.csproj", "{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}"
@@ -1509,7 +1500,6 @@ Global
 		{4FAF0FF3-DF73-40D8-866E-EE67013C52F6} = {3782A767-2274-4F44-80C6-D6C6EEB9C9A5}
 		{EA58877D-3023-429C-A1A8-E8479441139E} = {9B6B0235-BD3F-4604-8E93-B0112A241C63}
 		{2B24670B-EFAC-4779-B6BA-B34C17D3D39D} = {56E869FB-D718-421C-85DF-07291F1F47C6}
-		{596C8F37-52D2-402A-AD31-62B3DCB3A3E0} = {56E869FB-D718-421C-85DF-07291F1F47C6}
 		{AE57212B-9A30-4577-A795-7B411621BCDA} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
 		{E7B97607-58EA-4357-B649-E48A6F719A3B} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
 		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C} = {5838EE94-374F-4A6F-A231-1BC1C87985F4}

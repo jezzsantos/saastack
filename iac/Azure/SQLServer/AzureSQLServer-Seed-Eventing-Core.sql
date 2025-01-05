@@ -1,4 +1,4 @@
--- To be used to use your SQL database to define the read/write models used by all snapshotting aggregates.
+-- To be used to use your SQL database to define the read models produced by all event-sourcing aggregates.
 -- To be used to keep your SQL database up to date as you change your platform, and subdomains evolve.
 --
 -- Note: Normalization:
@@ -23,30 +23,22 @@
 -- noinspection SqlDialectInspectionForFile
 
 USE
-    [SaaStack]
+    [saastack-sqldatabase]
 GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[Car]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[DomainEvent]
+    DROP TABLE [dbo].[Car]
 GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[ProjectionCheckpoints]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[Unavailability]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[ProjectionCheckpoints]
+    DROP TABLE [dbo].[Unavailability]
 GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[WebhookNotificationAudits]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[WebhookNotificationAudits]
-GO
-
 
 SET ANSI_NULLS ON
 GO
@@ -54,63 +46,62 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--
 
-CREATE TABLE [dbo].[DomainEvent]
+CREATE TABLE [dbo].[Car]
 (
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [Data]               [nvarchar](max) NULL,
-    [EventType]          [nvarchar](max) NULL,
-    [Metadata]           [nvarchar](max) NULL,
-    [RootAggregateType]  [nvarchar](max) NULL,
-    [StreamName] [nvarchar](450) NULL,
-    [Version]            [int]           NULL,
+    [Id]                  [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]  [datetime]      NULL,
+    [IsDeleted]           [bit]           NULL,
+    [LicenseJurisdiction] [nvarchar](max) NULL,
+    [LicenseNumber]       [nvarchar](max) NULL,
+    [ManagerIds]          [nvarchar](max) NULL,
+    [ManufactureMake]     [nvarchar](max) NULL,
+    [ManufactureModel]    [nvarchar](max) NULL,
+    [ManufactureYear]     [int]           NULL,
+    [OrganizationId]      [nvarchar](100) NULL,
+    [Status]              [nvarchar](100) NULL,
+    [VehicleOwnerId]      [nvarchar](100) NULL,
 ) ON [PRIMARY]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[DomainEvent]
+    ON [dbo].[Car]
         (
          [Id]
             );
+CREATE INDEX OrganizationId
+    ON [dbo].[Car]
+        (
+         [OrganizationId]
+            );
+CREATE INDEX Status
+    ON [dbo].[Car]
+        (
+         [Status]
+            );
 
-CREATE TABLE [dbo].[ProjectionCheckpoints]
+CREATE TABLE [dbo].[Unavailability]
 (
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
     [IsDeleted]          [bit]           NULL,
-    [Position]           [int]           NULL,
-    [StreamName]         [nvarchar](450) NULL,
+    [CarId]              [nvarchar](100) NULL,
+    [CausedBy]           [nvarchar](max) NULL,
+    [CausedByReference]  [nvarchar](max) NULL,
+    [From]               [datetime]      NULL,
+    [OrganizationId]     [nvarchar](100) NULL,
+    [To]                 [datetime]      NULL,
 ) ON [PRIMARY]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[ProjectionCheckpoints]
+    ON [dbo].[Unavailability]
         (
          [Id]
             );
-CREATE INDEX StreamName
-    ON [dbo].[ProjectionCheckpoints]
+CREATE INDEX OrganizationId
+    ON [dbo].[Unavailability]
         (
-         [StreamName]
-            );
-
-CREATE TABLE [dbo].[WebhookNotificationAudits]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [EventId]            [nvarchar](max) NULL,
-    [EventType]          [nvarchar](max) NULL,
-    [JsonContent]        [nvarchar](max) NULL,
-    [Source]             [nvarchar](max) NULL,
-    [Status]             [nvarchar](max) NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[WebhookNotificationAudits]
-        (
-         [Id]
+         [OrganizationId]
             );

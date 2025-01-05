@@ -1,5 +1,13 @@
--- To be used to use your SQL database as the EventStore for all event-sourcing aggregates.
+-- To be used to use your SQL database to define the read/write models used by all snapshotting aggregates.
+-- To be used to keep your SQL database up to date as you change your platform, and subdomains evolve.
 --
+-- Note: Normalization:
+--    We deliberately do NOT define any referential integrity, or associated structure, in this database, because that violates the architectural rules.
+--    The tables pertaining to each subdomain should always remain independent of each other
+--    Individual subdomains could be split and deployed into separate databases at any time
+--      you are not to be joining across subdomains 
+--      you are not to be creating joins across read-models, you can just write the full de-normalized table from your projection 
+--      you can write multiple read-models from multiple projections (if you need different representations) 
 -- Note: Column Definitions:
 --     We are deliberately defining most textual columns (in most of the read-model tables) as "string nvarchar(max)" by default
 --       this is to allow for future expansion of the content of the column as you code evolves, without having to change the sizes of the columns.
@@ -15,14 +23,14 @@
 -- noinspection SqlDialectInspectionForFile
 
 USE
-    [SaaStack]
+    [saastack-sqldatabase]
 GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[EventStore]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[Booking]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[EventStore]
+    DROP TABLE [dbo].[Booking]
 GO
 
 SET ANSI_NULLS ON
@@ -31,30 +39,26 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
---
-
-CREATE TABLE [dbo].[EventStore]
+CREATE TABLE [dbo].[Booking]
 (
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
     [IsDeleted]          [bit]           NULL,
-    [Data]               [nvarchar](max) NULL,
-    [EntityName]         [nvarchar](max) NULL,
-    [EntityType]         [nvarchar](max) NULL,
-    [EventType]          [nvarchar](max) NULL,
-    [Metadata]           [nvarchar](max) NULL,
-    [StreamName]         [nvarchar](450) NULL,
-    [Version]            [bigint]        NULL,
+    [BorrowerId]         [nvarchar](100) NULL,
+    [CarId]              [nvarchar](100) NULL,
+    [End]                [datetime]      NULL,
+    [OrganizationId]     [nvarchar](100) NULL,
+    [Start]              [datetime]      NULL,
 ) ON [PRIMARY]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[EventStore]
+    ON [dbo].[Booking]
         (
          [Id]
             );
-CREATE INDEX StreamName
-    ON [dbo].[EventStore]
+CREATE INDEX OrganizationId
+    ON [dbo].[Booking]
         (
-         [StreamName]
+         [OrganizationId]
             );

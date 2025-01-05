@@ -2,11 +2,13 @@
 
 This document details the basic steps required to deploy your software into a production environment.
 
-A production environment might be in the cloud or on premise. The deployment process will be similar in either case, except for the tools used to perform the deployment.
+> Your production environment might be in the cloud or on premise. We assume the cloud, and we assume either Azure, AWS or GC.
+>
+> The deployment process will be similar in either case, except for the tools you choose to perform the deployment.
 
-By default, this deployment is assumed to take place from a GitHub repository using GitHub Actions.
+By default, deployment is assumed to take place from a GitHub repository using GitHub Actions, from a build that is triggered with a specific commit message. Other mechanisms are possible too.
 
-> However, you can use any CI/CD tool you prefer, many of the steps below will be similar, but will differ based on the toolset you use.
+> You can use any CI/CD tool you prefer, many of the steps below will be similar, but will differ based on the toolset you use.
 
 ## Automated deployment
 
@@ -22,7 +24,7 @@ Essentially we are deploying the following pieces of infrastructure in the cloud
 * Azure:
   * An Azure App Service for each API Host (i.e., `ApiHost`) for the Backend APIs.
   * An Azure App Service for the `WebsiteHost` for the Frontend website.
-  * An Azure FunctionHost for the functions that monitor queues and message buses.
+  * An Azure FunctionsHost for the functions that monitor queues and message buses.
   * An Azure Service Bus for publishing domain_events to various registered subscribers (i.e., `ApiHost1`).
   * An Azure Storage Account for its Queues and Blob storage.
 * AWS:
@@ -161,6 +163,123 @@ then, you will need these to define the physical components to deploy your code 
 
 ## Triggering a deployment
 
-The deployment script (`deploy-azure.yml` and `deploy-aws.yml`) is triggered only by a push to the `main` branch, with a specific commit message, that includes the instruction `xxx`.
+The deployment script (`deploy-azure.yml` and `deploy-aws.yml`) are both triggered manually (by a human) on the `main` branch
+
+> See the GitHub event [workflow_dispatch](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_dispatch).
 
 > This is a safety feature to prevent accidental deployments in the course of normal development of your product. This step should be very intentional in environment where you are not practicing "Continuous Deployment".
+
+## Initial Deployment
+
+By default, we assume that before deployment of the software, you have already (manually/automated) the creation of the actual target infrastructure, in your preferred cloud environment. (i.e, in Azure, AWS or GC).
+
+When the automated deployment step is run, it is simply deploying new software packages to existing running infrastructure components.
+
+> However, it is possible, to create a deployment process where the infrastructure itself is re-provisioned every time a deployment occurs. You can do this with tools like Terraform. However, this is not the default, and will not be discussed here.
+
+### Build the initial infrastructure in Azure
+
+![](images/Deployment-Azure.png)
+
+To build out an initial infrastructure in Azure, we can use an ARM template like that found in [Azure-Seed.json](../iac/Azure/ARM/Azure-Seed.json).
+
+> This template can be easily customized, and run once to create your initial infrastructure in Azure.
+>
+> It has made some low cost choices to get started with.
+
+Open the template, and edit the values you see the `parameters` section, at the start of the file
+
+> These are essentially the names of the resource that will be created in your resource group in you Azure subscription, and you may want to change them to match your product
+
+1. Determine the name of your new resource group in Azure. This will be referenced in the commands below as `<resourcegroupname>`
+
+2. To run this template, and deploy your new resource group, use the following commands:
+
+* `az login` and sign in to your Azure subscription. Your subscription ID will be listed.
+* `az account set --subscription <subscriptionid>`
+* `az group create --name <resourcegroupname> --location 'Central US'` make sure to 
+* `az deployment group create --name saastack-initial --resource-group <resourcegroupname> --template-file '../iac/Azure/ARM/Azure-Seed.json'`
+
+  * >  You will be prompted for the admin username and password for the SQL server database (SQL authentication).
+
+
+### Deployment credentials
+
+We now need to create a Service Principal to retrieve credentials, and the build pipeline will use these credentials to perform the automated deployment.
+
+```powershell
+az ad sp create-for-rbac --name "saastack" --role contributor --scopes /subscriptions/<subscriptionid>/resourceGroups/<resourcegroupname> --json-auth
+```
+
+* where, `<subscriptionid>` is your azure subscription id
+
+* where `<resourcegroupname>` is the name of the resource group you created
+
+> Warning: this service principal gives access to all the resources in the specific resource group
+
+This command will return a response as a block of JSON, like this:
+
+```json
+{
+  "clientId": "a5c33a65-2773-4215-a3b2-d347a83fd094",
+  "clientSecret": "r~E8S~-acDDM8tFpLLy.klcEW221HxucBCzcxcYT",
+  "subscriptionId": "43d46a07-e36e-448c-af7e-e2b02366cc9b",
+  "tenantId": "c979adb7-5649-468e-b2e8-a53891a07cf9",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+```
+
+Now, you will copy and paste that whole output text into a GitHub secret called: `DEPLOY_AZURE_CREDENTIALS`, either at the GitHub repository level, or as a secret into the GitHub deployment environment you are using.
+
+### Deployment variables and secrets
+
+Now that your Azure environment is provisioned, you need to update the following variables and secrets in your GitHub Project.
+
+Assign these GitHub variables (or secrets) in your deployment environment:
+
+*  `DEPLOY_AZURE_CLIENT_ID`
+* `DEPLOY_AZURE_TENANT_ID`
+* `DEPLOY_AZURE_SUBSCRIPTION_ID`
+
+and these ones, depending on the technology adapters you are using :
+* `APPLICATIONINSIGHTS_CONNECTIONSTRING` (read from Azure Portal: AppInsights -> Properties -> Connection String)
+* `APPLICATIONSERVICES_PERSISTENCE_AZURESERVICEBUS_CONNECTIONSTRING` (read from Azure Portal: ServiceBus -> Shared Access Policies -> RootManageSharedAccessKey -> Primary Connection String)
+* `APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTKEY` (read from Azure Portal: Storage Account -> Access keys -> key1)
+* `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBCREDENTIALS` (as defined in initial setup, in format: `User Id=<USERNAME>;Password=<PASSWORD>`)
+* `APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTNAME` (as defined in initial setup)
+* `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBSERVERNAME` (as defined in initial setup)
+* `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBNAME` (as defined in initial setup)
+* `DEPLOY_APIHOST1_APP_NAME` (as defined in initial setup)
+* `DEPLOY_WEBSITEHOST_APP_NAME` (as defined in initial setup)
+* `DEPLOY_AZUREFUNCTIONS_APP_NAME` (as defined in initial setup)
+* `HOSTS_ALLOWEDCORSORIGINS` (as defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com`)
+* `HOSTS_ANCILLARYAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
+* `HOSTS_APIHOST1_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
+* `HOSTS_IDENTITYAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
+* `HOSTS_IMAGESAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
+* `HOSTS_WEBSITEHOST_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com`)
+
+### Initialize SQL Database
+
+Your database has been created, but it has no schema at this point. You will need to initialize the schema.
+
+Using your favorite database tool, connect to the database in Azure.
+
+> By default, your Azure SQL database is protected by a firewall.
+>
+> In order to connect your local machine to Azure, you will need to set a firewall rule in the Azure Portal to allow access from your IP address.
+>
+> Go to Azure Portal, then for the SQL database, in the Overview -> Set server firewall, then in the firewall rules, select "Add your client IPv4 address", and hit Save
+
+Once you have access to your database, you can write the database schema files located at: `../iac/Azure/SQLServer`.
+
+For each of these files, (in no particular order) edit the file, change the name of the database on the first line, and execute the entire file.
+
+### Deploy your build
+
+Now that your cloud infrastructure is up and running, its time to trigger a build and deploy the code to your infrastructure.
