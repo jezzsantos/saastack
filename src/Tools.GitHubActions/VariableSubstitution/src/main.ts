@@ -1,21 +1,21 @@
 import {GlobPatternParser} from "./globPatternParser";
-import {AppSettingsJsonFileReaderWriter} from "./appSettingsJsonFileReaderWriter";
 import {ConfigurationSets} from "./configurationSets";
 import {Logger} from "./logger";
 import {IGitHubAction} from "./githubAction";
+import {IAppSettingsReaderWriterFactory} from "./appSettingsReaderWriterFactory";
 
 
 export class Main {
     private readonly _logger: Logger;
     private readonly _globParser: GlobPatternParser;
-    private readonly _jsonFileReader: AppSettingsJsonFileReaderWriter;
+    private readonly _readerWriterFactory: IAppSettingsReaderWriterFactory;
     private readonly _action: IGitHubAction;
 
-    constructor(logger: Logger, action: IGitHubAction, globParser: GlobPatternParser, jsonFileReader: AppSettingsJsonFileReaderWriter) {
+    constructor(logger: Logger, action: IGitHubAction, globParser: GlobPatternParser, readerWriterFactory: IAppSettingsReaderWriterFactory) {
         this._logger = logger;
         this._action = action;
         this._globParser = globParser;
-        this._jsonFileReader = jsonFileReader;
+        this._readerWriterFactory = readerWriterFactory;
     }
 
     public async run() {
@@ -27,7 +27,7 @@ export class Main {
             const gitHubEnvironmentVariables = this._action.getGitHubVariables();
             this._logger.info(MainMessages.writeInputs(filesParam, authorName, projectName));
 
-            const configurationSets = await ConfigurationSets.create(this._logger, this._globParser, this._jsonFileReader, filesParam);
+            const configurationSets = await ConfigurationSets.create(this._logger, this._globParser, this._readerWriterFactory, filesParam);
             if (configurationSets.hasNone) {
                 this._logger.info(MainMessages.abortNoSettings());
                 return;

@@ -1,6 +1,7 @@
 import {ConfigurationSet, ConfigurationSetMessages} from "./configurationSet";
 import {ILogger} from "./logger";
 import {ISettingsFile} from "./settingsFile";
+import {AppSettingRequiredVariable} from "./settingsFileProcessor";
 
 describe('verify', () => {
     const logger: jest.Mocked<ILogger> = {
@@ -26,7 +27,8 @@ describe('verify', () => {
             path: "afile.json",
             hasRequired: true,
             variables: ["aname"],
-            requiredVariables: ["arequired"],
+            requiredVariables: [new AppSettingRequiredVariable("arequired", "AREQUIRED")],
+            substitute: jest.fn(),
         };
         const set = new ConfigurationSet("apath", [settingsFile]);
         set.accumulateVariables();
@@ -44,7 +46,8 @@ describe('verify', () => {
             path: "afile.json",
             hasRequired: true,
             variables: ["arequired-arequired:aname"],
-            requiredVariables: ["arequired-arequired:aname"],
+            requiredVariables: [new AppSettingRequiredVariable("arequired-arequired:aname", "AREQUIRED_AREQUIRED_ANAME")],
+            substitute: jest.fn(),
         };
         const set = new ConfigurationSet("apath", [settingsFile]);
         set.accumulateVariables();
@@ -66,7 +69,8 @@ describe('verify', () => {
             path: "afile.json",
             hasRequired: true,
             variables: ["arequired-arequired:aname"],
-            requiredVariables: ["arequired-arequired:aname"],
+            requiredVariables: [new AppSettingRequiredVariable("arequired-arequired:aname", "AREQUIRED_AREQUIRED_ANAME")],
+            substitute: jest.fn(),
         };
         const set = new ConfigurationSet("apath", [settingsFile]);
         set.accumulateVariables();
@@ -87,7 +91,8 @@ describe('verify', () => {
             path: "afile.json",
             hasRequired: true,
             variables: ["arequired-arequired:aname"],
-            requiredVariables: ["arequired-arequired:aname"],
+            requiredVariables: [new AppSettingRequiredVariable("arequired-arequired:aname", "AREQUIRED_AREQUIRED_ANAME")],
+            substitute: jest.fn(),
         };
         const set = new ConfigurationSet("apath", [settingsFile]);
         set.accumulateVariables();

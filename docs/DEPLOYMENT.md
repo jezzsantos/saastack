@@ -148,9 +148,7 @@ For example, when using the `deploy-azure.yml` file, you will need to define log
 You can read about this process and the credentials required to do it in the [Azure Login Action](https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=openid%2Caspnetcore).
 
 For deploying to Azure, (using the `deploy-azure.yml` deployment workflow) you will also need to define the following secrets and variables in your GitHub deployment environment:
-* `DEPLOY_AZURE_CLIENT_ID`
-* `DEPLOY_AZURE_TENANT_ID`
-* `DEPLOY_AZURE_SUBSCRIPTION_ID`
+* `DEPLOY_AZURE_CREDENTIALS`
 
 > These are used to automate the deployment to your Azure subscription.
 
@@ -240,13 +238,8 @@ Now, you will copy and paste that whole output text into a GitHub secret called:
 
 Now that your Azure environment is provisioned, you need to update the following variables and secrets in your GitHub Project.
 
-Assign these GitHub variables (or secrets) in your deployment environment:
+Assign these GitHub variables (or secrets) in your deployment environment, depending on the technology adapters you are using :
 
-*  `DEPLOY_AZURE_CLIENT_ID`
-* `DEPLOY_AZURE_TENANT_ID`
-* `DEPLOY_AZURE_SUBSCRIPTION_ID`
-
-and these ones, depending on the technology adapters you are using :
 * `APPLICATIONINSIGHTS_CONNECTIONSTRING` (read from Azure Portal: AppInsights -> Properties -> Connection String)
 * `APPLICATIONSERVICES_PERSISTENCE_AZURESERVICEBUS_CONNECTIONSTRING` (read from Azure Portal: ServiceBus -> Shared Access Policies -> RootManageSharedAccessKey -> Primary Connection String)
 * `APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTKEY` (read from Azure Portal: Storage Account -> Access keys -> key1)

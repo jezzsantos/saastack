@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@hey-api/client-axios": "^0.2.7",
-    "@microsoft/applicationinsights-web": "^2.8.18",
+    "@microsoft/applicationinsights-web": "^3.3.4",
     "axios": "^1.7.7",
     "dotenv-webpack": "^8.1.0"
   }

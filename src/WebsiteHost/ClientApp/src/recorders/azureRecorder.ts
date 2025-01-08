@@ -2,7 +2,7 @@ import { ApplicationInsights, SeverityLevel as AISeverityLevel } from "@microsof
 import { SeverityLevel } from "../recorder";
 import { BrowserRecorder } from "./browserRecorder";
 
-const appInsightsKey = process.env.APPLICATION_INSIGHTS_INSTRUMENTATION_KEY;
+const appInsightsKey = process.env.APPLICATIONINSIGHTS_CONNECTIONSTRING;
 const applicationInsightsEnabled = process.env.NODE_ENV === "production";
 
 if (applicationInsightsEnabled && !appInsightsKey) {
@@ -11,7 +11,7 @@ if (applicationInsightsEnabled && !appInsightsKey) {
 
 const appInsights = new ApplicationInsights({
   config: {
-    instrumentationKey: process.env.APPLICATION_INSIGHTS_INSTRUMENTATION_KEY
+    connectionString: process.env.APPLICATIONINSIGHTS_CONNECTIONSTRING
   }
 });
 

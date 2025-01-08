@@ -147,14 +147,6 @@ In the `Infrastructure.Shared.IntegrationTests` project, create a new file calle
 
 > Note: As a result of this build step you should see new bundle file (e.g. `0123456789abcdef.bundle.js`) appear in the `wwwroot` folder. This file should never be added to source control.
 
-### Environment Variables
-
-You need to create your own version of the `.env` file on your computer (not source controlled).
-
-1. Copy the `src/WebsiteHost/ClientApp/.env.example` to `src/WebsiteHost/ClientApp/.env`.
-
-> DO NOT add this file `.env` to source control!  This files exists locally for security purposes, and in order to have the right environment variables in place when running and testing the JS App.
-
 # Build & Deploy
 
 When pushed, all branches will be built and tested with GitHub actions

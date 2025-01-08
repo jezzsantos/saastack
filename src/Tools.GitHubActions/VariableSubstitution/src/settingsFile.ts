@@ -1,11 +1,12 @@
-import {IAppSettingsJsonFileReaderWriter} from "./appSettingsJsonFileReaderWriter";
+import {IAppSettingsReaderWriterFactory} from "./appSettingsReaderWriterFactory";
 import {ILogger} from "./logger";
+import {AppSettingRequiredVariable, AppSettingVariables, ISettingsFileProcessor} from "./settingsFileProcessor";
 
 export interface ISettingsFile {
     readonly path: string;
     readonly variables: string[];
     readonly hasRequired: boolean;
-    readonly requiredVariables: string[];
+    readonly requiredVariables: AppSettingRequiredVariable[];
 
     substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
 }
@@ -16,13 +17,12 @@ export class SettingsFile implements ISettingsFile {
     public static RequiredProperty: string = "Required";
     public static KeysProperty: string = "Keys";
     public static DisabledProperty: string = "Disabled";
-    private readonly _reader: IAppSettingsJsonFileReaderWriter;
+    private readonly _readerWriter: ISettingsFileProcessor;
 
-    private constructor(reader: IAppSettingsJsonFileReaderWriter, path: string, variables: string[], requiredVariables: string[]) {
-        this._reader = reader;
+    private constructor(readerWriterFactory: ISettingsFileProcessor, path: string, variables: AppSettingVariables) {
+        this._readerWriter = readerWriterFactory;
         this._path = path;
         this._variables = variables;
-        this._requiredVariables = requiredVariables;
     }
 
     _path: string;
@@ -31,211 +31,34 @@ export class SettingsFile implements ISettingsFile {
         return this._path;
     }
 
-    _variables: string[];
+    _variables: AppSettingVariables;
 
     get variables(): string[] {
-        return this._variables;
+        return this._variables.variables;
     }
 
-    _requiredVariables: string[];
-
-    get requiredVariables(): string[] {
-        return this._requiredVariables;
+    get requiredVariables(): AppSettingRequiredVariable[] {
+        return this._variables.requiredVariables;
     }
 
     get hasRequired(): boolean {
-        return this._requiredVariables.length > 0;
+        return this._variables.requiredVariables.length > 0;
     }
 
-    public static async create(reader: IAppSettingsJsonFileReaderWriter, path: string): Promise<SettingsFile> {
+    public static async create(logger: ILogger, readerWriterFactory: IAppSettingsReaderWriterFactory, path: string): Promise<SettingsFile> {
 
-        const json = await reader.readAppSettingsFile(path);
-        const variables: string[] = [];
-        const requiredVariables: string[] = [];
-        SettingsFile.accumulateVariablesRecursively(json, variables, requiredVariables);
-        return new SettingsFile(reader, path, variables, requiredVariables);
-    }
-
-    public static isDefinedInGitHubVariables(gitHubVariables: any, gitHubSecrets: any, gitHubVariableName: string): boolean {
-
-        return gitHubVariables.hasOwnProperty(gitHubVariableName) || gitHubSecrets.hasOwnProperty(gitHubVariableName);
-    }
-
-    public static getGitHubVariableOrSecretValue(gitHubVariables: any, gitHubSecrets: any, gitHubVariableName: string): any | undefined {
-
-        if (gitHubVariables.hasOwnProperty(gitHubVariableName)) {
-            return gitHubVariables[gitHubVariableName];
-        }
-        if (gitHubSecrets.hasOwnProperty(gitHubVariableName)) {
-            return gitHubSecrets[gitHubVariableName];
-        }
-
-        return undefined;
-    }
-
-    public static calculateGitHubVariableName(fullyQualifiedVariableName: string) {
-        // refer to: https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#naming-your-secrets
-        return fullyQualifiedVariableName
-            .toUpperCase()
-            .replace(/[^A-Z0-9_]/g, '_');
-    }
-
-    private static accumulateVariablesRecursively(json: any, variables: string[], requiredVariables: string[], prefix: string = "") {
-        for (const key in json) {
-            if (json.hasOwnProperty(key)) {
-                const element = json[key];
-                const fullyQualifiedVariableName = SettingsFile.CalculateFullyQualifiedVariableName(prefix, key);
-                if (typeof element === "object") {
-                    if (SettingsFile.isDeployRequiredKey(element, key, prefix)) {
-                        const required = SettingsFile.getDeployRequiredVariables(element);
-                        if (required.length > 0) {
-                            requiredVariables.push(...required);
-                        }
-                    } else {
-                        SettingsFile.accumulateVariablesRecursively(element, variables, requiredVariables, fullyQualifiedVariableName);
-                    }
-                } else {
-                    variables.push(fullyQualifiedVariableName);
-                }
-            }
-        }
-    }
-
-    private static CalculateFullyQualifiedVariableName(prefix: string, key: string): string {
-        if (prefix === "") {
-            return key;
-        }
-        return `${prefix}:${key}`;
-    }
-
-    private static isDeployRequiredKey(element: any, key: string, prefix: string): boolean {
-        if (prefix !== "") {
-            return false;
-        }
-
-        if (key.toUpperCase() !== SettingsFile.DeployProperty.toUpperCase()) {
-            return false;
-        }
-
-        if (!element.hasOwnProperty(SettingsFile.RequiredProperty)) {
-            return false;
-        }
-
-
-        const required = element[SettingsFile.RequiredProperty];
-        if (!required) {
-            return false;
-        }
-
-        return Array.isArray(required);
-    }
-
-    private static getDeployRequiredKey(element: any, key: string, prefix: string): any | undefined {
-        if (prefix !== "") {
-            return undefined;
-        }
-
-        if (key.toUpperCase() !== SettingsFile.DeployProperty.toUpperCase()) {
-            return undefined;
-        }
-
-        if (!element.hasOwnProperty(SettingsFile.RequiredProperty)) {
-            return undefined;
-        }
-
-
-        const required = element[SettingsFile.RequiredProperty];
-        if (!required) {
-            return undefined;
-        }
-
-        if (!Array.isArray(required)) {
-            return undefined;
-        }
-
-        return element;
-    }
-
-    private static getDeployRequiredVariables(element: any): string[] {
-
-        const required = element[SettingsFile.RequiredProperty];
-        if (required) {
-            if (Array.isArray(required)) {
-                let requiredVariables: string[] = [];
-                for (let index = 0; index < required.length; index++) {
-                    const requiredSection = required[index];
-
-                    if (requiredSection.hasOwnProperty(SettingsFile.KeysProperty)) {
-
-                        if (requiredSection.hasOwnProperty(SettingsFile.DisabledProperty)) {
-                            const disabled = requiredSection[SettingsFile.DisabledProperty];
-                            if (disabled) {
-                                continue;
-                            }
-                        }
-
-                        const keys = requiredSection[SettingsFile.KeysProperty];
-                        if (keys) {
-                            requiredVariables.push(...keys);
-                        }
-                    }
-                }
-                return requiredVariables;
-            }
-        }
-
-        return [];
-    }
-
-    private static assignVariablesRecursively(logger: ILogger, gitHubVariables: any, gitHubSecrets: any, json: any, prefix: string = "") {
-        for (const key in json) {
-            if (json.hasOwnProperty(key)) {
-                const element = json[key];
-                const fullyQualifiedVariableName = SettingsFile.CalculateFullyQualifiedVariableName(prefix, key);
-                if (typeof element === "object") {
-                    let deployKey = SettingsFile.getDeployRequiredKey(element, key, prefix);
-                    if (deployKey) {
-                        json[key] = SettingsFileMessages.redactedDeployMessage();
-                    } else {
-                        SettingsFile.assignVariablesRecursively(logger, gitHubVariables, gitHubSecrets, element, fullyQualifiedVariableName);
-                    }
-                } else {
-                    if (typeof element === "string" || typeof element === "number" || typeof element === "boolean") {
-                        const githubVariableName = SettingsFile.calculateGitHubVariableName(fullyQualifiedVariableName);
-                        const gitHubSecretOrVariableValue = SettingsFile.getGitHubVariableOrSecretValue(gitHubVariables, gitHubSecrets, githubVariableName);
-                        if (gitHubSecretOrVariableValue) {
-                            logger.info(SettingsFileMessages.substitutingVariable(fullyQualifiedVariableName));
-                            json[key] = gitHubSecretOrVariableValue;
-                        }
-                    }
-                }
-            }
-        }
+        const readerWriter = await readerWriterFactory.createReadWriter(logger, path);
+        const variables = await readerWriter.getVariables(path);
+        return new SettingsFile(readerWriter, path, variables);
     }
 
     async substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
         logger.info(SettingsFileMessages.substitutingStarted(this.path));
-        try {
-            const json = await this._reader.readAppSettingsFile(this.path);
-            SettingsFile.assignVariablesRecursively(logger, gitHubVariables, gitHubSecrets, json);
-            await this._reader.writeAppSettingsFile(this.path, json);
-            logger.info(SettingsFileMessages.substitutingSucceeded(this.path));
-            return true;
-        } catch (error) {
-            logger.error(SettingsFileMessages.unknownError(this.path, error));
-            return false;
-        }
+
+        return await this._readerWriter.substitute(gitHubVariables, gitHubSecrets);
     }
 }
 
 export class SettingsFileMessages {
     public static readonly substitutingStarted = (path: string) => `\t\tSubstituting values into settings file '${path}'`;
-    public static readonly substitutingSucceeded = (path: string) => `\t\tSubstituting values into settings file '${path}' -> Successful!`;
-    public static readonly substitutingVariable = (fullyQualifiedVariableName: string) => `\t\t\tSubstituted '${fullyQualifiedVariableName}' with new value from GitHub environment variable or secret`;
-    public static unknownError = (path: string, error: any): string => `\t\tUnexpected error '${error}' substituting GitHub environment variables or secrets into setting file: '${path}'`;
-    public static redactedDeployMessage = () => {
-        const now = new Date().toISOString();
-        return `All keys substituted, and removed: '${now}'`;
-    };
-
 }

@@ -1,15 +1,15 @@
-import {AppSettingsJsonFileReaderMessages, AppSettingsJsonFileReaderWriter} from "./appSettingsJsonFileReaderWriter";
+import {AppSettingsJsonFileReaderWriter, FileReaderWriterMessages} from "./fileReaderWriter";
 
-describe('readAppSettingsFile', () => {
+describe('readSettingsFile', () => {
 
     it('should throw, when file does not exist', async () => {
 
         const reader = new AppSettingsJsonFileReaderWriter();
 
         try {
-            await reader.readAppSettingsFile('nonexistent.json');
+            await reader.readSettingsFile('nonexistent.json');
         } catch (error) {
-            expect(error.message).toMatch(AppSettingsJsonFileReaderMessages.fileCannotBeRead("nonexistent.json"));
+            expect(error.message).toMatch(FileReaderWriterMessages.fileCannotBeRead("nonexistent.json"));
         }
     });
 
@@ -19,29 +19,39 @@ describe('readAppSettingsFile', () => {
         const path = `${__dirname}/testing/__data/invalidjson.txt`;
 
         try {
-            await reader.readAppSettingsFile(path);
+            await reader.readSettingsFile(path);
         } catch (error) {
             // HACK: We have a slightly different error message in CI builds!
             expect(error.message).toContain(`File '${path}' does not contain valid JSON: SyntaxError: Unexpected token`);
         }
     });
 
-    it('should return file, when file has no variables', async () => {
+    it('should return file, when file exists, but empty', async () => {
 
         const reader = new AppSettingsJsonFileReaderWriter();
         const path = `${__dirname}/testing/__data/emptyjson.json`;
 
-        const file = await reader.readAppSettingsFile(path);
+        const file = await reader.readSettingsFile(path);
 
         expect(file).toEqual({});
     });
+    
+    it('should return file, when file exists', async () => {
+
+        const reader = new AppSettingsJsonFileReaderWriter();
+        const path = `${__dirname}/testing/__data/validjson.json`;
+
+        const file = await reader.readSettingsFile(path);
+
+        expect(file).toEqual({"aname": "avalue"});
+    });
 });
 
-describe('writeAppSettingsFile', () =>
+describe('writeSettingsFile', () =>
     it('should write, when file exists', async () => {
 
         const reader = new AppSettingsJsonFileReaderWriter();
         const path = `${__dirname}/testing/__data/validjson.json`;
 
-        await reader.writeAppSettingsFile(path, {"aname": "avalue"});
+        await reader.writeSettingsFile(path, {"aname": "avalue"});
     }));

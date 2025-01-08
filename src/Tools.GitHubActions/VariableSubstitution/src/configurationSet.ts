@@ -1,10 +1,11 @@
 import {ISettingsFile, SettingsFile} from "./settingsFile";
 import {ILogger} from "./logger";
+import {AppSettingRequiredVariable, GitHubVariables} from "./settingsFileProcessor";
 
 export interface IConfigurationSet {
     readonly hostProjectPath: string;
     readonly settingFiles: ISettingsFile[];
-    readonly requiredVariables: string[];
+    readonly requiredVariables: AppSettingRequiredVariable[];
     readonly definedVariables: string[];
 
     accumulateVariables(): void;
@@ -34,9 +35,9 @@ export class ConfigurationSet implements IConfigurationSet {
         return this._settingFiles;
     }
 
-    _requiredVariables: string[];
+    _requiredVariables: AppSettingRequiredVariable[];
 
-    get requiredVariables(): string[] {
+    get requiredVariables(): AppSettingRequiredVariable[] {
         return this._requiredVariables;
     }
 
@@ -72,17 +73,22 @@ export class ConfigurationSet implements IConfigurationSet {
         const missingVariables: Record<string, string>[] = [];
         const redundantVariables: string[] = [];
         for (const requiredVariable of this.requiredVariables) {
-            if (!this.definedVariables.includes(requiredVariable)) {
-                redundantVariables.push(requiredVariable);
+            if (!this.definedVariables.includes(requiredVariable.name)) {
+                redundantVariables.push(requiredVariable.name);
                 continue;
             }
 
-            const gitHubVariableName = SettingsFile.calculateGitHubVariableName(requiredVariable);
-            if (!SettingsFile.isDefinedInGitHubVariables(gitHubVariables, gitHubSecrets, gitHubVariableName)) {
-                missingVariables.push({requiredVariable, gitHubVariableName});
+            if (!GitHubVariables.isDefined(gitHubVariables, gitHubSecrets, requiredVariable.gitHubVariableOrSecretName)) {
+                missingVariables.push({
+                    requiredVariable: requiredVariable.name,
+                    gitHubVariableName: requiredVariable.gitHubVariableOrSecretName
+                });
                 isSetVerified = false;
             } else {
-                confirmedVariables.push({requiredVariable, gitHubVariableName});
+                confirmedVariables.push({
+                    requiredVariable: requiredVariable.name,
+                    gitHubVariableName: requiredVariable.gitHubVariableOrSecretName
+                });
             }
         }
 
@@ -117,9 +123,9 @@ export class ConfigurationSet implements IConfigurationSet {
 
     }
 
-    private accumulateRequiredVariables(variables: string[]) {
+    private accumulateRequiredVariables(variables: AppSettingRequiredVariable[]) {
         for (const variable of variables) {
-            if (!this._requiredVariables.includes(variable)) {
+            if (!this._requiredVariables.find(reqVar => reqVar.name === variable.name)) {
                 this._requiredVariables.push(variable);
             }
         }

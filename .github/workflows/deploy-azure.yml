@@ -12,6 +12,7 @@ env:
   SOLUTION_PATH: 'src/SaaStack.sln'
   DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
   DOTNET_VERSION: 8.0.302
+  NODEJS_VERSION: '22'
   HOSTED_ON: 'HOSTEDONAZURE'
 
 jobs:
@@ -28,7 +29,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build Custom GitHub Actions
@@ -38,13 +39,18 @@ jobs:
           npm run build
       - name: Build (Backend) for Deploy
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=${{env.HOSTED_ON}}
+      - name: Substitute (Frontend) GitHub Secrets/Variables
+        uses: ./src/Tools.GitHubActions/VariableSubstitution
+        with:
+          files: 'src/WebsiteHost/**/.env.deploy'
+          variables: ${{ toJSON(vars)}}
+          secrets: ${{ toJSON(secrets)}}
       - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
-          cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
-      - name: Substitute GitHub Secrets/Variables
+      - name: Substitute (Backend) GitHub Secrets/Variables
         uses: ./src/Tools.GitHubActions/VariableSubstitution
         with:
           files: '**/appsettings.json,**/appsettings.Azure.json'

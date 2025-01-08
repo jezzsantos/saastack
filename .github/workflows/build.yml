@@ -13,6 +13,7 @@ env:
   TESTINGONLY_BUILD_CONFIGURATION: 'Release'
   DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
   DOTNET_VERSION: 8.0.302
+  NODEJS_VERSION: '22'
 
 jobs:
   build:
@@ -27,7 +28,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build (Backend) for Azure Testing
@@ -41,7 +42,6 @@ jobs:
       - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
-          cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
       - name: Build Custom GitHub Actions
@@ -61,7 +61,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build for CI Testing (for Azure)
@@ -88,7 +88,6 @@ jobs:
         continue-on-error: false
         run: |
           cd src/WebsiteHost/ClientApp
-          cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
           npm run test:ci

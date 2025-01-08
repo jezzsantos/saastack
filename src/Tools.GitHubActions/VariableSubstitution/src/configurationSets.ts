@@ -2,7 +2,7 @@ import * as path from "node:path";
 import {ILogger} from "./logger";
 import {IGlobPatternParser} from "./globPatternParser";
 import {ISettingsFile, SettingsFile} from "./settingsFile";
-import {IAppSettingsJsonFileReaderWriter} from "./appSettingsJsonFileReaderWriter";
+import {IAppSettingsReaderWriterFactory} from "./appSettingsReaderWriterFactory";
 import {ConfigurationSet, IConfigurationSet} from "./configurationSet";
 
 export class ConfigurationSets {
@@ -22,7 +22,7 @@ export class ConfigurationSets {
         return this.sets.length;
     }
 
-    public static async create(logger: ILogger, globParser: IGlobPatternParser, jsonFileReader: IAppSettingsJsonFileReaderWriter, globPattern: string): Promise<ConfigurationSets> {
+    public static async create(logger: ILogger, globParser: IGlobPatternParser, readerWriterFactory: IAppSettingsReaderWriterFactory, globPattern: string): Promise<ConfigurationSets> {
         const matches = globPattern.length > 0 ? globPattern.split(',') : [];
 
         const files = await globParser.parseFiles(matches);
@@ -33,7 +33,7 @@ export class ConfigurationSets {
 
         const sets: ConfigurationSet[] = [];
         for (const file of files) {
-            await ConfigurationSets.accumulateFilesIntoSets(jsonFileReader, sets, file);
+            await ConfigurationSets.accumulateFilesIntoSets(logger, readerWriterFactory, sets, file);
         }
 
         for (const set of sets) {
@@ -45,17 +45,17 @@ export class ConfigurationSets {
         return new ConfigurationSets(logger, sets);
     }
 
-    private static async accumulateFilesIntoSets(jsonFileReader: IAppSettingsJsonFileReaderWriter, sets: ConfigurationSet[], file: string) {
+    private static async accumulateFilesIntoSets(logger: ILogger, readerWriterFactory: IAppSettingsReaderWriterFactory, sets: ConfigurationSet[], file: string) {
 
         const hostProjectPath: string = path.dirname(file);
 
         const set = sets.find(set => set.hostProjectPath.includes(hostProjectPath));
         if (set) {
-            const setting = await SettingsFile.create(jsonFileReader, file);
+            const setting = await SettingsFile.create(logger, readerWriterFactory, file);
             set.settingFiles.push(setting);
 
         } else {
-            const setting = await SettingsFile.create(jsonFileReader, file);
+            const setting = await SettingsFile.create(logger, readerWriterFactory, file);
             const settingFiles: ISettingsFile[] = [setting];
             sets.push(new ConfigurationSet(hostProjectPath, settingFiles));
         }
