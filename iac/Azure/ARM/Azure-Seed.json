@@ -30,6 +30,10 @@
         "Standard_RAGZRS"
       ]
     },
+    "netFrameworkVersion": {
+      "defaultValue": "v8.0",
+      "type": "string"
+    },
     "sqlserver_name": {
       "defaultValue": "saastack-sqlserver",
       "type": "string"
@@ -81,8 +85,8 @@
       "type": "string"
     }
   },
-  "variables": { 
-    "insights_analytics_name":"[concat(parameters('insights_name'), '-analytics')]"
+  "variables": {
+    "insights_analytics_name": "[concat(parameters('insights_name'), '-analytics')]"
   },
   "resources": [
     {
@@ -146,7 +150,8 @@
     {
       "type": "Microsoft.Sql/servers/firewallRules",
       "apiVersion": "2024-05-01-preview",
-      "name": "Allow Azure",
+      "name": "[concat(parameters('sqlserver_name'), '/', 'AllowAzure')]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', parameters('sqlserver_name'))]"
       ],
@@ -333,10 +338,16 @@
               "value": "[reference(resourceId('Microsoft.Insights/components', parameters('insights_name')), '2015-05-01').ConnectionString]"
             }
           ],
-          "netFrameworkVersion": "v8.0",
-          "use32BitWorkerProcess": false
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnet"
+            }
+          ],
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]"
         },
-        "httpsOnly": true
+        "httpsOnly": true,
+        "publicNetworkAccess": "Enabled"
       }
     },
     {
@@ -371,10 +382,16 @@
               "value": "[reference(resourceId('Microsoft.Insights/components', parameters('insights_name')), '2015-05-01').ConnectionString]"
             }
           ],
-          "netFrameworkVersion": "v8.0",
-          "use32BitWorkerProcess": false
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnet"
+            }
+          ],
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
         },
-        "httpsOnly": true
+        "httpsOnly": true,
+        "publicNetworkAccess": "Enabled"
       }
     },
     {

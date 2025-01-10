@@ -9,10 +9,12 @@ using AncillaryInfrastructure.Persistence.ReadModels;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Common;
+using Common.Configuration;
 using Domain.Interfaces;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
+using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -100,9 +102,18 @@ public class AncillaryModule : ISubdomainModule
                     .AddPerHttpRequest<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
 
                 // EXTEND: Change these services for your preferred providers
-                services.AddSingleton<IUsageDeliveryService, NoOpUsageDeliveryService>();
-                services.AddSingleton<IEmailDeliveryService, NoOpEmailDeliveryService>();
-                services.AddSingleton<ISmsDeliveryService, NoOpSmsDeliveryService>();
+                services.AddSingleton<IUsageDeliveryService>(c => new UserPilotHttpServiceClient(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    c.GetRequiredService<IHttpClientFactory>()));
+                services.AddSingleton<IEmailDeliveryService>(c => new MailgunHttpServiceClient(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    c.GetRequiredService<IHttpClientFactory>()));
+                services.AddSingleton<ISmsDeliveryService>(c => new TwilioHttpServiceClient(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    c.GetRequiredService<IHttpClientFactory>()));
             };
         }
     }

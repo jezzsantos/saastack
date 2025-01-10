@@ -29,7 +29,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: ${{NODEJS_VERSION}}
+          node-version: ${{env.NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build Custom GitHub Actions
@@ -97,7 +97,7 @@ jobs:
       - name: Deploy ApiHost1
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "${{ vars.DEPLOY_APIHOST1_APP_NAME }}"
+          app-name: "${{ vars.DEPLOY_AZURE_APIHOST1_APP_NAME }}"
           package: ./ApiHost1
 
       - name: Download WebsiteHost Artifacts
@@ -108,7 +108,7 @@ jobs:
       - name: Deploy WebsiteHost
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "${{ vars.DEPLOY_WEBSITEHOST_APP_NAME }}"
+          app-name: "${{ vars.DEPLOY_AZURE_WEBSITEHOST_APP_NAME }}"
           package: ./WebsiteHost
 
       - name: Download AzureFunctions.Api.WorkerHost Artifacts
@@ -119,7 +119,7 @@ jobs:
       - name: Deploy AzureFunctions.Api.WorkerHost
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "${{ vars.DEPLOY_AZUREFUNCTIONS_APP_NAME }}"
+          app-name: "${{ vars.DEPLOY_AZURE_AZUREFUNCTIONS_APP_NAME }}"
           package: ./AzureFunctions.Api.WorkerHost
 
       - name: logout

@@ -28,7 +28,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: ${{NODEJS_VERSION}}
+          node-version: ${{env.NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build (Backend) for Azure Testing
@@ -61,7 +61,7 @@ jobs:
       - name: Install NodeJs
         uses: actions/setup-node@v4
         with:
-          node-version: ${{NODEJS_VERSION}}
+          node-version: ${{env.NODEJS_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build for CI Testing (for Azure)
