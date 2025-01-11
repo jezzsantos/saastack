@@ -55,9 +55,7 @@ public class AzureSqlServerStoreSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 
         var connectionString = GetConnectionStringForDatabase(databaseName);
 
-#if TESTINGONLY
-        _store = AzureSqlServerStore.Create(NoOpRecorder.Instance, connectionString);
-#endif
+        _store = AzureSqlServerStore.Create(NoOpRecorder.Instance, AzureSqlServerStoreOptions.CustomConnectionString(connectionString));
     }
 
     private string GetConnectionStringForDatabase(string databaseName)

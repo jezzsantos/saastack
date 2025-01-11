@@ -72,4 +72,48 @@ public class CollectionExtensionsSpec
 
         result.Should().BeFalse();
     }
+
+    [Fact]
+    public void WhenJoinWithNoItems_ThenReturnsEmpty()
+    {
+        var result = new List<string>().Join("aseparator");
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenJoinWithOneItem_ThenReturnsItem()
+    {
+        var result = new List<string> { "anitem" }
+            .Join("aseparator");
+
+        result.Should().Be("anitem");
+    }
+
+    [Fact]
+    public void WhenJoinWithMoreItems_ThenReturnsItems()
+    {
+        var result = new List<string> { "anitem1", "anitem2", "anitem3" }
+            .Join("aseparator");
+
+        result.Should().Be("anitem1aseparatoranitem2aseparatoranitem3");
+    }
+
+    [Fact]
+    public void WhenJoinEmptyStringItems_ThenReturnsItems()
+    {
+        var result = new List<string?> { "anitem1", null, "anitem3" }
+            .Join("aseparator");
+
+        result.Should().Be("anitem1aseparatoranitem3");
+    }
+
+    [Fact]
+    public void WhenJoinEmptyObjectItems_ThenReturnsItems()
+    {
+        var result = new List<object?> { "anitem1", null, "anitem3" }
+            .Join("aseparator");
+
+        result.Should().Be("anitem1aseparatoranitem3");
+    }
 }

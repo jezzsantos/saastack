@@ -2,7 +2,6 @@ using Application.Persistence.Interfaces;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Infrastructure.Persistence.Azure.Extensions;
 using Infrastructure.Persistence.Interfaces;
@@ -16,32 +15,20 @@ namespace Infrastructure.Persistence.Azure.ApplicationServices;
 [UsedImplicitly]
 public class AzureStorageAccountBlobStore : IBlobStore
 {
-    private readonly string _connectionString;
+    private readonly AzureStorageAccountStoreOptions.ConnectionOptions _connectionOptions;
     private readonly Dictionary<string, bool> _containerExistenceChecks = new();
     private readonly IRecorder _recorder;
 
-    public static AzureStorageAccountBlobStore Create(IRecorder recorder, IConfigurationSettings settings)
+    public static AzureStorageAccountBlobStore Create(IRecorder recorder, AzureStorageAccountStoreOptions options)
     {
-        var accountKey = settings.GetString(AzureStorageAccountConstants.AccountKeySettingName);
-        var accountName = settings.GetString(AzureStorageAccountConstants.AccountNameSettingName);
-        var connection = accountKey.HasValue()
-            ? AzureStorageAccountConstants.ConnectionString.Format(accountName, accountKey)
-            : AzureStorageAccountConstants.DefaultConnectionString;
-
-        return new AzureStorageAccountBlobStore(recorder, connection);
+        return new AzureStorageAccountBlobStore(recorder, options.Connection);
     }
 
-#if TESTINGONLY
-    public static AzureStorageAccountBlobStore Create(IRecorder recorder, string connectionString)
-    {
-        return new AzureStorageAccountBlobStore(recorder, connectionString);
-    }
-#endif
-    
-    private AzureStorageAccountBlobStore(IRecorder recorder, string connectionString)
+    private AzureStorageAccountBlobStore(IRecorder recorder,
+        AzureStorageAccountStoreOptions.ConnectionOptions connectionOptions)
     {
         _recorder = recorder;
-        _connectionString = connectionString;
+        _connectionOptions = connectionOptions;
     }
 
     public async Task<Result<Error>> DeleteAsync(string containerName, string blobName,
@@ -172,7 +159,27 @@ public class AzureStorageAccountBlobStore : IBlobStore
     private async Task<BlobContainerClient> ConnectToContainerAsync(string name, CancellationToken cancellationToken)
     {
         var sanitizedContainerName = name.SanitizeAndValidateStorageAccountResourceName();
-        var container = new BlobContainerClient(_connectionString, sanitizedContainerName);
+        var blobClientOptions = new BlobClientOptions();
+        BlobContainerClient container;
+        switch (_connectionOptions.Type)
+        {
+            case AzureStorageAccountStoreOptions.ConnectionOptions.ConnectionType.Credentials:
+                container = new BlobContainerClient(_connectionOptions.ConnectionString, sanitizedContainerName,
+                    blobClientOptions);
+                break;
+
+            case AzureStorageAccountStoreOptions.ConnectionOptions.ConnectionType.ManagedIdentity:
+            {
+                var uri = new Uri(
+                    $"https://{_connectionOptions.AccountName}.blob.core.windows.net/{sanitizedContainerName}");
+                container = new BlobContainerClient(uri, _connectionOptions.Credential, blobClientOptions);
+                break;
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(AzureStorageAccountStoreOptions.ConnectionOptions.Type));
+        }
 
         if (IsContainerExistenceCheckPerformed(sanitizedContainerName))
         {

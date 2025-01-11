@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" />
+        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    </ItemGroup>
+
+</Project>

@@ -1,5 +1,4 @@
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
-using System.Text;
 #endif
 
 #if COMMON_PROJECT
@@ -43,18 +42,12 @@ public static class CollectionExtensions
     /// </summary>
     public static string Join<T>(this IEnumerable<T> collection, string separator)
     {
-        var stringBuilder = new StringBuilder();
-        foreach (var item in collection)
-        {
-            if (stringBuilder.Length > 0)
-            {
-                stringBuilder.Append(separator);
-            }
+        var stringCollection = collection
+            .Select(item => item?.ToString())
+            .Where(item => item.HasValue())
+            .ToList();
 
-            stringBuilder.Append(item);
-        }
-
-        return stringBuilder.ToString();
+        return string.Join(separator, stringCollection);
     }
 #endif
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM

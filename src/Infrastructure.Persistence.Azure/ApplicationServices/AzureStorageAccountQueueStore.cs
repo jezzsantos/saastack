@@ -2,7 +2,6 @@ using Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Infrastructure.Persistence.Azure.Extensions;
 using Infrastructure.Persistence.Interfaces;
@@ -17,32 +16,20 @@ namespace Infrastructure.Persistence.Azure.ApplicationServices;
 [UsedImplicitly]
 public class AzureStorageAccountQueueStore : IQueueStore
 {
-    private readonly string _connectionString;
+    private readonly AzureStorageAccountStoreOptions.ConnectionOptions _connectionOptions;
     private readonly Dictionary<string, bool> _queueExistenceChecks = new();
     private readonly IRecorder _recorder;
 
-    public static AzureStorageAccountQueueStore Create(IRecorder recorder, IConfigurationSettings settings)
+    public static AzureStorageAccountQueueStore Create(IRecorder recorder, AzureStorageAccountStoreOptions options)
     {
-        var accountKey = settings.GetString(AzureStorageAccountConstants.AccountKeySettingName);
-        var accountName = settings.GetString(AzureStorageAccountConstants.AccountNameSettingName);
-        var connection = accountKey.HasValue()
-            ? AzureStorageAccountConstants.ConnectionString.Format(accountName, accountKey)
-            : AzureStorageAccountConstants.DefaultConnectionString;
-
-        return new AzureStorageAccountQueueStore(recorder, connection);
+        return new AzureStorageAccountQueueStore(recorder, options.Connection);
     }
 
-#if TESTINGONLY
-    public static AzureStorageAccountQueueStore Create(IRecorder recorder, string connectionString)
-    {
-        return new AzureStorageAccountQueueStore(recorder, connectionString);
-    }
-#endif
-    
-    private AzureStorageAccountQueueStore(IRecorder recorder, string connectionString)
+    private AzureStorageAccountQueueStore(IRecorder recorder,
+        AzureStorageAccountStoreOptions.ConnectionOptions connectionOptions)
     {
         _recorder = recorder;
-        _connectionString = connectionString;
+        _connectionOptions = connectionOptions;
     }
 
 #if TESTINGONLY
@@ -230,10 +217,29 @@ public class AzureStorageAccountQueueStore : IQueueStore
     private async Task<QueueClient> ConnectToQueueAsync(string queueName, CancellationToken cancellationToken)
     {
         var sanitizedQueueName = queueName.SanitizeAndValidateStorageAccountResourceName();
-        var queue = new QueueClient(_connectionString, sanitizedQueueName, new QueueClientOptions
+        var queueClientOptions = new QueueClientOptions
         {
             MessageEncoding = QueueMessageEncoding.Base64
-        });
+        };
+        QueueClient queue;
+        switch (_connectionOptions.Type)
+        {
+            case AzureStorageAccountStoreOptions.ConnectionOptions.ConnectionType.Credentials:
+                queue = new QueueClient(_connectionOptions.ConnectionString, sanitizedQueueName, queueClientOptions);
+                break;
+
+            case AzureStorageAccountStoreOptions.ConnectionOptions.ConnectionType.ManagedIdentity:
+            {
+                var uri = new Uri(
+                    $"https://{_connectionOptions.AccountName}.queue.core.windows.net/{sanitizedQueueName}");
+                queue = new QueueClient(uri, _connectionOptions.Credential, queueClientOptions);
+                break;
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(AzureStorageAccountStoreOptions.ConnectionOptions.ConnectionType));
+        }
 
         if (IsQueueExistenceCheckPerformed(sanitizedQueueName))
         {

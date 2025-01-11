@@ -1,6 +1,5 @@
 using System.Data.SqlTypes;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
@@ -17,35 +16,18 @@ public sealed partial class AzureSqlServerStore
 {
     public static readonly DateTime MaximumAllowedSqlServerDate = SqlDateTime.MaxValue.Value;
     public static readonly DateTime MinimumAllowedSqlServerDate = SqlDateTime.MinValue.Value;
-    private readonly string _connectionString;
+    private readonly AzureSqlServerStoreOptions.ConnectionOptions _connectionOptions;
     private readonly IRecorder _recorder;
 
-    public static AzureSqlServerStore Create(IRecorder recorder, IConfigurationSettings settings)
+    public static AzureSqlServerStore Create(IRecorder recorder, AzureSqlServerStoreOptions options)
     {
-        var serverName = settings.GetString("ApplicationServices:Persistence:SqlServer:DbServerName");
-        var credentials = settings.GetString("ApplicationServices:Persistence:SqlServer:DbCredentials", string.Empty);
-        var databaseName = settings.GetString("ApplicationServices:Persistence:SqlServer:DbName");
-
-        var connectionString =
-            $"Persist Security Info=False;"
-            + $"{(credentials.HasValue() ? "Encrypt=True;" : "Integrated Security=true;Encrypt=False;")}"
-            + $"Initial Catalog={databaseName};"
-            + $"Server={serverName}{(credentials.HasValue() ? ";" + credentials : "")}";
-
-        return new AzureSqlServerStore(recorder, connectionString);
+        return new AzureSqlServerStore(recorder, options.Connection);
     }
 
-#if TESTINGONLY
-    public static AzureSqlServerStore Create(IRecorder recorder, string connectionString)
-    {
-        return new AzureSqlServerStore(recorder, connectionString);
-    }
-#endif
-
-    private AzureSqlServerStore(IRecorder recorder, string connectionString)
+    private AzureSqlServerStore(IRecorder recorder, AzureSqlServerStoreOptions.ConnectionOptions connectionOptions)
     {
         _recorder = recorder;
-        _connectionString = connectionString;
+        _connectionOptions = connectionOptions;
     }
 
     private async Task<Result<Error>> ExecuteSqlUpdateCommandAsync(string tableName,
@@ -58,7 +40,7 @@ public sealed partial class AzureSqlServerStore
         var commandText =
             $"UPDATE {tableName.ToTableName()} SET {columnValueExpressions} WHERE {nameof(CommandEntity.Id)}='{id}'";
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         {
             try
             {
@@ -97,7 +79,7 @@ public sealed partial class AzureSqlServerStore
         var commandText =
             $"INSERT INTO {tableName.ToTableName()} ({columnNames}) VALUES ({columnValuePlaceholders})";
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         {
             try
             {
@@ -134,7 +116,7 @@ public sealed partial class AzureSqlServerStore
             ? $"DELETE FROM {tableName.ToTableName()} WHERE {whereParameter.Value.Key.ToColumnName()}=@1"
             : $"DELETE FROM {tableName.ToTableName()}";
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         {
             try
             {
@@ -166,7 +148,7 @@ public sealed partial class AzureSqlServerStore
     private async Task<Result<object, Error>> ExecuteSqlScalarCommandAsync(string commandText,
         CancellationToken cancellationToken)
     {
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         try
         {
             object result;
@@ -196,7 +178,7 @@ public sealed partial class AzureSqlServerStore
             ? $"SELECT * FROM {tableName.ToTableName()} WHERE {whereParameter.Value.Key.ToColumnName()}=@1"
             : $"SELECT * FROM {tableName.ToTableName()}";
 
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         {
             try
             {
@@ -242,7 +224,7 @@ public sealed partial class AzureSqlServerStore
     private async Task<Result<List<Dictionary<string, object>>, Error>> ExecuteSqlSelectCommandAsync(
         string commandText, IDictionary<string, object> parameterValuesByParameter, CancellationToken cancellationToken)
     {
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
         {
             try
             {

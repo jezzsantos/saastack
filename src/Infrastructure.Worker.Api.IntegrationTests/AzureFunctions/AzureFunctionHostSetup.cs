@@ -21,9 +21,8 @@ public class AllAzureFunctionSpecs : ICollectionFixture<AzureFunctionHostSetup>;
 [UsedImplicitly]
 public class AzureFunctionHostSetup : IApiWorkerSpec, IAsyncLifetime
 {
-    private readonly AzuriteStorageEmulator _azurite = new();
-    
     private static readonly TimeSpan FunctionTriggerWaitLatency = TimeSpan.FromSeconds(5);
+    private readonly AzuriteStorageEmulator _azurite = new();
     private IHost? _host;
     private Action<IServiceCollection>? _overridenTestingDependencies;
 
@@ -74,6 +73,17 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IAsyncLifetime
         Thread.Sleep(FunctionTriggerWaitLatency);
     }
 
+    public async Task DisposeAsync()
+    {
+        await _azurite.StopAsync();
+
+        if (_host.Exists())
+        {
+            await _host.StopAsync();
+            _host.Dispose();
+        }
+    }
+
     public async Task InitializeAsync()
     {
         await _azurite.StartAsync();
@@ -84,22 +94,11 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IAsyncLifetime
             .Build());
 
         var recorder = NoOpRecorder.Instance;
-#if TESTINGONLY
-             var connectionString = _azurite.GetConnectionString();
-        QueueStore = AzureStorageAccountQueueStore.Create(recorder, connectionString);
-        MessageBusStore = AzureServiceBusStore.Create(recorder, settings);
-#endif
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _azurite.StopAsync();
-
-        if (_host.Exists())
-        {
-            await _host.StopAsync();
-            _host.Dispose();
-        }
+        var connectionString = _azurite.GetConnectionString();
+        QueueStore =
+            AzureStorageAccountQueueStore.Create(recorder,
+                AzureStorageAccountStoreOptions.CustomConnectionString(connectionString));
+        MessageBusStore = AzureServiceBusStore.Create(recorder, AzureServiceBusStoreOptions.Credentials(settings));
     }
 }
 

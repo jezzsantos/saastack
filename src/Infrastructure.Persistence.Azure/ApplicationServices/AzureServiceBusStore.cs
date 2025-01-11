@@ -1,7 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Infrastructure.Persistence.Azure.Extensions;
 using Infrastructure.Persistence.Interfaces;
@@ -19,32 +18,29 @@ namespace Infrastructure.Persistence.Azure.ApplicationServices;
 [UsedImplicitly]
 public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
 {
-    private const string ConnectionStringSettingName =
-        "ApplicationServices:Persistence:AzureServiceBus:ConnectionString";
     private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(5);
-    private readonly string _connectionString;
+    private readonly AzureServiceBusStoreOptions.ConnectionOptions _connectionOptions;
     private readonly IRecorder _recorder;
     private readonly Dictionary<string, TopicExistence> _topicExistenceChecks = new();
-    private ServiceBusClient? _client;
+    private ServiceBusAdministrationClient? _adminClient;
+    private ServiceBusClient? _busClient;
 
-    public static AzureServiceBusStore Create(IRecorder recorder, IConfigurationSettings settings)
+    public static AzureServiceBusStore Create(IRecorder recorder, AzureServiceBusStoreOptions options)
     {
-        var connection = settings.GetString(ConnectionStringSettingName);
-
-        return new AzureServiceBusStore(recorder, connection);
+        return new AzureServiceBusStore(recorder, options.Connection);
     }
 
-    private AzureServiceBusStore(IRecorder recorder, string connectionString)
+    private AzureServiceBusStore(IRecorder recorder, AzureServiceBusStoreOptions.ConnectionOptions connectionOptions)
     {
         _recorder = recorder;
-        _connectionString = connectionString;
+        _connectionOptions = connectionOptions;
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_client.Exists())
+        if (_busClient.Exists())
         {
-            await _client.DisposeAsync();
+            await _busClient.DisposeAsync();
         }
     }
 
@@ -56,17 +52,17 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
             Resources.AnyStore_MissingSubscriptionName);
 
-        var admin = new ServiceBusAdministrationClient(_connectionString);
         var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
         var sanitizedSubscriptionName = subscriptionName.SanitizeAndValidateSubscriptionName();
 
-        if (!await admin.TopicExistsAsync(sanitizedTopicName, cancellationToken))
+        EnsureAdminConnected();
+        if (!await _adminClient!.TopicExistsAsync(sanitizedTopicName, cancellationToken))
         {
             return 0;
         }
 
         var properties =
-            await admin.GetSubscriptionRuntimePropertiesAsync(sanitizedTopicName, sanitizedSubscriptionName,
+            await _adminClient.GetSubscriptionRuntimePropertiesAsync(sanitizedTopicName, sanitizedSubscriptionName,
                 cancellationToken);
         return properties.Exists()
             ? properties.Value.ActiveMessageCount
@@ -244,18 +240,44 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
     private async Task DeleteTopicAsync(string topicName, CancellationToken cancellationToken)
     {
         var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
-        var admin = new ServiceBusAdministrationClient(_connectionString);
-        if (await admin.TopicExistsAsync(sanitizedTopicName, cancellationToken))
+        EnsureAdminConnected();
+        if (await _adminClient!.TopicExistsAsync(sanitizedTopicName, cancellationToken))
         {
-            await admin.DeleteTopicAsync(sanitizedTopicName, cancellationToken);
+            await _adminClient.DeleteTopicAsync(sanitizedTopicName, cancellationToken);
         }
     }
 
     private void EnsureConnected()
     {
-        if (_client.NotExists())
+        if (_busClient.NotExists())
         {
-            _client = new ServiceBusClient(_connectionString, new ServiceBusClientOptions());
+            var busClientOptions = new ServiceBusClientOptions();
+            _busClient = _connectionOptions.Type switch
+            {
+                AzureServiceBusStoreOptions.ConnectionOptions.ConnectionType.Credentials => new ServiceBusClient(
+                    _connectionOptions.ConnectionString, busClientOptions),
+                AzureServiceBusStoreOptions.ConnectionOptions.ConnectionType.ManagedIdentity => new ServiceBusClient(
+                    _connectionOptions.NamespaceName, _connectionOptions.Credential, busClientOptions),
+                _ => throw new ArgumentOutOfRangeException(nameof(AzureServiceBusStoreOptions.ConnectionOptions.Type))
+            };
+        }
+    }
+
+    private void EnsureAdminConnected()
+    {
+        if (_adminClient.NotExists())
+        {
+            var adminClientOptions = new ServiceBusAdministrationClientOptions();
+            _adminClient = _connectionOptions.Type switch
+            {
+                AzureServiceBusStoreOptions.ConnectionOptions.ConnectionType.Credentials => new
+                    ServiceBusAdministrationClient(
+                        _connectionOptions.ConnectionString, adminClientOptions),
+                AzureServiceBusStoreOptions.ConnectionOptions.ConnectionType.ManagedIdentity => new
+                    ServiceBusAdministrationClient(
+                        _connectionOptions.NamespaceName, _connectionOptions.Credential, adminClientOptions),
+                _ => throw new ArgumentOutOfRangeException(nameof(AzureServiceBusStoreOptions.ConnectionOptions.Type))
+            };
         }
     }
 
@@ -268,17 +290,17 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await CreateTopicAsync(topicName, cancellationToken);
         }
 
-        return _client!.CreateSender(sanitizedTopicName);
+        return _busClient!.CreateSender(sanitizedTopicName);
     }
 
     private async Task CreateTopicAsync(string topicName, CancellationToken cancellationToken)
     {
         var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
 
-        var admin = new ServiceBusAdministrationClient(_connectionString);
-        if (!await admin.TopicExistsAsync(sanitizedTopicName, cancellationToken))
+        EnsureAdminConnected();
+        if (!await _adminClient!.TopicExistsAsync(sanitizedTopicName, cancellationToken))
         {
-            await admin.CreateTopicAsync(new CreateTopicOptions(sanitizedTopicName)
+            await _adminClient.CreateTopicAsync(new CreateTopicOptions(sanitizedTopicName)
             {
                 EnablePartitioning = false,
                 SupportOrdering = true
@@ -294,10 +316,11 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
         var sanitizedSubscriptionName = subscriptionName.SanitizeAndValidateSubscriptionName();
 
-        var admin = new ServiceBusAdministrationClient(_connectionString);
-        if (!await admin.SubscriptionExistsAsync(sanitizedTopicName, sanitizedSubscriptionName, cancellationToken))
+        EnsureAdminConnected();
+        if (!await _adminClient!.SubscriptionExistsAsync(sanitizedTopicName, sanitizedSubscriptionName,
+                cancellationToken))
         {
-            await admin.CreateSubscriptionAsync(
+            await _adminClient.CreateSubscriptionAsync(
                 new CreateSubscriptionOptions(sanitizedTopicName, sanitizedSubscriptionName), cancellationToken);
         }
     }
@@ -313,7 +336,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await CreateSubscriptionAsync(sanitizedTopicName, sanitizedSubscriptionName, cancellationToken);
         }
 
-        return _client!.CreateReceiver(sanitizedTopicName, sanitizedSubscriptionName, new ServiceBusReceiverOptions
+        return _busClient!.CreateReceiver(sanitizedTopicName, sanitizedSubscriptionName, new ServiceBusReceiverOptions
         {
             ReceiveMode = ServiceBusReceiveMode.PeekLock, // we want to manually complete messages
             PrefetchCount = 1 // we only want one (and only one) message at a time

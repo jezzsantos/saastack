@@ -34,7 +34,7 @@ public class QueuedAuditReporter : IAuditReporter
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
-            AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, settings)
+            AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, AzureStorageAccountStoreOptions.Credentials(settings))
 #elif HOSTEDONAWS
             AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
 #endif

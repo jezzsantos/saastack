@@ -368,7 +368,8 @@ public static class HostExtensions
                             Type = SecuritySchemeType.ApiKey,
                             Name = HttpConstants.QueryParams.APIKey,
                             Description =
-                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants.QueryParams
+                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants
+                                    .QueryParams
                                     .APIKey),
                             In = ParameterLocation.Query,
                             Scheme = APIKeyAuthenticationHandler.AuthenticationScheme
@@ -487,46 +488,51 @@ public static class HostExtensions
             // EXTEND: Add your production stores here
             services.AddForPlatform<IDataStore, IEventStore, AzureSqlServerStore>(c =>
                 AzureSqlServerStore.Create(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
+                    AzureSqlServerStoreOptions.Credentials(c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
             services.AddForPlatform<IBlobStore>(c =>
                 AzureStorageAccountBlobStore.Create(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
+                    AzureStorageAccountStoreOptions.Credentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
             services.AddForPlatform<IQueueStore>(c =>
                 AzureStorageAccountQueueStore.Create(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
+                    AzureStorageAccountStoreOptions.Credentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
             services.AddForPlatform<IMessageBusStore>(c =>
                 AzureServiceBusStore.Create(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
+                    AzureServiceBusStoreOptions.Credentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
 
             if (isMultiTenanted)
             {
                 services.AddPerHttpRequest<IDataStore, IEventStore, AzureSqlServerStore>(c =>
                     AzureSqlServerStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureSqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
                 services.AddPerHttpRequest<IBlobStore>(c =>
                     AzureStorageAccountBlobStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureStorageAccountStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
                 services.AddPerHttpRequest<IQueueStore>(c =>
                     AzureStorageAccountQueueStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureStorageAccountStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
                 services.AddPerHttpRequest<IMessageBusStore>(c =>
                     AzureServiceBusStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureServiceBusStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
             }
             else
             {
                 services.AddSingleton<IDataStore, IEventStore, AzureSqlServerStore>(c =>
                     AzureSqlServerStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureSqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
                 services.AddSingleton<IBlobStore>(c =>
                     AzureStorageAccountBlobStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureStorageAccountStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
                 services.AddSingleton<IQueueStore>(c =>
                     AzureStorageAccountQueueStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureStorageAccountStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
                 services.AddSingleton<IMessageBusStore>(c =>
                     AzureServiceBusStore.Create(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IConfigurationSettings>()));
+                        AzureServiceBusStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
             }
 #elif HOSTEDONAWS
             //HACK: Need AWS production stores here like DynamoDbDataStore

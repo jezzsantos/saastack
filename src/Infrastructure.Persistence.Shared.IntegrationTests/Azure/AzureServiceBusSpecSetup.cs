@@ -14,7 +14,8 @@ public class AzureServiceBusSpecSetup : StoreSpecSetupBase, IDisposable
 {
     public AzureServiceBusSpecSetup()
     {
-        MessageBusStore = AzureServiceBusStore.Create(NoOpRecorder.Instance, Settings);
+        MessageBusStore =
+            AzureServiceBusStore.Create(NoOpRecorder.Instance, AzureServiceBusStoreOptions.Credentials(Settings));
         AzureServiceBusBase.InitializeAllTests();
     }
 
