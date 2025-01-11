@@ -2,6 +2,7 @@ import {ILogger} from "./logger";
 import {AppSettingRequiredVariable, SettingsFileProcessorMessages} from "./settingsFileProcessor";
 import {IFileReaderWriter} from "./fileReaderWriter";
 import {FlatFileProcessor} from "./flatFileProcessor";
+import {WarningOptions} from "./main";
 
 describe('getVariables', () => {
     const logger: jest.Mocked<ILogger> = {
@@ -107,7 +108,7 @@ describe('getVariables', () => {
         expect(result.variables).toEqual(["aname1", "aname2", "aname3"]);
         expect(result.requiredVariables).toEqual([new AppSettingRequiredVariable("aname2", "ANAME2")]);
     });
-    
+
     it('should return variables with required variables, when file is has many substitutions', async () => {
 
         const readerWriter: jest.Mocked<IFileReaderWriter> = {
@@ -138,7 +139,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {});
+        const result = await processor.substitute(new WarningOptions(), {}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.readSettingsFile).not.toHaveBeenCalled();
@@ -153,7 +154,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"aname": "avalue"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"aname": "avalue"}, {});
 
         expect(result).toEqual(false);
         expect(readerWriter.readSettingsFile).toHaveBeenCalledWith("apath");
@@ -170,7 +171,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"aname": "avalue"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"aname": "avalue"}, {});
 
         expect(result).toEqual(false);
         expect(readerWriter.readSettingsFile).toHaveBeenCalledWith("apath");
@@ -187,7 +188,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"ANAME": "avalue1"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"ANAME": "avalue1"}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", "aname=avalue");
@@ -204,7 +205,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"ANAME": "avalue1"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"ANAME": "avalue1"}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", "aname=avalue1");
@@ -220,7 +221,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {"ANAME": "avalue1"});
+        const result = await processor.substitute(new WarningOptions(), {}, {"ANAME": "avalue1"});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", "aname=avalue1");
@@ -236,7 +237,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"LEVEL1_LEVEL2_LEVEL3": "avalue1"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"LEVEL1_LEVEL2_LEVEL3": "avalue1"}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", "aname=\"avalue1\"");
@@ -252,7 +253,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"ANAME": "avalue1"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"ANAME": "avalue1"}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", "aname=\"avalue1\"");
@@ -268,7 +269,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({
+        const result = await processor.substitute(new WarningOptions(), {
             "ANAME1": "avalue1",
             "ANAME2": "avalue2",
             "ANAME3": "avalue3",
@@ -290,7 +291,7 @@ describe('substitute', () => {
         };
         const processor = new FlatFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({
+        const result = await processor.substitute(new WarningOptions(), {
             "ANAME1": "avalue1",
             "ANAME2": "avalue2",
             "ANAME3": "avalue3",

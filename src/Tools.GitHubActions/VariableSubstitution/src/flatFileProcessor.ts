@@ -7,6 +7,7 @@ import {
     ISettingsFileProcessor,
     SettingsFileProcessorMessages
 } from "./settingsFileProcessor";
+import {WarningOptions} from "./main";
 
 export class FlatFileProcessor implements ISettingsFileProcessor {
     static PairMatchExpression: RegExp = /(?<name>[\w\d_.]+)(=)(?<value>[\w\d_\-.#{}"'()\[\]=,:;&%$@]*)/;
@@ -52,7 +53,7 @@ export class FlatFileProcessor implements ISettingsFileProcessor {
         }
     }
 
-    private static substituteVariables(logger: ILogger, gitHubVariables: any, gitHubSecrets: any, text: TextValue, _prefix: string = "") {
+    private static substituteVariables(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any, text: TextValue, _prefix: string = "") {
 
         if (text.value.length === 0) {
             return;
@@ -74,7 +75,7 @@ export class FlatFileProcessor implements ISettingsFileProcessor {
                     if (valueMatch && valueMatch.groups) {
                         const variableName = valueMatch.groups.variable;
                         const githubVariableName = GitHubVariables.calculateVariableOrSecretName(variableName);
-                        const gitHubSecretOrVariableValue = GitHubVariables.getVariableOrSecretValue(gitHubVariables, gitHubSecrets, githubVariableName);
+                        const gitHubSecretOrVariableValue = GitHubVariables.getVariableOrSecretValue(logger, warningOptions, gitHubVariables, gitHubSecrets, githubVariableName);
                         if (gitHubSecretOrVariableValue) {
                             logger.info(SettingsFileProcessorMessages.substitutingVariable(variableName));
                             text.value = text.value.replace(`\#\{${variableName}\}`, gitHubSecretOrVariableValue);
@@ -85,7 +86,7 @@ export class FlatFileProcessor implements ISettingsFileProcessor {
         }
     }
 
-    async substitute(gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
+    async substitute(warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
 
         if (Object.keys(gitHubVariables).length === 0 && Object.keys(gitHubSecrets).length === 0) {
             return true;
@@ -94,7 +95,7 @@ export class FlatFileProcessor implements ISettingsFileProcessor {
         try {
             const content = await this._readerWriter.readSettingsFile(this._path) as string;
             const textValue = new TextValue(content); //We need to alter the encapsulated value in the next function
-            FlatFileProcessor.substituteVariables(this._logger, gitHubVariables, gitHubSecrets, textValue);
+            FlatFileProcessor.substituteVariables(this._logger, warningOptions, gitHubVariables, gitHubSecrets, textValue);
             await this._readerWriter.writeSettingsFile(this._path, textValue.value);
             this._logger.info(SettingsFileProcessorMessages.substitutingSucceeded(this._path));
             return true;

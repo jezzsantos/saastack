@@ -2,6 +2,7 @@ import {ILogger} from "./logger";
 import {AppSettingRequiredVariable, SettingsFileProcessorMessages} from "./settingsFileProcessor";
 import {IFileReaderWriter} from "./fileReaderWriter";
 import {AppSettingsJsonFileProcessor} from "./appSettingsJsonFileProcessor";
+import {WarningOptions} from "./main";
 
 describe('getVariables', () => {
     const logger: jest.Mocked<ILogger> = {
@@ -246,13 +247,13 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {});
+        const result = await processor.substitute(new WarningOptions(), {}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.readSettingsFile).not.toHaveBeenCalled();
         expect(logger.info).not.toHaveBeenCalled();
     });
-    
+
     it('should not substitute, when read file throws', async () => {
 
         const readerWriter: jest.Mocked<IFileReaderWriter> = {
@@ -261,7 +262,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"aname": "avalue"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"aname": "avalue"}, {});
 
         expect(result).toEqual(false);
         expect(readerWriter.readSettingsFile).toHaveBeenCalledWith("apath");
@@ -278,7 +279,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"aname": "avalue"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"aname": "avalue"}, {});
 
         expect(result).toEqual(false);
         expect(readerWriter.readSettingsFile).toHaveBeenCalledWith("apath");
@@ -295,7 +296,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({"ANAME": "avalue2"}, {});
+        const result = await processor.substitute(new WarningOptions(), {"ANAME": "avalue2"}, {});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", {"aname": "avalue2"});
@@ -311,7 +312,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {"ANAME": "avalue2"});
+        const result = await processor.substitute(new WarningOptions(), {}, {"ANAME": "avalue2"});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", {"aname": "avalue2"});
@@ -333,7 +334,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {"ALEVEL1_ALEVEL2_ALEVEL3": "avalue2"});
+        const result = await processor.substitute(new WarningOptions(), {}, {"ALEVEL1_ALEVEL2_ALEVEL3": "avalue2"});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", {
@@ -371,7 +372,7 @@ describe('substitute', () => {
         };
         const processor = new AppSettingsJsonFileProcessor(logger, readerWriter, "apath");
 
-        const result = await processor.substitute({}, {"ALEVEL1_ALEVEL2_ALEVEL3": "avalue2"});
+        const result = await processor.substitute(new WarningOptions(), {}, {"ALEVEL1_ALEVEL2_ALEVEL3": "avalue2"});
 
         expect(result).toEqual(true);
         expect(readerWriter.writeSettingsFile).toHaveBeenCalledWith("apath", expect.objectContaining({

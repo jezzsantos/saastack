@@ -142,15 +142,28 @@ In the GitHub project, you would define the following variables or secrets:
 
 **Required**. This must have this specific value in the YML file: `${{ toJSON(vars)}}`.
 
-## Outputs
 
-None.
+### `warnOnAdditionalVars`
+
+**Optional**. If set to `true`, the action will create a build warning if there are additional variables or secrets in the GitHub repository that are not substituted into any `appsettings.json`/`.env` files. Default `false`.
+
+### `ignoreAdditionalVars`
+
+**Optional**. A regular expression that matches any GitHub variables/secrets that should be ignored if `warnOnAdditionalVars` is `true`.
+
+## Outputs
 
 All variables, in all files found by the `files` input, will be substituted with the values of the variables/secrets found in the GitHub repository, for the specified environment.
 
+Additional build warnings will be raised in these cases:
+* In `appsettings.json` files, when a declared `Deploy -> Required -> Keys` key in the `appsettings.json` file is present in specific `appsettings.json` file.
+* In all files, when a variable is substituted and the variable is both defined as a secret and a variable in the GitHub repository. In this case, the secret value will be preferred.
+
+> These warnings cannot be suppressed.
+
 ## Example usage
 
-For C# host projects:
+For .NET host projects:
 
 ```yaml
 jobs:
@@ -164,6 +177,8 @@ jobs:
           files: '**/appsettings.json'
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
+          warnOnAdditionalVars: true
+          ignoreAdditionalVars: '^DEPLOY_'
 ```
 
 For JavaScript/NodeJS projects:
@@ -180,6 +195,8 @@ jobs:
           files: '**/WebsiteHost/**/.env.deploy'
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
+          warnOnAdditionalVars: true
+          ignoreAdditionalVars: '^DEPLOY_'
 ```
 
 > Note: That you should specify the name of the deployment environment that you have set up in your GitHub project, on the job itself. When you do, all secrets and variables from that environment, plus those form the GitHub repository (plus those from your GitHub organization).

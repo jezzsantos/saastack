@@ -45,6 +45,7 @@ jobs:
           files: 'src/WebsiteHost/**/.env.deploy'
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
+          warnOnAdditionalVars: false
       - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
@@ -56,6 +57,8 @@ jobs:
           files: '**/appsettings.json,**/appsettings.Azure.json'
           variables: ${{ toJSON(vars)}}
           secrets: ${{ toJSON(secrets)}}
+          warnOnAdditionalVars: true
+          ignoreAdditionalVars: '^DEPLOY_'
       - name: Package (ApiHost1) for Deploy
         run: dotnet publish --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "src/ApiHost1/ApiHost1.csproj" --output ".\publish\ApiHost1" /p:HostingPlatform=${{env.HOSTED_ON}}
       - name: Package (WebsiteHost) for Deploy

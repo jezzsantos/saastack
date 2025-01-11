@@ -11,6 +11,13 @@ inputs:
   variables:
     description: 'The variables of the GitHub repository (and environment). Must be the value: \$\{\{ toJSON(vars)\}\}'
     required: true
+  warnOnAdditionalVars:
+    description: 'Whether to output warnings if there are additional variables or secrets in the GitHub repository that are not substituted into any files'
+    required: false
+    default: false
+  ignoreAdditionalVars:
+    description: 'A regular expression that matches any GitHub variables/secrets that should be ignored if `warnOnAdditionalVars` is enabled'
+    required: false
 runs:
   using: 'node20'
   main: './built/index.js'

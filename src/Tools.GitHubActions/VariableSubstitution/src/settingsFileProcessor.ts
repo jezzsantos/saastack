@@ -1,5 +1,8 @@
+import {ILogger} from "./logger";
+import {WarningOptions} from "./main";
+
 export interface ISettingsFileProcessor {
-    substitute(gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
+    substitute(warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
 
     getVariables(path: string): Promise<AppSettingVariables>;
 }
@@ -26,16 +29,26 @@ export class GitHubVariables {
         return gitHubVariables.hasOwnProperty(gitHubVariableName) || gitHubSecrets.hasOwnProperty(gitHubVariableName);
     }
 
-    public static getVariableOrSecretValue(gitHubVariables: any, gitHubSecrets: any, gitHubVariableName: string): any | undefined {
+    public static getVariableOrSecretValue(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any, gitHubVariableName: string): any | undefined {
 
+        let variable = undefined;
         if (gitHubVariables.hasOwnProperty(gitHubVariableName)) {
-            return gitHubVariables[gitHubVariableName];
-        }
-        if (gitHubSecrets.hasOwnProperty(gitHubVariableName)) {
-            return gitHubSecrets[gitHubVariableName];
+            variable = gitHubVariables[gitHubVariableName];
         }
 
-        return undefined;
+        let secret = undefined;
+        if (gitHubSecrets.hasOwnProperty(gitHubVariableName)) {
+            secret = gitHubSecrets[gitHubVariableName];
+        }
+
+        if (variable && secret) {
+            if (warningOptions.warnOnDuplicateVariables) {
+                logger.warning(SettingsFileProcessorMessages.ambiguousVariableAndSecret(gitHubVariableName));
+            }
+            return secret
+        }
+
+        return variable ?? secret;
     }
 
     public static calculateVariableOrSecretName(fullyQualifiedVariableName: string) {
@@ -55,4 +68,5 @@ export class SettingsFileProcessorMessages {
         const now = new Date().toISOString();
         return `All keys substituted, and removed: '${now}'`;
     };
+    public static ambiguousVariableAndSecret = (variableName: string) => `'${variableName} was found as both a variable and as a secret in this GitHub repository. Using the secret value, and ignoring the variable value. Delete the duplicated variable or the secret to use the other value`;
 }

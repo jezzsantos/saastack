@@ -2,6 +2,7 @@ import {SettingsFile, SettingsFileMessages} from "./settingsFile";
 import {IAppSettingsReaderWriterFactory} from "./appSettingsReaderWriterFactory";
 import {ILogger} from "./logger";
 import {ISettingsFileProcessor} from "./settingsFileProcessor";
+import {WarningOptions} from "./main";
 
 describe('create', () => {
     const logger: jest.Mocked<ILogger> = {
@@ -50,10 +51,10 @@ describe('substitute', () => {
 
         const settingsFile = await SettingsFile.create(logger, readerWriterFactory, "apath");
 
-        const result = await settingsFile.substitute(logger, {"avariable": "avalue1"}, {"asecret": "avalue2"});
+        const result = await settingsFile.substitute(logger, new WarningOptions(), {"avariable": "avalue1"}, {"asecret": "avalue2"});
 
         expect(result).toEqual(true);
-        expect(readerWriter.substitute).toHaveBeenCalledWith({"avariable": "avalue1"}, {"asecret": "avalue2"});
+        expect(readerWriter.substitute).toHaveBeenCalledWith(new WarningOptions(), {"avariable": "avalue1"}, {"asecret": "avalue2"});
         expect(logger.info).toHaveBeenCalledWith(SettingsFileMessages.substitutingStarted("apath"));
     });
 });

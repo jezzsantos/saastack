@@ -1,6 +1,7 @@
 import {IAppSettingsReaderWriterFactory} from "./appSettingsReaderWriterFactory";
 import {ILogger} from "./logger";
 import {AppSettingRequiredVariable, AppSettingVariables, ISettingsFileProcessor} from "./settingsFileProcessor";
+import {WarningOptions} from "./main";
 
 export interface ISettingsFile {
     readonly path: string;
@@ -8,7 +9,7 @@ export interface ISettingsFile {
     readonly hasRequired: boolean;
     readonly requiredVariables: AppSettingRequiredVariable[];
 
-    substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
+    substitute(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
 }
 
 export class SettingsFile implements ISettingsFile {
@@ -52,10 +53,10 @@ export class SettingsFile implements ISettingsFile {
         return new SettingsFile(readerWriter, path, variables);
     }
 
-    async substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
+    async substitute(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
         logger.info(SettingsFileMessages.substitutingStarted(this.path));
 
-        return await this._readerWriter.substitute(gitHubVariables, gitHubSecrets);
+        return await this._readerWriter.substitute(warningOptions, gitHubVariables, gitHubSecrets);
     }
 }
 

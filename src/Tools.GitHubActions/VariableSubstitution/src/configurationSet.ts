@@ -1,6 +1,7 @@
 import {ISettingsFile, SettingsFile} from "./settingsFile";
 import {ILogger} from "./logger";
 import {AppSettingRequiredVariable, GitHubVariables} from "./settingsFileProcessor";
+import {WarningOptions} from "./main";
 
 export interface IConfigurationSet {
     readonly hostProjectPath: string;
@@ -12,7 +13,7 @@ export interface IConfigurationSet {
 
     verify(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): boolean;
 
-    substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
+    substitute(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean>;
 }
 
 export class ConfigurationSet implements IConfigurationSet {
@@ -47,11 +48,11 @@ export class ConfigurationSet implements IConfigurationSet {
         return this._definedVariables;
     }
 
-    async substitute(logger: ILogger, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
+    async substitute(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
         logger.info(ConfigurationSetMessages.startSubstitution(this.hostProjectPath));
         let isSetSubstituted = true;
         for (const file of this.settingFiles) {
-            const isSubstituted = await file.substitute(logger, gitHubVariables, gitHubSecrets);
+            const isSubstituted = await file.substitute(logger, warningOptions, gitHubVariables, gitHubSecrets);
             if (!isSubstituted) {
                 isSetSubstituted = false;
             }

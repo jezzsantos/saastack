@@ -8,6 +8,7 @@ import {
     ISettingsFileProcessor,
     SettingsFileProcessorMessages
 } from "./settingsFileProcessor";
+import {WarningOptions} from "./main";
 
 export class AppSettingsJsonFileProcessor implements ISettingsFileProcessor {
     _logger: ILogger;
@@ -41,7 +42,7 @@ export class AppSettingsJsonFileProcessor implements ISettingsFileProcessor {
         }
     }
 
-    private static substituteVariablesRecursively(logger: ILogger, gitHubVariables: any, gitHubSecrets: any, json: any, prefix: string = "") {
+    private static substituteVariablesRecursively(logger: ILogger, warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any, json: any, prefix: string = "") {
         for (const key in json) {
             if (json.hasOwnProperty(key)) {
                 const element = json[key];
@@ -51,12 +52,12 @@ export class AppSettingsJsonFileProcessor implements ISettingsFileProcessor {
                     if (deployKey) {
                         json[key] = SettingsFileProcessorMessages.redactedDeployMessage();
                     } else {
-                        AppSettingsJsonFileProcessor.substituteVariablesRecursively(logger, gitHubVariables, gitHubSecrets, element, fullyQualifiedVariableName);
+                        AppSettingsJsonFileProcessor.substituteVariablesRecursively(logger, warningOptions, gitHubVariables, gitHubSecrets, element, fullyQualifiedVariableName);
                     }
                 } else {
                     if (typeof element === "string" || typeof element === "number" || typeof element === "boolean") {
                         const githubVariableName = GitHubVariables.calculateVariableOrSecretName(fullyQualifiedVariableName);
-                        const gitHubSecretOrVariableValue = GitHubVariables.getVariableOrSecretValue(gitHubVariables, gitHubSecrets, githubVariableName);
+                        const gitHubSecretOrVariableValue = GitHubVariables.getVariableOrSecretValue(logger, warningOptions, gitHubVariables, gitHubSecrets, githubVariableName);
                         if (gitHubSecretOrVariableValue) {
                             logger.info(SettingsFileProcessorMessages.substitutingVariable(fullyQualifiedVariableName));
                             json[key] = gitHubSecretOrVariableValue;
@@ -153,7 +154,7 @@ export class AppSettingsJsonFileProcessor implements ISettingsFileProcessor {
         return `${prefix}:${key}`;
     }
 
-    async substitute(gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
+    async substitute(warningOptions: WarningOptions, gitHubVariables: any, gitHubSecrets: any): Promise<boolean> {
 
         if (Object.keys(gitHubVariables).length === 0 && Object.keys(gitHubSecrets).length === 0) {
             return true;
@@ -161,7 +162,7 @@ export class AppSettingsJsonFileProcessor implements ISettingsFileProcessor {
 
         try {
             const json = await this._readerWriter.readSettingsFile(this._path);
-            AppSettingsJsonFileProcessor.substituteVariablesRecursively(this._logger, gitHubVariables, gitHubSecrets, json);
+            AppSettingsJsonFileProcessor.substituteVariablesRecursively(this._logger, warningOptions, gitHubVariables, gitHubSecrets, json);
             await this._readerWriter.writeSettingsFile(this._path, json);
             this._logger.info(SettingsFileProcessorMessages.substitutingSucceeded(this._path));
             return true;

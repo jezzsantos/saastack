@@ -5,6 +5,8 @@ export interface IGitHubAction {
 
     getRequiredWorkflowInput(paramName: string): string;
 
+    getOptionalWorkflowInput(paramName: string, defaultValue: string): string;
+
     getRepositoryOwner(): string;
 
     getRepositoryName(): string;
@@ -35,5 +37,10 @@ export class GithubAction implements IGitHubAction {
 
     getRequiredWorkflowInput(paramName: string): string {
         return core.getInput(paramName, {required: true});
+    }
+
+    getOptionalWorkflowInput(paramName: string, defaultValue: string): string {
+        const value = core.getInput(paramName, {required: false});
+        return value ?? defaultValue;
     }
 }
