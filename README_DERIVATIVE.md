@@ -49,6 +49,8 @@ Repeat for these directories:
 * `C:\...\SaaStack\src\Tools.Templates\IntegrationTestProject`
 * `C:\...\SaaStack\src\Tools.Templates\UnitTestProject`
 
+Then cancel the dialog box.
+
 ## Azure Functions Host
 
 Only if you are deploying your product to Azure.
@@ -98,7 +100,7 @@ Install [Docker Desktop](https://docs.docker.com/desktop/)
 
 > We will be using [TestContainers](https://dotnet.testcontainers.org/) to create containers specifically for the tests.
 
-### MSSQL Service 
+### MSSQL Service
 
 The docker `tools/compose.yml` file defines a service for MSSQL.
 

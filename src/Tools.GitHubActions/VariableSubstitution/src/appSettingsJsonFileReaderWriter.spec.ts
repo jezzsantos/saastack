@@ -35,7 +35,7 @@ describe('readSettingsFile', () => {
 
         expect(file).toEqual({});
     });
-    
+
     it('should return file, when file exists', async () => {
 
         const reader = new AppSettingsJsonFileReaderWriter();
