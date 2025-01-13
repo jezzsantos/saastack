@@ -5,16 +5,23 @@ namespace Common;
 
 public static class Timezones
 {
+    //See: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    public const string GmtIANA = "GMT";
     public const string NewZealandIANA = "Pacific/Auckland";
     public const string NewZealandWindows = "New Zealand Standard Time";
     public const string SydneyIANA = "Australia/Sydney";
     public const string UniversalCoordinatedIANA = "Etc/UTC";
     public const string UniversalCoordinatedWindows = "UTC";
+    public const string UsPacificIANA = "US/Pacific";
     public static readonly TimezoneIANA Sydney = TimezoneIANA.Create(SydneyIANA, TimeSpan.FromHours(10),
         "AEST", TimeSpan.FromHours(11), "AEDT");
     public static readonly TimezoneIANA NewZealand = TimezoneIANA.Create(NewZealandIANA, TimeSpan.FromHours(12),
         "NZST", TimeSpan.FromHours(13), "NZDT");
-    public static readonly TimezoneIANA Default = NewZealand;
+    public static readonly TimezoneIANA UsPacific = TimezoneIANA.Create(UsPacificIANA, TimeSpan.FromHours(-8),
+        "PST", TimeSpan.FromHours(-7), "PDT");
+    public static readonly TimezoneIANA Default = UsPacific; //EXTEND: set your default country code
+    public static readonly TimezoneIANA Gmt = TimezoneIANA.Create(GmtIANA, TimeSpan.FromHours(0),
+        "GMT", TimeSpan.FromHours(0), "GMT");
 
 #if TESTINGONLY
     public static readonly TimezoneIANA Test = TimezoneIANA.Create("testTimezone", TimeSpan.FromHours(1), "TSST",

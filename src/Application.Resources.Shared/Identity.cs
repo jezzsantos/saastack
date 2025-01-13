@@ -75,3 +75,10 @@ public enum TokenType
     AccessToken = 1, // access_token
     RefreshToken = 2 // refresh_token
 }
+
+public class SSOUser : IIdentifiableResource
+{
+    public required string Id { get; set; }
+
+    public required string ProviderUId { get; set; }
+}

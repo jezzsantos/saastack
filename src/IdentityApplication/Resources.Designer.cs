@@ -159,6 +159,33 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SSO Authentication provider has not provided a valid EmailAddress for this user.
+        /// </summary>
+        internal static string SSOProvidersService_Authentication_InvalidEmailAddress {
+            get {
+                return ResourceManager.GetString("SSOProvidersService_Authentication_InvalidEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SSO Authentication provider has not provided valid First and Last names for this user.
+        /// </summary>
+        internal static string SSOProvidersService_Authentication_InvalidNames {
+            get {
+                return ResourceManager.GetString("SSOProvidersService_Authentication_InvalidNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SSO Authentication provider has not provided a valid UID for this user.
+        /// </summary>
+        internal static string SSOProvidersService_Authentication_MissingUid {
+            get {
+                return ResourceManager.GetString("SSOProvidersService_Authentication_MissingUid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; is not registered.
         /// </summary>
         internal static string SSOProvidersService_UnknownProvider {

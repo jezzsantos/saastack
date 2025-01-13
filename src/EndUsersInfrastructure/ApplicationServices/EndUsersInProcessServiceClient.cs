@@ -19,12 +19,6 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         _endUsersApplication = endUsersApplication;
     }
 
-    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailPrivateAsync(ICallerContext caller,
-        string emailAddress, CancellationToken cancellationToken)
-    {
-        return await _endUsersApplication.FindPersonByEmailAddressAsync(caller, emailAddress, cancellationToken);
-    }
-
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller,
         string id, CancellationToken cancellationToken)
     {

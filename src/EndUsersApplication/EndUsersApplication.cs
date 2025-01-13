@@ -140,27 +140,6 @@ public partial class EndUsersApplication : IEndUsersApplication
         return user.ToUser();
     }
 
-    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller,
-        string emailAddress, CancellationToken cancellationToken)
-    {
-        var email = EmailAddress.Create(emailAddress);
-        if (email.IsFailure)
-        {
-            return email.Error;
-        }
-
-        var retrieved =
-            await FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(caller, email.Value, cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        return retrieved.Value.HasValue
-            ? retrieved.Value.Value.User.ToUser().ToOptional()
-            : Optional<EndUser>.None;
-    }
-
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {

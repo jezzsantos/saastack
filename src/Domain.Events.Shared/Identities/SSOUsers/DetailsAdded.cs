@@ -24,4 +24,6 @@ public sealed class DetailsAdded : DomainEvent
     public string? LastName { get; set; }
 
     public required string Timezone { get; set; }
+
+    public required string ProviderUId { get; set; }
 }

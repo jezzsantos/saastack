@@ -50,10 +50,11 @@ public class SSOUserRootSpec
             .Value;
         var tokens = SSOAuthTokens.Create([token]).Value;
 
-        var result = _user.AddDetails(tokens, EmailAddress.Create("auser@company.com").Value,
+        var result = _user.AddDetails(tokens, "aprovideruid", EmailAddress.Create("auser@company.com").Value,
             PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
 
         result.Should().BeSuccess();
+        _user.ProviderUId.Should().Be("aprovideruid");
         _user.UserId.Should().Be("auserid".ToId());
         _user.EmailAddress.Value.Address.Should().Be("auser@company.com");
         _user.Name.Value.FirstName.Text.Should().Be("afirstname");

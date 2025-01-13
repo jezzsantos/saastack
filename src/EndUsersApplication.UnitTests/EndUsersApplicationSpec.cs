@@ -593,45 +593,6 @@ public class EndUsersApplicationSpec
 #endif
 
     [Fact]
-    public async Task WhenFindPersonByEmailAsyncAndNotExists_ThenReturnsNone()
-    {
-        _userProfilesService.Setup(ups =>
-                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<UserProfile>.None);
-        _invitationRepository.Setup(rep =>
-                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional.None<EndUserRoot>());
-
-        var result =
-            await _application.FindPersonByEmailAddressAsync(_caller.Object, "auser@company.com",
-                CancellationToken.None);
-
-        result.Should().BeSuccess();
-        result.Value.Should().BeNone();
-    }
-
-    [Fact]
-    public async Task WhenFindPersonByEmailAsyncAndExists_ThenReturns()
-    {
-        var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        _userProfilesService.Setup(ups =>
-                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<UserProfile>.None);
-        _invitationRepository.Setup(rep =>
-                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(endUser.ToOptional());
-
-        var result =
-            await _application.FindPersonByEmailAddressAsync(_caller.Object, "auser@company.com",
-                CancellationToken.None);
-
-        result.Should().BeSuccess();
-        result.Value.Value.Id.Should().Be("anid");
-    }
-
-    [Fact]
     public async Task WhenGetMembershipsAndNotRegisteredOrMemberAsync_ThenReturnsUser()
     {
         var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;

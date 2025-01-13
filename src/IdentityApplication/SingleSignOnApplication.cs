@@ -30,27 +30,25 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         string? invitationToken, string providerName, string authCode, string? username,
         CancellationToken cancellationToken)
     {
-        var retrievedProvider = await _ssoProvidersService.FindProviderByNameAsync(providerName, cancellationToken);
-        if (retrievedProvider.IsFailure)
-        {
-            return retrievedProvider.Error;
-        }
-
-        if (!retrievedProvider.Value.HasValue)
-        {
-            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
-        }
-
-        var provider = retrievedProvider.Value.Value;
-        var authenticated = await provider.AuthenticateAsync(caller, authCode, username, cancellationToken);
+        var authenticated =
+            await _ssoProvidersService.AuthenticateUserAsync(caller, providerName, authCode, username,
+                cancellationToken);
         if (authenticated.IsFailure)
         {
-            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+            if (authenticated.Error.Is(ErrorCode.NotAuthenticated)
+                || authenticated.Error.Is(ErrorCode.EntityNotFound)
+                || authenticated.Error.Is(ErrorCode.Validation))
+            {
+                return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+            }
+
+            return authenticated.Error;
         }
 
-        var userInfo = authenticated.Value;
+        //Have we seen you before? based on ProviderName+(OID+TID) (e.g. Microsoft's unique ID for a user, unique in a MS tenant?)
+        var authUserInfo = authenticated.Value;
         var existingUser =
-            await _endUsersService.FindPersonByEmailPrivateAsync(caller, userInfo.EmailAddress, cancellationToken);
+            await _ssoProvidersService.FindUserByProviderAsync(caller, providerName, authUserInfo, cancellationToken);
         if (existingUser.IsFailure)
         {
             return existingUser.Error;
@@ -60,8 +58,9 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         if (!existingUser.Value.HasValue)
         {
             var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(caller, invitationToken,
-                userInfo.EmailAddress,
-                userInfo.FirstName, userInfo.LastName, userInfo.Timezone.ToString(), userInfo.CountryCode.ToString(),
+                authUserInfo.EmailAddress,
+                authUserInfo.FirstName, authUserInfo.LastName, authUserInfo.Timezone.ToString(),
+                authUserInfo.CountryCode.ToString(),
                 true,
                 cancellationToken);
             if (autoRegistered.IsFailure)
@@ -106,9 +105,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         }
 
         var saved = await _ssoProvidersService.SaveInfoOnBehalfOfUserAsync(caller, providerName,
-            registeredUserId.ToId(),
-            userInfo,
-            cancellationToken);
+            registeredUserId.ToId(), authUserInfo, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
@@ -118,7 +115,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             Audits.SingleSignOnApplication_Authenticate_Succeeded,
             "User {Id} succeeded to authenticate with SSO {Provider}", user.Id, providerName);
         _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
-            user.ToLoginUserUsage(providerName, userInfo));
+            user.ToLoginUserUsage(providerName, authUserInfo));
 
         var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
         if (issued.IsFailure)
@@ -246,20 +243,20 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 internal static class SingleSignOnApplicationExtensions
 {
     public static Dictionary<string, object> ToLoginUserUsage(this EndUserWithMemberships user, string providerName,
-        SSOUserInfo userInfo)
+        SSOAuthUserInfo authUserInfo)
     {
         var context = new Dictionary<string, object>
         {
             { UsageConstants.Properties.AuthProvider, providerName },
             { UsageConstants.Properties.UserIdOverride, user.Id },
-            { UsageConstants.Properties.Name, userInfo.FullName },
-            { UsageConstants.Properties.EmailAddress, userInfo.EmailAddress }
+            { UsageConstants.Properties.Name, authUserInfo.FullName },
+            { UsageConstants.Properties.EmailAddress, authUserInfo.EmailAddress }
         };
 
         var defaultMembership = user.Memberships.FirstOrDefault(ms => ms.IsDefault);
         if (defaultMembership.Exists())
         {
-            context.Add(UsageConstants.Properties.DefaultOrganizationId, defaultMembership.Id);
+            context.Add(UsageConstants.Properties.DefaultOrganizationId, defaultMembership.OrganizationId);
         }
 
         return context;

@@ -12,9 +12,6 @@ public partial interface IEndUsersApplication
     Task<Result<EndUser, Error>> ChangeDefaultMembershipAsync(ICallerContext caller, string organizationId,
         CancellationToken cancellationToken);
 
-    Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller, string emailAddress,
-        CancellationToken cancellationToken);
-
     Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
 

@@ -60,4 +60,13 @@
     <data name="PasswordCredentialsApplication_MfaRequired" xml:space="preserve">
       <value>Authentication requires another factor</value>
     </data>
+    <data name="SSOProvidersService_Authentication_MissingUid" xml:space="preserve">
+      <value>SSO Authentication provider has not provided a valid UID for this user</value>
+    </data>
+    <data name="SSOProvidersService_Authentication_InvalidEmailAddress" xml:space="preserve">
+      <value>SSO Authentication provider has not provided a valid EmailAddress for this user</value>
+    </data>
+    <data name="SSOProvidersService_Authentication_InvalidNames" xml:space="preserve">
+      <value>SSO Authentication provider has not provided valid First and Last names for this user</value>
+    </data>
 </root>

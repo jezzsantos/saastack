@@ -38,6 +38,8 @@ public sealed class SSOUserRoot : AggregateRootBase
 
     public Optional<string> ProviderName { get; private set; }
 
+    public Optional<string> ProviderUId { get; private set; }
+
     public Optional<Timezone> Timezone { get; private set; }
 
     public Optional<SSOAuthTokens> Tokens { get; private set; }
@@ -88,6 +90,7 @@ public sealed class SSOUserRoot : AggregateRootBase
 
             case DetailsAdded added:
             {
+                ProviderUId = added.ProviderUId;
                 var emailAddress = Domain.Shared.EmailAddress.Create(added.EmailAddress);
                 if (emailAddress.IsFailure)
                 {
@@ -125,11 +128,11 @@ public sealed class SSOUserRoot : AggregateRootBase
         }
     }
 
-    public Result<Error> AddDetails(SSOAuthTokens tokens, EmailAddress emailAddress,
+    public Result<Error> AddDetails(SSOAuthTokens tokens, string uId, EmailAddress emailAddress,
         PersonName name, Timezone timezone, Address address)
     {
         var detailsUpdated = RaiseChangeEvent(
-            IdentityDomain.Events.SSOUsers.DetailsAdded(Id, emailAddress, name, timezone,
+            IdentityDomain.Events.SSOUsers.DetailsAdded(Id, uId, emailAddress, name, timezone,
                 address));
         if (detailsUpdated.IsFailure)
         {

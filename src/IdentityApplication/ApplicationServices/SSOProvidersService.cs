@@ -36,12 +36,47 @@ public class SSOProvidersService : ISSOProvidersService
         _authenticationProviders = authenticationProviders;
     }
 
-    public Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByNameAsync(string providerName,
+    public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateUserAsync(ICallerContext caller, string providerName,
+        string authCode, string? username,
         CancellationToken cancellationToken)
     {
-        var provider =
-            _authenticationProviders.FirstOrDefault(provider => provider.ProviderName.EqualsIgnoreCase(providerName));
-        return Task.FromResult<Result<Optional<ISSOAuthenticationProvider>, Error>>(provider.ToOptional());
+        var retrievedProvider = FindProviderByNameInternal(providerName);
+        if (retrievedProvider.IsFailure)
+        {
+            return retrievedProvider.Error;
+        }
+
+        if (!retrievedProvider.Value.HasValue)
+        {
+            return Error.EntityNotFound(Resources.SSOProvidersService_UnknownProvider.Format(providerName));
+        }
+
+        var provider = retrievedProvider.Value.Value;
+        var authenticated = await provider.AuthenticateAsync(caller, authCode, username, cancellationToken);
+        if (authenticated.IsFailure)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var userInfo = authenticated.Value;
+        if (userInfo.UId.HasNoValue())
+        {
+            return Error.Validation(Resources.SSOProvidersService_Authentication_MissingUid);
+        }
+
+        var email = EmailAddress.Create(userInfo.EmailAddress);
+        if (email.IsFailure)
+        {
+            return Error.Validation(Resources.SSOProvidersService_Authentication_InvalidEmailAddress);
+        }
+
+        var name = PersonName.Create(userInfo.FirstName, userInfo.LastName);
+        if (name.IsFailure)
+        {
+            return Error.Validation(Resources.SSOProvidersService_Authentication_InvalidNames);
+        }
+
+        return userInfo;
     }
 
     public async Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByUserIdAsync(
@@ -74,7 +109,40 @@ public class SSOProvidersService : ISSOProvidersService
             return viewed.Error;
         }
 
+        _recorder.TraceInformation(caller.ToCall(), "SSO Provider {Provider} retrieved", provider.ProviderName);
+
         return provider.ToOptional();
+    }
+
+    public async Task<Result<Optional<SSOUser>, Error>> FindUserByProviderAsync(ICallerContext caller,
+        string providerName, SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken)
+    {
+        var retrievedProvider = FindProviderByNameInternal(providerName);
+        if (retrievedProvider.IsFailure)
+        {
+            return retrievedProvider.Error;
+        }
+
+        if (!retrievedProvider.Value.HasValue)
+        {
+            return Error.EntityNotFound(Resources.SSOProvidersService_UnknownProvider.Format(providerName));
+        }
+
+        var retrievedUser = await _repository.FindByProviderUIdAsync(providerName, authUserInfo.UId, cancellationToken);
+        if (retrievedUser.IsFailure)
+        {
+            return retrievedUser.Error;
+        }
+
+        if (!retrievedUser.Value.HasValue)
+        {
+            return Optional<SSOUser>.None;
+        }
+
+        var user = retrievedUser.Value.Value;
+        _recorder.TraceInformation(caller.ToCall(), "SSO User {UserId} retrieved", user.UserId);
+
+        return user.ToUser().ToOptional();
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
@@ -91,9 +159,9 @@ public class SSOProvidersService : ISSOProvidersService
 
     public async Task<Result<Error>> SaveInfoOnBehalfOfUserAsync(ICallerContext caller, string providerName,
         string userId,
-        SSOUserInfo userInfo, CancellationToken cancellationToken)
+        SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken)
     {
-        var retrievedProvider = await FindProviderByNameAsync(providerName, cancellationToken);
+        var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -128,31 +196,31 @@ public class SSOProvidersService : ISSOProvidersService
             user = created.Value;
         }
 
-        var name = PersonName.Create(userInfo.FirstName, userInfo.LastName);
+        var name = PersonName.Create(authUserInfo.FirstName, authUserInfo.LastName);
         if (name.IsFailure)
         {
             return name.Error;
         }
 
-        var emailAddress = EmailAddress.Create(userInfo.EmailAddress);
+        var emailAddress = EmailAddress.Create(authUserInfo.EmailAddress);
         if (emailAddress.IsFailure)
         {
             return emailAddress.Error;
         }
 
-        var timezone = Timezone.Create(userInfo.Timezone);
+        var timezone = Timezone.Create(authUserInfo.Timezone);
         if (timezone.IsFailure)
         {
             return timezone.Error;
         }
 
-        var address = Address.Create(userInfo.CountryCode);
+        var address = Address.Create(authUserInfo.CountryCode);
         if (address.IsFailure)
         {
             return address.Error;
         }
 
-        var toks = userInfo.Tokens.ToAuthTokens(_encryptionService);
+        var toks = authUserInfo.Tokens.ToAuthTokens(_encryptionService);
         if (toks.IsFailure)
         {
             return toks.Error;
@@ -164,7 +232,9 @@ public class SSOProvidersService : ISSOProvidersService
             return tokens.Error;
         }
 
-        var updated = user.AddDetails(tokens.Value, emailAddress.Value, name.Value, timezone.Value, address.Value);
+        var uId = authUserInfo.UId;
+
+        var updated = user.AddDetails(tokens.Value, uId, emailAddress.Value, name.Value, timezone.Value, address.Value);
         if (updated.IsFailure)
         {
             return updated.Error;
@@ -187,7 +257,7 @@ public class SSOProvidersService : ISSOProvidersService
         string userId,
         ProviderAuthenticationTokens tokens, CancellationToken cancellationToken)
     {
-        var retrievedProvider = await FindProviderByNameAsync(providerName, cancellationToken);
+        var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -241,6 +311,13 @@ public class SSOProvidersService : ISSOProvidersService
             user.UserId);
 
         return Result.Ok;
+    }
+
+    private Result<Optional<ISSOAuthenticationProvider>, Error> FindProviderByNameInternal(string providerName)
+    {
+        var provider =
+            _authenticationProviders.FirstOrDefault(provider => provider.ProviderName.EqualsIgnoreCase(providerName));
+        return provider.ToOptional();
     }
 
     private async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensInternalAsync(
@@ -390,5 +467,14 @@ internal static class SSOProvidersServiceConversionExtensions
         };
 
         return providerTokens;
+    }
+
+    public static SSOUser ToUser(this SSOUserRoot user)
+    {
+        return new SSOUser
+        {
+            Id = user.UserId,
+            ProviderUId = user.ProviderUId
+        };
     }
 }

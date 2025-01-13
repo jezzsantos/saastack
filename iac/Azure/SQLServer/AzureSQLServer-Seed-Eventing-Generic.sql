@@ -528,6 +528,7 @@ CREATE TABLE [dbo].[SSOUser]
     [FirstName]          [nvarchar](max) NULL,
     [LastName]           [nvarchar](max) NULL,
     [ProviderName]       [nvarchar](max) NULL,
+    [ProviderUId]        [nvarchar](100) NULL,
     [Timezone]           [nvarchar](max) NULL,
     [Tokens]             [nvarchar](max) NULL,
     [UserId]             [nvarchar](100) NULL,
@@ -543,6 +544,11 @@ CREATE INDEX UserId
     ON [dbo].[SSOUser]
         (
          [UserId]
+            );
+CREATE INDEX ProviderUId
+    ON [dbo].[SSOUser]
+        (
+         [ProviderUId]
             );
 
 CREATE TABLE [dbo].[UserProfile]

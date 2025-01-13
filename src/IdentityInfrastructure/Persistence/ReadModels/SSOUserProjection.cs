@@ -36,6 +36,7 @@ public class SSOUserProjection : IReadModelProjection
             case DetailsAdded e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
+                    dto.ProviderUId = e.ProviderUId;
                     dto.EmailAddress = e.EmailAddress;
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;

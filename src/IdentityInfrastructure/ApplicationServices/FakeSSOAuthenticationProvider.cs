@@ -27,7 +27,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
         _auth2Service = auth2Service;
     }
 
-    public async Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
+    public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
         string? emailAddress, CancellationToken cancellationToken)
     {
         authCode.ThrowIfNotValuedParameter(nameof(authCode),

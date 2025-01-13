@@ -22,5 +22,7 @@ public class SSOUser : ReadModelEntity
 
     public Optional<SSOAuthTokens> Tokens { get; set; }
 
+    public Optional<string> ProviderUId { get; set; }
+
     public Optional<string> UserId { get; set; }
 }

@@ -53,10 +53,10 @@ public class FakeOAuth2Service : IOAuth2Service
         };
     }
 
-    public static SSOUserInfo GetUserInfoFromTokens(List<AuthToken> tokens)
+    public static SSOAuthUserInfo GetUserInfoFromTokens(List<AuthToken> tokens)
     {
         var accessToken = tokens.Single(tok => tok.Type == TokenType.AccessToken).Value;
-
+        var uid = Guid.NewGuid().ToString("N");
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).Claims.ToArray();
         var emailAddress = claims.Single(c => c.Type == ClaimTypes.Email).Value;
         var firstName = claims.Single(c => c.Type == ClaimTypes.GivenName).Value;
@@ -65,7 +65,7 @@ public class FakeOAuth2Service : IOAuth2Service
             Timezones.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForTimezone).Value);
         var country = CountryCodes.FindOrDefault(claims.Single(c => c.Type == ClaimTypes.Country).Value);
 
-        return new SSOUserInfo(tokens, emailAddress, firstName, lastName, timezone, country);
+        return new SSOAuthUserInfo(tokens, uid, emailAddress, firstName, lastName, timezone, country);
     }
 
     private static AuthToken CreateAccessToken(OAuth2CodeTokenExchangeOptions options)

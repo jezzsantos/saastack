@@ -16,7 +16,7 @@ public interface ISSOAuthenticationProvider
     ///     Returns the authenticated user with the specified <see cref="authCode" /> for the specified
     ///     <see cref="emailAddress" />
     /// </summary>
-    Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? emailAddress,
+    Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? emailAddress,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -27,14 +27,15 @@ public interface ISSOAuthenticationProvider
 }
 
 /// <summary>
-///     Provides the information about a user from a 3rd party system
+///     Provides the information about user info from a 3rd party system
 /// </summary>
-public class SSOUserInfo
+public class SSOAuthUserInfo
 {
-    public SSOUserInfo(IReadOnlyList<AuthToken> tokens, string emailAddress, string firstName, string? lastName,
-        TimezoneIANA timezone, CountryCodeIso3166 countryCode)
+    public SSOAuthUserInfo(IReadOnlyList<AuthToken> tokens, string uId, string emailAddress, string firstName,
+        string? lastName, TimezoneIANA timezone, CountryCodeIso3166 countryCode)
     {
         Tokens = tokens;
+        UId = uId;
         EmailAddress = emailAddress;
         FirstName = firstName;
         LastName = lastName;
@@ -57,4 +58,6 @@ public class SSOUserInfo
     public TimezoneIANA Timezone { get; }
 
     public IReadOnlyList<AuthToken> Tokens { get; }
+
+    public string UId { get; }
 }

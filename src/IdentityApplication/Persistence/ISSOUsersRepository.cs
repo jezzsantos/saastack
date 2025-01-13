@@ -7,6 +7,9 @@ namespace IdentityApplication.Persistence;
 
 public interface ISSOUsersRepository : IApplicationRepository
 {
+    Task<Result<Optional<SSOUserRoot>, Error>> FindByProviderUIdAsync(string providerName, string providerUId,
+        CancellationToken cancellationToken);
+
     Task<Result<Optional<SSOUserRoot>, Error>> FindByUserIdAsync(string providerName, Identifier userId,
         CancellationToken cancellationToken);
 

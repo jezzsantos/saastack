@@ -8,57 +8,63 @@ public static class CountryCodes
     public static readonly CountryCodeIso3166 Australia = CountryCodeIso3166.Create("Australia", "AU", "AUS", "036");
     public static readonly CountryCodeIso3166 UnitedStates =
         CountryCodeIso3166.Create("United States of America", "US", "USA", "840");
-    public static readonly CountryCodeIso3166 Default = UnitedStates;
+    public static readonly CountryCodeIso3166 Default = UnitedStates; //EXTEND: set your default country code
     public static readonly CountryCodeIso3166 NewZealand = CountryCodeIso3166.Create("New Zealand", "NZ", "NZL", "554");
 
 #if TESTINGONLY
-    public static readonly CountryCodeIso3166 Test = CountryCodeIso3166.Create("Test", "XX", "XXX", "001");
+    internal static readonly CountryCodeIso3166 Test = CountryCodeIso3166.Create("Test", "XX", "XXX", "001");
 #endif
 
     /// <summary>
-    ///     Whether the specified timezone by its <see cref="countryCodeAlpha3" /> exists
+    ///     Returns the specified timezone by its <see cref="countryCode" /> if it exists,
+    ///     which tries to match the 3 letter <see cref="CountryCodeIso3166.Alpha3" /> first,
+    ///     then tries to match the 2 letter <see cref="CountryCodeIso3166.Alpha2" />,
+    ///     then tries to match the number <see cref="CountryCodeIso3166.Numeric" /> last.
     /// </summary>
-    public static bool Exists(string? countryCodeAlpha3)
+    public static bool Exists(string? countryCode)
     {
-        if (countryCodeAlpha3.NotExists())
+        if (countryCode.NotExists())
         {
             return false;
         }
 
-        return Find(countryCodeAlpha3).Exists();
+        return Find(countryCode).Exists();
     }
 
     /// <summary>
-    ///     Returns the specified timezone by its <see cref="countryCodeAlpha3" /> if it exists
+    ///     Returns the specified timezone by its <see cref="countryCode" /> if it exists,
+    ///     which tries to match the 3 letter <see cref="CountryCodeIso3166.Alpha3" /> first,
+    ///     then tries to match the 2 letter <see cref="CountryCodeIso3166.Alpha2" />,
+    ///     then tries to match the number <see cref="CountryCodeIso3166.Numeric" /> last.
     /// </summary>
-    public static CountryCodeIso3166? Find(string? countryCodeAlpha3)
+    public static CountryCodeIso3166? Find(string? countryCode)
     {
-        if (countryCodeAlpha3.NotExists())
+        if (countryCode.NotExists())
         {
             return null;
         }
 
 #if TESTINGONLY
-        if (countryCodeAlpha3 == Test.Alpha3
-            || countryCodeAlpha3 == Test.Alpha2
-            || countryCodeAlpha3 == Test.Numeric)
+        if (countryCode == Test.Alpha3
+            || countryCode == Test.Alpha2
+            || countryCode == Test.Numeric)
         {
             return Test;
         }
 #endif
-        var alpha3 = CountryCodesResolver.GetByAlpha3Code(countryCodeAlpha3);
+        var alpha3 = CountryCodesResolver.GetByAlpha3Code(countryCode);
         if (alpha3.Exists())
         {
             return CountryCodeIso3166.Create(alpha3.Name, alpha3.Alpha2, alpha3.Alpha3, alpha3.NumericCode);
         }
 
-        var alpha2 = CountryCodesResolver.GetByAlpha2Code(countryCodeAlpha3);
+        var alpha2 = CountryCodesResolver.GetByAlpha2Code(countryCode);
         if (alpha2.Exists())
         {
             return CountryCodeIso3166.Create(alpha2.Name, alpha2.Alpha2, alpha2.Alpha3, alpha2.NumericCode);
         }
 
-        var numeric = CountryCodesResolver.GetList().FirstOrDefault(cc => cc.NumericCode == countryCodeAlpha3);
+        var numeric = CountryCodesResolver.GetList().FirstOrDefault(cc => cc.NumericCode == countryCode);
         if (numeric.Exists())
         {
             return CountryCodeIso3166.Create(numeric.Name, numeric.Alpha2, numeric.Alpha3, numeric.NumericCode);

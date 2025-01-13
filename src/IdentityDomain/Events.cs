@@ -311,11 +311,12 @@ public static class Events
             };
         }
 
-        public static DetailsAdded DetailsAdded(Identifier id, EmailAddress emailAddress,
+        public static DetailsAdded DetailsAdded(Identifier id, string uId, EmailAddress emailAddress,
             PersonName name, Timezone timezone, Address address)
         {
             return new DetailsAdded(id)
             {
+                ProviderUId = uId,
                 EmailAddress = emailAddress,
                 FirstName = name.FirstName,
                 LastName = name.LastName.ValueOrDefault?.Text,

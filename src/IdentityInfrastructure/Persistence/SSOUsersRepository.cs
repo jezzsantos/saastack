@@ -33,6 +33,15 @@ public class SSOUsersRepository : ISSOUsersRepository
     }
 #endif
 
+    public async Task<Result<Optional<SSOUserRoot>, Error>> FindByProviderUIdAsync(string providerName,
+        string providerUId, CancellationToken cancellationToken)
+    {
+        var query = Query.From<SSOUser>()
+            .Where<string>(usr => usr.ProviderUId, ConditionOperator.EqualTo, providerUId)
+            .AndWhere<string>(usr => usr.ProviderName, ConditionOperator.EqualTo, providerName);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<Optional<SSOUserRoot>, Error>> FindByUserIdAsync(string providerName,
         Identifier userId, CancellationToken cancellationToken)
     {
