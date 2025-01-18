@@ -54,14 +54,15 @@ public sealed class SmsesApi : IWebApiService
     }
 #endif
 
-    public async Task<ApiSearchResult<DeliveredSms, SearchSmsDeliveriesResponse>> SearchAll(
-        SearchSmsDeliveriesRequest request, CancellationToken cancellationToken)
+    public async Task<ApiSearchResult<DeliveredSms, SearchAllSmsDeliveriesResponse>> SearchAll(
+        SearchAllSmsDeliveriesRequest request, CancellationToken cancellationToken)
     {
         var deliveries = await _ancillaryApplication.SearchAllSmsDeliveriesAsync(_callerFactory.Create(),
-            request.SinceUtc, request.Tags, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+            request.SinceUtc, request.OrganizationId, request.Tags, request.ToSearchOptions(), request.ToGetOptions(),
+            cancellationToken);
 
         return () =>
-            deliveries.HandleApplicationResult(c => new SearchSmsDeliveriesResponse
+            deliveries.HandleApplicationResult(c => new SearchAllSmsDeliveriesResponse
                 { Smses = c.Results, Metadata = c.Metadata });
     }
 

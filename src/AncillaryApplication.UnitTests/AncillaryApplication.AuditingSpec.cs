@@ -1,4 +1,5 @@
 using AncillaryApplication.Persistence;
+using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
 using Application.Persistence.Shared;
@@ -8,6 +9,7 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
@@ -52,7 +54,6 @@ public class AncillaryApplicationAuditingSpec
             provisioningMessageQueue.Object, provisioningDeliveryService.Object);
     }
 
-
     [Fact]
     public async Task WhenDeliverAuditAsyncAndMessageHasNoAuditCode_ThenReturnsError()
     {
@@ -76,7 +77,7 @@ public class AncillaryApplicationAuditingSpec
         {
             AuditCode = "anauditcode",
             AgainstId = "anagainstid",
-            Arguments = new List<string> { "anarg1", "anarg2" },
+            Arguments = ["anarg1", "anarg2"],
             MessageTemplate = "amessagetemplate",
             TenantId = "atenantid"
         }.ToJson()!;
@@ -94,6 +95,39 @@ public class AncillaryApplicationAuditingSpec
                 && aud.TemplateArguments.Value.Items[1] == "anarg2"
                 && aud.OrganizationId.Value == "atenantid"
             ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenSearchAllDeliveredEmails_ThenReturnsEmails()
+    {
+        var datum = DateTime.UtcNow;
+        var audit = new Audit
+        {
+            Id = "anid",
+            OrganizationId = "anorganizationid",
+            AgainstId = "anagainstid",
+            AuditCode = "anauditcode",
+            MessageTemplate = "amessagetemplate",
+            TemplateArguments = TemplateArguments.Create(["anarg1", "anarg2"]).Value
+        };
+        _auditRepository.Setup(edr =>
+                edr.SearchAllAsync(It.IsAny<DateTime?>(), It.IsAny<string?>(),
+                    It.IsAny<SearchOptions>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Audit> { audit });
+
+        var result = await _application.SearchAllAuditsAsync(_caller.Object, null, null,
+            new SearchOptions(), new GetOptions(), CancellationToken.None);
+
+        result.Value.Results.Count.Should().Be(1);
+        result.Value.Results[0].Id.Should().Be("anid");
+        result.Value.Results[0].OrganizationId.Should().Be("anorganizationid");
+        result.Value.Results[0].AgainstId.Should().Be("anagainstid");
+        result.Value.Results[0].AuditCode.Should().Be("anauditcode");
+        result.Value.Results[0].MessageTemplate.Should().Be("amessagetemplate");
+        result.Value.Results[0].TemplateArguments.Count.Should().Be(2);
+        result.Value.Results[0].TemplateArguments[0].Should().Be("anarg1");
+        result.Value.Results[0].TemplateArguments[1].Should().Be("anarg2");
     }
 
 #if TESTINGONLY

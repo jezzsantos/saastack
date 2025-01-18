@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -14,10 +15,10 @@ namespace AncillaryDomain;
 public sealed class EmailDeliveryRoot : AggregateRootBase
 {
     public static Result<EmailDeliveryRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        QueuedMessageId messageId)
+        QueuedMessageId messageId, Optional<Identifier> organizationId)
     {
         var root = new EmailDeliveryRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.EmailDelivery.Created(root.Id, messageId));
+        root.RaiseCreateEvent(AncillaryDomain.Events.EmailDelivery.Created(root.Id, messageId, organizationId));
         return root;
     }
 
@@ -39,6 +40,8 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     public Optional<DateTime> Delivered { get; private set; } = Optional<DateTime>.None;
 
     public Optional<DateTime> FailedDelivery { get; private set; } = Optional<DateTime>.None;
+
+    public Optional<Identifier> OrganizationId { get; private set; }
 
     public bool IsAttempted => Attempts.HasBeenAttempted;
 
@@ -86,6 +89,9 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 }
 
                 MessageId = messageId.Value;
+                OrganizationId = created.OrganizationId.HasValue()
+                    ? created.OrganizationId.ToId()
+                    : Optional<Identifier>.None;
                 return Result.Ok;
             }
 

@@ -22,7 +22,7 @@ public class SendingAttemptsSpec
     {
         var datum = DateTime.UtcNow;
 
-        var result = SendingAttempts.Create(new List<DateTime> { datum }).Value;
+        var result = SendingAttempts.Create([datum]).Value;
 
         result.Attempts.Should().ContainInOrder(datum);
         result.HasBeenAttempted.Should().BeTrue();
@@ -34,7 +34,7 @@ public class SendingAttemptsSpec
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
 
-        var result = SendingAttempts.Create(new List<DateTime> { datum2, datum1 });
+        var result = SendingAttempts.Create([datum2, datum1]);
 
         result.Should().BeError(ErrorCode.Validation, Resources.SendingAttempts_PreviousAttemptsNotInOrder);
     }
@@ -45,7 +45,7 @@ public class SendingAttemptsSpec
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
 
-        var result = SendingAttempts.Create(new List<DateTime> { datum1, datum2 });
+        var result = SendingAttempts.Create([datum1, datum2]);
 
         result.Should().BeSuccess();
         result.Value.Attempts.Should().ContainInOrder(datum1, datum2);
@@ -57,7 +57,7 @@ public class SendingAttemptsSpec
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
-        var attempts = SendingAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
+        var attempts = SendingAttempts.Create([datum1, datum2]).Value;
 
         var result = attempts.Attempt(datum1);
 
@@ -69,7 +69,7 @@ public class SendingAttemptsSpec
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
-        var attempts = SendingAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
+        var attempts = SendingAttempts.Create([datum1, datum2]).Value;
         var datum3 = datum2.AddSeconds(1);
 
         var result = attempts.Attempt(datum3);

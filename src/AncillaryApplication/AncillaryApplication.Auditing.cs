@@ -43,11 +43,13 @@ partial class AncillaryApplication
     }
 #endif
 
-#if TESTINGONLY
     public async Task<Result<SearchResults<Audit>, Error>> SearchAllAuditsAsync(ICallerContext caller,
-        string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken)
+        DateTime? sinceUtc, string? organizationId, SearchOptions searchOptions, GetOptions getOptions,
+        CancellationToken cancellationToken)
     {
-        var searched = await _auditRepository.SearchAllAsync(organizationId.ToId(), searchOptions, cancellationToken);
+        var sinceWhen = sinceUtc ?? DateTime.UtcNow.SubtractDays(14);
+        var searched =
+            await _auditRepository.SearchAllAsync(sinceWhen, organizationId, searchOptions, cancellationToken);
         if (searched.IsFailure)
         {
             return searched.Error;
@@ -57,7 +59,6 @@ partial class AncillaryApplication
 
         return searchOptions.ApplyWithMetadata(audits.Select(audit => audit.ToAudit()));
     }
-#endif
 
     private async Task<Result<bool, Error>> DeliverAuditInternalAsync(ICallerContext caller, AuditMessage message,
         CancellationToken cancellationToken)
@@ -73,7 +74,9 @@ partial class AncillaryApplication
             return templateArguments.Error;
         }
 
-        var created = AuditRoot.Create(_recorder, _idFactory, message.AgainstId.ToId(), message.TenantId.ToId(),
+        var created = AuditRoot.Create(_recorder, _idFactory, message.AgainstId.ToId(), message.TenantId.HasValue()
+                ? message.TenantId.ToId()
+                : Optional<Identifier>.None,
             message.AuditCode!, message.MessageTemplate.ToOptional(), templateArguments.Value);
         if (created.IsFailure)
         {
@@ -100,6 +103,9 @@ public static class AncillaryAuditingConversionExtensions
     {
         return new Audit
         {
+            Created = audit.Created.HasValue
+                ? audit.Created.Value!.Value
+                : DateTime.UtcNow,
             Id = audit.Id,
             AuditCode = audit.AuditCode,
             AgainstId = audit.AgainstId,

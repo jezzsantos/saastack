@@ -54,14 +54,15 @@ public sealed class EmailsApi : IWebApiService
     }
 #endif
 
-    public async Task<ApiSearchResult<DeliveredEmail, SearchEmailDeliveriesResponse>> SearchAll(
-        SearchEmailDeliveriesRequest request, CancellationToken cancellationToken)
+    public async Task<ApiSearchResult<DeliveredEmail, SearchAllEmailDeliveriesResponse>> SearchAll(
+        SearchAllEmailDeliveriesRequest request, CancellationToken cancellationToken)
     {
         var deliveries = await _ancillaryApplication.SearchAllEmailDeliveriesAsync(_callerFactory.Create(),
-            request.SinceUtc, request.Tags, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+            request.SinceUtc, request.OrganizationId, request.Tags, request.ToSearchOptions(), request.ToGetOptions(),
+            cancellationToken);
 
         return () =>
-            deliveries.HandleApplicationResult(c => new SearchEmailDeliveriesResponse
+            deliveries.HandleApplicationResult(c => new SearchAllEmailDeliveriesResponse
                 { Emails = c.Results, Metadata = c.Metadata });
     }
 

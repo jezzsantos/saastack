@@ -48,6 +48,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
+                TenantId = "atenantid",
                 Message = new QueuedSmsMessage
                 {
                     Body = "anhtmlbody",
@@ -62,11 +63,12 @@ public class SmsesApiSpec : WebApiSpec<Program>
         _smsDeliveryService.LastPhoneNumber.Should().Be("+6498876986");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
         deliveries.Content.Value.Smses.Count.Should().Be(1);
+        deliveries.Content.Value.Smses[0].OrganizationId.Should().Be("atenantid");
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should()
@@ -106,7 +108,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
         _smsDeliveryService.LastPhoneNumber.Should().Be("+6498876986");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -154,7 +156,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
         secondAttempt.Content.Value.IsSent.Should().BeTrue();
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -205,7 +207,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
 #endif
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -258,7 +260,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
 #endif
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -279,7 +281,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchSmsDeliveriesWithTags_TheReturnsSmses()
+    public async Task WhenSearchSmsDeliveriesWithTagsForAllOrganizations_TheReturnsSmses()
     {
         _smsDeliveryService.SendingSucceeds = true;
         var request = new SendSmsRequest
@@ -303,13 +305,54 @@ public class SmsesApiSpec : WebApiSpec<Program>
         _smsDeliveryService.LastPhoneNumber.Should().Be("+6498876986");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest
             {
                 Tags = ["atag2", "atag3"]
             },
             req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Smses.Count.Should().Be(1);
+        deliveries.Content.Value.Smses[0].Tags.Count.Should().Be(3);
+        deliveries.Content.Value.Smses[0].Tags[0].Should().Be("atag1");
+        deliveries.Content.Value.Smses[0].Tags[1].Should().Be("atag2");
+        deliveries.Content.Value.Smses[0].Tags[2].Should().Be("atag3");
+    }
+
+    [Fact]
+    public async Task WhenSearchSmsDeliveriesWithTagsForAnOrganization_TheReturnsSmses()
+    {
+        var login = await LoginUserAsync(LoginUser.Operator);
+        _smsDeliveryService.SendingSucceeds = true;
+        var tenantId = login.DefaultOrganizationId;
+        var request = new SendSmsRequest
+        {
+            Message = new SmsMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                TenantId = tenantId,
+                Message = new QueuedSmsMessage
+                {
+                    Body = "anhtmlbody",
+                    ToPhoneNumber = "+6498876986",
+                    Tags = ["atag1", "atag2", "atag3"]
+                }
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.Content.Value.IsSent.Should().BeTrue();
+        _smsDeliveryService.LastPhoneNumber.Should().Be("+6498876986");
+
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest
+            {
+                OrganizationId = tenantId
+            },
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
+        deliveries.Content.Value.Smses[0].OrganizationId.Should().Be(tenantId);
         deliveries.Content.Value.Smses[0].Tags.Count.Should().Be(3);
         deliveries.Content.Value.Smses[0].Tags[0].Should().Be("atag1");
         deliveries.Content.Value.Smses[0].Tags[1].Should().Be("atag2");

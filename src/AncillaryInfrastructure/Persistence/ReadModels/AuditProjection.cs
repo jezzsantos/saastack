@@ -29,6 +29,7 @@ public class AuditProjection : IReadModelProjection
                 return await _audits.HandleCreateAsync(e.RootId, dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;
+                    dto.Created = e.When;
                     dto.AuditCode = e.AuditCode;
                     dto.AgainstId = e.AgainstId;
                     dto.MessageTemplate = e.MessageTemplate;

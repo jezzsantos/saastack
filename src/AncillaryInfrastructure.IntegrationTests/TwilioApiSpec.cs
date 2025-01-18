@@ -62,7 +62,7 @@ public class TwilioApiSpec : WebApiSpec<Program>
         result.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Smses.Count.Should().Be(1);
@@ -90,7 +90,7 @@ public class TwilioApiSpec : WebApiSpec<Program>
         result.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Smses.Count.Should().Be(1);

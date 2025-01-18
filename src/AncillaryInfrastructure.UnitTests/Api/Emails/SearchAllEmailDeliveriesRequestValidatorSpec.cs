@@ -1,5 +1,6 @@
 using AncillaryInfrastructure.Api.Emails;
 using Common.Extensions;
+using Domain.Common.ValueObjects;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -9,15 +10,15 @@ using Xunit;
 namespace AncillaryInfrastructure.UnitTests.Api.Emails;
 
 [Trait("Category", "Unit")]
-public class SearchEmailDeliveriesRequestValidatorSpec
+public class SearchAllEmailDeliveriesRequestValidatorSpec
 {
-    private readonly SearchEmailDeliveriesRequest _dto;
-    private readonly SearchEmailDeliveriesRequestValidator _validator;
+    private readonly SearchAllEmailDeliveriesRequest _dto;
+    private readonly SearchAllEmailDeliveriesRequestValidator _validator;
 
-    public SearchEmailDeliveriesRequestValidatorSpec()
+    public SearchAllEmailDeliveriesRequestValidatorSpec()
     {
-        _validator = new SearchEmailDeliveriesRequestValidator();
-        _dto = new SearchEmailDeliveriesRequest();
+        _validator = new SearchAllEmailDeliveriesRequestValidator("anid".ToIdentifierFactory());
+        _dto = new SearchAllEmailDeliveriesRequest();
     }
 
     [Fact]
@@ -26,6 +27,13 @@ public class SearchEmailDeliveriesRequestValidatorSpec
         _validator.ValidateAndThrow(_dto);
     }
 
+    [Fact]
+    public void WhenOrganizationIdExists_ThenSucceeds()
+    {
+        _dto.OrganizationId = "anid";
+        _validator.ValidateAndThrow(_dto);
+    }
+    
     [Fact]
     public void WhenSinceUtcIsTooFuture_ThenThrows()
     {

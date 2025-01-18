@@ -6,6 +6,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
+using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -45,18 +46,17 @@ public class AuditsApiSpec : WebApiSpec<Program>
                 AuditCode = "anauditcode",
                 AgainstId = "anagainstid",
                 MessageTemplate = "amessagetemplate",
-                Arguments = new List<string> { "anarg1", "anarg2" }
+                Arguments = ["anarg1", "anarg2"]
             }.ToJson()!
         };
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsSent.Should().BeTrue();
 
-#if TESTINGONLY
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {
             OrganizationId = tenantId
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         audits.Content.Value.Audits.Count.Should().Be(1);
         audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
@@ -64,7 +64,76 @@ public class AuditsApiSpec : WebApiSpec<Program>
         audits.Content.Value.Audits[0].TemplateArguments.Count.Should().Be(2);
         audits.Content.Value.Audits[0].TemplateArguments[0].Should().Be("anarg1");
         audits.Content.Value.Audits[0].TemplateArguments[1].Should().Be("anarg2");
-#endif
+    }
+
+    [Fact]
+    public async Task WhenSearchAuditsForAllOrganizations_TheReturnsAudits()
+    {
+        var login = await LoginUserAsync(LoginUser.Operator);
+
+        var request = new DeliverAuditRequest
+        {
+            Message = new AuditMessage
+            {
+                MessageId = "amessageid",
+                CallId = "acallid",
+                CallerId = "acallerid",
+                AuditCode = "anauditcode",
+                AgainstId = "anagainstid",
+                MessageTemplate = "amessagetemplate",
+                Arguments = ["anarg1", "anarg2"]
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.Content.Value.IsSent.Should().BeTrue();
+
+        var audits = await Api.GetAsync(new SearchAllAuditsRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        audits.Content.Value.Audits.Count.Should().Be(1);
+        audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate");
+        audits.Content.Value.Audits[0].TemplateArguments.Count.Should().Be(2);
+        audits.Content.Value.Audits[0].TemplateArguments[0].Should().Be("anarg1");
+        audits.Content.Value.Audits[0].TemplateArguments[1].Should().Be("anarg2");
+    }
+
+    [Fact]
+    public async Task WhenSearchAuditsForAnOrganization_TheReturnsAudits()
+    {
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var tenantId = login.DefaultOrganizationId;
+
+        var request = new DeliverAuditRequest
+        {
+            Message = new AuditMessage
+            {
+                MessageId = "amessageid",
+                TenantId = tenantId,
+                CallId = "acallid",
+                CallerId = "acallerid",
+                AuditCode = "anauditcode",
+                AgainstId = "anagainstid",
+                MessageTemplate = "amessagetemplate",
+                Arguments = ["anarg1", "anarg2"]
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.Content.Value.IsSent.Should().BeTrue();
+
+        var audits = await Api.GetAsync(new SearchAllAuditsRequest
+            {
+                OrganizationId = tenantId
+            },
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        audits.Content.Value.Audits.Count.Should().Be(1);
+        audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
+        audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate");
+        audits.Content.Value.Audits[0].TemplateArguments.Count.Should().Be(2);
+        audits.Content.Value.Audits[0].TemplateArguments[0].Should().Be("anarg1");
+        audits.Content.Value.Audits[0].TemplateArguments[1].Should().Be("anarg2");
     }
 
 #if TESTINGONLY
@@ -80,7 +149,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {
             OrganizationId = tenantId
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         audits.Content.Value.Audits.Count.Should().Be(0);
     }
@@ -90,7 +159,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDrainAllAuditsAndSomeWithUnknownTenancies_ThenDrains()
     {
-        var login = await LoginUserAsync();
+        var login = await LoginUserAsync(LoginUser.Operator);
         var tenantId = login.DefaultOrganizationId;
         var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
@@ -99,7 +168,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             TenantId = tenantId,
             AuditCode = "anauditcode1",
             MessageTemplate = "amessagetemplate1",
-            Arguments = new List<string> { "anarg1" }
+            Arguments = ["anarg1"]
         }, CancellationToken.None);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {
@@ -107,7 +176,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             TenantId = tenantId,
             AuditCode = "anauditcode2",
             MessageTemplate = "amessagetemplate2",
-            Arguments = new List<string> { "anarg2" }
+            Arguments = ["anarg2"]
         }, CancellationToken.None);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {
@@ -115,7 +184,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             TenantId = "anothertenantid",
             AuditCode = "anauditcode3",
             MessageTemplate = "amessagetemplate3",
-            Arguments = new List<string> { "anarg3" }
+            Arguments = ["anarg3"]
         }, CancellationToken.None);
 
         var request = new DrainAllAuditsRequest();
@@ -124,7 +193,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {
             OrganizationId = tenantId
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         audits.Content.Value.Audits.Count.Should().Be(2);
         audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);

@@ -5,6 +5,7 @@ using Application.Interfaces;
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
@@ -54,12 +55,23 @@ public class AuditRepository : IAuditRepository
         return await SaveAsync(audit, false, cancellationToken);
     }
 
-    public async Task<Result<IReadOnlyList<Audit>, Error>> SearchAllAsync(Identifier organizationId,
+    public async Task<Result<IReadOnlyList<Audit>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var queried = await _auditQueries.QueryAsync(Query.From<Audit>()
-            .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
-            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        var query = Query.From<Audit>().WhereNoOp();
+        if (sinceUtc.HasValue)
+        {
+            query = query.AndWhere<DateTime?>(aud => aud.Created, ConditionOperator.GreaterThan, sinceUtc);
+        }
+
+        if (organizationId.HasValue())
+        {
+            query = query.AndWhere<string?>(aud => aud.OrganizationId, ConditionOperator.EqualTo, organizationId);
+        }
+
+        query = query.WithSearchOptions(searchOptions);
+
+        var queried = await _auditQueries.QueryAsync(query, cancellationToken: cancellationToken);
         if (queried.IsFailure)
         {
             return queried.Error;

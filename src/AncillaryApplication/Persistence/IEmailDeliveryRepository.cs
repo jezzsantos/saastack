@@ -17,7 +17,8 @@ public interface IEmailDeliveryRepository : IApplicationRepository
     Task<Result<EmailDeliveryRoot, Error>> SaveAsync(EmailDeliveryRoot delivery, bool reload,
         CancellationToken cancellationToken);
 
-    Task<Result<List<EmailDelivery>, Error>> SearchAllDeliveriesAsync(DateTime? sinceUtc, IReadOnlyList<string>? tags,
+    Task<Result<List<EmailDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
+        IReadOnlyList<string>? tags,
         SearchOptions searchOptions,
         CancellationToken cancellationToken);
 }

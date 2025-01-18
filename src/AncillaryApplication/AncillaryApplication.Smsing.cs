@@ -7,6 +7,7 @@ using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
+using Domain.Common.ValueObjects;
 using Domain.Shared;
 
 namespace AncillaryApplication;
@@ -104,12 +105,13 @@ partial class AncillaryApplication
 #endif
 
     public async Task<Result<SearchResults<DeliveredSms>, Error>> SearchAllSmsDeliveriesAsync(ICallerContext caller,
-        DateTime? sinceUtc, IReadOnlyList<string>? tags, SearchOptions searchOptions,
+        DateTime? sinceUtc, string? organizationId, IReadOnlyList<string>? tags, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
     {
         var sinceWhen = sinceUtc ?? DateTime.UtcNow.SubtractDays(14);
         var searched =
-            await _smsDeliveryRepository.SearchAllDeliveriesAsync(sinceWhen, tags, searchOptions, cancellationToken);
+            await _smsDeliveryRepository.SearchAllAsync(sinceWhen, organizationId, tags, searchOptions,
+                cancellationToken);
         if (searched.IsFailure)
         {
             return searched.Error;
@@ -180,7 +182,9 @@ partial class AncillaryApplication
         }
         else
         {
-            var created = SmsDeliveryRoot.Create(_recorder, _idFactory, messageId.Value);
+            var created = SmsDeliveryRoot.Create(_recorder, _idFactory, messageId.Value, message.TenantId.HasValue()
+                ? message.TenantId.ToId()
+                : Optional<Identifier>.None);
             if (created.IsFailure)
             {
                 return created.Error;
@@ -263,6 +267,9 @@ public static class AncillaryMSmsingConversionExtensions
     {
         return new DeliveredSms
         {
+            Created = sms.Created.HasValue
+                ? sms.Created.Value!.Value
+                : DateTime.UtcNow,
             Attempts = sms.Attempts.HasValue
                 ? sms.Attempts.Value.Attempts.ToList()
                 : new List<DateTime>(),
@@ -273,6 +280,7 @@ public static class AncillaryMSmsingConversionExtensions
                 : null,
             ToPhoneNumber = sms.ToPhoneNumber,
             Id = sms.Id,
+            OrganizationId = sms.OrganizationId,
             IsDelivered = sms.Delivered.HasValue,
             DeliveredAt = sms.Delivered.HasValue
                 ? sms.Delivered.Value

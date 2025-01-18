@@ -12,6 +12,8 @@ public class SmsDelivery : ReadModelEntity
 
     public Optional<string> Body { get; set; }
 
+    public Optional<DateTime?> Created { get; set; }
+
     public Optional<DateTime?> Delivered { get; set; }
 
     public Optional<DateTime?> DeliveryFailed { get; set; }
@@ -21,6 +23,8 @@ public class SmsDelivery : ReadModelEntity
     public Optional<DateTime?> LastAttempted { get; set; }
 
     public Optional<string> MessageId { get; set; }
+
+    public Optional<string> OrganizationId { get; set; }
 
     public Optional<string> ReceiptId { get; set; }
 

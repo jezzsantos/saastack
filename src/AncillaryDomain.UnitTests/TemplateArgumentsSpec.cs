@@ -9,7 +9,7 @@ public class TemplateArgumentsSpec
     [Fact]
     public void WhenCreate_ThenAssigned()
     {
-        var result = TemplateArguments.Create(new List<string> { "anarg1", "anarg2" });
+        var result = TemplateArguments.Create(["anarg1", "anarg2"]);
 
         result.Value.Items.Count.Should().Be(2);
         result.Value.Items[0].Should().Be("anarg1");

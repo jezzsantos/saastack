@@ -18,11 +18,16 @@ public static class Events
     public static class EmailDelivery
     {
         public static Domain.Events.Shared.Ancillary.EmailDelivery.Created Created(Identifier id,
-            QueuedMessageId messageId)
+            QueuedMessageId messageId,
+            Optional<Identifier> organizationId)
         {
             return new Domain.Events.Shared.Ancillary.EmailDelivery.Created(id)
             {
-                MessageId = messageId
+                When = DateTime.UtcNow,
+                MessageId = messageId,
+                OrganizationId = organizationId.HasValue
+                    ? organizationId.Value.Text
+                    : null
             };
         }
 
@@ -98,11 +103,16 @@ public static class Events
     public static class SmsDelivery
     {
         public static Domain.Events.Shared.Ancillary.SmsDelivery.Created Created(Identifier id,
-            QueuedMessageId messageId)
+            QueuedMessageId messageId,
+            Optional<Identifier> organizationId)
         {
             return new Domain.Events.Shared.Ancillary.SmsDelivery.Created(id)
             {
-                MessageId = messageId
+                When = DateTime.UtcNow,
+                MessageId = messageId,
+                OrganizationId = organizationId.HasValue
+                    ? organizationId.Value.Text
+                    : null
             };
         }
 
@@ -177,6 +187,7 @@ public static class Events
         {
             return new Created(id)
             {
+                When = DateTime.UtcNow,
                 OrganizationId = organizationId.HasValue
                     ? organizationId.Value.Text
                     : null,

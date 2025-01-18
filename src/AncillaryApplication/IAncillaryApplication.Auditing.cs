@@ -13,8 +13,7 @@ partial interface IAncillaryApplication
     Task<Result<Error>> DrainAllAuditsAsync(ICallerContext caller, CancellationToken cancellationToken);
 #endif
 
-#if TESTINGONLY
-    Task<Result<SearchResults<Audit>, Error>> SearchAllAuditsAsync(ICallerContext caller, string organizationId,
+    Task<Result<SearchResults<Audit>, Error>> SearchAllAuditsAsync(ICallerContext caller, DateTime? sinceUtc,
+        string? organizationId,
         SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
-#endif
 }

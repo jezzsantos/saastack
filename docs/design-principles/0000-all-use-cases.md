@@ -50,7 +50,7 @@ Legend:
 For permanently recording compliance and business critical events that are performed on the platform.
 
 1. [Asynchronously] persist an audit to permanent storage <sup>SVC</sup>
-2. Find all stored audits <sup>TSTO</sup>
+2. Find all stored audits for org <sup>OPS</sup>
 3. Deliver all pending audits <sup>TSTO</sup>
 
 #### Emails
@@ -58,7 +58,7 @@ For permanently recording compliance and business critical events that are perfo
 For delivering emails to 3rd party services
 
 1. [Asynchronously] deliver an email to an email gateway <sup>SVC</sup>
-2. Find all delivered emails <sup>TSTO</sup>
+2. Find all delivered emails, by tags or for org <sup>OPS</sup>
 3. Deliver all pending emails <sup>TSTO</sup>
 
 #### SMS
@@ -66,7 +66,7 @@ For delivering emails to 3rd party services
 For delivering SMS to 3rd party services
 
 1. [Asynchronously] deliver an SMS to an SMS gateway <sup>SVC</sup>
-2. Find all delivered SMS <sup>TSTO</sup>
+2. Find all delivered SMS, by tags or for org <sup>OPS</sup>
 3. Deliver all pending SMS <sup>TSTO</sup>
 
 #### Feature Flags

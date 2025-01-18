@@ -1,5 +1,6 @@
 using AncillaryInfrastructure.Api.Smses;
 using Common.Extensions;
+using Domain.Common.ValueObjects;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -9,20 +10,27 @@ using Xunit;
 namespace AncillaryInfrastructure.UnitTests.Api.Smses;
 
 [Trait("Category", "Unit")]
-public class SearchSmsDeliveriesRequestValidatorSpec
+public class SearchAllSmsDeliveriesRequestValidatorSpec
 {
-    private readonly SearchSmsDeliveriesRequest _dto;
-    private readonly SearchSmsDeliveriesRequestValidator _validator;
+    private readonly SearchAllSmsDeliveriesRequest _dto;
+    private readonly SearchAllSmsDeliveriesRequestValidator _validator;
 
-    public SearchSmsDeliveriesRequestValidatorSpec()
+    public SearchAllSmsDeliveriesRequestValidatorSpec()
     {
-        _validator = new SearchSmsDeliveriesRequestValidator();
-        _dto = new SearchSmsDeliveriesRequest();
+        _validator = new SearchAllSmsDeliveriesRequestValidator("anid".ToIdentifierFactory());
+        _dto = new SearchAllSmsDeliveriesRequest();
     }
 
     [Fact]
     public void WhenAllProperties_ThenSucceeds()
     {
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenOrganizationIdExists_ThenSucceeds()
+    {
+        _dto.OrganizationId = "anid";
         _validator.ValidateAndThrow(_dto);
     }
 

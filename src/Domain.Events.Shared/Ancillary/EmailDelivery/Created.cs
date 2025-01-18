@@ -16,4 +16,9 @@ public sealed class Created : DomainEvent
     }
 
     public required string MessageId { get; set; }
+
+    public string? OrganizationId { get; set; }
+
+    public required DateTime When { get; set; }
+
 }

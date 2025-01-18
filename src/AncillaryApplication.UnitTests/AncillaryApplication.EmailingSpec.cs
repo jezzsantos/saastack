@@ -107,7 +107,8 @@ public class AncillaryApplicationEmailingSpec
             }
         }.ToJson()!;
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -162,7 +163,8 @@ public class AncillaryApplicationEmailingSpec
             }
         }.ToJson()!;
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -358,12 +360,14 @@ public class AncillaryApplicationEmailingSpec
             LastAttempted = datum
         };
         _emailDeliveryRepository.Setup(edr =>
-                edr.SearchAllDeliveriesAsync(It.IsAny<DateTime?>(), It.IsAny<IReadOnlyList<string>>(),
+                edr.SearchAllAsync(It.IsAny<DateTime?>(), It.IsAny<string?>(),
+                    It.IsAny<IReadOnlyList<string>>(),
                     It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EmailDelivery> { delivery });
 
-        var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, null, new SearchOptions(),
+        var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, null, null,
+            new SearchOptions(),
             new GetOptions(), CancellationToken.None);
 
         result.Value.Results.Count.Should().Be(1);
@@ -397,7 +401,8 @@ public class AncillaryApplicationEmailingSpec
     {
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -421,7 +426,8 @@ public class AncillaryApplicationEmailingSpec
     {
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -465,7 +471,8 @@ public class AncillaryApplicationEmailingSpec
     {
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -489,7 +496,8 @@ public class AncillaryApplicationEmailingSpec
     {
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });

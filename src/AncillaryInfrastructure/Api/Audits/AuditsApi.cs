@@ -40,15 +40,14 @@ public sealed class AuditsApi : IWebApiService
     }
 #endif
 
-#if TESTINGONLY
     public async Task<ApiSearchResult<Audit, SearchAllAuditsResponse>> SearchAll(
         SearchAllAuditsRequest request, CancellationToken cancellationToken)
     {
         var audits = await _ancillaryApplication.SearchAllAuditsAsync(_callerFactory.Create(),
-            request.OrganizationId!, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+            request.SinceUtc, request.OrganizationId!, request.ToSearchOptions(), request.ToGetOptions(),
+            cancellationToken);
 
         return () => audits.HandleApplicationResult(a => new SearchAllAuditsResponse
             { Audits = a.Results, Metadata = a.Metadata });
     }
-#endif
 }

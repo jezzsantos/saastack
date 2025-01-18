@@ -29,7 +29,9 @@ public class EmailDeliveryProjection : IReadModelProjection
             case Created e:
                 return await _deliveries.HandleCreateAsync(e.RootId, dto =>
                     {
+                        dto.OrganizationId = e.OrganizationId;
                         dto.MessageId = e.MessageId;
+                        dto.Created = e.When;
                         dto.Attempts = SendingAttempts.Empty;
                         dto.LastAttempted = Optional<DateTime?>.None;
                         dto.SendFailed = Optional<DateTime?>.None;

@@ -33,9 +33,11 @@ public class SmsDeliverRootSpec
     {
         var messageId = CreateMessageId();
 
-        var result = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var result = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, "anorganizationid".ToId())
+            .Value;
 
         result.MessageId.Should().Be(messageId);
+        result.OrganizationId.Should().Be("anorganizationid".ToId());
         result.Events.Last().Should().BeOfType<Created>();
     }
 
@@ -43,7 +45,8 @@ public class SmsDeliverRootSpec
     public void WhenSetSmsDetailsAndMissingBody_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         var recipient = PhoneNumber.Create("+6498876986").Value;
 
         var result = root.SetSmsDetails(string.Empty, recipient, new List<string>());
@@ -55,7 +58,8 @@ public class SmsDeliverRootSpec
     public void WhenSetSmsDetails_ThenDetailsAssigned()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         var recipient = PhoneNumber.Create("+6498876986").Value;
 
         var result = root.SetSmsDetails("abody", recipient, new List<string> { "atag" });
@@ -71,7 +75,8 @@ public class SmsDeliverRootSpec
     public void WhenAttemptSendingAndAlreadyDelivered_ThenDoesNotAttemptAndReturnsTrue()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverSms();
 #endif
@@ -86,7 +91,8 @@ public class SmsDeliverRootSpec
     public void WhenAttemptSendingAndNotDelivered_ThenAddsAnAttempt()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 
         var result = root.AttemptSending();
 
@@ -101,7 +107,8 @@ public class SmsDeliverRootSpec
     public void WhenFailSendingAndDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverSms();
 #endif
@@ -115,7 +122,8 @@ public class SmsDeliverRootSpec
     public void WhenFailSendingAndNotAttempted_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 
         var result = root.FailedSending();
 
@@ -126,7 +134,8 @@ public class SmsDeliverRootSpec
     public void WhenFailSending_ThenFails()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
 
         var result = root.FailedSending();
@@ -139,7 +148,8 @@ public class SmsDeliverRootSpec
     public void WhenSucceededSendingAndDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverSms();
 #endif
@@ -153,7 +163,8 @@ public class SmsDeliverRootSpec
     public void WhenSucceededSendingAndNotAttempted_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 
         var result = root.SucceededSending(Optional<string>.None);
 
@@ -164,7 +175,8 @@ public class SmsDeliverRootSpec
     public void WhenSucceededSending_ThenSent()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
 
         var result = root.SucceededSending("areceiptid");
@@ -181,7 +193,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryAndNotSent_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 
         var result = root.ConfirmDelivery("areceiptid", DateTime.UtcNow);
 
@@ -192,7 +205,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryAndAlreadyDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
         root.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -206,7 +220,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryAnd_ThenConfirmsDelivery()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
         var deliveredAt = DateTime.UtcNow;
@@ -223,7 +238,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryFailedAndNotSent_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
 
         var result = root.ConfirmDeliveryFailed("areceiptid", DateTime.UtcNow, "areason");
 
@@ -234,7 +250,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryFailedAndAlreadyDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
         root.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -248,7 +265,8 @@ public class SmsDeliverRootSpec
     public void WhenConfirmDeliveryFailedAnd_ThenConfirmsDelivery()
     {
         var messageId = CreateMessageId();
-        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var root = SmsDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+            .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
         var failedAt = DateTime.UtcNow;

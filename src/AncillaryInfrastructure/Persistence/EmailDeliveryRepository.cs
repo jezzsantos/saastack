@@ -68,20 +68,26 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
             : delivery;
     }
 
-    public async Task<Result<List<EmailDelivery>, Error>> SearchAllDeliveriesAsync(DateTime? sinceUtc,
-        IReadOnlyList<string>? tags, SearchOptions searchOptions, CancellationToken cancellationToken)
+    public async Task<Result<List<EmailDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc,
+        string? organizationId, IReadOnlyList<string>? tags, SearchOptions searchOptions,
+        CancellationToken cancellationToken)
     {
         var query = Query.From<EmailDelivery>().WhereNoOp();
         if (sinceUtc.HasValue)
         {
-            query = query.AndWhere<DateTime?>(u => u.LastAttempted, ConditionOperator.GreaterThan, sinceUtc);
+            query = query.AndWhere<DateTime?>(ed => ed.Created, ConditionOperator.GreaterThan, sinceUtc);
+        }
+
+        if (organizationId.HasValue())
+        {
+            query = query.AndWhere<string?>(ed => ed.OrganizationId, ConditionOperator.EqualTo, organizationId);
         }
 
         if (tags.Exists() && tags.HasAny())
         {
             foreach (var tag in tags)
             {
-                query = query.AndWhere<string>(u => u.Tags, ConditionOperator.Like, tag);
+                query = query.AndWhere<string>(ed => ed.Tags, ConditionOperator.Like, tag);
             }
         }
 

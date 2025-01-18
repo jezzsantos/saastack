@@ -22,7 +22,7 @@ public class AuditRootSpec
             .Returns("anid".ToId());
         _audit = AuditRoot.Create(recorder.Object, identifierFactory.Object,
             "anagainstid".ToId(), "atenantid".ToId(), "anauditcode", "amessagetemplate",
-            TemplateArguments.Create(new List<string> { "anarg1", "anarg2" }).Value).Value;
+            TemplateArguments.Create(["anarg1", "anarg2"]).Value).Value;
     }
 
     [Fact]

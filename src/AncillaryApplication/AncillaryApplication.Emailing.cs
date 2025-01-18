@@ -8,6 +8,7 @@ using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
+using Domain.Common.ValueObjects;
 using Domain.Shared;
 
 namespace AncillaryApplication;
@@ -105,12 +106,13 @@ partial class AncillaryApplication
 #endif
 
     public async Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(ICallerContext caller,
-        DateTime? sinceUtc, IReadOnlyList<string>? tags, SearchOptions searchOptions,
+        DateTime? sinceUtc, string? organizationId, IReadOnlyList<string>? tags, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
     {
         var sinceWhen = sinceUtc ?? DateTime.UtcNow.SubtractDays(14);
         var searched =
-            await _emailDeliveryRepository.SearchAllDeliveriesAsync(sinceWhen, tags, searchOptions, cancellationToken);
+            await _emailDeliveryRepository.SearchAllAsync(sinceWhen, organizationId, tags, searchOptions,
+                cancellationToken);
         if (searched.IsFailure)
         {
             return searched.Error;
@@ -207,7 +209,9 @@ partial class AncillaryApplication
         }
         else
         {
-            var created = EmailDeliveryRoot.Create(_recorder, _idFactory, messageId.Value);
+            var created = EmailDeliveryRoot.Create(_recorder, _idFactory, messageId.Value, message.TenantId.HasValue()
+                ? message.TenantId.ToId()
+                : Optional<Identifier>.None);
             if (created.IsFailure)
             {
                 return created.Error;
@@ -334,6 +338,9 @@ public static class AncillaryEmailingConversionExtensions
     {
         return new DeliveredEmail
         {
+            Created = email.Created.HasValue
+                ? email.Created.Value!.Value
+                : DateTime.UtcNow,
             Attempts = email.Attempts.HasValue
                 ? email.Attempts.Value.Attempts.ToList()
                 : new List<DateTime>(),
@@ -346,6 +353,7 @@ public static class AncillaryEmailingConversionExtensions
             ToDisplayName = email.ToDisplayName,
             ToEmailAddress = email.ToEmailAddress,
             Id = email.Id,
+            OrganizationId = email.OrganizationId,
             IsDelivered = email.Delivered.HasValue,
             DeliveredAt = email.Delivered.HasValue
                 ? email.Delivered.Value

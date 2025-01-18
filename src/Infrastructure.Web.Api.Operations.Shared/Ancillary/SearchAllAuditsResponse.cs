@@ -1,7 +1,6 @@
 using Application.Resources.Shared;
 using Infrastructure.Web.Api.Interfaces;
 
-#if TESTINGONLY
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary
 {
     public class SearchAllAuditsResponse : SearchResponse
@@ -9,4 +8,3 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary
         public List<Audit> Audits { get; set; } = [];
     }
 }
-#endif

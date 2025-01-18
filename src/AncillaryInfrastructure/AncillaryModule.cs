@@ -8,6 +8,7 @@ using AncillaryInfrastructure.Persistence;
 using AncillaryInfrastructure.Persistence.ReadModels;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Domain.Interfaces;
@@ -100,6 +101,8 @@ public class AncillaryModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services
                     .AddPerHttpRequest<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
+                services
+                    .AddPerHttpRequest<IAncillaryService, AncillaryInProcessServiceClient>();
 
                 // EXTEND: Change these services for your preferred providers
                 services.AddSingleton<IUsageDeliveryService>(c => new UserPilotHttpServiceClient(

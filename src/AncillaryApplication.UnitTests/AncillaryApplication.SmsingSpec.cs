@@ -95,11 +95,12 @@ public class AncillaryApplicationSmsingSpec
             {
                 Body = "abody",
                 ToPhoneNumber = "+6498876986",
-                Tags = new List<string> { "atag" }
+                Tags = ["atag"]
             }
         }.ToJson()!;
         var sms = SmsDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");
@@ -202,12 +203,14 @@ public class AncillaryApplicationSmsingSpec
             LastAttempted = datum
         };
         _smsDeliveryRepository.Setup(edr =>
-                edr.SearchAllDeliveriesAsync(It.IsAny<DateTime?>(), It.IsAny<IReadOnlyList<string>>(),
+                edr.SearchAllAsync(It.IsAny<DateTime?>(), It.IsAny<string?>(),
+                    It.IsAny<IReadOnlyList<string>>(),
                     It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SmsDelivery> { delivery });
 
-        var result = await _application.SearchAllSmsDeliveriesAsync(_caller.Object, null, null, new SearchOptions(),
+        var result = await _application.SearchAllSmsDeliveriesAsync(_caller.Object, null, null, null,
+            new SearchOptions(),
             new GetOptions(), CancellationToken.None);
 
         result.Value.Results.Count.Should().Be(1);
@@ -239,7 +242,8 @@ public class AncillaryApplicationSmsingSpec
     {
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.SucceededSending("areceiptid");
         sms.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -261,7 +265,8 @@ public class AncillaryApplicationSmsingSpec
     {
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");
@@ -303,7 +308,8 @@ public class AncillaryApplicationSmsingSpec
     {
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.SucceededSending("areceiptid");
         sms.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -325,7 +331,8 @@ public class AncillaryApplicationSmsingSpec
     {
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
-            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
+                Optional<Identifier>.None).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");

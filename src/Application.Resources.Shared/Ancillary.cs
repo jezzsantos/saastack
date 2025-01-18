@@ -8,9 +8,11 @@ public class Audit : IIdentifiableResource
 
     public required string AuditCode { get; set; }
 
+    public required DateTime Created { get; set; }
+
     public required string MessageTemplate { get; set; }
 
-    public required string OrganizationId { get; set; }
+    public string? OrganizationId { get; set; }
 
     public required List<string> TemplateArguments { get; set; }
 
@@ -31,6 +33,8 @@ public class DeliveredEmail : IIdentifiableResource
 
     public required string Body { get; set; }
 
+    public required DateTime Created { get; set; }
+
     public DateTime? DeliveredAt { get; set; }
 
     public DateTime? FailedDeliveryAt { get; set; }
@@ -42,6 +46,8 @@ public class DeliveredEmail : IIdentifiableResource
     public bool IsDeliveryFailed { get; set; }
 
     public bool IsSent { get; set; }
+
+    public string? OrganizationId { get; set; }
 
     public DateTime? SentAt { get; set; }
 
@@ -62,6 +68,8 @@ public class DeliveredSms : IIdentifiableResource
 
     public required string Body { get; set; }
 
+    public required DateTime Created { get; set; }
+
     public DateTime? DeliveredAt { get; set; }
 
     public DateTime? FailedDeliveryAt { get; set; }
@@ -73,6 +81,8 @@ public class DeliveredSms : IIdentifiableResource
     public bool IsDeliveryFailed { get; set; }
 
     public bool IsSent { get; set; }
+
+    public string? OrganizationId { get; set; }
 
     public DateTime? SentAt { get; set; }
 

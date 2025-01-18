@@ -48,6 +48,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
+                TenantId = "atenantid",
                 Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
@@ -66,11 +67,12 @@ public class EmailsApiSpec : WebApiSpec<Program>
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
         deliveries.Content.Value.Emails.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].OrganizationId.Should().Be("atenantid");
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -116,7 +118,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -170,7 +172,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
         secondAttempt.Content.Value.IsSent.Should().BeTrue();
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -227,7 +229,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
 #endif
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -286,7 +288,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
 #endif
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
@@ -309,7 +311,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchEmailDeliveriesWithTags_TheReturnsEmails()
+    public async Task WhenSearchEmailDeliveriesWithTagsForAllOrganizations_TheReturnsEmails()
     {
         _emailDeliveryService.SendingSucceeds = true;
         var request = new SendEmailRequest
@@ -337,13 +339,59 @@ public class EmailsApiSpec : WebApiSpec<Program>
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
         var login = await LoginUserAsync(LoginUser.Operator);
-        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest
             {
                 Tags = ["atag2", "atag3"]
             },
             req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Emails.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(3);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag1");
+        deliveries.Content.Value.Emails[0].Tags[1].Should().Be("atag2");
+        deliveries.Content.Value.Emails[0].Tags[2].Should().Be("atag3");
+    }
+
+    [Fact]
+    public async Task WhenSearchEmailDeliveriesForAnOrganization_TheReturnsEmails()
+    {
+        var login = await LoginUserAsync(LoginUser.Operator);
+        _emailDeliveryService.SendingSucceeds = true;
+        var tenantId = login.DefaultOrganizationId;
+        var request = new SendEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                TenantId = tenantId,
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    Body = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag1", "atag2", "atag3"]
+                }
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.Content.Value.IsSent.Should().BeTrue();
+        _emailDeliveryService.LastSubject.Should().Be("asubject");
+
+        var deliveries = await Api.GetAsync(new SearchAllEmailDeliveriesRequest
+            {
+                OrganizationId = tenantId
+            },
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].OrganizationId.Should().Be(tenantId);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(3);
         deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag1");
