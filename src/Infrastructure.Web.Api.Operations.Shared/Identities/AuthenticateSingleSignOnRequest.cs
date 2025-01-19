@@ -17,5 +17,7 @@ public class AuthenticateSingleSignOnRequest : UnTenantedRequest<AuthenticateSin
 
     [Required] public string? Provider { get; set; }
 
+    public bool? TermsAndConditionsAccepted { get; set; }
+
     public string? Username { get; set; }
 }

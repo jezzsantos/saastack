@@ -451,7 +451,7 @@ public class PasswordCredentialsApplicationSpec
     [Fact]
     public async Task WhenAuthenticateAsyncAndSendingEmailFails_ThenReturnsError()
     {
-        var registeredAccount = new EndUser
+        var registeredAccount = new EndUserWithProfile
         {
             Id = "auserid"
         };
@@ -484,9 +484,9 @@ public class PasswordCredentialsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenRegisterPersonAsyncAndAlreadyExists_ThenDoesNothing()
+    public async Task WhenRegisterPersonAsyncAndAlreadyExistsButNotRegistered_ThenDoesNothing()
     {
-        var endUser = new EndUser
+        var endUser = new EndUserWithProfile
         {
             Id = "auserid"
         };
@@ -508,12 +508,71 @@ public class PasswordCredentialsApplicationSpec
         _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
+        _notificationsService.Verify(
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenRegisterPersonAsyncAndAlreadyExistsAndPreviouslyRegistered_ThenDoesNothing()
+    {
+        var endUser = new EndUserWithProfile
+        {
+            Id = "auserid",
+            Classification = EndUserClassification.Person,
+            Status = EndUserStatus.Registered,
+            Profile = new UserProfile
+            {
+                Id = "aprofileid",
+                Classification = UserProfileClassification.Person,
+                UserId = "auserid",
+                DisplayName = "afirstname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                EmailAddress = "anotheruser@company.com",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                },
+                Timezone = "atimezone"
+            }
+        };
+        _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(endUser);
+        var credential = CreateUnVerifiedCredential();
+        _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(credential.ToOptional());
+        _notificationsService.Setup(ns =>
+                ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+
+        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
+            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+
+        result.Value.User.Should().Be(endUser);
+        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
+            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            It.IsAny<CancellationToken>()));
+        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(_caller.Object, "auserid",
+            "anotheruser@company.com", "afirstname", "atimezone", "acountrycode",
+            UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, CancellationToken.None));
     }
 
     [Fact]
     public async Task WhenRegisterPersonAsyncAndNotExists_ThenCreatesAndSendsConfirmation()
     {
-        var registeredAccount = new EndUser
+        var registeredAccount = new EndUserWithProfile
         {
             Id = "auserid"
         };
@@ -546,6 +605,10 @@ public class PasswordCredentialsApplicationSpec
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
+        _notificationsService.Verify(
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

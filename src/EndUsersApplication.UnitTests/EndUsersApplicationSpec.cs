@@ -32,7 +32,6 @@ public class EndUsersApplicationSpec
     private readonly Mock<IEndUserRepository> _endUserRepository;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IInvitationRepository> _invitationRepository;
-    private readonly Mock<IUserNotificationsService> _notificationsService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IUserProfilesService> _userProfilesService;
 
@@ -64,12 +63,11 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) => root);
         _invitationRepository = new Mock<IInvitationRepository>();
         _userProfilesService = new Mock<IUserProfilesService>();
-        _notificationsService = new Mock<IUserNotificationsService>();
         var subscriptionsService = new Mock<ISubscriptionsService>();
 
         _application =
-            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object,
-                _notificationsService.Object, _userProfilesService.Object, subscriptionsService.Object,
+            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, _userProfilesService.Object,
+                subscriptionsService.Object,
                 _invitationRepository.Object, _endUserRepository.Object);
     }
 
@@ -147,13 +145,11 @@ public class EndUsersApplicationSpec
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Features.Should()
+            .ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Profile.Should().BeNull();
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-        _notificationsService.Verify(
-            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -214,13 +210,11 @@ public class EndUsersApplicationSpec
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Features.Should()
+            .ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Profile.Should().BeNull();
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(TestingToken, It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(
-            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -270,13 +264,11 @@ public class EndUsersApplicationSpec
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Features.Should()
+            .ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Profile.Should().BeNull();
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync("anunknowninvitationtoken", It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(
-            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -326,14 +318,10 @@ public class EndUsersApplicationSpec
                 ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()),
             Times.Never);
-        _notificationsService.Verify(
-            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task WhenRegisterPersonAsyncAndAlreadyRegistered_ThenSendsCourtesyEmail()
+    public async Task WhenRegisterPersonAsyncAndAlreadyRegistered_ThenRegisters()
     {
         var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         endUser.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
@@ -364,15 +352,9 @@ public class EndUsersApplicationSpec
         _endUserRepository.Setup(rep =>
                 rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser);
-        _notificationsService.Setup(ns =>
-                ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result.Ok);
 
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
-            "afirstname",
-            "alastname", null, null, true, CancellationToken.None);
+            "afirstname", "alastname", null, null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -381,15 +363,17 @@ public class EndUsersApplicationSpec
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().BeEmpty();
         result.Value.Features.Should().BeEmpty();
+        result.Value.Profile!.EmailAddress.Should().Be("anotheruser@company.com");
+        result.Value.Profile.Name.FirstName.Should().Be("afirstname");
+        result.Value.Profile.Name.LastName.Should().Be("alastname");
+        result.Value.Profile.Timezone.Should().Be("atimezone");
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         _userProfilesService.Verify(ups =>
                 ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()),
             Times.Never);
-        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(_caller.Object, "anid",
-            "anotheruser@company.com", "afirstname", "atimezone", "acountrycode",
-            UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, CancellationToken.None));
     }
 
     [Fact]
@@ -436,7 +420,9 @@ public class EndUsersApplicationSpec
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Features.Should()
+            .ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        result.Value.Profile.Should().BeNull();
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }

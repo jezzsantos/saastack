@@ -37,7 +37,8 @@ public class FakeSSOAuthenticationProviderSpec
     public async Task WhenAuthenticateAsyncAndNoUsername_ThenReturnsError()
     {
         var result =
-            await _provider.AuthenticateAsync(_caller.Object, "1234567890", null, CancellationToken.None);
+            await _provider.AuthenticateAsync(_caller.Object, FakeOAuth2Service.AuthCode1, null,
+                CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.FakeSSOAuthenticationProvider_MissingUsername);
     }
@@ -55,7 +56,8 @@ public class FakeSSOAuthenticationProviderSpec
     public async Task WhenAuthenticateAsync_ThenReturnsTokens()
     {
         var result =
-            await _provider.AuthenticateAsync(_caller.Object, "1234567890", "anemailaddress", CancellationToken.None);
+            await _provider.AuthenticateAsync(_caller.Object, FakeOAuth2Service.AuthCode1, "anemailaddress",
+                CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Tokens.Count.Should().Be(1);
@@ -64,6 +66,7 @@ public class FakeSSOAuthenticationProviderSpec
         result.Value.Tokens[0].ExpiresOn.Should()
             .BeCloseTo(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry),
                 TimeSpan.FromMinutes(1));
+        result.Value.UId.Should().Be("6Afx/PgtEy+bsBjKZzihnw==");
         result.Value.EmailAddress.Should().Be("anemailaddress");
         result.Value.FirstName.Should().Be("anemailaddress");
         result.Value.LastName.Should().Be("asurname");

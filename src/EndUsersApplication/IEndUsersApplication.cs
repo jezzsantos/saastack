@@ -27,7 +27,7 @@ public partial interface IEndUsersApplication
     Task<Result<EndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name, string? timezone,
         string? countryCode, CancellationToken cancellationToken);
 
-    Task<Result<EndUser, Error>> RegisterPersonAsync(ICallerContext caller, string? invitationToken,
+    Task<Result<EndUserWithProfile, Error>> RegisterPersonAsync(ICallerContext caller, string? invitationToken,
         string emailAddress,
         string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
         CancellationToken cancellationToken);

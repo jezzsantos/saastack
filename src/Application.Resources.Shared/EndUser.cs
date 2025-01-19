@@ -17,6 +17,11 @@ public class EndUser : IIdentifiableResource
     public required string Id { get; set; }
 }
 
+public class EndUserWithProfile : EndUser
+{
+    public UserProfile? Profile { get; set; }
+}
+
 public enum EndUserStatus
 {
     Unregistered = 0,

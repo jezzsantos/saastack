@@ -356,21 +356,47 @@ public partial class PasswordCredentialsApplication : IPasswordCredentialsApplic
     }
 
     private async Task<Result<PasswordCredential, Error>> RegisterPersonInternalAsync(ICallerContext caller,
-        string emailAddress, string password, string displayName, EndUser user, CancellationToken cancellationToken)
+        string emailAddress, string password, string displayName, EndUserWithProfile user,
+        CancellationToken cancellationToken)
     {
-        var fetched = await _repository.FindCredentialsByUserIdAsync(user.Id.ToId(), cancellationToken);
-        if (fetched.IsFailure)
+        var userId = user.Id;
+        var retrievedCredential = await _repository.FindCredentialsByUserIdAsync(user.Id.ToId(), cancellationToken);
+        if (retrievedCredential.IsFailure)
         {
-            return fetched.Error;
+            return retrievedCredential.Error;
         }
 
-        if (fetched.Value.HasValue)
+        if (retrievedCredential.Value.HasValue)
         {
-            return fetched.Value.Value.ToCredential(user);
+            var profile = user.Profile;
+            if (user is { Status: EndUserStatus.Registered, Classification: EndUserClassification.Person }
+                && profile.Exists())
+            {
+                var notified = await _userNotificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(caller,
+                    userId, profile.EmailAddress!, profile.DisplayName, profile.Timezone,
+                    profile.Address.CountryCode,
+                    UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, cancellationToken);
+                if (notified.IsFailure)
+                {
+                    return notified.Error;
+                }
+
+                _recorder.TraceInformation(caller.ToCall(),
+                    "Attempted re-registration of user: {Id}, with email {EmailAddress}", userId, emailAddress);
+                _recorder.TrackUsage(caller.ToCall(),
+                    UsageConstants.Events.UsageScenarios.Generic.PersonReRegistered,
+                    new Dictionary<string, object>
+                    {
+                        { UsageConstants.Properties.Id, userId },
+                        { UsageConstants.Properties.EmailAddress, emailAddress }
+                    });
+            }
+
+            return retrievedCredential.Value.Value.ToCredential(user);
         }
 
         var created = PasswordCredentialRoot.Create(_recorder, _identifierFactory, _settings, _emailAddressService,
-            _tokensService, _encryptionService, _passwordHasherService, _mfaService, user.Id.ToId());
+            _tokensService, _encryptionService, _passwordHasherService, _mfaService, userId.ToId());
         if (created.IsFailure)
         {
             return created.Error;
@@ -388,43 +414,43 @@ public partial class PasswordCredentialsApplication : IPasswordCredentialsApplic
             return name.Error;
         }
 
-        var credentials = created.Value;
-        var credentialed = credentials.SetPasswordCredential(password);
+        var credential = created.Value;
+        var credentialed = credential.SetPasswordCredential(password);
         if (credentialed.IsFailure)
         {
             return credentialed.Error;
         }
 
-        var registered = credentials.SetRegistrationDetails(email.Value, name.Value);
+        var registered = credential.SetRegistrationDetails(email.Value, name.Value);
         if (registered.IsFailure)
         {
             return registered.Error;
         }
 
-        var initiated = credentials.InitiateRegistrationVerification();
+        var initiated = credential.InitiateRegistrationVerification();
         if (initiated.IsFailure)
         {
             return initiated.Error;
         }
 
-        var notified = await _userNotificationsService.NotifyPasswordRegistrationConfirmationAsync(caller,
-            credentials.Registration.Value.EmailAddress, credentials.Registration.Value.Name,
-            credentials.VerificationKeep.Token, UserNotificationConstants.EmailTags.RegisterPerson, cancellationToken);
-        if (notified.IsFailure)
+        var confirmed = await _userNotificationsService.NotifyPasswordRegistrationConfirmationAsync(caller,
+            credential.Registration.Value.EmailAddress, credential.Registration.Value.Name,
+            credential.VerificationKeep.Token, UserNotificationConstants.EmailTags.RegisterPerson, cancellationToken);
+        if (confirmed.IsFailure)
         {
-            return notified.Error;
+            return confirmed.Error;
         }
 
-        var saved = await _repository.SaveAsync(credentials, cancellationToken);
+        var saved = await _repository.SaveAsync(credential, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        credentials = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Password credentials created for {UserId}", credentials.UserId);
+        credential = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Password credentials created for {UserId}", credential.UserId);
 
-        return credentials.ToCredential(user);
+        return credential.ToCredential(user);
     }
 
     /// <summary>

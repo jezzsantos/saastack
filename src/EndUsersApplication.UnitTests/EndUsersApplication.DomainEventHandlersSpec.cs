@@ -69,7 +69,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
         _subscriptionsService = new Mock<ISubscriptionsService>();
 
         _application =
-            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, notificationsService.Object,
+            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object,
                 _userProfilesService.Object, _subscriptionsService.Object, invitationRepository.Object,
                 _endUserRepository.Object);
     }

@@ -27,9 +27,6 @@
     <data name="EndUsersApplication_NotAcceptedTerms" xml:space="preserve">
         <value>This user must accept the terms of service</value>
     </data>
-    <data name="EndUsersApplication_MembershipNotFound" xml:space="preserve">
-        <value>The membership could not be found</value>
-    </data>
     <data name="EndUsersApplication_NotPersonProfile" xml:space="preserve">
         <value>The profile for this person cannot be found</value>
     </data>

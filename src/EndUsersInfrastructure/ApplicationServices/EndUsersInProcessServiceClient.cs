@@ -46,7 +46,7 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.RegisterMachineAsync(caller, name, timezone, countryCode, cancellationToken);
     }
 
-    public async Task<Result<EndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
+    public async Task<Result<EndUserWithProfile, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
         string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {

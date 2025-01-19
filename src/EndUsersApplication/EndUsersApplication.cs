@@ -30,18 +30,15 @@ public partial class EndUsersApplication : IEndUsersApplication
     private readonly IRecorder _recorder;
     private readonly IConfigurationSettings _settings;
     private readonly ISubscriptionsService _subscriptionsService;
-    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IUserProfilesService _userProfilesService;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
-        IUserNotificationsService userNotificationsService, IUserProfilesService userProfilesService,
-        ISubscriptionsService subscriptionsService,
+        IUserProfilesService userProfilesService, ISubscriptionsService subscriptionsService,
         IInvitationRepository invitationRepository, IEndUserRepository endUserRepository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _settings = settings;
-        _userNotificationsService = userNotificationsService;
         _userProfilesService = userProfilesService;
         _subscriptionsService = subscriptionsService;
         _invitationRepository = invitationRepository;
@@ -295,7 +292,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         return machine.ToUser();
     }
 
-    public async Task<Result<EndUser, Error>> RegisterPersonAsync(ICallerContext caller,
+    public async Task<Result<EndUserWithProfile, Error>> RegisterPersonAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
         string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
@@ -312,7 +309,7 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         var username = email.Value;
 
-        var existingUser = Optional<EndUserWithProfile>.None;
+        var existingUser = Optional<UserAndProfile>.None;
         if (invitationToken.HasValue())
         {
             var retrievedGuest =
@@ -345,7 +342,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                 }
 
                 _recorder.TraceInformation(caller.ToCall(), "Guest user {Id} accepted their invitation", invitee.Id);
-                existingUser = new EndUserWithProfile(invitee, null);
+                existingUser = new UserAndProfile(invitee, null);
             }
         }
 
@@ -376,25 +373,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                     return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
                 }
 
-                var notified = await _userNotificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(caller,
-                    unregisteredUser.Id, unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
-                    unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode,
-                    UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, cancellationToken);
-                if (notified.IsFailure)
-                {
-                    return notified.Error;
-                }
-
-                _recorder.TraceInformation(caller.ToCall(),
-                    "Attempted re-registration of user: {Id}, with email {EmailAddress}", unregisteredUser.Id, email);
-                _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonReRegistered,
-                    new Dictionary<string, object>
-                    {
-                        { UsageConstants.Properties.Id, unregisteredUser.Id },
-                        { UsageConstants.Properties.EmailAddress, username.Address }
-                    });
-
-                return unregisteredUser.ToUser();
+                return unregisteredUser.ToUserWithUserProfile(unregisteredUserProfile);
             }
         }
         else
@@ -444,7 +423,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                 { UsageConstants.Properties.UserIdOverride, person.Id }
             });
 
-        return person.ToUser();
+        return person.ToUserWithUserProfile(null);
     }
 
     public async Task<Result<EndUser, Error>> UnassignPlatformRolesAsync(ICallerContext caller, string id,
@@ -538,7 +517,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         return members.Any(ms => ms.UserId.Value.EqualsIgnoreCase(userId));
     }
 
-    private async Task<Result<Optional<EndUserWithProfile>, Error>>
+    private async Task<Result<Optional<UserAndProfile>, Error>>
         FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(ICallerContext caller, EmailAddress emailAddress,
             CancellationToken cancellationToken)
     {
@@ -564,10 +543,10 @@ public partial class EndUsersApplication : IEndUsersApplication
             return existingInvitation;
         }
 
-        return Optional<EndUserWithProfile>.None;
+        return Optional<UserAndProfile>.None;
     }
 
-    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindProfileWithEmailAddressAsync(
+    private async Task<Result<Optional<UserAndProfile>, Error>> FindProfileWithEmailAddressAsync(
         ICallerContext caller, EmailAddress emailAddress, CancellationToken cancellationToken)
     {
         var retrievedProfile =
@@ -587,10 +566,10 @@ public partial class EndUsersApplication : IEndUsersApplication
                 return user.Error;
             }
 
-            return new EndUserWithProfile(user.Value, profile).ToOptional();
+            return new UserAndProfile(user.Value, profile).ToOptional();
         }
 
-        return Optional<EndUserWithProfile>.None;
+        return Optional<UserAndProfile>.None;
     }
 
     private async Task<Result<UserProfile, Error>> GetUserProfileAsync(ICallerContext caller, Identifier userId,
@@ -600,7 +579,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         return await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
     }
 
-    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindInvitedGuestWithEmailAddressAsync(
+    private async Task<Result<Optional<UserAndProfile>, Error>> FindInvitedGuestWithEmailAddressAsync(
         EmailAddress emailAddress, CancellationToken cancellationToken)
     {
         var invitedGuest =
@@ -611,8 +590,8 @@ public partial class EndUsersApplication : IEndUsersApplication
         }
 
         return invitedGuest.Value.HasValue
-            ? new EndUserWithProfile(invitedGuest.Value, null).ToOptional()
-            : Optional<EndUserWithProfile>.None;
+            ? new UserAndProfile(invitedGuest.Value, null).ToOptional()
+            : Optional<UserAndProfile>.None;
     }
 
     private async Task<Result<Optional<EndUserRoot>, Error>> FindInvitedGuestWithInvitationTokenAsync(
@@ -646,7 +625,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             .ToList()!;
     }
 
-    private record EndUserWithProfile(EndUserRoot User, UserProfile? Profile);
+    private record UserAndProfile(EndUserRoot User, UserProfile? Profile);
 }
 
 internal static class EndUserConversionExtensions
@@ -757,5 +736,14 @@ internal static class EndUserConversionExtensions
         withMemberships.Memberships = user.Memberships.Select(ms => ms.ToMembership()).ToList();
 
         return withMemberships;
+    }
+
+    public static EndUserWithProfile ToUserWithUserProfile(this EndUserRoot user, UserProfile? profile)
+    {
+        var endUser = ToUser(user);
+        var withProfile = endUser.Convert<EndUser, EndUserWithProfile>();
+        withProfile.Profile = profile;
+
+        return withProfile;
     }
 }

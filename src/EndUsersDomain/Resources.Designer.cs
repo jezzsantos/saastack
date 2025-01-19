@@ -60,15 +60,6 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot add a membership to machine&apos;s organization.
-        /// </summary>
-        internal static string EndUserRoot_AddMembership_MachineCannotHaveMemberships {
-            get {
-                return ResourceManager.GetString("EndUserRoot_AddMembership_MachineCannotHaveMemberships", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cannot add another &apos;Personal&apos; organization.
         /// </summary>
         internal static string EndUserRoot_AddMembership_OnlyOnePersonalOrganization {
@@ -209,15 +200,6 @@ namespace EndUsersDomain {
         internal static string EndUserRoot_NotOrganizationOwner {
             get {
                 return ResourceManager.GetString("EndUserRoot_NotOrganizationOwner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This user is not yet registered.
-        /// </summary>
-        internal static string EndUserRoot_NotRegistered {
-            get {
-                return ResourceManager.GetString("EndUserRoot_NotRegistered", resourceCulture);
             }
         }
         

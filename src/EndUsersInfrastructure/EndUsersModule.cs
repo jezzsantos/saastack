@@ -52,7 +52,6 @@ public class EndUsersModule : ISubdomainModule
                     new EndUsersApplication.EndUsersApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                        c.GetRequiredService<IUserNotificationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<ISubscriptionsService>(),
                         c.GetRequiredService<IInvitationRepository>(),

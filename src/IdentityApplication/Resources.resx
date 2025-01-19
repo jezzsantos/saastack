@@ -36,12 +36,6 @@
     <data name="PasswordCredentialsApplication_RegistrationAlreadyVerified" xml:space="preserve">
         <value>The user account has already been verified</value>
     </data>
-    <data name="PasswordCredentialsApplication_InvalidUsername" xml:space="preserve">
-        <value>The username is not a valid email address</value>
-    </data>
-    <data name="PasswordCredentialsApplication_InvalidUserAccountId" xml:space="preserve">
-        <value>The user account ID is not a valid identifier</value>
-    </data>
     <data name="PasswordCredentialsApplication_NotPerson" xml:space="preserve">
         <value>The user account ID is not a person</value>
     </data>

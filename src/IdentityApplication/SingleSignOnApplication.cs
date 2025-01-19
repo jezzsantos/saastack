@@ -28,6 +28,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
     public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller,
         string? invitationToken, string providerName, string authCode, string? username,
+        bool? termsAndConditionsAccepted,
         CancellationToken cancellationToken)
     {
         var authenticated =
@@ -61,7 +62,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
                 authUserInfo.EmailAddress,
                 authUserInfo.FirstName, authUserInfo.LastName, authUserInfo.Timezone.ToString(),
                 authUserInfo.CountryCode.ToString(),
-                true,
+                !termsAndConditionsAccepted.HasValue || termsAndConditionsAccepted.Value,
                 cancellationToken);
             if (autoRegistered.IsFailure)
             {

@@ -8,6 +8,7 @@ using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using IdentityApplication;
 using IdentityDomain;
+using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Interfaces;
 using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
@@ -37,7 +38,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenRegisterPerson_ThenRegisters()
+    public async Task WhenRegisterPersonWithNewEmail_ThenRegistersNewUser()
     {
         var result = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
@@ -56,31 +57,68 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        _userNotificationsService.LastReRegistrationCourtesyEmailRecipient.Should().BeNull();
     }
 
     [Fact]
-    public async Task WhenRegisterSamePersonAgain_ThenSendsCourtesyEmail()
+    public async Task
+        WhenRegisterWithSameEmailAndEndUserAlreadyRegisteredWithPassword_ThenRegistersAndSendsCourtesyEmail()
     {
-        await Api.PostAsync(new RegisterPersonPasswordRequest
+        const string emailAddress = "auser@company.com";
+        var registered = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
-            EmailAddress = "auser@company.com",
+            EmailAddress = emailAddress,
             FirstName = "afirstname",
             LastName = "alastname",
             Password = "1Password!",
             TermsAndConditionsAccepted = true
         });
+
+        registered.Content.Value.Credential.User.Id.Should().NotBeNull();
+        var userId = registered.Content.Value.Credential.User.Id;
 
         await PropagateDomainEventsAsync(PropagationRounds.Twice);
-        await Api.PostAsync(new RegisterPersonPasswordRequest
+        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
-            EmailAddress = "auser@company.com",
+            EmailAddress = emailAddress,
             FirstName = "afirstname",
             LastName = "alastname",
             Password = "1Password!",
             TermsAndConditionsAccepted = true
         });
 
-        _userNotificationsService.LastReRegistrationCourtesyEmailRecipient.Should().Be("auser@company.com");
+        result.Content.Value.Credential.User.Id.Should().Be(userId);
+        _userNotificationsService.LastReRegistrationCourtesyEmailRecipient.Should().Be(emailAddress);
+    }
+
+    [Fact]
+    public async Task WhenRegisterWithSameEmailAndEndUserAlreadyRegisteredWithSSO_ThenRegistersAndNoCourtesyEmail()
+    {
+        const string emailAddress = "auser@company.com";
+        var registered = await Api.PostAsync(new AuthenticateSingleSignOnRequest
+        {
+            Username = emailAddress,
+#if TESTINGONLY
+            Provider = FakeSSOAuthenticationProvider.SSOName,
+            AuthCode = FakeOAuth2Service.AuthCode1
+#endif
+        });
+
+        registered.Content.Value.Tokens.UserId.Should().NotBeNull();
+        var userId = registered.Content.Value.Tokens.UserId;
+
+        await PropagateDomainEventsAsync(PropagationRounds.Twice);
+        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
+        {
+            EmailAddress = emailAddress,
+            FirstName = "afirstname",
+            LastName = "alastname",
+            Password = "1Password!",
+            TermsAndConditionsAccepted = true
+        });
+
+        result.Content.Value.Credential.User.Id.Should().Be(userId);
+        _userNotificationsService.LastReRegistrationCourtesyEmailRecipient.Should().BeNull();
     }
 
     [Fact]

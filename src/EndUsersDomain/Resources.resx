@@ -24,9 +24,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="EndUserRoot_NotRegistered" xml:space="preserve">
-        <value>This user is not yet registered</value>
-    </data>
     <data name="EndUserRoot_AlreadyRegistered" xml:space="preserve">
         <value>This user is already registered</value>
     </data>
@@ -113,9 +110,6 @@
     </data>
     <data name="EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser" xml:space="preserve">
         <value>This guest invitation cannot be accepted by an authenticated user</value>
-    </data>
-    <data name="EndUserRoot_AddMembership_MachineCannotHaveMemberships" xml:space="preserve">
-        <value>Cannot add a membership to machine's organization</value>
     </data>
     <data name="EndUserRoot_AddMembership_OnlyOnePersonalOrganization" xml:space="preserve">
         <value>Cannot add another 'Personal' organization</value>

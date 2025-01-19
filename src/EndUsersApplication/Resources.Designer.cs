@@ -87,15 +87,6 @@ namespace EndUsersApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The membership could not be found.
-        /// </summary>
-        internal static string EndUsersApplication_MembershipNotFound {
-            get {
-                return ResourceManager.GetString("EndUsersApplication_MembershipNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This user must accept the terms of service.
         /// </summary>
         internal static string EndUsersApplication_NotAcceptedTerms {

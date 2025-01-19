@@ -49,7 +49,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
 
         var tokens = retrievedTokens.Value;
 
-        return FakeOAuth2Service.GetUserInfoFromTokens(tokens);
+        return FakeOAuth2Service.GetUserInfoFromTokens(authCode, tokens);
     }
 
     public string ProviderName => SSOName;

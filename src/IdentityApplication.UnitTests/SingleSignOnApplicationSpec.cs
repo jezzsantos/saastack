@@ -49,7 +49,7 @@ public class SingleSignOnApplicationSpec
             .ReturnsAsync(Error.NotAuthenticated("amessage"));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, CancellationToken.None);
+            "anauthcode", null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _ssoProvidersService.Verify(sps =>
@@ -92,8 +92,7 @@ public class SingleSignOnApplicationSpec
             .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null,
-            CancellationToken.None);
+            "anauthcode", null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _ssoProvidersService.Verify(sps =>
@@ -148,8 +147,7 @@ public class SingleSignOnApplicationSpec
             .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null,
-            CancellationToken.None);
+            "anauthcode", null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityLocked, Resources.SingleSignOnApplication_AccountSuspended);
         _ssoProvidersService.Verify(sps =>
@@ -187,7 +185,7 @@ public class SingleSignOnApplicationSpec
         _endUsersService.Setup(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new EndUser
+            .ReturnsAsync(new EndUserWithProfile
             {
                 Id = "aregistereduserid"
             });
@@ -216,7 +214,7 @@ public class SingleSignOnApplicationSpec
             .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, CancellationToken.None);
+            "anauthcode", null, null, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Value.Should().Be("anaccesstoken");
@@ -283,8 +281,7 @@ public class SingleSignOnApplicationSpec
             .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null,
-            CancellationToken.None);
+            "anauthcode", null, null, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Value.Should().Be("anaccesstoken");

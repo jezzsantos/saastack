@@ -96,24 +96,6 @@ namespace IdentityApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user account ID is not a valid identifier.
-        /// </summary>
-        internal static string PasswordCredentialsApplication_InvalidUserAccountId {
-            get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_InvalidUserAccountId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The username is not a valid email address.
-        /// </summary>
-        internal static string PasswordCredentialsApplication_InvalidUsername {
-            get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_InvalidUsername", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Authentication requires another factor.
         /// </summary>
         internal static string PasswordCredentialsApplication_MfaRequired {

@@ -1,6 +1,8 @@
 #if TESTINGONLY
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -15,10 +17,14 @@ namespace IdentityInfrastructure.ApplicationServices;
 /// </summary>
 public class FakeOAuth2Service : IOAuth2Service
 {
+    public const string AuthCode1 = "1234567890";
+    public const string AuthCode2 = "2345678901";
+    private static readonly string[] ValidAuthCodes = [AuthCode1, AuthCode2];
+
     public Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
         OAuth2CodeTokenExchangeOptions options, CancellationToken cancellationToken)
     {
-        if (options.Code != "1234567890")
+        if (!ValidAuthCodes.Contains(options.Code))
         {
             return Task.FromResult<Result<List<AuthToken>, Error>>(Error.RuleViolation());
         }
@@ -53,10 +59,10 @@ public class FakeOAuth2Service : IOAuth2Service
         };
     }
 
-    public static SSOAuthUserInfo GetUserInfoFromTokens(List<AuthToken> tokens)
+    public static SSOAuthUserInfo GetUserInfoFromTokens(string authCode, List<AuthToken> tokens)
     {
         var accessToken = tokens.Single(tok => tok.Type == TokenType.AccessToken).Value;
-        var uid = Guid.NewGuid().ToString("N");
+        var uid = Convert.ToBase64String(MD5.HashData(Encoding.UTF8.GetBytes(authCode)));
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).Claims.ToArray();
         var emailAddress = claims.Single(c => c.Type == ClaimTypes.Email).Value;
         var firstName = claims.Single(c => c.Type == ClaimTypes.GivenName).Value;
