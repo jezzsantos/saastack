@@ -62,7 +62,7 @@ Content-Type: application/json
 {
   "MfaToken": "{{mfa_token}}",
   "AuthenticatorType": "OobSms",
-  "PhoneNumber": "+6498876986"
+  "PhoneNumber": "{{phonenumber}}"
 }
 
 > {%

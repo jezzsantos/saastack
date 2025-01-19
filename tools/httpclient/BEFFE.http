@@ -19,7 +19,7 @@ anti-csrf-tok: {{csrf_token}}
 Origin: {{websitehost}}
 
 {
-  "Username": "auser@company.com",
+  "Username": "{{username}}",
   "Password": "{{password}}",
   "Provider" : "credentials"
 }

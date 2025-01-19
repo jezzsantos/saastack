@@ -1,63 +1,8 @@
-POST {{apihost1}}/testingonly/repositories/destroy
-Accept: application/json
-Content-Type: application/json
+### Register and authenticate
 
-{ }
+run ./CreateUser.http
 
-###
-
-POST {{apihost1}}/passwords/register
-Accept: application/json
-Content-Type: application/json
-
-{
-  "EmailAddress": "{{username}}",
-  "Password": "{{password}}",
-  "FirstName" : "afirstname",
-  "LastName" : "alastname",
-  "TermsAndConditionsAccepted": true
-}
-
-> {%
-    client.global.set("user_id", response.body.credential.user.id);
-%}
-
-###
-
-GET {{apihost1}}/passwords/confirm-registration?UserId={{user_id}}
-Accept: application/json
-
-> {%
-    client.global.set("registration_token", response.body.token);
-%}
-
-###
-
-POST {{apihost1}}/passwords/confirm-registration
-Accept: application/json
-Content-Type: application/json
-
-{
-  "Token": "{{registration_token}}"
-}
-
-###
-
-POST {{apihost1}}/passwords/auth
-Accept: application/json
-Content-Type: application/json
-
-{
-  "Username": "{{username}}",
-  "Password": "{{password}}",
-  "Provider" : "credentials"
-}
-
-> {%
-    client.global.set("access_token", response.body.tokens.accessToken.value);
-%}
-
-###
+### Upload an image from the local machine
 
 PUT {{apihost1}}/profiles/{{user_id}}/avatar
 Accept: application/json
@@ -73,7 +18,7 @@ Content-Disposition: form-data; name="UserId"
 Content-Disposition: form-data; name="file"; filename="SuiteFiles.png"
 Content-Type: image/png
 
-< C:/Users/jezzs/OneDrive/Desktop/TestImage.png
+< C:/Users/you/OneDrive/Desktop/TestImage.png
 --WebAppBoundary
 
 > {%
@@ -81,7 +26,7 @@ Content-Type: image/png
 %}
 
 
-###
+### Fetch avatar
 
 GET {{avatar_url}}
 Accept: application/json

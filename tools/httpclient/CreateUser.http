@@ -11,8 +11,8 @@ Content-Type: application/json
 {
   "EmailAddress": "{{username}}",
   "Password": "{{password}}",
-  "FirstName" : "afirstname",
-  "LastName" : "alastname",
+  "FirstName" : "{{firstname}}",
+  "LastName" : "{{lastname}}",
   "TermsAndConditionsAccepted": true
 }
 
