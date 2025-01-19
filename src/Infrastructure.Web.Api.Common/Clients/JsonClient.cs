@@ -602,6 +602,13 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 return true;
             }
 
+            // Mailgun API formats
+            if (details.Message.HasValue())
+            {
+                problem = statusCode.ToResponseProblem(details.Message);
+                return true;
+            }
+
             problem = statusCode.ToResponseProblem(Resources.JsonClient_TryParseNonStandardErrors_NonStandard,
                 responseText);
             return true;
@@ -652,6 +659,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
 [UsedImplicitly]
 internal class NonStandardProblemDetails
 {
+    [JsonPropertyName("message")] public string? Message { get; set; }
+    
     [JsonPropertyName("details")] public string? Details { get; set; }
 
     [JsonPropertyName("error")] public NonStandardProblemError? Error { get; set; }
