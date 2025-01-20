@@ -30,8 +30,9 @@ export type AssociatePasswordMfaAuthenticatorForCallerResponse = {
 export type Audit = {
   againstId?: string;
   auditCode: string;
+  created: string;
   messageTemplate: string;
-  organizationId: string;
+  organizationId?: string;
   templateArguments: Array<string>;
   id: string;
 };
@@ -49,6 +50,7 @@ export type AuthenticateSingleSignOnRequest = {
   authCode: string;
   invitationToken?: string | null;
   provider: string;
+  termsAndConditionsAccepted?: boolean | null;
   username?: string | null;
 };
 
@@ -150,6 +152,51 @@ export type ChangeSubscriptionPlanRequest = {
   planId?: string | null;
 };
 
+export type ChargebeeEventContent = {
+  customer: ChargebeeEventCustomer;
+  subscription: ChargebeeEventSubscription;
+};
+
+export type ChargebeeEventCustomer = {
+  id: string;
+  payment_method?: ChargebeePaymentMethod;
+};
+
+export type ChargebeeEventSubscription = {
+  billing_period?: number;
+  billing_period_unit?: string;
+  cancelled_at?: number;
+  currency_code?: string;
+  customer_id?: string;
+  deleted?: boolean;
+  id: string;
+  next_billing_at?: number;
+  status: string;
+  subscription_items?: Array<ChargebeeEventSubscriptionItem>;
+  trial_end?: number;
+  trial_start?: number;
+};
+
+export type ChargebeeEventSubscriptionItem = {
+  amount?: number;
+  item_price_id?: string;
+  item_type?: string;
+  quantity?: number;
+  unit_price?: number;
+};
+
+export type ChargebeeNotifyWebhookEventRequest = {
+  content?: ChargebeeEventContent;
+  event_type?: string | null;
+  id?: string | null;
+};
+
+export type ChargebeePaymentMethod = {
+  id: string;
+  status: string;
+  type: string;
+};
+
 export type CompletePasswordResetRequest = {
   password: string;
 };
@@ -236,12 +283,14 @@ export type DeliverUsageRequest = {
 export type DeliveredEmail = {
   attempts: Array<string>;
   body: string;
+  created: string;
   deliveredAt?: string;
   failedDeliveryAt?: string;
   failedDeliveryReason?: string;
   isDelivered: boolean;
   isDeliveryFailed: boolean;
   isSent: boolean;
+  organizationId?: string;
   sentAt?: string;
   subject: string;
   tags: Array<string>;
@@ -253,12 +302,14 @@ export type DeliveredEmail = {
 export type DeliveredSms = {
   attempts: Array<string>;
   body: string;
+  created: string;
   deliveredAt?: string;
   failedDeliveryAt?: string;
   failedDeliveryReason?: string;
   isDelivered: boolean;
   isDeliveryFailed: boolean;
   isSent: boolean;
+  organizationId?: string;
   sentAt?: string;
   tags: Array<string>;
   toPhoneNumber: string;
@@ -425,8 +476,8 @@ export type HealthCheckResponse = {
 };
 
 export type Identity = {
-  isMfaEnabled: boolean;
   hasCredentials: boolean;
+    isMfaEnabled: boolean;
   id: string;
 };
 
@@ -730,6 +781,10 @@ export type PostInsecureTestingOnlyRequest = {
   [key: string]: unknown;
 };
 
+export type PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest = {
+  requiredField?: string | null;
+};
+
 export type PostWithEmptyBodyTestingOnlyRequest = {
   [key: string]: unknown;
 };
@@ -905,9 +960,14 @@ export type SearchAllDomainEventsResponse = {
   events: Array<DomainEvent>;
 };
 
-export type SearchEmailDeliveriesResponse = {
+export type SearchAllEmailDeliveriesResponse = {
   metadata: SearchResultMetadata;
   emails: Array<DeliveredEmail>;
+};
+
+export type SearchAllSmsDeliveriesResponse = {
+  metadata: SearchResultMetadata;
+  smses: Array<DeliveredSms>;
 };
 
 export type SearchResultMetadata = {
@@ -916,11 +976,6 @@ export type SearchResultMetadata = {
   offset: number;
   sort: Sorting;
   total: number;
-};
-
-export type SearchSmsDeliveriesResponse = {
-  metadata: SearchResultMetadata;
-  smses: Array<DeliveredSms>;
 };
 
 export type SearchSubscriptionHistoryResponse = {
@@ -1234,10 +1289,8 @@ export type SearchAllAuditsData = {
      * The zero-based index of the first search result
      */
     Offset?: number;
-    /**
-     * An ID of the Organization. If not provided, the ID of the default organization of the authenticated user (if any) is used
-     */
     OrganizationId?: string;
+    SinceUtc?: string;
     /**
      * List of fields to sort the results on
      */
@@ -1565,6 +1618,14 @@ export type TakeOfflineCarPatchResponse = GetCarResponse;
 
 export type TakeOfflineCarPatchError = ProblemDetails | unknown;
 
+export type ChargebeeNotifyWebhookEventData = {
+  body?: ChargebeeNotifyWebhookEventRequest;
+};
+
+export type ChargebeeNotifyWebhookEventResponse = EmptyResponse;
+
+export type ChargebeeNotifyWebhookEventError = ProblemDetails | unknown;
+
 export type DrainAllDomainEventsData = {
   body?: DrainAllDomainEventsRequest;
 };
@@ -1634,7 +1695,7 @@ export type DrainAllEmailsResponse = EmptyResponse;
 
 export type DrainAllEmailsError = ProblemDetails | unknown;
 
-export type SearchEmailDeliveriesData = {
+export type SearchAllEmailDeliveriesData = {
   query?: {
     /**
      * List of child resources to embed in the resource
@@ -1652,6 +1713,7 @@ export type SearchEmailDeliveriesData = {
      * The zero-based index of the first search result
      */
     Offset?: number;
+    OrganizationId?: string;
     SinceUtc?: string;
     /**
      * List of fields to sort the results on
@@ -1661,9 +1723,9 @@ export type SearchEmailDeliveriesData = {
   };
 };
 
-export type SearchEmailDeliveriesResponse2 = SearchEmailDeliveriesResponse;
+export type SearchAllEmailDeliveriesResponse2 = SearchAllEmailDeliveriesResponse;
 
-export type SearchEmailDeliveriesError = ProblemDetails | unknown;
+export type SearchAllEmailDeliveriesError = ProblemDetails | unknown;
 
 export type SendEmailData = {
   body?: SendEmailRequest;
@@ -2368,7 +2430,7 @@ export type DrainAllSmsesResponse = EmptyResponse;
 
 export type DrainAllSmsesError = ProblemDetails | unknown;
 
-export type SearchSmsDeliveriesData = {
+export type SearchAllSmsDeliveriesData = {
   query?: {
     /**
      * List of child resources to embed in the resource
@@ -2386,6 +2448,7 @@ export type SearchSmsDeliveriesData = {
      * The zero-based index of the first search result
      */
     Offset?: number;
+    OrganizationId?: string;
     SinceUtc?: string;
     /**
      * List of fields to sort the results on
@@ -2395,9 +2458,9 @@ export type SearchSmsDeliveriesData = {
   };
 };
 
-export type SearchSmsDeliveriesResponse2 = SearchSmsDeliveriesResponse;
+export type SearchAllSmsDeliveriesResponse2 = SearchAllSmsDeliveriesResponse;
 
-export type SearchSmsDeliveriesError = ProblemDetails | unknown;
+export type SearchAllSmsDeliveriesError = ProblemDetails | unknown;
 
 export type SendSmsData = {
   body?: SendSmsRequest;
@@ -2586,6 +2649,14 @@ export type PostWithEmptyBodyTestingOnlyData = {
 export type PostWithEmptyBodyTestingOnlyResponse = StringMessageTestingOnlyResponse;
 
 export type PostWithEmptyBodyTestingOnlyError = ProblemDetails | unknown;
+
+export type PostWithEmptyBodyAndRequiredPropertiesTestingOnlyData = {
+  body?: PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest;
+};
+
+export type PostWithEmptyBodyAndRequiredPropertiesTestingOnlyResponse = StringMessageTestingOnlyResponse;
+
+export type PostWithEmptyBodyAndRequiredPropertiesTestingOnlyError = ProblemDetails | unknown;
 
 export type PostWithRouteParamsAndEmptyBodyTestingOnlyData = {
   body?: PostWithRouteParamsAndEmptyBodyTestingOnlyRequest;

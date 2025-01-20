@@ -92,6 +92,9 @@ import type {
   ChangeSubscriptionPlanPutData,
   ChangeSubscriptionPlanPutError,
   ChangeSubscriptionPlanPutResponse,
+  ChargebeeNotifyWebhookEventData,
+  ChargebeeNotifyWebhookEventError,
+  ChargebeeNotifyWebhookEventResponse,
   CompletePasswordResetData,
   CompletePasswordResetError,
   CompletePasswordResetResponse,
@@ -292,6 +295,9 @@ import type {
   PostInsecureTestingOnlyData,
   PostInsecureTestingOnlyError,
   PostInsecureTestingOnlyResponse,
+  PostWithEmptyBodyAndRequiredPropertiesTestingOnlyData,
+  PostWithEmptyBodyAndRequiredPropertiesTestingOnlyError,
+  PostWithEmptyBodyAndRequiredPropertiesTestingOnlyResponse,
   PostWithEmptyBodyTestingOnlyData,
   PostWithEmptyBodyTestingOnlyError,
   PostWithEmptyBodyTestingOnlyResponse,
@@ -363,12 +369,12 @@ import type {
   SearchAllDomainEventsData,
   SearchAllDomainEventsError,
   SearchAllDomainEventsResponse2,
-  SearchEmailDeliveriesData,
-  SearchEmailDeliveriesError,
-  SearchEmailDeliveriesResponse2,
-  SearchSmsDeliveriesData,
-  SearchSmsDeliveriesError,
-  SearchSmsDeliveriesResponse2,
+  SearchAllEmailDeliveriesData,
+  SearchAllEmailDeliveriesError,
+  SearchAllEmailDeliveriesResponse2,
+  SearchAllSmsDeliveriesData,
+  SearchAllSmsDeliveriesError,
+  SearchAllSmsDeliveriesResponse2,
   SearchSubscriptionHistoryData,
   SearchSubscriptionHistoryError,
   SearchSubscriptionHistoryResponse2,
@@ -517,7 +523,7 @@ export const drainAllAudits = <ThrowOnError extends boolean = false>(options?: O
   });
 
 /**
- * Lists all available audits
+ * Lists all audits since the specified date, for the specified organization
  * (request type: SearchAllAuditsRequest)
  */
 export const searchAllAudits = <ThrowOnError extends boolean = false>(options?: Options<SearchAllAuditsData, ThrowOnError>) =>
@@ -741,6 +747,20 @@ export const takeOfflineCarPatch = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Notifies a Chargebee event, via a webhook
+ * (request type: ChargebeeNotifyWebhookEventRequest)
+ */
+export const chargebeeNotifyWebhookEvent = <ThrowOnError extends boolean = false>(
+    options?: Options<ChargebeeNotifyWebhookEventData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<ChargebeeNotifyWebhookEventResponse, ChargebeeNotifyWebhookEventError, ThrowOnError>(
+        {
+            ...options,
+            url: "/webhooks/chargebee"
+        }
+    );
+
+/**
  * Drains all the pending domain_event messages
  * (request type: DrainAllDomainEventsRequest)
  */
@@ -811,13 +831,13 @@ export const drainAllEmails = <ThrowOnError extends boolean = false>(options?: O
   });
 
 /**
- * Lists all email deliveries since the specified date, for the specified tags
- * (request type: SearchEmailDeliveriesRequest)
+ * Lists all email deliveries since the specified date, for the specified timeframe, organization and tags
+ * (request type: SearchAllEmailDeliveriesRequest)
  */
-export const searchEmailDeliveries = <ThrowOnError extends boolean = false>(
-  options?: Options<SearchEmailDeliveriesData, ThrowOnError>
+export const searchAllEmailDeliveries = <ThrowOnError extends boolean = false>(
+  options?: Options<SearchAllEmailDeliveriesData, ThrowOnError>
 ) =>
-  (options?.client ?? client).get<SearchEmailDeliveriesResponse2, SearchEmailDeliveriesError, ThrowOnError>({
+  (options?.client ?? client).get<SearchAllEmailDeliveriesResponse2, SearchAllEmailDeliveriesError, ThrowOnError>({
     ...options,
     url: "/emails"
   });
@@ -1724,13 +1744,13 @@ export const drainAllSmses = <ThrowOnError extends boolean = false>(options?: Op
   });
 
 /**
- * Lists all SMS deliveries since the specified date, for the specified tags
- * (request type: SearchSmsDeliveriesRequest)
+ * Lists all SMS deliveries since the specified date, for the specified timeframe, organization and tags
+ * (request type: SearchAllSmsDeliveriesRequest)
  */
-export const searchSmsDeliveries = <ThrowOnError extends boolean = false>(
-  options?: Options<SearchSmsDeliveriesData, ThrowOnError>
+export const searchAllSmsDeliveries = <ThrowOnError extends boolean = false>(
+  options?: Options<SearchAllSmsDeliveriesData, ThrowOnError>
 ) =>
-  (options?.client ?? client).get<SearchSmsDeliveriesResponse2, SearchSmsDeliveriesError, ThrowOnError>({
+  (options?.client ?? client).get<SearchAllSmsDeliveriesResponse2, SearchAllSmsDeliveriesError, ThrowOnError>({
     ...options,
     url: "/smses"
   });
@@ -2006,6 +2026,22 @@ export const postWithEmptyBodyTestingOnly = <ThrowOnError extends boolean = fals
     ...options,
     url: "/testingonly/general/body/empty"
   });
+
+/**
+ * Tests the use of an empty body in a POST request that has required properties
+ * (request type: PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest)
+ */
+export const postWithEmptyBodyAndRequiredPropertiesTestingOnly = <ThrowOnError extends boolean = false>(
+    options?: Options<PostWithEmptyBodyAndRequiredPropertiesTestingOnlyData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<
+        PostWithEmptyBodyAndRequiredPropertiesTestingOnlyResponse,
+        PostWithEmptyBodyAndRequiredPropertiesTestingOnlyError,
+        ThrowOnError
+    >({
+        ...options,
+        url: "/testingonly/general/body/empty/required"
+    });
 
 /**
  * Tests the use of an empty post body with route parameters Notice the use of Infrastructure.Web.Api.Interfaces.WebRequest`2 instead of Infrastructure.Web.Api.Interfaces.IWebRequest`1

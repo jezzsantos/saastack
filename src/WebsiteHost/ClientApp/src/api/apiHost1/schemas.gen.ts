@@ -91,7 +91,7 @@ export const AssociatePasswordMfaAuthenticatorForCallerResponseSchema = {
 } as const;
 
 export const AuditSchema = {
-  required: ["auditCode", "id", "messageTemplate", "organizationId", "templateArguments"],
+  required: ["auditCode", "created", "id", "messageTemplate", "templateArguments"],
   type: "object",
   properties: {
     againstId: {
@@ -99,6 +99,10 @@ export const AuditSchema = {
     },
     auditCode: {
       type: "string"
+    },
+    created: {
+      type: "string",
+      format: "date-time"
     },
     messageTemplate: {
       type: "string"
@@ -162,6 +166,10 @@ export const AuthenticateSingleSignOnRequestSchema = {
     provider: {
       minLength: 1,
       type: "string"
+    },
+    termsAndConditionsAccepted: {
+      type: "boolean",
+      nullable: true
     },
     username: {
       type: "string",
@@ -470,6 +478,147 @@ export const ChangeSubscriptionPlanRequestSchema = {
   additionalProperties: false
 } as const;
 
+export const ChargebeeEventContentSchema = {
+  required: ["customer", "subscription"],
+  type: "object",
+  properties: {
+    customer: {
+      $ref: "#/components/schemas/ChargebeeEventCustomer"
+    },
+    subscription: {
+      $ref: "#/components/schemas/ChargebeeEventSubscription"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChargebeeEventCustomerSchema = {
+  required: ["id", "paymentMethod"],
+  type: "object",
+  properties: {
+    id: {
+      type: "string"
+    },
+    payment_method: {
+      $ref: "#/components/schemas/ChargebeePaymentMethod"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChargebeeEventSubscriptionSchema = {
+  required: ["billingPeriodUnit", "currencyCode", "customerId", "id", "status"],
+  type: "object",
+  properties: {
+    billing_period: {
+      type: "integer",
+      format: "int32"
+    },
+    billing_period_unit: {
+      type: "string"
+    },
+    cancelled_at: {
+      type: "integer",
+      format: "int64"
+    },
+    currency_code: {
+      type: "string"
+    },
+    customer_id: {
+      type: "string"
+    },
+    deleted: {
+      type: "boolean"
+    },
+    id: {
+      type: "string"
+    },
+    next_billing_at: {
+      type: "integer",
+      format: "int64"
+    },
+    status: {
+      type: "string"
+    },
+    subscription_items: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/ChargebeeEventSubscriptionItem"
+      }
+    },
+    trial_end: {
+      type: "integer",
+      format: "int64"
+    },
+    trial_start: {
+      type: "integer",
+      format: "int64"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChargebeeEventSubscriptionItemSchema = {
+  required: ["itemPriceId", "itemType"],
+  type: "object",
+  properties: {
+    amount: {
+      type: "number",
+      format: "double"
+    },
+    item_price_id: {
+      type: "string"
+    },
+    item_type: {
+      type: "string"
+    },
+    quantity: {
+      type: "integer",
+      format: "int32"
+    },
+    unit_price: {
+      type: "number",
+      format: "double"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChargebeeNotifyWebhookEventRequestSchema = {
+  type: "object",
+  properties: {
+    content: {
+      $ref: "#/components/schemas/ChargebeeEventContent"
+    },
+    event_type: {
+      type: "string",
+      nullable: true
+    },
+    id: {
+      type: "string",
+      nullable: true
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChargebeePaymentMethodSchema = {
+  required: ["id", "status", "type"],
+  type: "object",
+  properties: {
+    id: {
+      type: "string"
+    },
+    status: {
+      type: "string"
+    },
+    type: {
+      type: "string"
+    }
+  },
+  additionalProperties: false
+} as const;
+
 export const CompletePasswordResetRequestSchema = {
   required: ["password", "token"],
   type: "object",
@@ -728,6 +877,7 @@ export const DeliveredEmailSchema = {
   required: [
     "attempts",
     "body",
+    "created",
     "id",
     "isDelivered",
     "isDeliveryFailed",
@@ -769,6 +919,10 @@ export const DeliveredEmailSchema = {
     body: {
       type: "string"
     },
+    created: {
+      type: "string",
+      format: "date-time"
+    },
     deliveredAt: {
       type: "string",
       format: "date-time"
@@ -788,6 +942,9 @@ export const DeliveredEmailSchema = {
     },
     isSent: {
       type: "boolean"
+    },
+    organizationId: {
+      type: "string"
     },
     sentAt: {
       type: "string",
@@ -817,7 +974,7 @@ export const DeliveredEmailSchema = {
 } as const;
 
 export const DeliveredSmsSchema = {
-  required: ["attempts", "body", "id", "isDelivered", "isDeliveryFailed", "isSent", "tags", "toPhoneNumber"],
+  required: ["attempts", "body", "created", "id", "isDelivered", "isDeliveryFailed", "isSent", "tags", "toPhoneNumber"],
   type: "object",
   properties: {
     attempts: {
@@ -850,6 +1007,10 @@ export const DeliveredSmsSchema = {
     body: {
       type: "string"
     },
+    created: {
+      type: "string",
+      format: "date-time"
+    },
     deliveredAt: {
       type: "string",
       format: "date-time"
@@ -869,6 +1030,9 @@ export const DeliveredSmsSchema = {
     },
     isSent: {
       type: "boolean"
+    },
+    organizationId: {
+      type: "string"
     },
     sentAt: {
       type: "string",
@@ -1329,10 +1493,10 @@ export const IdentitySchema = {
   required: ["hasCredentials", "id", "isMfaEnabled"],
   type: "object",
   properties: {
-    isMfaEnabled: {
+    hasCredentials: {
       type: "boolean"
     },
-    hasCredentials: {
+    isMfaEnabled: {
       type: "boolean"
     },
     id: {
@@ -2199,6 +2363,17 @@ export const PostInsecureTestingOnlyRequestSchema = {
   additionalProperties: false
 } as const;
 
+export const PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequestSchema = {
+  type: "object",
+  properties: {
+    requiredField: {
+      type: "string",
+      nullable: true
+    }
+  },
+  additionalProperties: false
+} as const;
+
 export const PostWithEmptyBodyTestingOnlyRequestSchema = {
   type: "object",
   additionalProperties: false
@@ -2720,7 +2895,7 @@ export const SearchAllDomainEventsResponseSchema = {
   additionalProperties: false
 } as const;
 
-export const SearchEmailDeliveriesResponseSchema = {
+export const SearchAllEmailDeliveriesResponseSchema = {
   required: ["emails", "metadata"],
   type: "object",
   properties: {
@@ -2731,6 +2906,23 @@ export const SearchEmailDeliveriesResponseSchema = {
       type: "array",
       items: {
         $ref: "#/components/schemas/DeliveredEmail"
+      }
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const SearchAllSmsDeliveriesResponseSchema = {
+  required: ["metadata", "smses"],
+  type: "object",
+  properties: {
+    metadata: {
+      $ref: "#/components/schemas/SearchResultMetadata"
+    },
+    smses: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/DeliveredSms"
       }
     }
   },
@@ -2758,23 +2950,6 @@ export const SearchResultMetadataSchema = {
     total: {
       type: "integer",
       format: "int32"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const SearchSmsDeliveriesResponseSchema = {
-  required: ["metadata", "smses"],
-  type: "object",
-  properties: {
-    metadata: {
-      $ref: "#/components/schemas/SearchResultMetadata"
-    },
-    smses: {
-      type: "array",
-      items: {
-        $ref: "#/components/schemas/DeliveredSms"
-      }
     }
   },
   additionalProperties: false

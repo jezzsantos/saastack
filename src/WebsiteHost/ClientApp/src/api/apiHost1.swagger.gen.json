@@ -562,17 +562,25 @@
         "tags": [
           "AuditsApi"
         ],
-        "summary": "Lists all available audits",
+        "summary": "Lists all audits since the specified date, for the specified organization",
         "description": "(request type: SearchAllAuditsRequest)",
         "operationId": "SearchAllAudits",
         "parameters": [
           {
             "name": "OrganizationId",
             "in": "query",
-            "description": "An ID of the Organization. If not provided, the ID of the default organization of the authenticated user (if any) is used",
             "style": "form",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "SinceUtc",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           },
           {
@@ -699,7 +707,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "APIKey": [ ]
+          }
+        ]
       }
     },
     "/tokens/refresh": {
@@ -2875,6 +2891,102 @@
         ]
       }
     },
+    "/webhooks/chargebee": {
+      "post": {
+        "tags": [
+          "ChargebeeApi"
+        ],
+        "summary": "Notifies a Chargebee event, via a webhook",
+        "description": "(request type: ChargebeeNotifyWebhookEventRequest)",
+        "operationId": "ChargebeeNotifyWebhookEvent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChargebeeNotifyWebhookEventRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/domain_events/drain": {
       "post": {
         "tags": [
@@ -3511,10 +3623,18 @@
         "tags": [
           "EmailsApi"
         ],
-        "summary": "Lists all email deliveries since the specified date, for the specified tags",
-        "description": "(request type: SearchEmailDeliveriesRequest)",
-        "operationId": "SearchEmailDeliveries",
+        "summary": "Lists all email deliveries since the specified date, for the specified timeframe, organization and tags",
+        "description": "(request type: SearchAllEmailDeliveriesRequest)",
+        "operationId": "SearchAllEmailDeliveries",
         "parameters": [
+          {
+            "name": "OrganizationId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "SinceUtc",
             "in": "query",
@@ -3593,12 +3713,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchEmailDeliveriesResponse"
+                  "$ref": "#/components/schemas/SearchAllEmailDeliveriesResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchEmailDeliveriesResponse"
+                  "$ref": "#/components/schemas/SearchAllEmailDeliveriesResponse"
                 }
               }
             }
@@ -11049,10 +11169,18 @@
         "tags": [
           "SmsesApi"
         ],
-        "summary": "Lists all SMS deliveries since the specified date, for the specified tags",
-        "description": "(request type: SearchSmsDeliveriesRequest)",
-        "operationId": "SearchSmsDeliveries",
+        "summary": "Lists all SMS deliveries since the specified date, for the specified timeframe, organization and tags",
+        "description": "(request type: SearchAllSmsDeliveriesRequest)",
+        "operationId": "SearchAllSmsDeliveries",
         "parameters": [
+          {
+            "name": "OrganizationId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "SinceUtc",
             "in": "query",
@@ -11131,12 +11259,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchSmsDeliveriesResponse"
+                  "$ref": "#/components/schemas/SearchAllSmsDeliveriesResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchSmsDeliveriesResponse"
+                  "$ref": "#/components/schemas/SearchAllSmsDeliveriesResponse"
                 }
               }
             }
@@ -13300,6 +13428,102 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PostWithEmptyBodyTestingOnlyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringMessageTestingOnlyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringMessageTestingOnlyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/testingonly/general/body/empty/required": {
+      "post": {
+        "tags": [
+          "TestingWebApi"
+        ],
+        "summary": "Tests the use of an empty body in a POST request that has required properties",
+        "description": "(request type: PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest)",
+        "operationId": "PostWithEmptyBodyAndRequiredPropertiesTestingOnly",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest"
               }
             }
           }
@@ -16913,9 +17137,9 @@
       "Audit": {
         "required": [
           "auditCode",
+          "created",
           "id",
           "messageTemplate",
-          "organizationId",
           "templateArguments"
         ],
         "type": "object",
@@ -16925,6 +17149,10 @@
           },
           "auditCode": {
             "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
           },
           "messageTemplate": {
             "type": "string"
@@ -16996,6 +17224,10 @@
           "provider": {
             "minLength": 1,
             "type": "string"
+          },
+          "termsAndConditionsAccepted": {
+            "type": "boolean",
+            "nullable": true
           },
           "username": {
             "type": "string",
@@ -17334,6 +17566,160 @@
         },
         "additionalProperties": false
       },
+      "ChargebeeEventContent": {
+        "required": [
+          "customer",
+          "subscription"
+        ],
+        "type": "object",
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/ChargebeeEventCustomer"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/ChargebeeEventSubscription"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChargebeeEventCustomer": {
+        "required": [
+          "id",
+          "paymentMethod"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/ChargebeePaymentMethod"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChargebeeEventSubscription": {
+        "required": [
+          "billingPeriodUnit",
+          "currencyCode",
+          "customerId",
+          "id",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "billing_period": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "billing_period_unit": {
+            "type": "string"
+          },
+          "cancelled_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency_code": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "next_billing_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subscription_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargebeeEventSubscriptionItem"
+            }
+          },
+          "trial_end": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "trial_start": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChargebeeEventSubscriptionItem": {
+        "required": [
+          "itemPriceId",
+          "itemType"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "item_price_id": {
+            "type": "string"
+          },
+          "item_type": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unit_price": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChargebeeNotifyWebhookEventRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "$ref": "#/components/schemas/ChargebeeEventContent"
+          },
+          "event_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChargebeePaymentMethod": {
+        "required": [
+          "id",
+          "status",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CompletePasswordResetRequest": {
         "required": [
           "password",
@@ -17611,6 +17997,7 @@
         "required": [
           "attempts",
           "body",
+          "created",
           "id",
           "isDelivered",
           "isDeliveryFailed",
@@ -17652,6 +18039,10 @@
           "body": {
             "type": "string"
           },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
           "deliveredAt": {
             "type": "string",
             "format": "date-time"
@@ -17671,6 +18062,9 @@
           },
           "isSent": {
             "type": "boolean"
+          },
+          "organizationId": {
+            "type": "string"
           },
           "sentAt": {
             "type": "string",
@@ -17705,6 +18099,7 @@
         "required": [
           "attempts",
           "body",
+          "created",
           "id",
           "isDelivered",
           "isDeliveryFailed",
@@ -17744,6 +18139,10 @@
           "body": {
             "type": "string"
           },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
           "deliveredAt": {
             "type": "string",
             "format": "date-time"
@@ -17763,6 +18162,9 @@
           },
           "isSent": {
             "type": "boolean"
+          },
+          "organizationId": {
+            "type": "string"
           },
           "sentAt": {
             "type": "string",
@@ -18287,10 +18689,10 @@
         ],
         "type": "object",
         "properties": {
-          "isMfaEnabled": {
+          "hasCredentials": {
             "type": "boolean"
           },
-          "hasCredentials": {
+          "isMfaEnabled": {
             "type": "boolean"
           },
           "id": {
@@ -19294,6 +19696,16 @@
         "type": "object",
         "additionalProperties": false
       },
+      "PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest": {
+        "type": "object",
+        "properties": {
+          "requiredField": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PostWithEmptyBodyTestingOnlyRequest": {
         "type": "object",
         "additionalProperties": false
@@ -19868,7 +20280,7 @@
         },
         "additionalProperties": false
       },
-      "SearchEmailDeliveriesResponse": {
+      "SearchAllEmailDeliveriesResponse": {
         "required": [
           "emails",
           "metadata"
@@ -19882,6 +20294,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DeliveredEmail"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchAllSmsDeliveriesResponse": {
+        "required": [
+          "metadata",
+          "smses"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/SearchResultMetadata"
+          },
+          "smses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeliveredSms"
             }
           }
         },
@@ -19914,25 +20345,6 @@
           "total": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "SearchSmsDeliveriesResponse": {
-        "required": [
-          "metadata",
-          "smses"
-        ],
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "$ref": "#/components/schemas/SearchResultMetadata"
-          },
-          "smses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DeliveredSms"
-            }
           }
         },
         "additionalProperties": false
