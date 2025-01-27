@@ -11,13 +11,7 @@ public class ApiHostModule : ISubdomainModule
 {
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
-        get
-        {
-            return (_, _) =>
-            {
-                // Add you host specific middleware here
-            };
-        }
+        get { return (app, _) => app.RegisterRoutes(); }
     }
 
     public Assembly? DomainAssembly => null;
