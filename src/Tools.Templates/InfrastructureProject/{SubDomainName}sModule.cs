@@ -6,7 +6,6 @@ using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectName.Api.Subscriptions;
 using ProjectName.Persistence;
 using ProjectName.Persistence.Notifications;
 using ProjectName.Persistence.ReadModels;
