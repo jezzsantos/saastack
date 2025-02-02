@@ -17,6 +17,7 @@ public static class AuthenticationConstants
     public static class Authorization
     {
         public const string HMACPolicyName = "HMAC";
+        public const string PrivateInterHostPolicyName = "PrivateInterHost";
         public const string RolesAndFeaturesPolicyNameForNone = $"{RolesAndFeaturesPolicyNamePrefix}None";
         public const string RolesAndFeaturesPolicyNamePrefix = "RolesAndFeatures_";
         public const string TokenPolicyName = "Token";

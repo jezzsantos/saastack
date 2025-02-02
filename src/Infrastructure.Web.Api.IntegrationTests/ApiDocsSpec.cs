@@ -197,6 +197,18 @@ public class ApiDocSpec
             operation.Security[0].First().Key.Reference.Id.Should().Be(HMACAuthenticationHandler.AuthenticationScheme);
             operation.Security[0].First().Key.Type.Should().Be(SecuritySchemeType.ApiKey);
         }
+
+        [Fact]
+        public async Task WhenFetchOpenApiForSecurePrivateInterHostEndpoint_ThenShouldNotExist()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths.ContainsKey("/testingonly/authn/interhost/get");
+            operation.Should().BeFalse();
+        }
     }
 
     [Trait("Category", "Integration.API")]

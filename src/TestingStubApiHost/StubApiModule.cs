@@ -94,7 +94,8 @@ public class StubApiModule : ISubdomainModule
                 services.AddSingleton<IServiceClient>(c =>
                     new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
                         c.GetRequiredService<JsonSerializerOptions>(),
-                        c.GetRequiredService<IHostSettings>().GetAncillaryApiHostBaseUrl()));
+                        c.GetRequiredService<IHostSettings>().GetAncillaryApiHostBaseUrl(),
+                        c.GetRequiredService<IHostSettings>().GetPrivateInterHostHmacAuthSecret()));
                 services.AddSingleton<IMessageMonitor, StubMessageMonitor>();
                 services.AddHostedService(c =>
                     new StubCloudWorkerService(c.GetRequiredService<IHostSettings>(),

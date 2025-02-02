@@ -47,6 +47,11 @@ public interface IHostSettings
     ///     Returns the URL for the specified <see cref="MediaTypeNames.Image" />
     /// </summary>
     string MakeImagesApiGetUrl(string imageId);
+
+    /// <summary>
+    ///     Returns the HMAC auth secret for Inter Host
+    /// </summary>
+    string GetPrivateInterHostHmacAuthSecret();
 }
 
 /// <summary>

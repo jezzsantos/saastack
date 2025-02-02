@@ -117,4 +117,16 @@
     <data name="DefaultResponsesFilter_Example_UnexpectedError_Summary" xml:space="preserve">
         <value>Unexpected Error</value>
     </data>
+    <data name="HMACAuthenticationHandler_Misconfigured_NoSecret" xml:space="preserve">
+        <value>Failed HMAC authentication, HMAC secret has not been correctly configured</value>
+    </data>
+    <data name="PrivateInterHostAuthenticationHandler_Misconfigured_NoSecret" xml:space="preserve">
+        <value>Failed Private InterHost authentication, HMAC secret has not been correctly configured</value>
+    </data>
+    <data name="PrivateInterHostAuthenticationHandler_Misconfigured_JwtProvider" xml:space="preserve">
+        <value>Failed Private InterHost authentication, JWT Provider has not been correctly configured</value>
+    </data>
+    <data name="PrivateInterHostAuthenticationHandler_FailedAuthentication" xml:space="preserve">
+        <value>Failed Private InterHost authentication</value>
+    </data>
 </root>

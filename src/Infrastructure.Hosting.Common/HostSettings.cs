@@ -18,6 +18,7 @@ public class HostSettings : IHostSettings
     internal const string EventNotificationApiHostBaseUrlSettingName = "Hosts:{0}:BaseUrl";
     internal const string EventNotificationSubscriberSettingName = "Hosts:EventNotificationApi:SubscribedHosts";
     internal const string ImagesApiHostBaseUrlSettingName = "Hosts:ImagesApi:BaseUrl";
+    internal const string PrivateInterHostHmacSecretSettingName = "Hosts:PrivateInterHost:HMACAuthNSecret";
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
     internal const string WebsiteHostCSRFEncryptionSettingName = "Hosts:WebsiteHost:CSRFAESSecret";
     internal const string WebsiteHostCSRFSigningSettingName = "Hosts:WebsiteHost:CSRFHMACSecret";
@@ -81,6 +82,18 @@ public class HostSettings : IHostSettings
                 var hmacSecret = _settings.Platform.GetString(EventNotificationApiHmacSecretSettingName.Format(id));
                 return new SubscriberHost(id, baseUrl, hmacSecret);
             }).ToList();
+    }
+
+    public string GetPrivateInterHostHmacAuthSecret()
+    {
+        var secret = _settings.Platform.GetString(PrivateInterHostHmacSecretSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(PrivateInterHostHmacSecretSettingName));
     }
 
     public virtual string GetWebsiteHostBaseUrl()

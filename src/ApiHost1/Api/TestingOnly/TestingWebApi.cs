@@ -31,6 +31,14 @@ public sealed class TestingWebApi : IWebApiService
             { CallerId = _callerFactory.Create().CallerId });
     }
 
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthNPrivateApi(
+        GetCallerWithPrivateInterHostTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _callerFactory.Create().CallerId });
+    }
+
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthNToken(
         GetCallerWithTokenOrAPIKeyTestingOnlyRequest request, CancellationToken cancellationToken)
     {

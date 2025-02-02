@@ -137,6 +137,7 @@ namespace {assemblyNamespace}
                     {
                         AccessType.Token => AuthenticationConstants.Authorization.TokenPolicyName,
                         AccessType.HMAC => AuthenticationConstants.Authorization.HMACPolicyName,
+                        AccessType.PrivateInterHost => AuthenticationConstants.Authorization.PrivateInterHostPolicyName,
                         _ => string.Empty
                     };
                     if (policyName.HasValue())
@@ -164,22 +165,30 @@ namespace {assemblyNamespace}
 
                 endpointRegistrations.AppendLine();
 
-                var requestDtoName = registration.RequestDto;
-                var openApiName = GenerateOpenApiName(requestDtoName, routeEndpointMethod);
-                endpointRegistrations.AppendLine(
-                    @"                .WithOpenApi(op =>");
-                endpointRegistrations.AppendLine(
-                    @"                    {");
-                endpointRegistrations.AppendLine(
-                    $@"                        op.OperationId = ""{openApiName}"";");
-                endpointRegistrations.AppendLine(
-                    $@"                        op.Description = ""(request type: {requestDtoName.Name})"";");
-                endpointRegistrations.AppendLine(
-                    @"                        op.Responses.Clear();");
-                endpointRegistrations.AppendLine(
-                    @"                        return op;");
-                endpointRegistrations.AppendLine(
-                    @"                    });");
+                if (registration.OperationAccess == AccessType.PrivateInterHost)
+                {
+                    endpointRegistrations.AppendLine(
+                        @"                .ExcludeFromDescription();");
+                }
+                else
+                {
+                    var requestDtoName = registration.RequestDto;
+                    var openApiName = GenerateOpenApiName(requestDtoName, routeEndpointMethod);
+                    endpointRegistrations.AppendLine(
+                        @"                .WithOpenApi(op =>");
+                    endpointRegistrations.AppendLine(
+                        @"                    {");
+                    endpointRegistrations.AppendLine(
+                        $@"                        op.OperationId = ""{openApiName}"";");
+                    endpointRegistrations.AppendLine(
+                        $@"                        op.Description = ""(request type: {requestDtoName.Name})"";");
+                    endpointRegistrations.AppendLine(
+                        @"                        op.Responses.Clear();");
+                    endpointRegistrations.AppendLine(
+                        @"                        return op;");
+                    endpointRegistrations.AppendLine(
+                        @"                    });");
+                }
             }
 
             if (registration.IsTestingOnly)

@@ -70,8 +70,13 @@ public enum AccessType
     Token = 1,
 
     /// <summary>
-    ///     Authenticated with HMAC authentication, only used between hosts for "private" API access, for service account
-    ///     machine-to-machine access
+    ///     Authenticated with HMAC authentication, used between hosts for "private" API access, for service account
+    ///     machine-to-machine access only
     /// </summary>
-    HMAC = 2
+    HMAC = 2,
+
+    /// <summary>
+    ///     Authenticated with HMAC authentication, only used between hosts for "private" API access
+    /// </summary>
+    PrivateInterHost = 3
 }

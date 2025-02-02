@@ -123,13 +123,24 @@ public static class ClaimExtensions
     /// </summary>
     public static IReadOnlyList<Claim> ToClaimsForServiceAccount()
     {
-        return new[]
-        {
+        return
+        [
             new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.MaintenanceAccountUserId),
             new Claim(AuthenticationConstants.Claims.ForRole,
                 ToPlatformClaimValue(PlatformRoles.ServiceAccount)),
             new Claim(AuthenticationConstants.Claims.ForFeature, ToPlatformClaimValue(PlatformFeatures.Basic))
-        };
+        ];
+    }
+
+    /// <summary>
+    ///     Returns the claims for the anonymous user
+    /// </summary>
+    public static IReadOnlyList<Claim> ToClaimsForAnonymousUser()
+    {
+        return
+        [
+            new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.AnonymousUserId)
+        ];
     }
 
     /// <summary>

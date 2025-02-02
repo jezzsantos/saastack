@@ -84,11 +84,29 @@ public sealed class RouteAuthenticationSecurityFilter : IOperationFilter
                 }
             }
         };
+        var privateInterHost = new List<OpenApiSecurityRequirement>
+        {
+            new()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = PrivateInterHostAuthenticationHandler.AuthenticationScheme
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            }
+        };
 
         return routeAttribute.Access switch
         {
             AccessType.Token => tokenOrApiKey,
             AccessType.HMAC => hmac,
+            AccessType.PrivateInterHost => privateInterHost,
             _ => []
         };
     }

@@ -155,18 +155,15 @@ Associating a second factor (during the authentication process), is only necessa
 
 ![MFA Associate](../images/Authentication-MFA-Associate.png)
 
-At this point (during the authentication process), the client will need to first request
-`GET /passwords/mfa/authenticators` to determine what authenticators are already associated.
+At this point (during the authentication process), the client will need to first request `GET /passwords/mfa/authenticators` to determine what authenticators are already associated.
 
-If the client determines that there are any associated authenticators already (
-`IsActive == true`) the client will not be able to associate others, and the client must move to challenging one of the existing authenticators. See [Challenging](#Challenging-a-Second-Factor).
+If the client determines that there are any associated authenticators already (`IsActive == true`) the client will not be able to associate others, and the client must move to challenging one of the existing authenticators. See [Challenging](#Challenging-a-Second-Factor).
 
 If there are no already associated authenticators (during the authentication process) the client will need to offer to the user a choice to "associate" one of the available second factors below:
 
 ###### TOTP Authenticator
 
-If the user chooses to use an Authenticator App, then they are choosing the
-`TOTP Authenticator` option, which is a time-based one-time password.
+If the user chooses to use an Authenticator App, then they are choosing the `TOTP Authenticator` option, which is a time-based one-time password.
 
 This method uses an Authenticator App (e.g., Microsoft, Google, etc.), typically installed on a mobile device.
 
@@ -198,11 +195,9 @@ HTTP 200
 }
 ```
 
-At this point, the client will need to render the
-`barCodeUri` in the user interface, and instruct the user to open their Authenticator app on their mobile device, and scan it with their Authenticator App.
+At this point, the client will need to render the `barCodeUri` in the user interface, and instruct the user to open their Authenticator app on their mobile device, and scan it with their Authenticator App.
 
-The client can also offer to display the
-`secret`, if the user needs to input it manually into their Authenticator app, in the case where the bar code scanner is not working.
+The client can also offer to display the `secret`, if the user needs to input it manually into their Authenticator app, in the case where the bar code scanner is not working.
 
 Once configured in their Authenticator App, the user will see a revolving 6-digit code (every 30secs), they will need to copy and paste that code back into the user interface and the client will issue this request:
 
@@ -601,11 +596,7 @@ SSO authentication is typically achieved by authenticating with a 3rd party prov
 
 The OAuth2 "Authorization Code Flow" is usually performed in a browser, that can be redirected to a 3rd party website and back. The flow has several steps where the user signs in and authorizes access to their data provided by the 3rd party.
 
-The final step of this specific flow ([Authorization Code Flow](https://aaronparecki.com/oauth-2-simplified/#web-server-apps)) is to exchange a generated code for a set of tokens (typically an
-`access_token` and in some cases a
-`refresh_token`). This step often requires a "secret" to be provided that the 3rd party already knows belongs to a specific client (e.g.
-`client_id` and
-`client_secret`). Storing these secrets in browsers is problematic and represents security vulnerabilities.
+The final step of this specific flow ([Authorization Code Flow](https://aaronparecki.com/oauth-2-simplified/#web-server-apps)) is to exchange a generated code for a set of tokens (typically an `access_token` and in some cases a `refresh_token`). This step often requires a "secret" to be provided that the 3rd party already knows belongs to a specific client (e.g. `client_id` and `client_secret`). Storing these secrets in browsers is problematic and represents security vulnerabilities.
 
 Managing the first few steps of this flow is typically done by a 3rd party JavaScript library in the browser. However, the last step (exchange code for tokens) can be performed either in the front end browser or in the back end web server.
 
@@ -619,13 +610,11 @@ There are two reasons that this step is performed in the backend API (in the `Id
 
 ### HMAC Authentication/Authorization
 
-HMAC authentication is a legacy hybrid, authentication authorization system. HMAC authentication and authorization is performed as a single interaction between client and the API, by the
-`HMACAuthenticationHandler`
+HMAC authentication is a legacy hybrid, authentication authorization system. HMAC authentication and authorization is performed as a single interaction between client and the API, by the `HMACAuthenticationHandler`
 
 HMAC authentication is primarily used by trusted external services within the infrastructure of the architecture. (i.e. Azure Functions/AWS Lambdas).
 
-HMAC authentication is performed by the client signing the body of an inbound HTTP request with a signing key (that the client knows). The signature that is calculated is then send with the request in a
-`X-Hub-Signature` header in the HTTP request.
+HMAC authentication is performed by the client signing the body of an inbound HTTP request with a signing key (that the client knows). The signature that is calculated is then send with the request in a `X-Hub-Signature` header in the HTTP request.
 
 When the request is received the signature is compared against the calculated signature of the request body (using a signing key that the server knows). If the signatures match it confirms the signature was created with the correct signing key, and thus proves that the sender is to be trusted.
 
@@ -654,11 +643,11 @@ For example,
     }
 ```
 
-In the API layer, authentication is declarative, using the `[Route]` attribute, and the
-`AccessType` enumeration which defines whether it should be authenticated or not and by what provider. The choices are:
+In the API layer, authentication is declarative, using the `[Route]` attribute, and the `AccessType` enumeration which defines whether it should be authenticated or not and by what provider. The choices are:
 
 * Token authentication (`AccessType.Token`)
 * HMAC authentication (`AccessType.HMAC`)
+* Private InterHost API authentication (`AccessType.PrivateInterHost`) for calling private API's between subdomains
 * No authentication (`AccessType.Anonymous`) this is the default, if none is specified.
 
 For example,
@@ -680,8 +669,7 @@ Now that we've seen all the ways that users can be authenticated it is time to s
 
 Token authorization is provided by the `JwtBearerHandler`, that produces JWT `access_tokens`.
 
-> No matter how the user is actually authenticated (in-built or 3rd party), an
-`access_token` only issued by this system will be used to gain access to this system.
+> No matter how the user is actually authenticated (in-built or 3rd party), an `access_token` only issued by this system will be used to gain access to this system.
 
 The primary form of performing authorization, used in this system, are to verify "claims". As opposed to proprietary forms of authorization in the past (i.e. cookies, and opaque tokens etc.).
 
@@ -695,8 +683,7 @@ In "Token" based authorization, those "claims" are contained within a [transpare
 
 > In some systems, making this JWT token "opaque" by encrypting it is necessary to hide the values of the actual claims inside it. However, this is not always necessary, and should be avoided if possible for performance reasons in high-throughput systems.
 
-JWT tokens can be passed easily between modules and components of a whole system as a "bearer token" in the
-`Authorization` header of an HTTP request.
+JWT tokens can be passed easily between modules and components of a whole system as a "bearer token" in the `Authorization` header of an HTTP request.
 
 1. When an incoming request (that must be from an authenticated user) is processed, the token is extracted from the `Authorization` header first. If not present, then a `401 - Unauthorized` response if returned.
 2. Next, the token itself is unpacked into its component parts, and the signature on the token is verified to be from the trusted issuer. In a system like this, the issuers is the system itself. If the signature check fails, then so does authorization and a `401 - Unauthorized` response is returned.
@@ -706,25 +693,33 @@ JWT tokens, always declare their issuers (backed up with a signature), and alway
 
 #### Inter-service Communication
 
-When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), the incoming JWT token, used to access one service can be relayed to access other services. This is achieved using the
-`ICallerContext` and the `InterHostServiceClient` that know collaborate to relay calls between services.
+When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), then the subdomains need to communicate across HTTP (whereas in the beginning they are all hosted in the same runtime host, and thus, can consume each other in-process).
+
+When split, the incoming JWT token, in the request form the client, must be relayed from the first host to access other subdomains in other hosts.
+
+This is achieved by using the `ICallerContext` and using the `InterHostServiceClient` that knows how to collaborate to relay calls between different APIs that are hosted in different subdomains.
+
+> The built-in `JsonClient` is not intended to be used cross-subdomain host, and is not aware of this behavior. 
+
+##### Private APIs
+
+There exist a concept of "Private" API's that are accessible only by other subdomains across HTTP, and not accessible to public clients.
+
+These APIs are typically used for inter-service communication (when hosts are split), and these APIs are not supported publicly.
+
+They are also unlisted in the OpenAPI, and should NEVER be used by any public client other than any of the API hosts in the system.
 
 #### Refresh Tokens
 
-When an end-user is authenticated, either from one of the in-built authentication mechanisms above, or by 3rd parties, the authentication step often returns a short-lived
-`access_token`, along with a long-lived `refresh_token`.
+When an end-user is authenticated, either from one of the in-built authentication mechanisms above, or by 3rd parties, the authentication step often returns a short-lived `access_token`, along with a long-lived `refresh_token`.
 
-The `refresh_-token` can then be stored and used later to re-issue another
-`access_token` when a previous one has expired. In this way, a user's access to a system can be longer lived (until the
-`refresh_token` expires). And older `access_tokens` automatically retired (expired).
+The `refresh_-token` can then be stored and used later to re-issue another `access_token` when a previous one has expired. In this way, a user's access to a system can be longer lived (until the `refresh_token` expires). And older `access_tokens` automatically retired (expired).
 
-When the
-`refresh_token` finally expires (e.g. after 7 days). The end-user will be forced to authenticate again, to obtain access to the system.
+When the `refresh_token` finally expires (e.g. after 7 days). The end-user will be forced to authenticate again, to obtain access to the system.
 
 ### API Key Authorization
 
-API key authorization is provided as a convenient alternative to Token based authorization, primarily for use in long-lived machine-to-machine interactions. API Key authorization is provided by the
-`APIKeyAuthenticationHandler`
+API key authorization is provided as a convenient alternative to Token based authorization, primarily for use in long-lived machine-to-machine interactions. API Key authorization is provided by the `APIKeyAuthenticationHandler`
 
 API keys can be issued for accessing the system by both `machine` and `person` end-users.
 
@@ -735,8 +730,7 @@ They have expiry dates and can be more tightly controlled (in terms of validity)
 
 #### Inter-service Communication
 
-When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), the incoming API key, used to access one service can be relayed to access other services. This is achieved using the
-`ICallerContext` and the `InterHostServiceClient` that know collaborate to relay calls between services.
+When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), the incoming API key, used to access one service can be relayed to access other services. This is achieved using the `ICallerContext` and the `InterHostServiceClient` that know collaborate to relay calls between services.
 
 #### Refresh Tokens
 
@@ -774,20 +768,15 @@ This is commonly referred to as [RBAC](https://en.wikipedia.org/wiki/Role-based_
 1. For "Platform" APIs and subdomains that are untenanted (all tenants)
 2. For "Tenant" APIs and subdomains that are specific to a tenant (or an organization).
 
-All
-`End-Users` should have, at least, a minimum level of access to all untenanted API's based on their role, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the
-`PlatformRoles.Standard` role, used for accessing all untenanted APIs, and some Tenanted APIs.
+All `End-Users` should have, at least, a minimum level of access to all untenanted API's based on their role, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the `PlatformRoles.Standard` role, used for accessing all untenanted APIs, and some Tenanted APIs.
 
-This means, that despite what specific roles are required access to any tenanted API or subdomain (which are tenant specific), a user can access untenanted API and subdomains (e.g.
-`EndUsers`, `Organizations`, `Images`, etc.).
+This means, that despite what specific roles are required access to any tenanted API or subdomain (which are tenant specific), a user can access untenanted API and subdomains (e.g. `EndUsers`, `Organizations`, `Images`, etc.).
 
 While it is possible in some products to add more "Platform" level roles, it is not usually necessary.
 
-However, adding or updating "Tenant" level roles is often the case for many SaaS products, beyond just
-`TenantRoles.Member` and `TenantRoles.Owner`.
+However, adding or updating "Tenant" level roles is often the case for many SaaS products, beyond just `TenantRoles.Member` and `TenantRoles.Owner`.
 
-> Warning: even though RBAC is common in many SaaS products, so is the next level of granularity: "Permissions". Using permissions (as well as roles) can get very fine-grained very quickly if not designed very carefully. It is not recommended to go there easily, and this approach should be done very cautiously. The implications of using fine-grained permissions, over time, typically means that
-`access_token` start to contain a large number of claims related to permissions (for all kinds of resources), depending on the design of the system. There is a real danger of stuffing too much authorization information in these claims and this can lead to performance and synchronicity issues that have not been thought out carefully beforehand.
+> Warning: even though RBAC is common in many SaaS products, so is the next level of granularity: "Permissions". Using permissions (as well as roles) can get very fine-grained very quickly if not designed very carefully. It is not recommended to go there easily, and this approach should be done very cautiously. The implications of using fine-grained permissions, over time, typically means that `access_token` start to contain a large number of claims related to permissions (for all kinds of resources), depending on the design of the system. There is a real danger of stuffing too much authorization information in these claims and this can lead to performance and synchronicity issues that have not been thought out carefully beforehand.
 
 ### Feature-Based Authorization
 
@@ -798,17 +787,13 @@ Just like the roles above, there are two sets of "features" that apply separatel
 1. For "Platform" APIs and subdomains that are untenanted (all tenants)
 2. For "Tenant" APIs and subdomains that are specific to a tenant (or an organization).
 
-All
-`End-Users` should have, at least, a minimum level of access to all untenanted API's based on a specific feature set, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the
-`PlatformFeatures.Basic` feature set, used for accessing all untenanted APIs, and some Tenanted APIs, no matter what subscription plan they have.
+All `End-Users` should have, at least, a minimum level of access to all untenanted API's based on a specific feature set, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the `PlatformFeatures.Basic` feature set, used for accessing all untenanted APIs, and some Tenanted APIs, no matter what subscription plan they have.
 
 In most SaaS products, there are one or more pricing tiers. These are analog to "features".
 
 It is likely that every product will define its own custom tiers and features as a result.
 
-By default, we've defined
-`Basic` to represent a free set of features that every user should have at a bare minimum. This "feature set" needs to be made available even when the end-user loses their access to the rest of the system. For example, their free-trial expired. We've also defined
-`PaidTrial` to be used for a free-trial notion, and other tiers for paid pricing tiers. These are expected to be renamed for each product.
+By default, we've defined `Basic` to represent a free set of features that every user should have at a bare minimum. This "feature set" needs to be made available even when the end-user loses their access to the rest of the system. For example, their free-trial expired. We've also defined `PaidTrial` to be used for a free-trial notion, and other tiers for paid pricing tiers. These are expected to be renamed for each product.
 
 ### Web Application Authentication/Authorization
 

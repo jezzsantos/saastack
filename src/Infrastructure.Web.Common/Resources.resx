@@ -24,7 +24,4 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="HttpRequestExtensions_HMACAuthorizationNotSupported" xml:space="preserve">
-        <value>HMAC authorization cannot be relayed as an authorization method</value>
-    </data>
 </root>

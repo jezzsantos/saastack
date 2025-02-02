@@ -40,18 +40,19 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
             return AuthenticateResult.NoResult();
         }
 
+        var recorder = Context.RequestServices.GetRequiredService<IRecorder>();
+        var caller = Context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
         var hmacSecret = Context.RequestServices.GetRequiredService<IHostSettings>()
             .GetAncillaryApiHostHmacAuthSecret();
         if (hmacSecret.HasNoValue())
         {
-            return AuthenticateResult.Success(IssueTicket());
+            recorder.TraceError(caller.ToCall(), Resources.HMACAuthenticationHandler_Misconfigured_NoSecret);
+            return AuthenticateResult.Fail(Resources.AuthenticationHandler_Failed);
         }
 
         var isAuthenticated = await Request.VerifyHMACSignatureAsync(signature, hmacSecret, CancellationToken.None);
         if (!isAuthenticated)
         {
-            var recorder = Context.RequestServices.GetRequiredService<IRecorder>();
-            var caller = Context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
             recorder.Audit(caller.ToCall(), AuditingConstants.HMACAuthenticationFailed,
                 Resources.HMACAuthenticationHandler_FailedAuthentication);
             return AuthenticateResult.Fail(Resources.AuthenticationHandler_Failed);

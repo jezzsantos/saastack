@@ -141,6 +141,15 @@ namespace Infrastructure.Web.Api.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HMAC authorization cannot be relayed as an authorization method.
+        /// </summary>
+        internal static string RequestExtensions_HMACAuthorizationNotSupported {
+            get {
+                return ResourceManager.GetString("RequestExtensions_HMACAuthorizationNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request DTO type &apos;{0}&apos; is missing a &apos;{1}&apos; declared on the class.
         /// </summary>
         internal static string RequestExtensions_MissingRouteAttribute {

@@ -159,6 +159,18 @@ This is a symmetrical crypto secret used to secure communications between variou
 
 > Note: You can run the unit tests for this class and copy the value of the generated key in the first test.
 
+#### PrivateInterHost signing key
+
+This is a symmetrical crypto secret used to secure communications between various hosts (e.g., `ApiHost1` and `ApiHost2`).
+
+**IMPORTANT:** This crypto secret must be the same for all hosts.
+
+> You SHOULD NOT reuse the value of the HMAC signing key above for this secret.
+
+* sec: `HOSTS_PRIVATEINTERHOST_HMACAUTHNSECRET` Generate a random value using the [HMACSigner.GenerateKey()](https://github.com/jezzsantos/saastack/blob/main/src/Infrastructure.Web.Api.Common/HMACSigner.cs) method.
+
+> Note: You can run the unit tests for this class and copy the value of the generated key in the first test.
+
 #### CSRF secrets
 
 These crypto secrets are used to secure communications to the `WebsiteHost` BEEFE. The HMAC crypto secret is a symmetrical crypto key used to sign the CSRF cookie used between the JSApp and the `WebsiteHost` BEFFE. The AES crypto secret is a symmetrical crypto key used to encrypt the CSRF token used in the CSRF cookie.

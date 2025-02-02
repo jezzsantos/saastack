@@ -84,7 +84,7 @@ public class HMACAuthenticationHandlerSpec
     }
 
     [Fact]
-    public async Task WhenHandleAuthenticateAsyncAndNoSecret_ThenReturnsAuthenticated()
+    public async Task WhenHandleAuthenticateAsyncAndNoSecret_ThenReturnsNoResult()
     {
         _httpContext.Request.Headers[HttpConstants.Headers.HMACSignature] = "asignature";
         _hostSettings.Setup(hs => hs.GetAncillaryApiHostHmacAuthSecret()).Returns(string.Empty);
@@ -94,16 +94,14 @@ public class HMACAuthenticationHandlerSpec
 
         var result = await _handler.AuthenticateAsync();
 
-        result.Succeeded.Should().BeTrue();
-        result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.Claims.ForId
-            && claim.Value == CallerConstants.MaintenanceAccountUserId);
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.Claims.ForRole
-            && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.Claims.ForFeature
-            && claim.Value == $"Platform_{PlatformFeatures.Basic.Name}");
+        result.Succeeded.Should().BeFalse();
+        _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(),
+            It.IsAny<string>()), Times.Never);
+        _recorder.Verify(rec =>
+            rec.TraceError(It.IsAny<ICallContext>(), Resources.HMACAuthenticationHandler_Misconfigured_NoSecret));
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
+            .Which.Message.Should()
+            .Be(Resources.AuthenticationHandler_Failed);
     }
 
     [Fact]
@@ -136,13 +134,13 @@ public class HMACAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeTrue();
-        result.Ticket!.Principal.Claims.Should().Contain(claim =>
+        result.Ticket?.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == CallerConstants.MaintenanceAccountUserId);
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
+        result.Ticket?.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForRole
             && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
+        result.Ticket?.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForFeature
             && claim.Value == $"Platform_{PlatformFeatures.Basic.Name}");
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),

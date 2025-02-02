@@ -16,7 +16,7 @@ public static class StreamExtensions
             return memoryStream.ToArray();
         }
 
-        using var reusableStream = MemoryManager.GetStream();
+        using var reusableStream = MemoryManager.GetStream("StreamReader");
         value.CopyTo(reusableStream);
 
         return reusableStream.ToArray();
@@ -32,7 +32,7 @@ public static class StreamExtensions
             return memoryStream.ToArray();
         }
 
-        await using var memoryStream2 = MemoryManager.GetStream();
+        await using var memoryStream2 = MemoryManager.GetStream("StreamReader");
         await value.CopyToAsync(memoryStream2, cancellationToken);
         return memoryStream2.ToArray();
     }

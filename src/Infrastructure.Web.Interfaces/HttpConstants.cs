@@ -39,6 +39,7 @@ public static class HttpConstants
         public const string ContentLength = "Content-Length";
         public const string ContentType = "Content-Type";
         public const string HMACSignature = "X-Hub-Signature";
+        public const string PrivateInterHostSignature = "X-InterHost-Signature";
         public const string Origin = "Origin";
         public const string Referer = "Referer";
         public const string RequestId = "Request-Id";

@@ -258,6 +258,15 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed HMAC authentication, HMAC secret has not been correctly configured.
+        /// </summary>
+        internal static string HMACAuthenticationHandler_Misconfigured_NoSecret {
+            get {
+                return ResourceManager.GetString("HMACAuthenticationHandler_Misconfigured_NoSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to API Key Authorization using the &apos;{0}&apos; query parameter..
         /// </summary>
         internal static string HostExtensions_ApiDocumentation_APIKeyQueryDescription {
@@ -299,6 +308,33 @@ namespace Infrastructure.Web.Hosting.Common {
         internal static string MultiTenancyMiddleware_UserNotAMember {
             get {
                 return ResourceManager.GetString("MultiTenancyMiddleware_UserNotAMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed Private InterHost authentication.
+        /// </summary>
+        internal static string PrivateInterHostAuthenticationHandler_FailedAuthentication {
+            get {
+                return ResourceManager.GetString("PrivateInterHostAuthenticationHandler_FailedAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed Private InterHost authentication, JWT Provider has not been correctly configured.
+        /// </summary>
+        internal static string PrivateInterHostAuthenticationHandler_Misconfigured_JwtProvider {
+            get {
+                return ResourceManager.GetString("PrivateInterHostAuthenticationHandler_Misconfigured_JwtProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed Private InterHost authentication, HMAC secret has not been correctly configured.
+        /// </summary>
+        internal static string PrivateInterHostAuthenticationHandler_Misconfigured_NoSecret {
+            get {
+                return ResourceManager.GetString("PrivateInterHostAuthenticationHandler_Misconfigured_NoSecret", resourceCulture);
             }
         }
         

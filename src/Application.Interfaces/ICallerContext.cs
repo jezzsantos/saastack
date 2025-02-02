@@ -14,7 +14,8 @@ public partial interface ICallerContext
     {
         Token = 0,
         APIKey = 1,
-        HMAC = 2
+        HMAC = 2,
+        PrivateInterHost = 3
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public partial interface ICallerContext
     /// </summary>
     public class CallerAuthorization
     {
-        public CallerAuthorization(AuthorizationMethod method, string value)
+        public CallerAuthorization(AuthorizationMethod method, Optional<string> value)
         {
             Method = method;
             Value = value;
@@ -70,6 +71,6 @@ public partial interface ICallerContext
 
         public AuthorizationMethod Method { get; }
 
-        public string Value { get; }
+        public Optional<string> Value { get; }
     }
 }

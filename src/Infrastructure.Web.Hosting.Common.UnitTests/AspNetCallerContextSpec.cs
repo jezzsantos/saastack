@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Application.Interfaces;
+using Common;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
@@ -260,6 +261,46 @@ public class AspNetCallerContextSpec
     }
 
     [Fact]
+    public void WhenConstructedAndPrivateInterHostAuthSchemeButNoJwtToken_ThenSetsAuthorization()
+    {
+        var authFeature = new Mock<IAuthenticateResultFeature>();
+        var ticket = new AuthenticationTicket(new ClaimsPrincipal(),
+            PrivateInterHostAuthenticationHandler.AuthenticationScheme);
+        authFeature.Setup(af => af.AuthenticateResult)
+            .Returns(AuthenticateResult.Success(ticket));
+        var features = new FeatureCollection();
+        features.Set(authFeature.Object);
+        _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(features);
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.PrivateInterHost && auth.Value == Optional<string>.None);
+    }
+
+    [Fact]
+    public void WhenConstructedAndPrivateInterHostAuthSchemeAndJwtToken_ThenSetsAuthorization()
+    {
+        var authFeature = new Mock<IAuthenticateResultFeature>();
+        var ticket = new AuthenticationTicket(new ClaimsPrincipal(),
+            PrivateInterHostAuthenticationHandler.AuthenticationScheme);
+        authFeature.Setup(af => af.AuthenticateResult)
+            .Returns(AuthenticateResult.Success(ticket));
+        var features = new FeatureCollection();
+        features.Set(authFeature.Object);
+        _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(features);
+        _httpContext.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
+        {
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
+        });
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.PrivateInterHost && auth.Value == "atoken".ToOptional());
+    }
+
+    [Fact]
     public void WhenConstructedAndTokenAuthScheme_ThenSetsAuthorization()
     {
         var authFeature = new Mock<IAuthenticateResultFeature>();
@@ -276,8 +317,8 @@ public class AspNetCallerContextSpec
 
         var result = new AspNetCallerContext(_httpContext.Object);
 
-        result.Authorization.Should().BeSome(auth => auth is
-            { Method: ICallerContext.AuthorizationMethod.Token, Value: "atoken" });
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.Token && auth.Value == "atoken".ToOptional());
     }
 
     [Fact]
@@ -302,8 +343,8 @@ public class AspNetCallerContextSpec
 
         var result = new AspNetCallerContext(_httpContext.Object);
 
-        result.Authorization.Should().BeSome(auth => auth is
-            { Method: ICallerContext.AuthorizationMethod.APIKey, Value: "anapikey" });
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.APIKey && auth.Value == "anapikey".ToOptional());
     }
 
     [Fact]
@@ -336,6 +377,8 @@ public class AspNetCallerContextSpec
         var result = new AspNetCallerContext(_httpContext.Object);
 
         result.IsAuthenticated.Should().BeTrue();
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.Token && auth.Value == "atoken".ToOptional());
     }
 
     [Fact]

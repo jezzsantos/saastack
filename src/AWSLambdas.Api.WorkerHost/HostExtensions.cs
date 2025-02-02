@@ -41,7 +41,7 @@ public static class HostExtensions
                 c.GetRequiredService<ICrashReporter>()));
         services.AddSingleton<IServiceClientFactory>(c =>
             new InterHostServiceClientFactory(c.GetRequiredService<IHttpClientFactory>(),
-                c.GetRequiredService<JsonSerializerOptions>()));
+                c.GetRequiredService<JsonSerializerOptions>(), c.GetRequiredService<IHostSettings>()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, SendEmailRelayWorker>();

@@ -24,13 +24,13 @@ internal sealed class AspNetCallerContext : ICallerContext
     public AspNetCallerContext(IHttpContextAccessor httpContextAccessor)
     {
         var httpContext = httpContextAccessor.HttpContext!;
-        var claims = httpContext.User.Claims.ToArray();
         var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>();
         TenantId = GetTenantId(tenancyContext);
         CallId = httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
             out var callId)
             ? callId!.ToString()!
             : Caller.GenerateCallId();
+        var claims = httpContext.User.Claims.ToArray();
         CallerId = GetCallerId(claims);
         IsServiceAccount = CallerConstants.IsServiceAccount(CallerId);
         Roles = GetRoles(claims, TenantId);
@@ -63,7 +63,7 @@ internal sealed class AspNetCallerContext : ICallerContext
             : null;
     }
 
-    private static ICallerContext.CallerAuthorization GetAuthorization(HttpContext context)
+    private static Optional<ICallerContext.CallerAuthorization> GetAuthorization(HttpContext context)
     {
         var authenticationFeature = context.Features.Get<IAuthenticateResultFeature>();
         if (authenticationFeature.NotExists())
@@ -83,8 +83,19 @@ internal sealed class AspNetCallerContext : ICallerContext
         return GetCallerAuthorization(context, schemes.ToList());
     }
 
-    private static ICallerContext.CallerAuthorization GetCallerAuthorization(HttpContext context, List<string> schemes)
+    private static Optional<ICallerContext.CallerAuthorization> GetCallerAuthorization(HttpContext context,
+        List<string> schemes)
     {
+        // This scheme check comes before JwtBearer since PrivateInterHost will always include JwtBearer also 
+        if (schemes.ContainsIgnoreCase(PrivateInterHostAuthenticationHandler.AuthenticationScheme))
+        {
+            var token = context.Request.GetTokenAuth();
+            return !token.HasValue
+                ? new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
+                    Optional<string>.None)
+                : new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost, token);
+        }
+
         if (schemes.ContainsIgnoreCase(JwtBearerDefaults.AuthenticationScheme))
         {
             var token = context.Request.GetTokenAuth();
@@ -115,6 +126,10 @@ internal sealed class AspNetCallerContext : ICallerContext
         return Optional<ICallerContext.CallerAuthorization>.None;
     }
 
+    /// <summary>
+    ///     Get the claim identifying the ID of the user.
+    ///     Note: Can also be the <see cref="CallerConstants.AnonymousUserId" /> user too!
+    /// </summary>
     private static string GetCallerId(Claim[] claims)
     {
         var userClaim = claims.FirstOrDefault(claim => claim.Type == AuthenticationConstants.Claims.ForId);

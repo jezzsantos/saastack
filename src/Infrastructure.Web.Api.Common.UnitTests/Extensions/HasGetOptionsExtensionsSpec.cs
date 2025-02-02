@@ -89,4 +89,48 @@ public class HasGetOptionsExtensionsSpec
         result.ResourceReferences.ToList()[2]
             .Should().Be("aresourceref3");
     }
+
+    [Fact]
+    public void WhenToEmbedWithNothing_ThenReturns()
+    {
+        var result = new GetOptions().ToEmbed();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToEmbedWithAll_ThenReturns()
+    {
+        var result = new GetOptions(ExpandOptions.All)
+            .ToEmbed();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToEmbedWithNone_ThenReturns()
+    {
+        var result = new GetOptions(ExpandOptions.None)
+            .ToEmbed();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToEmbedWithCustomButNoReferences_ThenReturns()
+    {
+        var result = new GetOptions(ExpandOptions.Custom, [])
+            .ToEmbed();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToEmbedWithCustomWithReferences_ThenReturns()
+    {
+        var result = new GetOptions(ExpandOptions.Custom, ["aresource1", "aresource2"])
+            .ToEmbed();
+
+        result.Should().Be("aresource1,aresource2");
+    }
 }

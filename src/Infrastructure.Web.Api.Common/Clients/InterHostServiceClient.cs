@@ -3,6 +3,7 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces;
 
@@ -17,10 +18,13 @@ namespace Infrastructure.Web.Api.Common.Clients;
 public sealed class InterHostServiceClient : ApiServiceClient
 {
     private const int RetryCount = 2;
+    private readonly string _privateInterHostSecret;
 
-    public InterHostServiceClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions, string baseUrl) :
+    public InterHostServiceClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions, string baseUrl,
+        string privateInterHostSecret) :
         base(clientFactory, jsonOptions, baseUrl, RetryCount)
     {
+        _privateInterHostSecret = privateInterHostSecret;
     }
 
     protected override JsonClient CreateJsonClient(ICallerContext? context,
@@ -35,7 +39,7 @@ public sealed class InterHostServiceClient : ApiServiceClient
             {
                 inboundRequestFilter(req);
                 AddCorrelationId(req, context);
-                AddCallerAuthorization(req, context);
+                AddCallerAuthorization(req, context, _privateInterHostSecret);
             };
         }
         else
@@ -43,7 +47,7 @@ public sealed class InterHostServiceClient : ApiServiceClient
             modifiedRequestFilter = req =>
             {
                 AddCorrelationId(req, context);
-                AddCallerAuthorization(req, context);
+                AddCallerAuthorization(req, context, _privateInterHostSecret);
             };
         }
 
@@ -58,11 +62,12 @@ public sealed class InterHostServiceClient : ApiServiceClient
         }
     }
 
-    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context)
+    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
+        string privateInterHostSecret)
     {
         if (context.Exists())
         {
-            message.SetAuthorization(context);
+            message.SetAuthorization(context, privateInterHostSecret);
         }
     }
 }

@@ -141,6 +141,37 @@ public class HasSearchOptionsExtensionsSpec
         result.Filter.Fields[0]
             .Should().Be("afilter1");
     }
+
+    [Fact]
+    public void WhenWithOptionsAndNoOptions_ThenReturnsDto()
+    {
+        var result = new SearchOptionsDto()
+            .WithOptions(new SearchOptions(), new GetOptions());
+
+        result.Sort.Should().BeNull();
+        result.Embed.Should().BeNull();
+        result.Filter.Should().BeNull();
+        result.Offset.Should().Be(-1);
+    }
+
+    [Fact]
+    public void WhenWithOptionsAndAllOptions_ThenReturnsDto()
+    {
+        var result = new SearchOptionsDto()
+            .WithOptions(new SearchOptions
+            {
+                Filter = new Filtering(["afield1", "afield2"]),
+                Sort = new Sorting("asort", SortDirection.Descending),
+                Limit = 9,
+                Offset = 7
+            }, new GetOptions(ExpandOptions.Custom, ["anembed1", "anembed2"], ExpandOptions.None));
+
+        result.Sort.Should().Be("-asort");
+        result.Embed.Should().Be("anembed1,anembed2");
+        result.Filter.Should().Be("afield1,afield2");
+        result.Limit.Should().Be(9);
+        result.Offset.Should().Be(7);
+    }
 }
 
 public class SearchOptionsDto : IHasSearchOptions

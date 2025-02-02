@@ -43,6 +43,7 @@ public class AuthNApiSpec : WebApiSpec<Program>
     public async Task WhenGetHMACRequestWithWrongSignature_ThenReturns401()
     {
         var request = new GetCallerWithHMACTestingOnlyRequest();
+        
         var result = await Api.GetAsync(request, req => req.SetHMACAuth(request, "awrongsecret"));
 
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -53,6 +54,7 @@ public class AuthNApiSpec : WebApiSpec<Program>
     public async Task WhenGetHMACRequestWithSignature_ThenReturnsSuccess()
     {
         var request = new GetCallerWithHMACTestingOnlyRequest();
+        
         var result = await Api.GetAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -112,6 +114,49 @@ public class AuthNApiSpec : WebApiSpec<Program>
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Content.Value.CallerId.Should().Be(login.User.Id);
+    }
+
+    [Fact]
+    public async Task WhenGetPrivateInterHostRequestWithNoHMACSignature_ThenReturns401()
+    {
+        var result = await Api.GetAsync(new GetCallerWithPrivateInterHostTestingOnlyRequest());
+
+        result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        result.Content.Error.Title.Should().Be("Unauthorized");
+    }
+
+    [Fact]
+    public async Task WhenGetPrivateInterHostRequestWithWrongSignature_ThenReturns401()
+    {
+        var request = new GetCallerWithPrivateInterHostTestingOnlyRequest();
+
+        var result = await Api.GetAsync(request, req => req.SetPrivateInterHostAuth(request, "awrongsecret"));
+
+        result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        result.Content.Error.Title.Should().Be("Unauthorized");
+    }
+
+    [Fact]
+    public async Task WhenGetPrivateInterHostRequestWithSignatureAndNoToken_ThenReturnsSuccessForAnonymous()
+    {
+        var request = new GetCallerWithPrivateInterHostTestingOnlyRequest();
+
+        var result = await Api.GetAsync(request, req => req.SetPrivateInterHostAuth(request, "asecret"));
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.CallerId.Should().Be(CallerConstants.AnonymousUserId);
+    }
+
+    [Fact]
+    public async Task WhenGetPrivateInterHostRequestWithSignatureAndToken_ThenReturnsSuccessForUser()
+    {
+        var token = CreateJwtToken(_settings, _tokensService);
+        var request = new GetCallerWithPrivateInterHostTestingOnlyRequest();
+
+        var result = await Api.GetAsync(request, req => req.SetPrivateInterHostAuth(request, "asecret", token));
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.CallerId.Should().Be("auserid");
     }
 
     private static string CreateJwtToken(IConfigurationSettings settings, ITokensService tokensService)

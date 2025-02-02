@@ -534,7 +534,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
                 return true;
             }
         }
-        else
+        else if (access != AccessType.PrivateInterHost)
         {
             if (attribute is null)
             {

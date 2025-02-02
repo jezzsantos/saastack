@@ -7,6 +7,15 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 public static class HasGetOptionsExtensions
 {
     /// <summary>
+    ///     Converts a <see cref="GetOptions" /> to its representation on the wire
+    /// </summary>
+    public static string? ToEmbed(this GetOptions options)
+    {
+        var hasOptions = options.ToHasGetOptions();
+        return hasOptions.Embed;
+    }
+
+    /// <summary>
     ///     Converts a <see cref="IHasGetOptions" /> to a <see cref="GetOptions" />
     /// </summary>
     public static GetOptions ToGetOptions(this IHasGetOptions requestDto, ExpandOptions? defaultExpand = null,
@@ -20,7 +29,8 @@ public static class HasGetOptionsExtensions
         var embedValue = requestDto.Embed;
         if (embedValue.HasNoValue())
         {
-            if (defaultChildResources is not null && defaultChildResources.HasAny())
+            if (defaultChildResources.Exists()
+                && defaultChildResources.HasAny())
             {
                 return GetOptions.Custom(defaultChildResources);
             }
@@ -63,7 +73,7 @@ public static class HasGetOptionsExtensions
             return new HasGetOptions();
         }
 
-        var childResourcesList = options.ResourceReferences.HasAny() && options.ResourceReferences.Any()
+        var childResourcesList = options.ResourceReferences.HasAny()
             ? options.ResourceReferences.Join(GetOptions.EmbedRequestParamDelimiter)
             : null;
 

@@ -29,17 +29,15 @@ public class EndUsersApi : IWebApiService
             new PostResult<UpdateUserResponse>(new UpdateUserResponse { User = usr }));
     }
 
-#if TESTINGONLY
-    public async Task<ApiGetResult<EndUserWithMemberships, GetUserResponse>> GetUserWithMemberships(
-        GetUserRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<EndUserWithMemberships, GetUserPrivateResponse>> GetMemberships(
+        GetUserPrivateRequest request, CancellationToken cancellationToken)
     {
         var user =
             await _endUsersApplication.GetMembershipsAsync(_callerFactory.Create(), request.Id!, cancellationToken);
 
-        return () => user.HandleApplicationResult<EndUserWithMemberships, GetUserResponse>(usr =>
-            new GetUserResponse { User = usr });
+        return () => user.HandleApplicationResult<EndUserWithMemberships, GetUserPrivateResponse>(usr =>
+            new GetUserPrivateResponse { User = usr });
     }
-#endif
 
     public async Task<ApiResult<EndUser, UpdateUserResponse>> UnassignPlatformRoles(
         UnassignPlatformRolesRequest request, CancellationToken cancellationToken)

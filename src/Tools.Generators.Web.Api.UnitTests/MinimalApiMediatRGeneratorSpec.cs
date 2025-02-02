@@ -453,7 +453,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", OperationMethod.Get, access:AccessType.HMAC, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.HMAC)]
                                                 public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
@@ -492,7 +492,6 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
-                #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
@@ -504,7 +503,6 @@ public class MinimalApiMediatRGeneratorSpec
                                         op.Responses.Clear();
                                         return op;
                                     });
-                #endif
                 
                         }
                     }
@@ -512,7 +510,6 @@ public class MinimalApiMediatRGeneratorSpec
 
                 namespace ANamespace.AServiceClassMediatRHandlers
                 {
-                #if TESTINGONLY
                     public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
                     {
                         public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
@@ -522,7 +519,6 @@ public class MinimalApiMediatRGeneratorSpec
                             return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
-                #endif
 
                 }
 
@@ -543,7 +539,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token)]
                                                 public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
@@ -582,7 +578,6 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
-                #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
@@ -594,7 +589,6 @@ public class MinimalApiMediatRGeneratorSpec
                                         op.Responses.Clear();
                                         return op;
                                     });
-                #endif
                 
                         }
                     }
@@ -602,7 +596,6 @@ public class MinimalApiMediatRGeneratorSpec
 
                 namespace ANamespace.AServiceClassMediatRHandlers
                 {
-                #if TESTINGONLY
                     public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
                     {
                         public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
@@ -612,7 +605,86 @@ public class MinimalApiMediatRGeneratorSpec
                             return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
-                #endif
+
+                }
+
+
+                """);
+        }
+
+        [Fact]
+        public void WhenDefinesAMethodAndPrivateInterHostAuth_ThenGenerates()
+        {
+            var compilation = CreateCompilation("""
+                                                using System;
+                                                using System.Threading;
+                                                using Infrastructure.Web.Api.Interfaces;
+
+                                                namespace ANamespace;
+
+                                                public class AResponse : IWebResponse
+                                                {
+                                                }
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.PrivateInterHost)]
+                                                public class ARequest : WebRequest<ARequest, AResponse>
+                                                {
+                                                }
+                                                public class AServiceClass : IWebApiService
+                                                {
+                                                    public async Task<string> AMethod(ARequest request, CancellationToken cancellationToken)
+                                                    {
+                                                         return "";
+                                                    }
+                                                }
+                                                """);
+
+            var result = Generate(compilation);
+
+            result.Should().Be(
+                """
+                // <auto-generated/>
+                using System.Threading;
+                using System;
+                using Microsoft.Extensions.DependencyInjection;
+                using Microsoft.AspNetCore.Http;
+                using Microsoft.AspNetCore.Builder;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common.Extensions;
+
+                namespace compilation
+                {
+                    public static class MinimalApiRegistration
+                    {
+                        public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
+                        {
+                            var aserviceclassGroup = app.MapGroup(string.Empty)
+                                .WithTags("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.HttpRecordingFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
+                            aserviceclassGroup.MapGet("aroute",
+                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .RequireAuthorization("PrivateInterHost")
+                                .ExcludeFromDescription();
+                
+                        }
+                    }
+                }
+
+                namespace ANamespace.AServiceClassMediatRHandlers
+                {
+                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
+                    {
+                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                        {
+                            var api = new global::ANamespace.AServiceClass();
+                            var result = await api.AMethod(request, cancellationToken);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                        }
+                    }
 
                 }
 

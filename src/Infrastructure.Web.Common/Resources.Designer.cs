@@ -58,14 +58,5 @@ namespace Infrastructure.Web.Common {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HMAC authorization cannot be relayed as an authorization method.
-        /// </summary>
-        internal static string HttpRequestExtensions_HMACAuthorizationNotSupported {
-            get {
-                return ResourceManager.GetString("HttpRequestExtensions_HMACAuthorizationNotSupported", resourceCulture);
-            }
-        }
     }
 }

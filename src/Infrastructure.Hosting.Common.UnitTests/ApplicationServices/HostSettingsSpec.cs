@@ -41,7 +41,7 @@ public class HostSettingsSpec
     }
 
     [Fact]
-    public void WhenGetAncillaryApiHostHmacAuthSecret_ThenReturnsBaseUrl()
+    public void WhenGetAncillaryApiHostHmacAuthSecret_ThenReturnsSecret()
     {
         _settings.Setup(s => s.Platform.GetString(HostSettings.AncillaryApiHmacSecretSettingName, It.IsAny<string>()))
             .Returns("asecret");
@@ -129,5 +129,17 @@ public class HostSettingsSpec
 
         result.Should().OnlyContain(x =>
             x.Id == "asubscribedhost" && x.BaseUrl == "http://localhost/api" && x.HmacSecret == "asecret");
+    }
+
+    [Fact]
+    public void WhenGetPrivateInterHostHmacAuthSecret_ThenReturnsSecret()
+    {
+        _settings.Setup(s =>
+                s.Platform.GetString(HostSettings.PrivateInterHostHmacSecretSettingName, It.IsAny<string>()))
+            .Returns("asecret");
+
+        var result = _service.GetPrivateInterHostHmacAuthSecret();
+
+        result.Should().Be("asecret");
     }
 }

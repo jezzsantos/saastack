@@ -95,63 +95,6 @@ public class HttpRequestExtensionsSpec
     }
 
     [Fact]
-    public void WhenSetAuthorizationAndNoAuthorizationValue_ThenDoesNothing()
-    {
-        var message = new HttpRequestMessage();
-        var context =
-            Mock.Of<ICallerContext>(cc => cc.Authorization == Optional.None<ICallerContext.CallerAuthorization>());
-
-        message.SetAuthorization(context);
-
-        message.Headers.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void WhenSetAuthorizationAndHMACAuthorization_ThenThrows()
-    {
-        var message = new HttpRequestMessage();
-        var context = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC, "avalue").ToOptional());
-
-        message.Invoking(x => x.SetAuthorization(context))
-            .Should().Throw<InvalidOperationException>()
-            .WithMessage(Resources.HttpRequestExtensions_HMACAuthorizationNotSupported);
-
-        message.Headers.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void WhenSetAuthorizationAndTokenAuthorization_ThenThrows()
-    {
-        var message = new HttpRequestMessage();
-        var context = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.Token, "avalue").ToOptional());
-
-        message.SetAuthorization(context);
-
-        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
-            .OnlyContain(hdr => hdr == "Bearer avalue");
-    }
-
-    [Fact]
-    public void WhenSetAuthorizationAndApiKeyAuthorization_ThenThrows()
-    {
-        var message = new HttpRequestMessage();
-        var context = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, "avalue")
-                .ToOptional());
-
-        message.SetAuthorization(context);
-
-        var base64Credential = Convert.ToBase64String(Encoding.UTF8.GetBytes("avalue:"));
-        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
-            .OnlyContain(hdr => hdr == $"Basic {base64Credential}");
-    }
-
-    [Fact]
     public void WhenRewindBodAndCanSeek_ThenRewindsStream()
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes("avalue"));

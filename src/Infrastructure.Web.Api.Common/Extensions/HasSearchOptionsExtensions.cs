@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Interfaces.Extensions;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
@@ -69,6 +70,25 @@ public static class HasSearchOptionsExtensions
 
             return SearchOptions.DefaultLimit;
         }
+    }
+
+    /// <summary>
+    ///     Applies the specified <see cref="searchOptions" /> and <see cref="getOptions" /> to the specified
+    ///     <see cref="requestDto" />
+    /// </summary>
+    public static TRequest WithOptions<TRequest>(this TRequest requestDto, SearchOptions searchOptions,
+        GetOptions getOptions)
+        where TRequest : IHasSearchOptions
+    {
+        requestDto.Offset = searchOptions.Offset;
+        requestDto.Limit = searchOptions.Limit;
+        requestDto.Sort = searchOptions.Sort.HasValue
+            ? searchOptions.Sort.Value.ToSort()
+            : null;
+        requestDto.Filter = searchOptions.Filter.ToFilter();
+        requestDto.Embed = getOptions.ToEmbed();
+
+        return requestDto;
     }
 
     private static string ParseSortBy(string sortBy)

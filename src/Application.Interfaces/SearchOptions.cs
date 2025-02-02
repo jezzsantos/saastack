@@ -17,12 +17,12 @@ public class SearchOptions
     public const int NoOffset = -1;
     public const char SortSignAscending = '+';
     public const char SortSignDescending = '-';
-
     public static readonly char[] FilterDelimiters =
-    {
+    [
         ',',
         ';'
-    };
+    ];
+
 
     public static readonly char[] SortSigns =
     {

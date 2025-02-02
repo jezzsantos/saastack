@@ -1,8 +1,12 @@
+using System.Text;
+using Application.Interfaces;
+using Common;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Interfaces;
+using Moq;
 using Xunit;
 
 // ReSharper disable UnusedMember.Local
@@ -379,6 +383,98 @@ public class RequestExtensionsSpec
         result[nameof(HasPlaceholdersPostRequest.ANumberProperty)].Should().Be(typeof(int?));
         result[nameof(HasPlaceholdersPostRequest.AStringProperty1)].Should().Be(typeof(string));
         result[nameof(HasPlaceholdersPostRequest.AStringProperty2)].Should().Be(typeof(string));
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndNoAuthorizationValue_ThenDoesNothing()
+    {
+        var message = new HttpRequestMessage();
+        var caller =
+            Mock.Of<ICallerContext>(cc => cc.Authorization == Optional<ICallerContext.CallerAuthorization>.None);
+
+        message.SetAuthorization(caller, "asecret");
+
+        message.Headers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndHMACAuthorization_ThenThrows()
+    {
+        var message = new HttpRequestMessage();
+        var caller = Mock.Of<ICallerContext>(cc =>
+            cc.Authorization
+            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC, "avalue").ToOptional());
+
+        message.Invoking(x => x.SetAuthorization(caller, "asecret"))
+            .Should().Throw<NotSupportedException>()
+            .WithMessage(Resources.RequestExtensions_HMACAuthorizationNotSupported);
+
+        message.Headers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndPrivateInterHostAuthorizationAndCallerHasAuthorization_ThenAuthorizes()
+    {
+        var message = new HttpRequestMessage();
+        var caller = Mock.Of<ICallerContext>(cc =>
+            cc.Authorization
+            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost, "avalue")
+                .ToOptional());
+
+        message.SetAuthorization(caller, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should()
+            .OnlyContain(hdr => hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
+            .OnlyContain(hdr => hdr == "Bearer avalue");
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndPrivateInterHostAuthorizationAndCallerHasNoAuthorization_ThenAuthorizes()
+    {
+        var message = new HttpRequestMessage();
+        var caller = Mock.Of<ICallerContext>(cc =>
+            cc.Authorization
+            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
+                    Optional<string>.None)
+                .ToOptional());
+
+        message.SetAuthorization(caller, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should()
+            .OnlyContain(hdr => hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+        message.Headers.Contains(HttpConstants.Headers.Authorization).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndTokenAuthorization_ThenAuthorizes()
+    {
+        var message = new HttpRequestMessage();
+        var caller = Mock.Of<ICallerContext>(cc =>
+            cc.Authorization
+            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost, "avalue")
+                .ToOptional());
+
+        message.SetAuthorization(caller, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
+            .OnlyContain(hdr => hdr == "Bearer avalue");
+    }
+
+    [Fact]
+    public void WhenSetAuthorizationAndApiKeyAuthorization_ThenAuthorizes()
+    {
+        var message = new HttpRequestMessage();
+        var caller = Mock.Of<ICallerContext>(cc =>
+            cc.Authorization
+            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, "avalue")
+                .ToOptional());
+
+        message.SetAuthorization(caller, "asecret");
+
+        var base64Credential = Convert.ToBase64String(Encoding.UTF8.GetBytes("avalue:"));
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
+            .OnlyContain(hdr => hdr == $"Basic {base64Credential}");
     }
 
     private class NoRouteRequest : IWebRequest<TestResponse>;

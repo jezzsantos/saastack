@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using Application.Interfaces;
@@ -118,6 +117,26 @@ public static class HttRequestExtensions
     }
 
     /// <summary>
+    ///     Returns the value of the PrivateInterHost signature authorization from the request (if any)
+    /// </summary>
+    public static Optional<string> GetPrivateInterHostAuth(this HttpRequest request)
+    {
+        var authorization = request.Headers[HttpConstants.Headers.PrivateInterHostSignature];
+        if (authorization.NotExists() || authorization.Count == 0)
+        {
+            return Optional<string>.None;
+        }
+
+        var signature = authorization.FirstOrDefault();
+        if (signature.HasNoValue())
+        {
+            return Optional<string>.None;
+        }
+
+        return signature;
+    }
+
+    /// <summary>
     ///     Returns the value of the Bearer token of the JWT authorization from the request (if any)
     /// </summary>
     public static Optional<string> GetTokenAuth(this HttpRequest request)
@@ -176,34 +195,6 @@ public static class HttRequestExtensions
         message.SetBasicAuth(apiKey);
     }
 
-    /// <summary>
-    ///     Sets the <see cref="Authorization" /> to the specified <see cref="message" />
-    /// </summary>
-    public static void SetAuthorization(this HttpRequestMessage message, ICallerContext caller)
-    {
-        var authorization = caller.Authorization;
-        if (!authorization.HasValue)
-        {
-            return;
-        }
-
-        switch (authorization.Value.Method)
-        {
-            case ICallerContext.AuthorizationMethod.Token:
-                SetJWTBearerToken(message, authorization.Value.Value);
-                break;
-
-            case ICallerContext.AuthorizationMethod.APIKey:
-                SetAPIKey(message, authorization.Value.Value);
-                break;
-
-            case ICallerContext.AuthorizationMethod.HMAC:
-                throw new InvalidOperationException(Resources.HttpRequestExtensions_HMACAuthorizationNotSupported);
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
 
     /// <summary>
     ///     Sets the <see cref="ICallerContext.Authorization" /> to Basic with <see cref="username" />, and

@@ -1620,6 +1620,45 @@ public class AClass : IWebApiService
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule019,
                     input, 9, 35, nameof(TestSecureRouteNoAuthorizeAttributeRequest));
             }
+
+            [Fact]
+            public async Task WhenRouteIsPrivateInterHostAndMissingAuthorizeAttribute_ThenNoAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiEmptyResult AMethod({nameof(TestPrivateInterHostRouteNoAuthorizeAttributeRequest)} request)
+    {{ 
+        return () => new Result<EmptyResponse, Error>();
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenRouteIsPrivateInterHostAndAuthorizeAttribute_ThenNoAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiEmptyResult AMethod({nameof(TestPrivateInterHostRouteAuthorizeAttributeRequest)} request)
+    {{ 
+        return () => new Result<EmptyResponse, Error>();
+    }}
+}}";
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
         }
 
         [Trait("Category", "Unit.Tooling")]
@@ -2558,3 +2597,16 @@ public class
 [UsedImplicitly]
 public class
     TestSecureRouteNoAuthorizeAttributeRequest : WebRequest<TestSecureRouteNoAuthorizeAttributeRequest, TestResponse>;
+    
+[Route("/aresource", OperationMethod.Post, AccessType.PrivateInterHost)]
+[UsedImplicitly]
+public class
+    TestPrivateInterHostRouteNoAuthorizeAttributeRequest : WebRequest<TestPrivateInterHostRouteNoAuthorizeAttributeRequest,
+    TestResponse>;
+
+[Route("/aresource", OperationMethod.Post, AccessType.PrivateInterHost)]
+[Authorize(Roles.Platform_Standard)]
+[UsedImplicitly]
+public class
+    TestPrivateInterHostRouteAuthorizeAttributeRequest : WebRequest<TestPrivateInterHostRouteAuthorizeAttributeRequest,
+    TestResponse>;
