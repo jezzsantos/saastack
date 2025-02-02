@@ -1,5 +1,4 @@
 using System.Text;
-using Application.Interfaces;
 using Common;
 using FluentAssertions;
 using Infrastructure.Web.Common.Extensions;

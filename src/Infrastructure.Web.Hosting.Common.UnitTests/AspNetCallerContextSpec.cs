@@ -257,7 +257,8 @@ public class AspNetCallerContextSpec
 
         var result = new AspNetCallerContext(_httpContext.Object);
 
-        result.Authorization.Should().BeNone();
+        result.Authorization.Should().BeSome(auth =>
+            auth.Method == ICallerContext.AuthorizationMethod.HMAC && auth.Value == Optional<string>.None);
     }
 
     [Fact]

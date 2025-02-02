@@ -54,7 +54,7 @@
     <data name="FileUploadService_InvalidContentTypeForFileType" xml:space="preserve">
         <value>The uploaded file detected as '{0}' does not match the content type '{1}'</value>
     </data>
-    <data name="RequestExtensions_HMACAuthorizationNotSupported" xml:space="preserve">
-        <value>HMAC authorization cannot be relayed as an authorization method</value>
+    <data name="RequestExtensions_HMACAuthorization_NotSupported" xml:space="preserve">
+        <value>HMAC authorization cannot be forwarded to another host</value>
     </data>
 </root>

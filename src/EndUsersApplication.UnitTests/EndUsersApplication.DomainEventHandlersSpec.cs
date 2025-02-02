@@ -65,7 +65,6 @@ public class EndUsersApplicationDomainEventHandlersSpec
                 Task.FromResult<Result<EndUserRoot, Error>>(root));
         var invitationRepository = new Mock<IInvitationRepository>();
         _userProfilesService = new Mock<IUserProfilesService>();
-        var notificationsService = new Mock<IUserNotificationsService>();
         _subscriptionsService = new Mock<ISubscriptionsService>();
 
         _application =

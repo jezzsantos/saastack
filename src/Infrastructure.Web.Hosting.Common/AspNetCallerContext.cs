@@ -86,7 +86,7 @@ internal sealed class AspNetCallerContext : ICallerContext
     private static Optional<ICallerContext.CallerAuthorization> GetCallerAuthorization(HttpContext context,
         List<string> schemes)
     {
-        // This scheme check comes before JwtBearer since PrivateInterHost will always include JwtBearer also 
+        // This scheme check needs to come before JwtBearer check, since PrivateInterHost will always include JwtBearer also 
         if (schemes.ContainsIgnoreCase(PrivateInterHostAuthenticationHandler.AuthenticationScheme))
         {
             var token = context.Request.GetTokenAuth();
@@ -112,7 +112,8 @@ internal sealed class AspNetCallerContext : ICallerContext
             var apikey = context.Request.GetAPIKeyAuth();
             if (!apikey.HasValue)
             {
-                return Optional<ICallerContext.CallerAuthorization>.None;
+                return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey,
+                    Optional<string>.None);
             }
 
             return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, apikey);
@@ -120,7 +121,8 @@ internal sealed class AspNetCallerContext : ICallerContext
 
         if (schemes.ContainsIgnoreCase(HMACAuthenticationHandler.AuthenticationScheme))
         {
-            return Optional<ICallerContext.CallerAuthorization>.None;
+            return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC,
+                Optional<string>.None);
         }
 
         return Optional<ICallerContext.CallerAuthorization>.None;

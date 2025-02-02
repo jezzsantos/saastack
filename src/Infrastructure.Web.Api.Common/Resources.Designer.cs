@@ -141,11 +141,11 @@ namespace Infrastructure.Web.Api.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HMAC authorization cannot be relayed as an authorization method.
+        ///   Looks up a localized string similar to HMAC authorization cannot be forwarded to another host.
         /// </summary>
-        internal static string RequestExtensions_HMACAuthorizationNotSupported {
+        internal static string RequestExtensions_HMACAuthorization_NotSupported {
             get {
-                return ResourceManager.GetString("RequestExtensions_HMACAuthorizationNotSupported", resourceCulture);
+                return ResourceManager.GetString("RequestExtensions_HMACAuthorization_NotSupported", resourceCulture);
             }
         }
         

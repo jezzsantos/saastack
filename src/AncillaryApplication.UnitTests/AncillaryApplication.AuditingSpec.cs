@@ -100,7 +100,6 @@ public class AncillaryApplicationAuditingSpec
     [Fact]
     public async Task WhenSearchAllDeliveredEmails_ThenReturnsEmails()
     {
-        var datum = DateTime.UtcNow;
         var audit = new Audit
         {
             Id = "anid",

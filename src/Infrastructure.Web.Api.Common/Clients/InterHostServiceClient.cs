@@ -62,12 +62,75 @@ public sealed class InterHostServiceClient : ApiServiceClient
         }
     }
 
-    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
+    private void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
         string privateInterHostSecret)
     {
         if (context.Exists())
         {
-            message.SetAuthorization(context, privateInterHostSecret);
+            SetAuthorization(message, context, privateInterHostSecret);
+        }
+    }
+
+    internal void SetAuthorization(HttpRequestMessage message, ICallerContext caller,
+        string privateInterHostSecret)
+    {
+        var authorization = caller.Authorization;
+        if (!authorization.HasValue)
+        {
+            return;
+        }
+
+        var authorizationValue = authorization is { HasValue: true, Value.Value.HasValue: true }
+            ? authorization.Value.Value.Value
+            : null;
+
+        switch (authorization.Value.Method)
+        {
+            case ICallerContext.AuthorizationMethod.Token:
+            {
+                if (authorizationValue.HasValue())
+                {
+                    var token = authorization.Value.Value.Value;
+                    message.SetJWTBearerToken(token);
+                }
+
+                break;
+            }
+
+            case ICallerContext.AuthorizationMethod.APIKey:
+            {
+                if (authorizationValue.HasValue())
+                {
+                    var apiKey = authorization.Value.Value.Value;
+                    message.SetAPIKey(apiKey);
+                }
+
+                break;
+            }
+
+            case ICallerContext.AuthorizationMethod.PrivateInterHost:
+            {
+                if (authorizationValue.HasValue())
+                {
+                    var token = authorization.Value.Value.Value;
+                    message.SetPrivateInterHostAuth(privateInterHostSecret, token);
+                }
+                else
+                {
+                    message.SetPrivateInterHostAuth(privateInterHostSecret);
+                }
+
+                break;
+            }
+
+            case ICallerContext.AuthorizationMethod.HMAC:
+            {
+                //We don't expect this client to be used to forward maintenance service workloads 
+                throw new NotSupportedException(Resources.RequestExtensions_HMACAuthorization_NotSupported);
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }
