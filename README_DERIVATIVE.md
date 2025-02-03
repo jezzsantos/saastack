@@ -25,6 +25,7 @@ You will need the following development tools to build, run, and test this proje
 
 * Build the solution in Rider
 * OR `dotnet build src\SaaStack.sln` in the terminal
+* for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
 
 ## Memory Allocation
 
@@ -174,6 +175,8 @@ When pushed, all branches will be built and tested with GitHub actions
    - `dotnet test --filter:"Category=Unit|Category=Unit.Tooling|Category=Unit.Architecture" src\SaaStack.sln`
 
    - `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
+   
+   - for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
 
 3. Configure your "Commit " window to select the "Cleanup with 'SaaStack Full' profile".
 
@@ -270,6 +273,7 @@ The `LocalMachineFileDataStore` is configured to place your files in `Environmen
 
    - Rebuild the solution
    - OR `dotnet build src\SaaStack.sln` in the terminal
+   - for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
 
 2. Run the backend:
 
@@ -311,6 +315,8 @@ OR, in a terminal:
 
 - `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
 
+- for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
+
 > Note: All tests will be run in parallel in `Rider` or in `dotnet test`.
 
 ### Persistence Integration tests
@@ -326,7 +332,7 @@ These tests should NOT be run frequently and can be scheduled to run as part of 
 > Warning: They may incur charges, or they may trigger rate-limiting policies on the accounts they are run against.
 
 `dotnet test --filter:"Category=Integration.Persistence" src\SaaStack.sln` (requires installing the server persistence components listed at the top of this page)
-
+- for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
 > Note: If any of the `Integration.Persistence` category of tests fail, it is likely due to the fact that you don't have that technology installed on your local machine, or that you are not running your IDE as Administrator, and therefore cannot start/stop those local services without elevated permissions.
 
 > Note: AWS infrastructure adapters require LocalStack to be running (in Docker) on your computer in order to work. (Run `localstack start`).
@@ -342,6 +348,7 @@ Only run these kinds of tests when the code in the technology adapters changes. 
 > Warning: They may incur charges, or they may trigger rate-limiting policies on the accounts they are run against.
 
 `dotnet test --filter:"Category=Integration.External" src\SaaStack.sln` (requires internet access to external services)
+- for MAC or Linux substitute `src\SaaStack.sln` with `src/SaaStack.sln`
 
 # Versioning the Code
 
