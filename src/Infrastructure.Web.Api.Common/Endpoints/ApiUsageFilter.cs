@@ -94,8 +94,7 @@ public class ApiUsageFilter : IEndpointFilter
     }
 
     private static Dictionary<string, object> PopulatePropertiesFromRequest(HttpContext httpContext,
-        IWebRequest request,
-        ICallerContext caller)
+        IWebRequest request, ICallerContext caller)
     {
         var requestName = request.GetType().Name.ToLowerInvariant();
         var route = httpContext.GetEndpoint()!.DisplayName!;
@@ -126,14 +125,8 @@ public class ApiUsageFilter : IEndpointFilter
 
     private static IWebRequest? GetRequest(EndpointFilterInvocationContext context)
     {
-        var arguments = context.Arguments;
-        if (arguments.Count < 2)
-        {
-            return null;
-        }
-
-        var request = context.Arguments[1]!;
-        if (request is not IWebRequest webRequest)
+        var webRequest = context.GetRequestDto();
+        if (webRequest.NotExists())
         {
             return null;
         }

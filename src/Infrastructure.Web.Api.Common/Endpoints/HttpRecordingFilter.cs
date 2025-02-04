@@ -49,7 +49,7 @@ public class HttpRecordingFilter : IEndpointFilter
         return response;
     }
 
-    private void TraceRequest(IRecorder recorder, ICallerContext caller, string requestDescriptor)
+    private static void TraceRequest(IRecorder recorder, ICallerContext caller, string requestDescriptor)
     {
         recorder.TraceInformation(caller.ToCall(),
 #if TESTINGONLY
@@ -60,8 +60,8 @@ public class HttpRecordingFilter : IEndpointFilter
             requestDescriptor);
     }
 
-    private void TraceResponse(IRecorder recorder, ICallerContext caller, EndpointFilterInvocationContext context,
-        string requestDescriptor, object response)
+    private static void TraceResponse(IRecorder recorder, ICallerContext caller,
+        EndpointFilterInvocationContext context, string requestDescriptor, object response)
     {
         var httpResponse = context.HttpContext.Response;
         var statusCode = httpResponse.StatusCode;
