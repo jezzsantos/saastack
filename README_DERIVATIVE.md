@@ -343,6 +343,17 @@ Only run these kinds of tests when the code in the technology adapters changes. 
 
 `dotnet test --filter:"Category=Integration.External" src\SaaStack.sln` (requires internet access to external services)
 
+# Upgrading .NET Version
+
+If you need to upgrade the version of .NET for this codebase, do the following:
+1. Download the new version of the .NET SDK from this page: https://dotnet.microsoft.com/en-us/download/dotnet
+2. Run the installer for your OS. This will add a new version to your local machine, but it will not change anything.
+3. Make a note of the version of the runtime, and the SDK (they are different numbers)
+4. In `Directory.Build.props`, change the value of the `<RoslynTargetFramework>` variable to the version of the runtime.
+5. In `RuntimeConstants.cs` change the value of both `DotNet.RuntimeVersion`, `Dotnet.SdkVersion` and `DotNet.Version`.
+6. (Optional) If necessary (i.e. moving from .NET 8 to .NET 9) then find and replace the `<TargetFramework>net8.0</TargetFramework>` attribute in every `*.csproj` file in the solution.
+7. Rebuild the solution
+
 # Versioning the Code
 
 > Note: We use the 2 dot [Semantic Versioning](https://semver.org/spec/v2.0.0.html) scheme.

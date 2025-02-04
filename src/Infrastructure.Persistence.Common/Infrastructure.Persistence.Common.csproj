@@ -8,11 +8,11 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Polly" Version="7.2.4" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.6" />
     </ItemGroup>
 
     <ItemGroup>
