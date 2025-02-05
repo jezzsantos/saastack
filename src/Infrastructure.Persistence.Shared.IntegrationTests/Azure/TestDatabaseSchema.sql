@@ -11,6 +11,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[testincompatibleentities]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[testincompatibleentities]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[firstjoiningtestentities]')
             AND type in (N'U'))
     DROP TABLE [dbo].[firstjoiningtestentities]
@@ -72,6 +79,22 @@ CREATE TABLE [dbo].[testentities]
     [AValueObjectValue]                  [nvarchar](max)     NULL,
     [EnumValue]                          [nvarchar](max)     NULL,
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[testincompatibleentities]
+(
+    [Id]                                 [nvarchar](100)     NOT NULL,
+    [LastPersistedAtUtc]                 [datetime2]         NULL,
+    [IsDeleted]                          [bit]               NULL,
+    [DefaultSortByUtc]                   [datetime2]         NULL,
+    [AnIdProperty]                       [nvarchar](max)     NULL,
+    [AnSourceOnlyProperty]               [nvarchar](max)     NULL,
+    [AnSourceProperty]                   [nvarchar](max)     NULL,
+    [AnTargetCalculatedProperty]         [nvarchar](max)     NULL,
+    [AnTargetMappedProperty]             [nvarchar](max)     NULL,
+    [AnTargetOnlyProperty]               [nvarchar](max)     NULL,
+    [AUnixTimeStamp]                     [bigint]            NULL,
+) ON [PRIMARY]
 GO
 
 CREATE TABLE [dbo].[firstjoiningtestentities]

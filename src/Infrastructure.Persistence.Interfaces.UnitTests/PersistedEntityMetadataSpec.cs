@@ -1,5 +1,9 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;
@@ -15,6 +19,7 @@ public class PersistedEntityMetadataSpec
         var result = new PersistedEntityMetadata();
 
         result.Types.Should().BeEmpty();
+        result.UnderlyingType.Should().Be(typeof(IDehydratableEntity));
     }
 
     [Fact]
@@ -28,7 +33,7 @@ public class PersistedEntityMetadataSpec
     [Fact]
     public void WhenConstructedWithProperties_ThenAssigned()
     {
-        var result = new PersistedEntityMetadata(new Dictionary<string, Type>
+        var result = new PersistedEntityMetadata(null, new Dictionary<string, Type>
         {
             { "aname1", typeof(string) },
             { "aname2", typeof(int) },
@@ -37,6 +42,7 @@ public class PersistedEntityMetadataSpec
             { "aname5", typeof(DateTime?) }
         });
 
+        result.UnderlyingType.Should().Be(typeof(IDehydratableEntity));
         result.Types.Count.Should().Be(5);
         result.Types["aname1"].Should().Be(typeof(string));
         result.Types["aname2"].Should().Be(typeof(int));
@@ -50,6 +56,7 @@ public class PersistedEntityMetadataSpec
     {
         var result = PersistedEntityMetadata.FromType<TestCommandDomainEntity>();
 
+        result.UnderlyingType.Should().Be(typeof(TestCommandDomainEntity));
         result.Types.Count.Should().Be(17);
         result.Types[nameof(TestCommandDomainEntity.Id)].Should().Be(typeof(string));
         result.Types[nameof(TestCommandDomainEntity.IsDeleted)].Should().Be(typeof(Optional<bool>));
@@ -77,6 +84,7 @@ public class PersistedEntityMetadataSpec
     {
         var result = PersistedEntityMetadata.FromType(typeof(TestCommandDomainEntity));
 
+        result.UnderlyingType.Should().Be(typeof(TestCommandDomainEntity));
         result.Types.Count.Should().Be(17);
         result.Types[nameof(TestCommandDomainEntity.Id)].Should().Be(typeof(string));
         result.Types[nameof(TestCommandDomainEntity.IsDeleted)].Should().Be(typeof(Optional<bool>));
@@ -168,5 +176,116 @@ public class PersistedEntityMetadataSpec
         metadata.AddOrUpdate(nameof(TestDto.AStringValue), typeof(int));
 
         metadata.Types[nameof(TestDto.AStringValue)].Should().Be(typeof(int));
+    }
+
+    [Fact]
+    public void WhenGetReadMappingsAndNoMethod_ThenReturnsEmptyDictionary()
+    {
+        var metadata = PersistedEntityMetadata.FromType(typeof(TestEntityWithNoMappingsEntity));
+
+        var result = metadata.GetReadMappingsOverride();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetReadMappingsAndMethod_ThenReturnsMappings()
+    {
+        var metadata = PersistedEntityMetadata.FromType(typeof(TestEntityWithMappingsEntity));
+
+        var result = metadata.GetReadMappingsOverride();
+
+        result.Count.Should().Be(1);
+        result["atargetfield"].Should().NotBeNull();
+    }
+
+    [Fact]
+    public void WhenGetDefaultOrderingFieldAndNoMethod_ThenReturnsEmptyDictionary()
+    {
+        var metadata = PersistedEntityMetadata.FromType(typeof(TestEntityWithNoSortFieldEntity));
+
+        var result = metadata.GetDefaultOrderingFieldOverride();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenGetDefaultOrderingFieldAndMethod_ThenReturnsMappings()
+    {
+        var metadata = PersistedEntityMetadata.FromType(typeof(TestEntityWithDefaultOrderingFieldEntity));
+
+        var result = metadata.GetDefaultOrderingFieldOverride();
+
+        result.Should().Be("asortfield");
+    }
+}
+
+public class TestEntityWithNoMappingsEntity : IDehydratableEntity
+{
+    public HydrationProperties Dehydrate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ISingleValueObject<string> Id { get; } = "anid".ToId();
+
+    public Optional<bool> IsDeleted { get; } = false;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
+}
+
+public class TestEntityWithNoSortFieldEntity : IDehydratableEntity
+{
+    public HydrationProperties Dehydrate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ISingleValueObject<string> Id { get; } = "anid".ToId();
+
+    public Optional<bool> IsDeleted { get; } = false;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
+}
+
+public class TestEntityWithMappingsEntity : IDehydratableEntity
+{
+    public HydrationProperties Dehydrate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ISingleValueObject<string> Id { get; } = "anid".ToId();
+
+    public Optional<bool> IsDeleted { get; } = false;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
+
+    // ReSharper disable once UnusedMember.Global
+    public static Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>> FieldReadMappings()
+    {
+        return new Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>>
+        {
+            { "atargetfield", entity => entity["asourcefieldname"] ?? "adefaultvalue" }
+        };
+    }
+}
+
+public class TestEntityWithDefaultOrderingFieldEntity : IDehydratableEntity
+{
+    public HydrationProperties Dehydrate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ISingleValueObject<string> Id { get; } = "anid".ToId();
+
+    public Optional<bool> IsDeleted { get; } = false;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
+
+    public static string DefaultOrderingField()
+    {
+        return "asortfield";
     }
 }

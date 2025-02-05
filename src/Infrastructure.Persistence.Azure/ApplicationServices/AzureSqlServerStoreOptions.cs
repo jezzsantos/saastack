@@ -8,10 +8,12 @@ namespace Infrastructure.Persistence.Azure.ApplicationServices;
 /// </summary>
 public class AzureSqlServerStoreOptions
 {
-    internal const string DbCredentialsSettingName = "ApplicationServices:Persistence:SqlServer:DbCredentials";
-    internal const string DbNameSettingName = "ApplicationServices:Persistence:SqlServer:DbName";
-    internal const string DbServerNameSettingName = "ApplicationServices:Persistence:SqlServer:DbServerName";
-    internal const string ManagedIdentityClientIdSettingName = "ApplicationServices:Persistence:SqlServer:ManagedIdentityClientId";
+    internal const string DbCredentialsFormatSettingName = "ApplicationServices:Persistence:{0}:DbCredentials";
+    internal const string DbNameFormatSettingName = "ApplicationServices:Persistence:{0}:DbName";
+    internal const string DbServerNameFormatSettingName = "ApplicationServices:Persistence:{0}:DbServerName";
+    private const string DefaultPrefix = "SqlServer";
+    internal const string ManagedIdentityClientIdFormatSettingName =
+        "ApplicationServices:Persistence:{0}:ManagedIdentityClientId";
 
     private AzureSqlServerStoreOptions(ConnectionOptions.ConnectionType connectionType, string connectionString)
     {
@@ -20,11 +22,11 @@ public class AzureSqlServerStoreOptions
 
     public ConnectionOptions Connection { get; }
 
-    public static AzureSqlServerStoreOptions Credentials(IConfigurationSettings settings)
+    public static AzureSqlServerStoreOptions AlternativeCredentials(IConfigurationSettings settings, string prefix)
     {
-        var serverName = settings.GetString(DbServerNameSettingName);
-        var databaseName = settings.GetString(DbNameSettingName);
-        var credentials = settings.GetString(DbCredentialsSettingName, string.Empty);
+        var serverName = settings.GetString(DbServerNameFormatSettingName.Format(prefix));
+        var databaseName = settings.GetString(DbNameFormatSettingName.Format(prefix));
+        var credentials = settings.GetString(DbCredentialsFormatSettingName.Format(prefix), string.Empty);
 
         var parts = new[]
         {
@@ -42,6 +44,11 @@ public class AzureSqlServerStoreOptions
         return new AzureSqlServerStoreOptions(ConnectionOptions.ConnectionType.Credentials, connectionString);
     }
 
+    public static AzureSqlServerStoreOptions Credentials(IConfigurationSettings settings)
+    {
+        return AlternativeCredentials(settings, DefaultPrefix);
+    }
+
     public static AzureSqlServerStoreOptions CustomConnectionString(string connectionString)
     {
         return new AzureSqlServerStoreOptions(ConnectionOptions.ConnectionType.Custom, connectionString);
@@ -49,9 +56,9 @@ public class AzureSqlServerStoreOptions
 
     public static AzureSqlServerStoreOptions UserManagedIdentity(IConfigurationSettings settings)
     {
-        var serverName = settings.GetString(DbServerNameSettingName);
-        var databaseName = settings.GetString(DbNameSettingName);
-        var clientId = settings.GetString(ManagedIdentityClientIdSettingName);
+        var serverName = settings.GetString(DbServerNameFormatSettingName.Format(DefaultPrefix));
+        var databaseName = settings.GetString(DbNameFormatSettingName.Format(DefaultPrefix));
+        var clientId = settings.GetString(ManagedIdentityClientIdFormatSettingName.Format(DefaultPrefix));
 
         var parts = new[]
         {

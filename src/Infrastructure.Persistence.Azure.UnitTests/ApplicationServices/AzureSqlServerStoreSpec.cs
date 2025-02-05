@@ -1,4 +1,5 @@
 using Common.Configuration;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Moq;
@@ -19,42 +20,58 @@ public class AzureSqlServerStoreOptionsSpec
     [Fact]
     public void WhenCredentialsWithCredentials_ThenUsesConnectionString()
     {
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsSettingName, It.IsAny<string>()))
+        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsFormatSettingName.Format("SqlServer"),
+                It.IsAny<string>()))
             .Returns("acredentials");
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s =>
+                s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), It.IsAny<string>()))
             .Returns("adbname");
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"),
+                It.IsAny<string>()))
             .Returns("aservername");
 
         var result = AzureSqlServerStoreOptions.Credentials(_settings.Object);
 
         result.Connection.Type.Should().Be(AzureSqlServerStoreOptions.ConnectionOptions.ConnectionType.Credentials);
-        result.Connection.ConnectionString.Should().Be("Persist Security Info=False;Encrypt=True;Initial Catalog=adbname;Server=aservername;acredentials");
+        result.Connection.ConnectionString.Should()
+            .Be("Persist Security Info=False;Encrypt=True;Initial Catalog=adbname;Server=aservername;acredentials");
         _settings.Verify(s => s.GetString(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(3));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsSettingName, string.Empty));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, null));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, null));
+        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsFormatSettingName.Format("SqlServer"),
+            string.Empty));
+        _settings.Verify(s =>
+            s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), null));
+        _settings.Verify(s =>
+            s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"), null));
     }
+
     [Fact]
     public void WhenCredentialsWithoutCredentials_ThenUsesConnectionString()
     {
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsSettingName, It.IsAny<string>()))
+        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsFormatSettingName.Format("SqlServer"),
+                It.IsAny<string>()))
             .Returns(string.Empty);
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s =>
+                s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), It.IsAny<string>()))
             .Returns("adbname");
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"),
+                It.IsAny<string>()))
             .Returns("aservername");
 
         var result = AzureSqlServerStoreOptions.Credentials(_settings.Object);
 
         result.Connection.Type.Should().Be(AzureSqlServerStoreOptions.ConnectionOptions.ConnectionType.Credentials);
-        result.Connection.ConnectionString.Should().Be("Persist Security Info=False;Integrated Security=true;Encrypt=False;Initial Catalog=adbname;Server=aservername");
+        result.Connection.ConnectionString.Should()
+            .Be(
+                "Persist Security Info=False;Integrated Security=true;Encrypt=False;Initial Catalog=adbname;Server=aservername");
         _settings.Verify(s => s.GetString(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(3));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsSettingName, string.Empty));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, null));
-        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, null));
+        _settings.Verify(s => s.GetString(AzureSqlServerStoreOptions.DbCredentialsFormatSettingName.Format("SqlServer"),
+            string.Empty));
+        _settings.Verify(s =>
+            s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), null));
+        _settings.Verify(s =>
+            s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"), null));
     }
-    
+
     [Fact]
     public void WhenCustomConnectionString_ThenUsesConnectionString()
     {
@@ -69,24 +86,29 @@ public class AzureSqlServerStoreOptionsSpec
     public void WhenUserManagedIdentity_ThenUsesCredentials()
     {
         _settings.Setup(s =>
-                s.GetString(AzureSqlServerStoreOptions.ManagedIdentityClientIdSettingName, It.IsAny<string>()))
+                s.GetString(AzureSqlServerStoreOptions.ManagedIdentityClientIdFormatSettingName.Format("SqlServer"),
+                    It.IsAny<string>()))
             .Returns("aclientid");
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s =>
+                s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), It.IsAny<string>()))
             .Returns("adbname");
-        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, It.IsAny<string>()))
+        _settings.Setup(s => s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"),
+                It.IsAny<string>()))
             .Returns("aservername");
 
         var result = AzureSqlServerStoreOptions.UserManagedIdentity(_settings.Object);
 
         result.Connection.Type.Should()
             .Be(AzureSqlServerStoreOptions.ConnectionOptions.ConnectionType.ManagedIdentity);
-        result.Connection.ConnectionString.Should().Be("Server=aservername;Authentication=Active Directory Managed Identity;Encrypt=True;User Id=aclientid;Database=adbname");
+        result.Connection.ConnectionString.Should()
+            .Be(
+                "Server=aservername;Authentication=Active Directory Managed Identity;Encrypt=True;User Id=aclientid;Database=adbname");
         _settings.Verify(s => s.GetString(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(3));
         _settings.Verify(s =>
-            s.GetString(AzureSqlServerStoreOptions.DbNameSettingName, null));
+            s.GetString(AzureSqlServerStoreOptions.DbNameFormatSettingName.Format("SqlServer"), null));
         _settings.Verify(s =>
-            s.GetString(AzureSqlServerStoreOptions.DbServerNameSettingName, null));
+            s.GetString(AzureSqlServerStoreOptions.DbServerNameFormatSettingName.Format("SqlServer"), null));
         _settings.Verify(s =>
-            s.GetString(AzureSqlServerStoreOptions.ManagedIdentityClientIdSettingName, null));
+            s.GetString(AzureSqlServerStoreOptions.ManagedIdentityClientIdFormatSettingName.Format("SqlServer"), null));
     }
 }

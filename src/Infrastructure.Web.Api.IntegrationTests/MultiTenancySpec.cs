@@ -223,7 +223,8 @@ public class MultiTenancySpec
             public string GetString(string key, string? defaultValue = null)
             {
 #if TESTINGONLY
-                if (key == LocalMachineJsonFileStore.PathSettingName)
+                if (key == LocalMachineJsonFileStore.PathSettingFormatName.Format(LocalMachineJsonFileStore
+                        .DefaultPrefix))
                 {
                     return _path;
                 }

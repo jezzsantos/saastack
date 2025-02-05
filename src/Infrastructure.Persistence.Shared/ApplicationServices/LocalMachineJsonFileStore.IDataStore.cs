@@ -26,7 +26,7 @@ partial class LocalMachineJsonFileStore : IDataStore
         await container.WriteAsync(entity.Id, entity.ToFileProperties(), cancellationToken);
 
         var properties = await container.ReadAsync(entity.Id, cancellationToken);
-        return CommandEntity.FromCommandEntity(properties.FromFileProperties(entity.Metadata), entity);
+        return CommandEntity.FromHydrationProperties(properties.FromFileProperties(entity.Metadata), entity);
     }
 
     public Task<Result<long, Error>> CountAsync(string containerName, CancellationToken cancellationToken)
@@ -111,7 +111,7 @@ partial class LocalMachineJsonFileStore : IDataStore
         var entityProperties = entity.ToFileProperties();
         await container.OverwriteAsync(id, entityProperties, cancellationToken);
 
-        return CommandEntity.FromCommandEntity(entityProperties.FromFileProperties(entity.Metadata), entity)
+        return CommandEntity.FromHydrationProperties(entityProperties.FromFileProperties(entity.Metadata), entity)
             .ToOptional();
     }
 
@@ -127,7 +127,7 @@ partial class LocalMachineJsonFileStore : IDataStore
         if (container.Exists(id))
         {
             var properties = await container.ReadAsync(id, cancellationToken);
-            return CommandEntity.FromCommandEntity(
+            return CommandEntity.FromHydrationProperties(
                 properties.FromFileProperties(metadata), metadata).ToOptional();
         }
 

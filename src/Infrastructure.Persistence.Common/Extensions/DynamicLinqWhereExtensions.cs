@@ -1,6 +1,7 @@
 ﻿using System.Linq.Dynamic.Core.CustomTypeProviders;
 using System.Text;
 using Common.Extensions;
+using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
 using QueryAny;
 
@@ -14,11 +15,12 @@ public static class DynamicLinqWhereExtensions
     /// <summary>
     ///     Converts the specified <see cref="query" /> expression into a dynamic LINQ search statement
     /// </summary>
-    public static string ToDynamicLinqOrderByClause<TQueryableEntity>(this QueryClause<TQueryableEntity> query)
+    public static string ToDynamicLinqOrderByClause<TQueryableEntity>(this QueryClause<TQueryableEntity> query,
+        PersistedEntityMetadata metadata)
         where TQueryableEntity : IQueryableEntity
 
     {
-        var orderBy = query.GetDefaultOrdering().ToFieldName();
+        var orderBy = query.GetDefaultOrdering(metadata).ToFieldName();
         orderBy = $"{orderBy}{(query.ResultOptions.OrderBy.Direction == OrderDirection.Descending ? " DESC" : "")}";
 
         return orderBy;

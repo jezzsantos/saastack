@@ -23,14 +23,21 @@ namespace Infrastructure.Persistence.Shared.ApplicationServices;
 [ExcludeFromCodeCoverage]
 public sealed partial class LocalMachineJsonFileStore : IDisposable
 {
-    public const string PathSettingName = "ApplicationServices:Persistence:LocalMachineJsonFileStore:RootPath";
+    public const string DefaultPrefix = "LocalMachineJsonFileStore";
+    public const string PathSettingFormatName = "ApplicationServices:Persistence:{0}:RootPath";
     private readonly FileSystemWatcher? _fileSystemWatcher;
     private readonly string _rootPath;
 
     public static LocalMachineJsonFileStore Create(IConfigurationSettings settings,
         IMessageMonitor? handler = default)
     {
-        var configPath = settings.GetString(PathSettingName);
+        return Create(settings, DefaultPrefix, handler);
+    }
+
+    public static LocalMachineJsonFileStore Create(IConfigurationSettings settings,
+        string prefix, IMessageMonitor? handler = default)
+    {
+        var configPath = settings.GetString(PathSettingFormatName.Format(prefix));
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var path = Path.GetFullPath(Path.Combine(basePath, configPath));
         VerifyRootPath(path);
@@ -223,7 +230,7 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
             var containers = GetDirectories(_dirPath).ToList();
             if (!containers.Any())
             {
-                return Enumerable.Empty<FileContainer>();
+                return [];
             }
 
             return containers
@@ -394,6 +401,8 @@ internal static class LocalMachineFileStoreExtensions
             .ToDictionary(pair => pair.Key,
                 pair => pair.Value.FromFileProperty(metadata.GetPropertyType(pair.Key)));
 
+        ApplyMappings(metadata, containerProperties, properties);
+
         return new HydrationProperties(properties);
     }
 
@@ -405,6 +414,34 @@ internal static class LocalMachineFileStoreExtensions
         containerProperties[nameof(CommandEntity.LastPersistedAtUtc)] = DateTime.UtcNow.ToIso8601();
 
         return containerProperties;
+    }
+
+    private static void ApplyMappings(PersistedEntityMetadata metadata,
+        IReadOnlyDictionary<string, Optional<string>> containerProperties,
+        Dictionary<string, Optional<object>>? properties)
+    {
+        if (properties.NotExists())
+        {
+            return;
+        }
+
+        var mappings = metadata.GetReadMappingsOverride();
+        if (mappings.HasAny())
+        {
+            var containerPropertiesDictionary = containerProperties
+                .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrNull);
+            foreach (var mapping in mappings)
+            {
+                var mapResult = Try.Safely(() => mapping.Value(containerPropertiesDictionary));
+                if (mapResult.Exists())
+                {
+                    if (!properties.TryAdd(mapping.Key, mapResult))
+                    {
+                        properties[mapping.Key] = mapResult;
+                    }
+                }
+            }
+        }
     }
 
     private static Optional<string> ToFileProperty(this Optional<object> propertyValue)

@@ -17,16 +17,16 @@ public sealed class CommandEntity : PersistedEntity, IHasIdentity
     /// <summary>
     ///     Converts the given <see cref="properties" /> with the given <see cref="descriptor" /> into a new entity
     /// </summary>
-    public static CommandEntity FromCommandEntity(HydrationProperties properties,
+    public static CommandEntity FromHydrationProperties(HydrationProperties properties,
         CommandEntity descriptor)
     {
-        return FromCommandEntity(properties, descriptor.Metadata);
+        return FromHydrationProperties(properties, descriptor.Metadata);
     }
 
     /// <summary>
     ///     Converts the given <see cref="properties" /> with the given <see cref="metadata" /> into a new entity
     /// </summary>
-    public static CommandEntity FromCommandEntity(HydrationProperties properties,
+    public static CommandEntity FromHydrationProperties(HydrationProperties properties,
         PersistedEntityMetadata metadata)
     {
         return FromProperties(properties, metadata);

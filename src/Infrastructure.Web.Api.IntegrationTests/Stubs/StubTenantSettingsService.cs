@@ -19,7 +19,7 @@ public class StubTenantSettingsService : ITenantSettingsService
         {
 #if TESTINGONLY
             {
-                LocalMachineJsonFileStore.PathSettingName,
+                LocalMachineJsonFileStore.PathSettingFormatName.Format(LocalMachineJsonFileStore.DefaultPrefix),
                 new TenantSetting { Value = GetRepositoryPath(tenantId) }
             }
 #endif

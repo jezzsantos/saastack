@@ -10,7 +10,7 @@ namespace Infrastructure.Persistence.Common.Extensions;
 public static class StoreExtensions
 {
     public const string BackupOrderingPropertyName = nameof(QueryEntity.Id);
-    public const string DefaultOrderingPropertyName = nameof(QueryEntity.LastPersistedAtUtc);
+    public const string DefaultOrderingFieldName = nameof(QueryEntity.LastPersistedAtUtc);
 
     /// <summary>
     ///     Converts the JSON serialized <see cref="propertyValue" /> to a value the appropriate
@@ -133,7 +133,7 @@ public static class StoreExtensions
         var results = joinedEntities
             .ToDictionary(pair => pair.Key, pair => pair.Value.ToObjectDictionary())
             .AsQueryable();
-        var orderBy = query.ToDynamicLinqOrderByClause();
+        var orderBy = query.ToDynamicLinqOrderByClause(metadata);
         var skip = query.GetDefaultSkip();
 
         if (query.Wheres.Any())
@@ -161,13 +161,17 @@ public static class StoreExtensions
     ///     3. If selected in query, <see cref="QueryEntity.Id" />
     ///     4. First of the <see cref="QueryClause{TPrimaryEntity}.Select{TValue}" />
     /// </summary>
-    public static string GetDefaultOrdering<TQueryableEntity>(this QueryClause<TQueryableEntity> query)
+    public static string GetDefaultOrdering<TQueryableEntity>(this QueryClause<TQueryableEntity> query,
+        PersistedEntityMetadata metadata)
         where TQueryableEntity : IQueryableEntity
     {
         var by = query.ResultOptions.OrderBy.By;
         if (by.HasNoValue())
         {
-            by = DefaultOrderingPropertyName;
+            var orderingFieldOverride = metadata.GetDefaultOrderingFieldOverride();
+            by = orderingFieldOverride.HasValue()
+                ? orderingFieldOverride
+                : DefaultOrderingFieldName;
         }
 
         var selectedFields = query.GetAllSelectedFields();

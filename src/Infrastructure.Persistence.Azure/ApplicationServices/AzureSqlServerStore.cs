@@ -311,6 +311,8 @@ internal static class AzureSqlServerStoreConversionExtensions
             .ToDictionary(pair => pair.Key,
                 pair => pair.FromTableEntityProperty(metadata.GetPropertyType(pair.Key)));
 
+        ApplyMappings(metadata, tableProperties, properties);
+
         if (properties.ContainsKey(nameof(CommandEntity.Id)))
         {
             return new HydrationProperties(properties);
@@ -318,6 +320,7 @@ internal static class AzureSqlServerStoreConversionExtensions
 
         var id = tableProperties[nameof(CommandEntity.Id)].ToString()!;
         properties[nameof(CommandEntity.Id)] = id;
+
         return new HydrationProperties(properties);
     }
 
@@ -347,7 +350,7 @@ internal static class AzureSqlServerStoreConversionExtensions
             var targetPropertyType = entity.GetPropertyType(key);
             properties.Add(key, ToTableEntityProperty(value, targetPropertyType));
         }
-
+        
         properties[nameof(CommandEntity.LastPersistedAtUtc)] = DateTime.UtcNow;
 
         return properties;
@@ -646,5 +649,33 @@ internal static class AzureSqlServerStoreConversionExtensions
         }
 
         return propertyValue;
+    }
+
+    private static void ApplyMappings(PersistedEntityMetadata metadata,
+        Dictionary<string, object> containerProperties,
+        Dictionary<string, Optional<object>>? properties)
+    {
+        if (properties.NotExists())
+        {
+            return;
+        }
+
+        var mappings = metadata.GetReadMappingsOverride();
+        if (mappings.HasAny())
+        {
+            var containerPropertiesDictionary = containerProperties
+                .ToDictionary<KeyValuePair<string, object>, string, object?>(pair => pair.Key, pair => pair.Value);
+            foreach (var mapping in mappings)
+            {
+                var mapResult = Try.Safely(() => mapping.Value(containerPropertiesDictionary));
+                if (mapResult.Exists())
+                {
+                    if (!properties.TryAdd(mapping.Key, mapResult))
+                    {
+                        properties[mapping.Key] = mapResult;
+                    }
+                }
+            }
+        }
     }
 }

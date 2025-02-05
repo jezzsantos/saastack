@@ -83,7 +83,7 @@ partial class AzureSqlServerStore : IDataStore
             return new List<QueryEntity>();
         }
 
-        var (select, queryParameters) = query.ToSqlServerQuery(containerName, this);
+        var (select, queryParameters) = query.ToSqlServerQuery(metadata, containerName, this);
 
         var executed = await ExecuteSqlSelectCommandAsync(select, queryParameters, cancellationToken);
         if (executed.IsFailure)
@@ -123,7 +123,7 @@ partial class AzureSqlServerStore : IDataStore
             return executed.Error;
         }
 
-        return CommandEntity.FromCommandEntity(updatedEntity.FromTableEntity(entity.Metadata), entity)
+        return CommandEntity.FromHydrationProperties(updatedEntity.FromTableEntity(entity.Metadata), entity)
             .ToOptional();
     }
 
@@ -144,7 +144,7 @@ partial class AzureSqlServerStore : IDataStore
         var properties = executed.Value;
         if (properties.Count > 0)
         {
-            return CommandEntity.FromCommandEntity(properties.FromTableEntity(metadata), metadata)
+            return CommandEntity.FromHydrationProperties(properties.FromTableEntity(metadata), metadata)
                 .ToOptional();
         }
 
@@ -155,8 +155,7 @@ partial class AzureSqlServerStore : IDataStore
 internal static class SqlServerQueryBuilderExtensions
 {
     public static (string Query, Dictionary<string, object> Parameters) ToSqlServerQuery<TQueryableEntity>(
-        this QueryClause<TQueryableEntity> query,
-        string tableName, IDataStore store)
+        this QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata, string tableName, IDataStore store)
         where TQueryableEntity : IQueryableEntity
     {
         var builder = new StringBuilder();
@@ -175,7 +174,7 @@ internal static class SqlServerQueryBuilderExtensions
             builder.Append($" WHERE {wheres}");
         }
 
-        var orderBy = query.ToOrderByClause(query.JoinedEntities);
+        var orderBy = query.ToOrderByClause(query.JoinedEntities, metadata);
         if (orderBy.HasValue())
         {
             builder.Append($" ORDER BY {orderBy}");
@@ -278,14 +277,14 @@ internal static class SqlServerQueryBuilderExtensions
     }
 
     private static string ToOrderByClause<TQueryableEntity>(this QueryClause<TQueryableEntity> query,
-        IReadOnlyList<QueriedEntity> joinedEntities)
+        IReadOnlyList<QueriedEntity> joinedEntities, PersistedEntityMetadata metadata)
         where TQueryableEntity : IQueryableEntity
     {
         var orderBy = query.ResultOptions.OrderBy;
         var direction = orderBy.Direction == OrderDirection.Ascending
             ? @"ASC"
             : @"DESC";
-        var by = query.GetDefaultOrdering();
+        var by = query.GetDefaultOrdering(metadata);
 
         var columnName = ToOrderByColumnName(by, joinedEntities);
         return $"{columnName} {direction}";

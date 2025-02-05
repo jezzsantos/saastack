@@ -76,9 +76,100 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public TestEnum EnumValue { get; set; }
 
+    // ReSharper disable once UnusedMember.Global
     public DateTime? LastPersistedAtUtc { get; set; }
 
     public Optional<string> Id { get; set; }
+}
+
+[EntityName("testincompatibleentities")]
+public class TestDataStoreInCompatibleWriteEntity : IHasIdentity, IQueryableEntity
+{
+    private static int _instanceCounter;
+
+    public TestDataStoreInCompatibleWriteEntity()
+    {
+        Id = $"anid{++_instanceCounter:00000}";
+    }
+
+    public Optional<string> AnIdProperty { get; set; }
+
+    public Optional<string> AnSourceOnlyProperty { get; set; }
+
+    public Optional<string> AnSourceProperty { get; set; }
+
+    public long AUnixTimeStamp { get; set; }
+
+    public Optional<string> Id { get; set; }
+}
+
+/// <summary>
+///     Note: This table definition is incompatible with the standard <see cref="IDehydratableEntity" />,
+///     in that it does not contain the properties <see cref="IDehydratableEntity.LastPersistedAtUtc" />,
+///     nor <see cref="LastPersistedAtUtc.IsDeleted" />.
+///     So when reading data from this table, it will define custom mappings, and define a different default sort order
+/// </summary>
+[EntityName("testincompatibleentities")] //Note: same table as TestDataStoreInCompatibleWriteEntity
+[UsedImplicitly]
+public class TestDataStoreIncompatibleReadEntity : IHasIdentity, IQueryableEntity
+{
+    public Optional<string> AnIdProperty { get; set; }
+
+    public Optional<string> AnSourceProperty { get; set; }
+
+    public Optional<string> AnTargetCalculatedProperty { get; set; }
+
+    public Optional<string> AnTargetMappedProperty { get; set; }
+
+    public Optional<string> AnTargetOnlyProperty { get; set; }
+
+    public long AUnixTimeStamp { get; set; }
+
+    public DateTime? DefaultSortByUtc { get; set; }
+
+    public Optional<string> Id { get; set; }
+
+    // ReSharper disable once UnusedMember.Global
+    public static string DefaultOrderingField()
+    {
+        return nameof(DefaultSortByUtc);
+    }
+
+    // ReSharper disable once UnusedMember.Global
+    public static IReadOnlyDictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>> FieldReadMappings()
+    {
+        return new Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>>
+        {
+            {
+                nameof(Id), entity => entity.GetValueOrDefault(nameof(AnIdProperty), string.Empty)
+            },
+            {
+                nameof(DefaultSortByUtc),
+                entity =>
+                {
+                    var timestamp = entity.GetValueOrDefault(nameof(AUnixTimeStamp));
+                    if (timestamp is string stringTimestamp)
+                    {
+                        return long.Parse(stringTimestamp).FromUnixTimestamp();
+                    }
+
+                    if (timestamp is long longTimestamp)
+                    {
+                        return longTimestamp.FromUnixTimestamp();
+                    }
+
+                    return DateTime.MinValue;
+                }
+            },
+            {
+                nameof(AnTargetMappedProperty),
+                entity => entity.GetValueOrDefault(nameof(AnSourceProperty), string.Empty)
+            },
+            {
+                nameof(AnTargetCalculatedProperty), _ => "acalculatedvalue"
+            }
+        };
+    }
 }
 
 [EntityName("testentities")]

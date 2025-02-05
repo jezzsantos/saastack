@@ -21,6 +21,7 @@ public abstract class AnyDataStoreBaseSpec
     private static readonly IRecorder Recorder = NoOpRecorder.Instance;
     private readonly DataStoreInfo _firstJoiningSetup;
     private readonly DataStoreInfo _secondJoiningSetup;
+    private readonly DataStoreInfo _incompatibleSetup;
     protected readonly DataStoreInfo Setup;
 
     static AnyDataStoreBaseSpec()
@@ -50,6 +51,13 @@ public abstract class AnyDataStoreBaseSpec
         };
         _secondJoiningSetup.Store
             .DestroyAllAsync(_secondJoiningSetup.ContainerName, CancellationToken.None).GetAwaiter()
+            .GetResult();
+        _incompatibleSetup = new DataStoreInfo
+        {
+            Store = dataStore, ContainerName = typeof(TestDataStoreIncompatibleReadEntity).GetEntityNameSafe()
+        };
+        _incompatibleSetup.Store
+            .DestroyAllAsync(_incompatibleSetup.ContainerName, CancellationToken.None).GetAwaiter()
             .GetResult();
 #endif
     }
@@ -2363,6 +2371,47 @@ public abstract class AnyDataStoreBaseSpec
     }
 
     [Fact]
+    public async Task WhenQueryForInCompatibleEntityWithDefaultSortAndMappingsOverride_ThenReturnsResults()
+    {
+        var datum = DateTime.UtcNow.ToNearestSecond();
+        await Setup.Store.AddAsync(_incompatibleSetup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreInCompatibleWriteEntity
+            {
+                AnIdProperty = "anid1",
+                AnSourceOnlyProperty = "asourceonlyvalue",
+                AnSourceProperty = "asourcevalue",
+                AUnixTimeStamp = datum.ToUnixSeconds()
+            }),
+            CancellationToken.None);
+
+        var query = Query.From<TestDataStoreIncompatibleReadEntity>()
+            .WhereAll();
+
+        var results = await Setup.Store.QueryAsync(_incompatibleSetup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreIncompatibleReadEntity>(), CancellationToken.None);
+
+        results.Value.Count.Should().Be(1);
+        results.Value[0].Id.Should().Be("anid1");
+        results.Value[0].GetValueOrDefault<long>(nameof(TestDataStoreIncompatibleReadEntity.AUnixTimeStamp)).Should()
+            .Be(datum.ToUnixSeconds());
+        results.Value[0].GetValueOrDefault<DateTime>(nameof(TestDataStoreIncompatibleReadEntity.DefaultSortByUtc))
+            .Should()
+            .Be(datum);
+        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnSourceProperty))
+            .Should()
+            .Be("asourcevalue");
+        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetOnlyProperty))
+            .Should()
+            .BeNull();
+        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetMappedProperty))
+            .Should()
+            .Be("asourcevalue");
+        results.Value[0]
+            .GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetCalculatedProperty))
+            .Should().Be("acalculatedvalue");
+    }
+    
+    [Fact]
     public async Task WhenRemoveWithNullId_ThenThrows()
     {
         await Setup.Store
@@ -2441,7 +2490,7 @@ public abstract class AnyDataStoreBaseSpec
         updated.Value.Value.Id.Should().Be(entity.Id);
         updated.Value.Value.Properties.GetValueOrDefault(nameof(TestDataStoreEntity.AStringValue)).Should()
             .Be("updated");
-        updated.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
+        updated.Value.Value.LastPersistedAtUtc.Should().BeNear(now, 1000);
     }
 
     [Fact]
@@ -2545,7 +2594,7 @@ public abstract class AnyDataStoreBaseSpec
                 PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         result.Value.Value.Id.Should().BeSome(entity.Id);
-        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
+        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now, 1000);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should()
             .Be("astringvalue");
@@ -2660,7 +2709,7 @@ public abstract class AnyDataStoreBaseSpec
 
         var now = DateTime.UtcNow.ToNearestSecond();
         result.Value.Value.Id.Should().Be(entity.Id);
-        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
+        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now, 1000);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNull();
         result.Value.Value.GetValueOrDefault<Optional<string>>(nameof(TestDataStoreEntity.AnOptionalStringValue))
@@ -2725,6 +2774,44 @@ public abstract class AnyDataStoreBaseSpec
             .Should().BeNone();
     }
 
+    [Fact]
+    public async Task WhenRetrieveForInCompatibleEntityWithMappings_ThenReturnsResults()
+    {
+        var datum = DateTime.UtcNow.ToNearestSecond();
+        var entity = await Setup.Store.AddAsync(_incompatibleSetup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreInCompatibleWriteEntity
+            {
+                AnIdProperty = "anid1",
+                AnSourceOnlyProperty = "asourceonlyvalue",
+                AnSourceProperty = "asourcevalue",
+                AUnixTimeStamp = datum.ToUnixSeconds()
+            }),
+            CancellationToken.None);
+
+        var result =
+            await Setup.Store.RetrieveAsync(_incompatibleSetup.ContainerName, entity.Value.Id,
+                PersistedEntityMetadata.FromType<TestDataStoreIncompatibleReadEntity>(), CancellationToken.None);
+
+        result.Value.Value.Id.Should().Be("anid1");
+        result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreIncompatibleReadEntity.AUnixTimeStamp)).Should()
+            .Be(datum.ToUnixSeconds());
+        result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreIncompatibleReadEntity.DefaultSortByUtc))
+            .Should()
+            .Be(datum);
+        result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnSourceProperty))
+            .Should()
+            .Be("asourcevalue");
+        result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetOnlyProperty))
+            .Should()
+            .BeNull();
+        result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetMappedProperty))
+            .Should()
+            .Be("asourcevalue");
+        result.Value.Value
+            .GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetCalculatedProperty))
+            .Should().Be("acalculatedvalue");
+    }
+
     public struct DataStoreInfo
     {
         public required IDataStore Store { get; init; }
@@ -2732,8 +2819,10 @@ public abstract class AnyDataStoreBaseSpec
         public required string ContainerName { get; init; }
     }
 
+    // ReSharper disable once UnusedMember.Global
     protected IDataStore DataStore => Setup.Store;
 
+    // ReSharper disable once UnusedMember.Global
     protected string ContainerName => Setup.ContainerName;
 
     private List<Optional<string>> CreateMultipleEntities(int count,

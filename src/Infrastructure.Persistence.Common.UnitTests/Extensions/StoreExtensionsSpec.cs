@@ -136,13 +136,26 @@ public class StoreExtensionsSpec
     }
 
     [Fact]
-    public void WhenGetDefaultOrderingForEntityWithoutIdAndNoOrderingSpecified_ThenReturnsLastPersistedAtUtc()
+    public void
+        WhenGetDefaultOrderingForEntityWithoutIdAndNoOrderingSpecifiedAndNoOverride_ThenReturnsLastPersistedAtUtc()
     {
         var query = Query.From<TestQueryEntityWithoutId>().WhereAll();
+        var metadata = PersistedEntityMetadata.FromType<TestQueryEntityWithoutId>();
 
-        var result = query.GetDefaultOrdering();
+        var result = query.GetDefaultOrdering(metadata);
 
-        result.Should().Be(StoreExtensions.DefaultOrderingPropertyName);
+        result.Should().Be(StoreExtensions.DefaultOrderingFieldName);
+    }
+
+    [Fact]
+    public void WhenGetDefaultOrderingForEntityWithoutIdAndNoOrderingSpecifiedWithOverride_ThenReturnsOverriden()
+    {
+        var query = Query.From<TestQueryEntityWithSortDefaultOverride>().WhereAll();
+        var metadata = PersistedEntityMetadata.FromType<TestQueryEntityWithSortDefaultOverride>();
+
+        var result = query.GetDefaultOrdering(metadata);
+
+        result.Should().Be(nameof(TestQueryEntityWithSortDefaultOverride.DefaultSortByUtc));
     }
 
     [Fact]
@@ -152,8 +165,9 @@ public class StoreExtensionsSpec
         var query = Query.From<TestQueryEntityWithoutId>()
             .WhereAll()
             .Select(x => x.AProperty);
+        var metadata = PersistedEntityMetadata.FromType<TestQueryEntityWithoutId>();
 
-        var result = query.GetDefaultOrdering();
+        var result = query.GetDefaultOrdering(metadata);
 
         result.Should().Be(nameof(TestQueryEntityWithoutId.AProperty));
     }
@@ -162,8 +176,9 @@ public class StoreExtensionsSpec
     public void WhenGetDefaultOrderingForEntityWithoutLastPersistedAtUtcAndNoOrderingSpecified_ThenReturnsId()
     {
         var query = Query.From<TestQueryEntityWithId>().WhereAll();
+        var metadata = PersistedEntityMetadata.FromType<TestQueryEntityWithId>();
 
-        var result = query.GetDefaultOrdering();
+        var result = query.GetDefaultOrdering(metadata);
 
         result.Should().Be(StoreExtensions.BackupOrderingPropertyName);
     }
@@ -175,8 +190,9 @@ public class StoreExtensionsSpec
         var query = Query.From<TestQueryEntityWithId>()
             .WhereAll()
             .Select(x => x.AProperty);
+        var metadata = PersistedEntityMetadata.FromType<TestQueryEntityWithId>();
 
-        var result = query.GetDefaultOrdering();
+        var result = query.GetDefaultOrdering(metadata);
 
         result.Should().Be(nameof(TestQueryEntityWithId.AProperty));
     }
@@ -269,4 +285,18 @@ public class TestQueryEntityWithId : IQueryableEntity
     public string? AProperty { get; set; }
 
     public string? Id { get; set; }
+}
+
+[UsedImplicitly]
+public class TestQueryEntityWithSortDefaultOverride : IQueryableEntity
+{
+    public string? AProperty { get; set; }
+
+    public DateTime? DefaultSortByUtc { get; set; }
+
+    // ReSharper disable once UnusedMember.Global
+    public static string DefaultOrderingField()
+    {
+        return nameof(DefaultSortByUtc);
+    }
 }

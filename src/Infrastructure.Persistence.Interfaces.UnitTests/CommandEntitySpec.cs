@@ -126,7 +126,7 @@ public class CommandEntitySpec
             ADateTimeValue = datum
         });
 
-        FluentActions.Invoking(() => CommandEntity.FromCommandEntity(new HydrationProperties(), other))
+        FluentActions.Invoking(() => CommandEntity.FromHydrationProperties(new HydrationProperties(), other))
             .Should().Throw<InvalidOperationException>()
             .WithMessage(Resources.CommandEntity_FromProperties_NoId);
     }
@@ -144,7 +144,7 @@ public class CommandEntitySpec
             ADateTimeValue = datum
         });
 
-        var result = CommandEntity.FromCommandEntity(new HydrationProperties
+        var result = CommandEntity.FromHydrationProperties(new HydrationProperties
         {
             { nameof(IHasIdentity.Id), "anid" }
         }, otherInstance);
@@ -176,7 +176,7 @@ public class CommandEntitySpec
             ADateTimeValue = datum
         });
 
-        var result = CommandEntity.FromCommandEntity(new HydrationProperties
+        var result = CommandEntity.FromHydrationProperties(new HydrationProperties
         {
             { nameof(IHasIdentity.Id), "anid" },
             { "AnUnknownProperty", "avalue" }
@@ -209,7 +209,7 @@ public class CommandEntitySpec
             ADateTimeValue = datum
         });
 
-        var result = CommandEntity.FromCommandEntity(new HydrationProperties
+        var result = CommandEntity.FromHydrationProperties(new HydrationProperties
         {
             { nameof(IHasIdentity.Id), "anid" },
             { nameof(TestDto.AStringValue), "avalue" },
@@ -247,7 +247,7 @@ public class CommandEntitySpec
             ADateTimeValue = datum
         }).Metadata;
 
-        var result = CommandEntity.FromCommandEntity(new HydrationProperties
+        var result = CommandEntity.FromHydrationProperties(new HydrationProperties
         {
             { nameof(IHasIdentity.Id), "anid" },
             { nameof(TestDto.AStringValue), "avalue" },

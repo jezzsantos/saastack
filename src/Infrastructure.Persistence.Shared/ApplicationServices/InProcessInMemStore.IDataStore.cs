@@ -28,8 +28,11 @@ partial class InProcessInMemStore : IDataStore
 
         document.Add(entity.Id, entity.ToHydrationProperties());
 
+        var hydrationProperties = document[entity.Id];
+        ApplyMappings(entity.Metadata, hydrationProperties);
+
         return Task.FromResult<Result<CommandEntity, Error>>(
-            CommandEntity.FromCommandEntity(document[entity.Id], entity));
+            CommandEntity.FromHydrationProperties(hydrationProperties, entity));
     }
 
     public Task<Result<long, Error>> CountAsync(string containerName, CancellationToken cancellationToken)
@@ -42,7 +45,6 @@ partial class InProcessInMemStore : IDataStore
             : 0);
     }
 
-#if TESTINGONLY
     Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -52,7 +54,6 @@ partial class InProcessInMemStore : IDataStore
 
         return Task.FromResult(Result.Ok);
     }
-#endif
 
     public int MaxQueryResults => 1000;
 
@@ -77,7 +78,7 @@ partial class InProcessInMemStore : IDataStore
         }
 
         var results = await query.FetchAllIntoMemoryAsync(MaxQueryResults, metadata,
-            () => QueryPrimaryEntitiesAsync(containerName, cancellationToken),
+            () => QueryPrimaryEntitiesAsync(containerName, metadata, cancellationToken),
             entity => QueryJoiningContainerAsync(entity, cancellationToken));
 
         return results;
@@ -106,11 +107,12 @@ partial class InProcessInMemStore : IDataStore
         id.ThrowIfNotValuedParameter(nameof(id), Resources.AnyStore_MissingId);
         ArgumentNullException.ThrowIfNull(entity);
 
-        var entityProperties = entity.ToHydrationProperties();
-        _documents[containerName][id] = entityProperties;
+        var hydrationProperties = entity.ToHydrationProperties();
+        _documents[containerName][id] = hydrationProperties;
+        ApplyMappings(entity.Metadata, hydrationProperties);
 
         return Task.FromResult<Result<Optional<CommandEntity>, Error>>(CommandEntity
-            .FromCommandEntity(entityProperties, entity).ToOptional());
+            .FromHydrationProperties(hydrationProperties, entity).ToOptional());
     }
 
     public Task<Result<Optional<CommandEntity>, Error>> RetrieveAsync(string containerName, string id,
@@ -122,27 +124,67 @@ partial class InProcessInMemStore : IDataStore
         ArgumentNullException.ThrowIfNull(metadata);
 
         if (_documents.TryGetValue(containerName, out var document)
-            && document.TryGetValue(id, out var properties))
+            && document.TryGetValue(id, out var hydrationProperties))
         {
+            ApplyMappings(metadata, hydrationProperties);
             return Task.FromResult<Result<Optional<CommandEntity>, Error>>(CommandEntity
-                .FromCommandEntity(properties, metadata).ToOptional());
+                .FromHydrationProperties(hydrationProperties, metadata).ToOptional());
         }
 
         return Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None);
     }
 
     private Task<Dictionary<string, HydrationProperties>> QueryPrimaryEntitiesAsync(string containerName,
+        PersistedEntityMetadata metadata,
         CancellationToken _)
     {
-        return Task.FromResult(_documents[containerName]);
+        var documents = _documents[containerName];
+        foreach (var document in documents)
+        {
+            ApplyMappings(metadata, document.Value);
+        }
+
+        return Task.FromResult(documents);
     }
 
     private Task<Dictionary<string, HydrationProperties>> QueryJoiningContainerAsync(
         QueriedEntity joinedEntity, CancellationToken _)
     {
-        return Task.FromResult(_documents.TryGetValue(joinedEntity.EntityName, out var value)
+        var metadata = PersistedEntityMetadata.FromType(joinedEntity.Join.Right.EntityType);
+
+        var documents = _documents.TryGetValue(joinedEntity.EntityName, out var value)
             ? value.ToDictionary(pair => pair.Key, pair => pair.Value)
-            : new Dictionary<string, HydrationProperties>());
+            : new Dictionary<string, HydrationProperties>();
+        foreach (var document in documents)
+        {
+            ApplyMappings(metadata, document.Value);
+        }
+
+        return Task.FromResult(documents);
+    }
+
+    private static void ApplyMappings(PersistedEntityMetadata metadata,
+        HydrationProperties containerProperties)
+    {
+        if (containerProperties.HasNone())
+        {
+            return;
+        }
+
+        var mappings = metadata.GetReadMappingsOverride();
+        if (mappings.HasAny())
+        {
+            var containerPropertiesDictionary = containerProperties
+                .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrNull);
+            foreach (var mapping in mappings)
+            {
+                var mapResult = Try.Safely(() => mapping.Value(containerPropertiesDictionary));
+                if (mapResult.Exists())
+                {
+                    containerProperties.AddOrUpdate(mapping.Key, mapResult.ToOptional());
+                }
+            }
+        }
     }
 }
 #endif
