@@ -36,17 +36,14 @@ public class OrganizationProjection : IReadModelProjection
                     cancellationToken);
 
             case SettingCreated _:
+            case SettingUpdated _:
                 return true;
 
             case MembershipAdded _:
-                return true;
-
             case MembershipRemoved _:
                 return true;
 
             case MemberInvited _:
-                return true;
-
             case MemberUnInvited _:
                 return true;
 
@@ -71,8 +68,6 @@ public class OrganizationProjection : IReadModelProjection
                     cancellationToken);
 
             case RoleAssigned _:
-                return true;
-
             case RoleUnassigned _:
                 return true;
 
