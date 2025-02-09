@@ -6,4 +6,6 @@ namespace Application.Services.Shared;
 public interface IDomainEventConsumerService
 {
     Task<Result<Error>> NotifyAsync(EventStreamChangeEvent changeEvent, CancellationToken cancellationToken);
+
+    string GetSubscriber();
 }

@@ -21,7 +21,7 @@ public class DomainEventsApi : IWebApiService
     }
 
 #if TESTINGONLY
-    public async Task<ApiEmptyResult> DrainAll(DrainAllDomainEventsRequest request,
+    public async Task<ApiEmptyResult> DrainAll(DrainAllEventNotificationsRequest request,
         CancellationToken cancellationToken)
     {
         var result =
@@ -44,14 +44,14 @@ public class DomainEventsApi : IWebApiService
     }
 
 #if TESTINGONLY
-    public async Task<ApiSearchResult<DomainEvent, SearchAllDomainEventsResponse>> SearchAll(
-        SearchAllDomainEventsRequest request, CancellationToken cancellationToken)
+    public async Task<ApiSearchResult<EventNotification, SearchAllEventNotificationsResponse>> SearchAll(
+        SearchAllEventNotificationsRequest request, CancellationToken cancellationToken)
     {
-        var events = await _domainEventsApplication.SearchAllDomainEventsAsync(_callerFactory.Create(),
+        var events = await _domainEventsApplication.SearchAllNotificationsAsync(_callerFactory.Create(),
             request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
-        return () => events.HandleApplicationResult(evt => new SearchAllDomainEventsResponse
-            { Events = evt.Results, Metadata = evt.Metadata });
+        return () => events.HandleApplicationResult(evt => new SearchAllEventNotificationsResponse
+            { Notifications = evt.Results, Metadata = evt.Metadata });
     }
 #endif
 }

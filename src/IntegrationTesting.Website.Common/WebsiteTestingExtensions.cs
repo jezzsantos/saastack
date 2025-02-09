@@ -155,7 +155,7 @@ public static class WebsiteTestingExtensions
         CSRFMiddleware.ICSRFService csrfService)
     {
 #if TESTINGONLY
-        var drainRequest = new DrainAllDomainEventsRequest();
+        var drainRequest = new DrainAllEventNotificationsRequest();
         var drainAllUrl = drainRequest.MakeApiRoute();
         await websiteClient.PostAsync(drainAllUrl, JsonContent.Create(drainRequest),
             (msg, cookies) =>

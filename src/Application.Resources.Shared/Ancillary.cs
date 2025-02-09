@@ -93,7 +93,7 @@ public class DeliveredSms : IIdentifiableResource
     public required string Id { get; set; }
 }
 
-public class DomainEvent : IIdentifiableResource
+public class EventNotification : IIdentifiableResource
 {
     public required string Data { get; set; }
 
@@ -104,6 +104,8 @@ public class DomainEvent : IIdentifiableResource
     public required string RootAggregateType { get; set; }
 
     public required string StreamName { get; set; }
+
+    public required string SubscriberRef { get; set; }
 
     public required int Version { get; set; }
 

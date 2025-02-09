@@ -51,12 +51,12 @@ public class EventNotificationsModule : ISubdomainModule
 
                 services.AddPerHttpRequest<IDomainEventsApplication>(c =>
                     new DomainEventsApplication(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IDomainEventRepository>(),
+                        c.GetRequiredService<IEventNotificationRepository>(),
                         c.GetRequiredService<IDomainEventingMessageBusTopic>(),
                         c.GetRequiredService<IDomainEventingSubscriber>(),
                         c.GetRequiredService<IDomainEventConsumerService>()));
-                services.AddPerHttpRequest<IDomainEventRepository>(c =>
-                    new DomainEventRepository(c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IEventNotificationRepository>(c =>
+                    new EventNotificationRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
             };

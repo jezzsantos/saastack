@@ -5,8 +5,8 @@ using QueryAny;
 
 namespace EventNotificationsApplication.Persistence.ReadModels;
 
-[EntityName("DomainEvent")]
-public class DomainEvent : ReadModelEntity
+[EntityName("EventNotification")]
+public class EventNotification : ReadModelEntity
 {
     public Optional<string> Data { get; set; }
 
@@ -17,6 +17,8 @@ public class DomainEvent : ReadModelEntity
     public Optional<string> RootAggregateType { get; set; }
 
     public Optional<string> StreamName { get; set; }
+
+    public Optional<string> SubscriberRef { get; set; }
 
     public Optional<int> Version { get; set; }
 }

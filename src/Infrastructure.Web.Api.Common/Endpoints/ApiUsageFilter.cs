@@ -30,9 +30,9 @@ public class ApiUsageFilter : IEndpointFilter
         typeof(DrainAllEmailsRequest),
         typeof(DrainAllSmsesRequest),
         typeof(DrainAllProvisioningsRequest),
-        typeof(DrainAllDomainEventsRequest),
+        typeof(DrainAllEventNotificationsRequest),
         typeof(SearchAllAuditsRequest),
-        typeof(SearchAllDomainEventsRequest),
+        typeof(SearchAllEventNotificationsRequest),
 #endif
         typeof(HealthCheckRequest),
         typeof(DeliverAuditRequest),

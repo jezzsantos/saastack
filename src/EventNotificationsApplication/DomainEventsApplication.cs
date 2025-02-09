@@ -3,43 +3,44 @@ using Application.Interfaces;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
-using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using EventNotificationsApplication.Persistence;
+using EventNotification = Application.Resources.Shared.EventNotification;
 
 namespace EventNotificationsApplication;
 
 public class DomainEventsApplication : IDomainEventsApplication
 {
     private readonly IRecorder _recorder;
-    private readonly IDomainEventRepository _domainEventRepository;
+    private readonly IEventNotificationRepository _eventNotificationRepository;
     private readonly IDomainEventConsumerService _domainEventConsumerService;
 #if TESTINGONLY
     private readonly IDomainEventingMessageBusTopic _domainEventMessageBusTopic;
     private readonly IDomainEventingSubscriber _subscriber;
 
     public DomainEventsApplication(IRecorder recorder,
-        IDomainEventRepository domainEventRepository, IDomainEventingMessageBusTopic domainEventMessageBusTopic,
+        IEventNotificationRepository eventNotificationRepository,
+        IDomainEventingMessageBusTopic domainEventMessageBusTopic,
         IDomainEventingSubscriber subscriber, IDomainEventConsumerService domainEventConsumerService)
     {
         _recorder = recorder;
-        _domainEventRepository = domainEventRepository;
+        _eventNotificationRepository = eventNotificationRepository;
         _domainEventMessageBusTopic = domainEventMessageBusTopic;
         _subscriber = subscriber;
         _domainEventConsumerService = domainEventConsumerService;
     }
 #else
     public DomainEventsApplication(IRecorder recorder,
-        IDomainEventRepository domainEventRepository,
+        IEventNotificationRepository eventNotificationRepository,
         // ReSharper disable once UnusedParameter.Local
         IDomainEventingMessageBusTopic domainEventMessageBusTopic,
         // ReSharper disable once UnusedParameter.Local
         IDomainEventingSubscriber subscriber, IDomainEventConsumerService domainEventConsumerService)
     {
         _recorder = recorder;
-        _domainEventRepository = domainEventRepository;
+        _eventNotificationRepository = eventNotificationRepository;
         _domainEventConsumerService = domainEventConsumerService;
     }
 #endif
@@ -49,7 +50,7 @@ public class DomainEventsApplication : IDomainEventsApplication
         CancellationToken cancellationToken)
     {
         await DrainAllOnSubscriptionAsync(_domainEventMessageBusTopic, _subscriber.SubscriptionName,
-            message => NotifyDomainEventingInternalAsync(caller, message, cancellationToken), cancellationToken);
+            message => NotifyDomainEventInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all domain event messages");
 
@@ -66,7 +67,7 @@ public class DomainEventsApplication : IDomainEventsApplication
             return rehydrated.Error;
         }
 
-        var delivered = await NotifyDomainEventingInternalAsync(caller, rehydrated.Value, cancellationToken);
+        var delivered = await NotifyDomainEventInternalAsync(caller, rehydrated.Value, cancellationToken);
         if (delivered.IsFailure)
         {
             return delivered.Error;
@@ -77,11 +78,11 @@ public class DomainEventsApplication : IDomainEventsApplication
     }
 
 #if TESTINGONLY
-    public async Task<Result<SearchResults<DomainEvent>, Error>>
-        SearchAllDomainEventsAsync(ICallerContext caller, SearchOptions searchOptions, GetOptions getOptions,
+    public async Task<Result<SearchResults<EventNotification>, Error>>
+        SearchAllNotificationsAsync(ICallerContext caller, SearchOptions searchOptions, GetOptions getOptions,
             CancellationToken cancellationToken)
     {
-        var searched = await _domainEventRepository.SearchAllAsync(searchOptions, cancellationToken);
+        var searched = await _eventNotificationRepository.SearchAllAsync(searchOptions, cancellationToken);
         if (searched.IsFailure)
         {
             return searched.Error;
@@ -89,12 +90,11 @@ public class DomainEventsApplication : IDomainEventsApplication
 
         var events = searched.Value;
 
-        return searchOptions.ApplyWithMetadata(events.Select(evt => evt.ToDomainEvent()));
+        return searchOptions.ApplyWithMetadata(events.Select(evt => evt.ToNotification()));
     }
 #endif
 
 #if TESTINGONLY
-
     private static async Task DrainAllOnSubscriptionAsync<TBusMessage>(IMessageBusTopicStore<TBusMessage> repository,
         string subscriptionName, Func<TBusMessage, Task<Result<bool, Error>>> handler,
         CancellationToken cancellationToken)
@@ -143,11 +143,12 @@ public class DomainEventsApplication : IDomainEventsApplication
         }
     }
 
-    private async Task<Result<bool, Error>> NotifyDomainEventingInternalAsync(ICallerContext caller,
+    private async Task<Result<bool, Error>> NotifyDomainEventInternalAsync(ICallerContext caller,
         DomainEventingMessage message, CancellationToken cancellationToken)
     {
-        var domainEvent = message.ToDomainEvent();
-        var added = await _domainEventRepository.SaveAsync(domainEvent, cancellationToken);
+        var subscriber = _domainEventConsumerService.GetSubscriber();
+        var notification = message.ToNotification(subscriber);
+        var added = await _eventNotificationRepository.SaveAsync(notification, cancellationToken);
         if (added.IsFailure)
         {
             return added.Error;
@@ -160,7 +161,7 @@ public class DomainEventsApplication : IDomainEventsApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Notified domain event for {EventType}:v{Version}",
-            domainEvent.Metadata.Value.Fqn, domainEvent.Version);
+            notification.Metadata.Value.Fqn, notification.Version);
 
         return true;
     }
@@ -168,9 +169,10 @@ public class DomainEventsApplication : IDomainEventsApplication
 
 public static class DomainEventConversionExtensions
 {
-    public static Persistence.ReadModels.DomainEvent ToDomainEvent(this DomainEventingMessage message)
+    public static Persistence.ReadModels.EventNotification ToNotification(this DomainEventingMessage message,
+        string subscriberRef)
     {
-        return new Persistence.ReadModels.DomainEvent
+        return new Persistence.ReadModels.EventNotification
         {
             Id = message.Event!.Id,
             RootAggregateType = message.Event.RootAggregateType,
@@ -178,21 +180,23 @@ public static class DomainEventConversionExtensions
             Data = message.Event.Data,
             Metadata = message.Event.Metadata,
             StreamName = message.Event.StreamName,
-            Version = message.Event.Version
+            Version = message.Event.Version,
+            SubscriberRef = subscriberRef
         };
     }
 
-    public static DomainEvent ToDomainEvent(this Persistence.ReadModels.DomainEvent domainEvent)
+    public static EventNotification ToNotification(this Persistence.ReadModels.EventNotification notification)
     {
-        return new DomainEvent
+        return new EventNotification
         {
-            Id = domainEvent.Id,
-            RootAggregateType = domainEvent.RootAggregateType,
-            EventType = domainEvent.EventType,
-            Data = domainEvent.Data,
-            MetadataFullyQualifiedName = domainEvent.Metadata.Value.Fqn,
-            StreamName = domainEvent.StreamName,
-            Version = domainEvent.Version
+            Id = notification.Id,
+            RootAggregateType = notification.RootAggregateType,
+            EventType = notification.EventType,
+            Data = notification.Data,
+            MetadataFullyQualifiedName = notification.Metadata.Value.Fqn,
+            StreamName = notification.StreamName,
+            Version = notification.Version,
+            SubscriberRef = notification.SubscriberRef
         };
     }
 }

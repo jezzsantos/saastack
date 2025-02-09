@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 /// <summary>
 ///     Notifies when a domain_event has been raised
 /// </summary>
-[Route("/domain_events/notify", OperationMethod.Post, AccessType.HMAC)]
+[Route("/event_notifications", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
 public class NotifyDomainEventRequest : UnTenantedRequest<NotifyDomainEventRequest, DeliverMessageResponse>
 {

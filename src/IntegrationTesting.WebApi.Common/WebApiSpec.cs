@@ -306,7 +306,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 #if TESTINGONLY
         await Repeat.TimesAsync(async () =>
         {
-            var request = new DrainAllDomainEventsRequest();
+            var request = new DrainAllEventNotificationsRequest();
             await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
         }, (int)rounds);
 #endif

@@ -2,6 +2,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
 using Common.Extensions;
 using Domain.Interfaces.Entities;
 using Infrastructure.Eventing.Interfaces.Notifications;
@@ -10,14 +11,23 @@ namespace Infrastructure.Shared.ApplicationServices;
 
 public class DomainEventConsumerService : IDomainEventConsumerService
 {
+    private const string SubscriptionNameSettingName = "ApplicationServices:EventNotifications:SubscriptionName";
     private readonly List<IDomainEventNotificationConsumer> _consumers;
     private readonly IEventSourcedChangeEventMigrator _migrator;
+    private readonly string _subscriberRef;
 
-    public DomainEventConsumerService(IEnumerable<IDomainEventNotificationConsumer> consumers,
+    public DomainEventConsumerService(IConfigurationSettings settings,
+        IEnumerable<IDomainEventNotificationConsumer> consumers,
         IEventSourcedChangeEventMigrator migrator)
     {
         _migrator = migrator;
         _consumers = consumers.ToList();
+        _subscriberRef = GetSubscriberRef(settings);
+    }
+
+    public string GetSubscriber()
+    {
+        return _subscriberRef;
     }
 
     public async Task<Result<Error>> NotifyAsync(EventStreamChangeEvent changeEvent,
@@ -46,5 +56,10 @@ public class DomainEventConsumerService : IDomainEventConsumerService
         }
 
         return Result.Ok;
+    }
+
+    public static string GetSubscriberRef(IConfigurationSettings settings)
+    {
+        return settings.Platform.GetString(SubscriptionNameSettingName);
     }
 }

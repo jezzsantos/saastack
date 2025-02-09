@@ -23,7 +23,7 @@ public class StubApiModule : ISubdomainModule
     private static readonly Dictionary<string, IWebRequest> MessageBusTopicMappings = new()
     {
         //EXTEND: add mappings to any new topics here to monitor
-        { WorkerConstants.MessageBuses.Topics.DomainEvents, new DrainAllDomainEventsRequest() }
+        { WorkerConstants.MessageBuses.Topics.DomainEvents, new DrainAllEventNotificationsRequest() }
     };
     private static readonly Dictionary<string, IWebRequest> QueuedMappings = new()
     {

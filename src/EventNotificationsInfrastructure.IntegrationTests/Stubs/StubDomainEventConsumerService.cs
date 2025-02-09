@@ -14,6 +14,11 @@ public class StubDomainEventConsumerService : IDomainEventConsumerService
         return Task.FromResult(Result.Ok);
     }
 
+    public string GetSubscriber()
+    {
+        return "asubscriberref";
+    }
+
     public void Reset()
     {
         LastEventId = null;

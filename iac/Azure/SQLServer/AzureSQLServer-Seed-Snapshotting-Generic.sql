@@ -28,9 +28,9 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[EventNotification]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[DomainEvent]
+    DROP TABLE [dbo].[EventNotification]
 GO
 
 IF EXISTS(SELECT *
@@ -55,7 +55,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE TABLE [dbo].[DomainEvent]
+CREATE TABLE [dbo].[EventNotification]
 (
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
@@ -64,13 +64,14 @@ CREATE TABLE [dbo].[DomainEvent]
     [EventType]          [nvarchar](max) NULL,
     [Metadata]           [nvarchar](max) NULL,
     [RootAggregateType]  [nvarchar](max) NULL,
-    [StreamName] [nvarchar](450) NULL,
+    [StreamName]         [nvarchar](450) NULL,
+    [SubscriberRef]      [nvarchar](max) NULL,
     [Version]            [int]           NULL,
 ) ON [PRIMARY]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[DomainEvent]
+    ON [dbo].[EventNotification]
         (
          [Id]
             );

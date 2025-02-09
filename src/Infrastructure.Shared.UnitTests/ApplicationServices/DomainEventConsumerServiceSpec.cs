@@ -1,8 +1,10 @@
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Configuration;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using FluentAssertions;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Shared.ApplicationServices;
 using Moq;
@@ -17,13 +19,17 @@ public class DomainEventConsumerServiceSpec
     private readonly Mock<IDomainEventNotificationConsumer> _consumer;
     private readonly Mock<IEventSourcedChangeEventMigrator> _migrator;
     private readonly DomainEventConsumerService _service;
+    private readonly Mock<IConfigurationSettings> _settings;
 
     public DomainEventConsumerServiceSpec()
     {
         _migrator = new Mock<IEventSourcedChangeEventMigrator>();
         _consumer = new Mock<IDomainEventNotificationConsumer>();
+        _settings = new Mock<IConfigurationSettings>();
+        _settings.Setup(s => s.Platform.GetString(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns("asubscriberref");
 
-        _service = new DomainEventConsumerService([_consumer.Object], _migrator.Object);
+        _service = new DomainEventConsumerService(_settings.Object, [_consumer.Object], _migrator.Object);
     }
 
     [Fact]
@@ -31,7 +37,7 @@ public class DomainEventConsumerServiceSpec
     {
         _migrator.Setup(m => m.Rehydrate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(new TestDomainEvent());
-        var service = new DomainEventConsumerService([], _migrator.Object);
+        var service = new DomainEventConsumerService(_settings.Object, [], _migrator.Object);
         var changeEvent = new EventStreamChangeEvent
         {
             Data = "{}",
@@ -113,6 +119,14 @@ public class DomainEventConsumerServiceSpec
             && evt.OccurredUtc.HasValue()
             && evt.AProperty == "avalue"
         ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public void WhenGetSubscriber_ThenReturnsReference()
+    {
+        var result = _service.GetSubscriber();
+
+        result.Should().Be("asubscriberref");
     }
 }
 

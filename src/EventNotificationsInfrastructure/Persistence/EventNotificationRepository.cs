@@ -11,13 +11,13 @@ using QueryAny;
 
 namespace EventNotificationsInfrastructure.Persistence;
 
-public class DomainEventRepository : IDomainEventRepository
+public class EventNotificationRepository : IEventNotificationRepository
 {
-    private readonly IReadModelStore<DomainEvent> _events;
+    private readonly IReadModelStore<EventNotification> _events;
 
-    public DomainEventRepository(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
+    public EventNotificationRepository(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _events = new ReadModelStore<DomainEvent>(recorder, domainFactory, store);
+        _events = new ReadModelStore<EventNotification>(recorder, domainFactory, store);
     }
 
 #if TESTINGONLY
@@ -27,18 +27,18 @@ public class DomainEventRepository : IDomainEventRepository
     }
 #endif
 
-    public async Task<Result<Error>> SaveAsync(DomainEvent domainEvent, CancellationToken cancellationToken)
+    public async Task<Result<Error>> SaveAsync(EventNotification notification, CancellationToken cancellationToken)
     {
-        var added = await _events.UpsertAsync(domainEvent, false, cancellationToken);
+        var added = await _events.UpsertAsync(notification, false, cancellationToken);
         return added.IsFailure
             ? added.Error
             : Result.Ok;
     }
 
-    public async Task<Result<IReadOnlyList<DomainEvent>, Error>> SearchAllAsync(SearchOptions searchOptions,
+    public async Task<Result<IReadOnlyList<EventNotification>, Error>> SearchAllAsync(SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
-        var queried = await _events.QueryAsync(Query.From<DomainEvent>()
+        var queried = await _events.QueryAsync(Query.From<EventNotification>()
             .WhereAll()
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
         if (queried.IsFailure)

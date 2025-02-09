@@ -14,7 +14,7 @@ public interface IDomainEventsApplication
         CancellationToken cancellationToken);
 
 #if TESTINGONLY
-    Task<Result<SearchResults<DomainEvent>, Error>> SearchAllDomainEventsAsync(ICallerContext caller,
+    Task<Result<SearchResults<EventNotification>, Error>> SearchAllNotificationsAsync(ICallerContext caller,
         SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 #endif
 }

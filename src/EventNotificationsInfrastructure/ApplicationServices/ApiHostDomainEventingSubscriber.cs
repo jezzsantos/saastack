@@ -3,18 +3,18 @@ using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Shared.ApplicationServices;
 
 namespace EventNotificationsInfrastructure.ApplicationServices;
 
 public class ApiHostDomainEventingSubscriber : IDomainEventingSubscriber
 {
-    private const string EventingSubscriberNameSettingName = "ApplicationServices:EventNotifications:SubscriptionName";
     private readonly IMessageBusStore _store;
 
     public ApiHostDomainEventingSubscriber(IConfigurationSettings settings, IMessageBusStore store)
     {
         _store = store;
-        SubscriptionName = settings.Platform.GetString(EventingSubscriberNameSettingName);
+        SubscriptionName = DomainEventConsumerService.GetSubscriberRef(settings);
     }
 
     public async Task<Result<Error>> Subscribe(CancellationToken cancellationToken)
