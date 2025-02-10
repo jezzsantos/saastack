@@ -27,23 +27,35 @@ partial class InProcessInMemStore : IEventStore
         var latestStoredEventVersion = latestStoredEvent.HasValue
             ? latestStoredEvent.Value.Version.ToOptional()
             : Optional<int>.None;
-        var concurrencyCheck =
-            this.VerifyConcurrencyCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
-        if (concurrencyCheck.IsFailure)
+        var @checked =
+            this.VerifyContiguousCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
+        if (@checked.IsFailure)
         {
-            return concurrencyCheck.Error;
+            return @checked.Error;
         }
 
-        events.ForEach(@event =>
+        foreach (var @event in events)
         {
             var entity = CommandEntity.FromDto(@event.ToTabulated(entityName, streamName));
+            var version = @event.Version;
+
             if (!_events.ContainsKey(entityName))
             {
                 _events.Add(entityName, new Dictionary<string, HydrationProperties>());
             }
 
-            _events[entityName].Add(entity.Id, entity.ToHydrationProperties());
-        });
+            try
+            {
+                var stream = _events[entityName];
+                stream.Add(entity.Id, entity.ToHydrationProperties());
+            }
+            catch (ArgumentException)
+            {
+                return Error.EntityExists(
+                    Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
+                        streamName, version));
+            }
+        }
 
         return streamName;
     }

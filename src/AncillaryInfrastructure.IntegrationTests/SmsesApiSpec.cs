@@ -281,7 +281,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchSmsDeliveriesWithTagsForAllOrganizations_TheReturnsSmses()
+    public async Task WhenSearchSmsDeliveriesWithTagsForAllOrganizations_ThenReturnsSmses()
     {
         _smsDeliveryService.SendingSucceeds = true;
         var request = new SendSmsRequest
@@ -319,7 +319,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchSmsDeliveriesWithTagsForAnOrganization_TheReturnsSmses()
+    public async Task WhenSearchSmsDeliveriesWithTagsForAnOrganization_ThenReturnsSmses()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
         _smsDeliveryService.SendingSucceeds = true;

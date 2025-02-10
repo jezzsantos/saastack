@@ -15,54 +15,52 @@ public class EventStoreExtensionsSpec
     private readonly Mock<IEventStore> _eventStore = new();
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndNothingStoredAndFirstVersionIsNotFirst_TheReturnsError()
+    public void WhenVerifyContiguousCheckAndNothingStoredAndFirstVersionIsNotFirst_ThenReturnsError()
     {
-        var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", Optional<int>.None, 10);
+        var result = _eventStore.Object.VerifyContiguousCheck("astreamname", Optional<int>.None, 10);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStore_ConcurrencyVerificationFailed_StreamReset.Format("astreamname"));
     }
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndNothingStoredAndFirstVersionIsFirst_ThenPasses()
+    public void WhenVerifyContiguousCheckAndNothingStoredAndFirstVersionIsFirst_ThenPasses()
     {
         var result =
-            _eventStore.Object.VerifyConcurrencyCheck("astreamname", Optional<int>.None, EventStream.FirstVersion);
+            _eventStore.Object.VerifyContiguousCheck("astreamname", Optional<int>.None, EventStream.FirstVersion);
 
         result.Should().BeSuccess();
     }
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndFirstVersionIsSameAsStored_TheReturnsError()
+    public void WhenVerifyContiguousCheckAndFirstVersionIsSameAsStored_ThenPasses()
     {
-        var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 2, 2);
+        var result = _eventStore.Object.VerifyContiguousCheck("astreamname", 2, 2);
 
-        result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 2));
+        result.Should().BeSuccess();
     }
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndFirstVersionIsBeforeStored_TheReturnsError()
+    public void WhenVerifyContiguousCheckAndFirstVersionIsBeforeStored_ThenPasses()
     {
-        var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 2, 1);
+        var result = _eventStore.Object.VerifyContiguousCheck("astreamname", 2, 1);
 
-        result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 1));
+        result.Should().BeSuccess();
     }
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndFirstVersionIsAfterStoredButNotContiguous_TheReturnsError()
+    public void WhenVerifyContiguousCheckAndFirstVersionIsAfterStoredButNotContiguous_ThenReturnsError()
     {
-        var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 1, 3);
+        var result = _eventStore.Object.VerifyContiguousCheck("astreamname", 1, 3);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format("astreamname", 2, 3));
     }
 
     [Fact]
-    public void WhenVerifyConcurrencyCheckAndFirstVersionIsNextAfterStored_ThenPasses()
+    public void WhenVerifyContiguousCheckAndFirstVersionIsNextAfterStored_ThenPasses()
     {
-        var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 1, 2);
+        var result = _eventStore.Object.VerifyContiguousCheck("astreamname", 1, 2);
 
         result.Should().BeSuccess();
     }

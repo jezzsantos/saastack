@@ -21,14 +21,6 @@ public class BillingProviderSpec
     }
 
     [Fact]
-    public void WhenCreateWithEmptyState_ThenReturnsError()
-    {
-        var result = BillingProvider.Create("aprovidername", new SubscriptionMetadata());
-
-        result.Should().BeError(ErrorCode.Validation, Resources.BillingProvider_InvalidMetadata);
-    }
-
-    [Fact]
     public void WhenCreate_ThenReturns()
     {
         var state = new SubscriptionMetadata
@@ -44,7 +36,7 @@ public class BillingProviderSpec
     }
 
     [Fact]
-    public void WhenCreateWithEmptyProviderName_TheReturnsError()
+    public void WhenCreateWithEmptyProviderName_ThenReturnsError()
     {
         var result = BillingProvider.Create(string.Empty, new SubscriptionMetadata());
 
@@ -52,7 +44,7 @@ public class BillingProviderSpec
     }
 
     [Fact]
-    public void WhenCreateWithInvalidProviderName_TheReturnsError()
+    public void WhenCreateWithInvalidProviderName_ThenReturnsError()
     {
         var result = BillingProvider.Create("^^aninvalidname^^", new SubscriptionMetadata());
 
@@ -60,7 +52,7 @@ public class BillingProviderSpec
     }
 
     [Fact]
-    public void WhenCreateWithEmptyState_TheReturnsError()
+    public void WhenCreateWithEmptyState_ThenReturnsError()
     {
         var result = BillingProvider.Create("aprovidername", new SubscriptionMetadata());
 

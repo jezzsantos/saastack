@@ -70,6 +70,9 @@ public sealed partial class AzureSqlServerStore
         }
     }
 
+    /// <summary>
+    ///     Inserts the entity into the table whether it exists or not.
+    /// </summary>
     private async Task<Result<Error>> ExecuteSqlInsertCommandAsync(string tableName,
         Dictionary<string, object> parameters, CancellationToken cancellationToken)
     {
@@ -99,6 +102,80 @@ public sealed partial class AzureSqlServerStore
                 await connection.CloseAsync();
                 _recorder.TraceInformation(null, "SQLServer executed SQL {Command}, affecting {Affecting} records",
                     commandText, numRecords);
+                return Result.Ok;
+            }
+            catch (Exception ex)
+            {
+                _recorder.TraceError(null, ex, "SQLServer failed executing SQL {Command}", commandText);
+                return ex.ToError(ErrorCode.Unexpected);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Inserts the entity into the table, as long as the entity does not already exist for the specified
+    ///     <see cref="wheresParameter" />, otherwise return <see cref="ErrorCode.EntityExists" />
+    /// </summary>
+    private async Task<Result<Error>> ExecuteSqlInsertExclusiveCommandAsync(string tableName,
+        Dictionary<string, object> wheresParameter,
+        Dictionary<string, object> parameters, CancellationToken cancellationToken)
+    {
+        const int whereParameterOffset = 500; // Arbitrary offset to avoid parameter collision
+        var columnNames = string.Join(',', parameters.Select(p => p.Key.ToColumnName()));
+        var columnIndex = 1;
+        var columnValuePlaceholders = string.Join(',', parameters.Select(_ => $"@{columnIndex++}"));
+        var existsIndex = whereParameterOffset;
+        var existsColumnNames = string.Join(' ', wheresParameter.Select(where =>
+            $"{(existsIndex++ > whereParameterOffset ? "AND " : "")}{where.Key.ToColumnName()} = @{existsIndex - 1}"));
+        var commandText = $"""
+                           SET TRANSACTION ISOLATION LEVEL SERIALIZABLE 
+                           BEGIN TRANSACTION 
+                             IF NOT EXISTS (
+                               SELECT [Id] 
+                               FROM {tableName.ToTableName()} 
+                               WHERE {existsColumnNames}
+                               ) 
+                               BEGIN 
+                                 INSERT INTO {tableName.ToTableName()} ({columnNames}) 
+                                 VALUES ({columnValuePlaceholders}) 
+                               END 
+                           COMMIT TRANSACTION
+                           """;
+
+        await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
+        {
+            try
+            {
+                await connection.OpenAsync(cancellationToken);
+                int numRecords;
+                await using (var command = new SqlCommand(commandText, connection))
+                {
+                    var whereParameterIndex = whereParameterOffset;
+                    foreach (var whereParameter in wheresParameter)
+                    {
+                        command.Parameters.AddWithValue($"@{whereParameterIndex++}", whereParameter.Value);
+                    }
+
+                    var parameterIndex = 1;
+                    foreach (var parameter in parameters)
+                    {
+                        command.Parameters.AddWithValue($"@{parameterIndex++}", parameter.Value);
+                    }
+
+                    numRecords = await command.ExecuteNonQueryAsync(cancellationToken);
+                }
+
+                await connection.CloseAsync();
+                if (numRecords == -1)
+                {
+                    _recorder.TraceWarning(null, "SQLServer executed SQL {Command}, but found existing record",
+                        commandText);
+                    return Error.EntityExists();
+                }
+
+                _recorder.TraceInformation(null, "SQLServer executed SQL {Command}, affecting {Affecting} records",
+                    commandText, numRecords);
+
                 return Result.Ok;
             }
             catch (Exception ex)
@@ -350,7 +427,7 @@ internal static class AzureSqlServerStoreConversionExtensions
             var targetPropertyType = entity.GetPropertyType(key);
             properties.Add(key, ToTableEntityProperty(value, targetPropertyType));
         }
-        
+
         properties[nameof(CommandEntity.LastPersistedAtUtc)] = DateTime.UtcNow;
 
         return properties;

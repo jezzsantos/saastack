@@ -1,5 +1,6 @@
 ﻿#if TESTINGONLY
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -196,6 +197,8 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
     private sealed class FileContainer
     {
         internal const string FileExtension = "json";
+
+        private static readonly Encoding DefaultSystemTextEncoding = new UTF8Encoding(false, true);
         private readonly string _dirPath;
         private readonly string _rootPath;
 
@@ -248,7 +251,7 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
 
         public bool Exists(string entityId)
         {
-            var filename = GetFullFilePathFromId(entityId);
+            var filename = GetFullFilePathFromName(entityId);
             return File.Exists(filename);
         }
 
@@ -307,7 +310,7 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
         {
             if (Exists(entityId))
             {
-                var filename = GetFullFilePathFromId(entityId);
+                var filename = GetFullFilePathFromName(entityId);
                 var content = await File.ReadAllTextAsync(filename, cancellationToken);
                 return (content.FromJson<Dictionary<string, string>>()
                         ?? new Dictionary<string, string>())
@@ -321,33 +324,88 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
         {
             if (Exists(entityId))
             {
-                var filename = GetFullFilePathFromId(entityId);
+                var filename = GetFullFilePathFromName(entityId);
                 File.Delete(filename);
             }
         }
 
         /// <summary>
-        ///     Writes the specified <see cref="properties" /> to JSON to a file on the disk
+        ///     Writes the specified <see cref="properties" /> to JSON to a file on the disk.
+        ///     This version of the method will overwrite the file if it already exists.
         /// </summary>
-        public async Task WriteAsync(string entityId, IReadOnlyDictionary<string, Optional<string>> properties,
+        public async Task WriteAsync(string filename, IReadOnlyDictionary<string, Optional<string>> properties,
             CancellationToken cancellationToken)
         {
             var retryPolicy = Policy.Handle<IOException>()
                 .WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(300));
 
-            var filename = GetFullFilePathFromId(entityId);
+            var fullFilename = GetFullFilePathFromName(filename);
             await retryPolicy.ExecuteAsync(SaveFileAsync);
             return;
 
             async Task SaveFileAsync()
             {
-                await using var file = File.CreateText(filename);
+                await using var file = File.CreateText(fullFilename);
                 var json = properties
                     .Where(pair => pair.Value.HasValue)
                     .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrDefault)
                     .ToJson();
                 await file.WriteAsync(json);
                 await file.FlushAsync(cancellationToken);
+            }
+        }
+
+        /// <summary>
+        ///     Writes the specified <see cref="properties" /> to JSON to a file on the disk.
+        ///     This version of the method will return an error if the file already exists.
+        /// </summary>
+        public async Task<Result<Error>> WriteExclusiveAsync(string filename,
+            IReadOnlyDictionary<string, Optional<string>> properties,
+            CancellationToken cancellationToken)
+        {
+            var retryPolicy = Policy.Handle<IOException>()
+                .WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(300));
+
+            var fullFilename = GetFullFilePathFromName(filename);
+            return await retryPolicy.ExecuteAsync(CreateFileExclusiveAsync);
+
+            async Task<Result<Error>> CreateFileExclusiveAsync()
+            {
+                var json = properties
+                    .Where(pair => pair.Value.HasValue)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrDefault)
+                    .ToJson()!;
+
+                var content = DefaultSystemTextEncoding.GetBytes(json);
+
+                FileStream? file = null;
+                try
+                {
+                    // Try to open the file for writing, but fail if it already exists, or if someone else is writing
+                    // or reading it at the same time (essentially locking the file).
+                    file = File.Open(fullFilename, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                }
+                catch (IOException)
+                {
+                    if (file.Exists())
+                    {
+                        file.Close();
+                    }
+
+                    return Error.EntityExists();
+                }
+
+                try
+                {
+                    await file.WriteAsync(content, cancellationToken);
+                    await file.FlushAsync(cancellationToken);
+
+                    return Result.Ok;
+                }
+                finally
+                {
+                    file.Close();
+                }
             }
         }
 
@@ -361,10 +419,10 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
             return string.Join("", fileName.Split(Path.GetInvalidFileNameChars()));
         }
 
-        private string GetFullFilePathFromId(string entityId)
+        private string GetFullFilePathFromName(string filename)
         {
-            var filename = $"{CleanFileName(entityId)}.{FileExtension}";
-            return Path.Combine(_dirPath, filename);
+            var fullFilename = $"{CleanFileName(filename)}.{FileExtension}";
+            return Path.Combine(_dirPath, fullFilename);
         }
 
         private static string GetIdFromFullFilePath(string path)

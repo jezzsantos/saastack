@@ -23,7 +23,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedSuccessfulLoginOnce_TheReturnsHistory()
+    public void WhenAttemptedSuccessfulLoginOnce_ThenReturnsHistory()
     {
         var datum = DateTime.UtcNow;
         var history = LoginMonitor.Create(1, TimeSpan.FromHours(1)).Value;
@@ -37,7 +37,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginOnceAndFailedAttemptsIsLessThanMax_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginOnceAndFailedAttemptsIsLessThanMax_ThenReturnsHistory()
     {
         var datum = DateTime.UtcNow;
         var history = LoginMonitor.Create(2, TimeSpan.FromHours(1)).Value;
@@ -51,7 +51,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginsTwiceAndFailedAttemptsIsLessThanMax_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginsTwiceAndFailedAttemptsIsLessThanMax_ThenReturnsHistory()
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
@@ -67,7 +67,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginAndFailedAttemptsIsLessThanMaxAndThenLoginSuccessful_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginAndFailedAttemptsIsLessThanMaxAndThenLoginSuccessful_ThenReturnsHistory()
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
@@ -85,7 +85,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginAndFailedAttemptsIsMax_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginAndFailedAttemptsIsMax_ThenReturnsHistory()
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
@@ -101,7 +101,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginAndFailedAttemptsIsOneMoreThanMax_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginAndFailedAttemptsIsOneMoreThanMax_ThenReturnsHistory()
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
@@ -119,7 +119,7 @@ public class LoginMonitorSpec
     }
 
     [Fact]
-    public void WhenAttemptedFailedLoginAndFailedAttemptsIsManyMoreThanMax_TheReturnsHistory()
+    public void WhenAttemptedFailedLoginAndFailedAttemptsIsManyMoreThanMax_ThenReturnsHistory()
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);

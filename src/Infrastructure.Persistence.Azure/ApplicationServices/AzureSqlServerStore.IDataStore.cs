@@ -150,6 +150,18 @@ partial class AzureSqlServerStore : IDataStore
 
         return Optional<CommandEntity>.None;
     }
+
+    private async Task<Result<Error>> AddExclusiveAsync(string containerName, Dictionary<string, object> wheres,
+        CommandEntity entity,
+        CancellationToken cancellationToken)
+    {
+        containerName.ThrowIfNotValuedParameter(nameof(containerName),
+            Resources.AnyStore_MissingContainerName);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return await ExecuteSqlInsertExclusiveCommandAsync(containerName, wheres, entity.ToTableEntity(),
+            cancellationToken);
+    }
 }
 
 internal static class SqlServerQueryBuilderExtensions

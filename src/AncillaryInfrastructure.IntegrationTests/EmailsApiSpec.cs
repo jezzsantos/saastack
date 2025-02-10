@@ -311,7 +311,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchEmailDeliveriesWithTagsForAllOrganizations_TheReturnsEmails()
+    public async Task WhenSearchEmailDeliveriesWithTagsForAllOrganizations_ThenReturnsEmails()
     {
         _emailDeliveryService.SendingSucceeds = true;
         var request = new SendEmailRequest
@@ -354,7 +354,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchEmailDeliveriesForAnOrganization_TheReturnsEmails()
+    public async Task WhenSearchEmailDeliveriesForAnOrganization_ThenReturnsEmails()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
         _emailDeliveryService.SendingSucceeds = true;

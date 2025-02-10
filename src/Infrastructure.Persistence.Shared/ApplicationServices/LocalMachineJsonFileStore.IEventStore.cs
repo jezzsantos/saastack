@@ -27,11 +27,11 @@ partial class LocalMachineJsonFileStore : IEventStore
         var latestStoredEventVersion = latestStoredEvent.HasValue
             ? latestStoredEvent.Value.Version.ToOptional()
             : Optional<int>.None;
-        var concurrencyCheck =
-            this.VerifyConcurrencyCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
-        if (concurrencyCheck.IsFailure)
+        var @checked =
+            this.VerifyContiguousCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
+        if (@checked.IsFailure)
         {
-            return concurrencyCheck.Error;
+            return @checked.Error;
         }
 
         foreach (var @event in events)
@@ -39,7 +39,20 @@ partial class LocalMachineJsonFileStore : IEventStore
             var entity = CommandEntity.FromDto(@event.ToTabulated(entityName, streamName));
 
             var container = EnsureContainer(GetEventStoreContainerPath(entityName, entityId));
-            await container.WriteAsync(entity.Id, entity.ToFileProperties(), cancellationToken);
+            var version = @event.Version;
+            var filename = $"version_{version:D3}";
+            var added = await container.WriteExclusiveAsync(filename, entity.ToFileProperties(), cancellationToken);
+            if (added.IsFailure)
+            {
+                if (added.Error.Is(ErrorCode.EntityExists))
+                {
+                    return Error.EntityExists(
+                        Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
+                            streamName, version));
+                }
+
+                return added.Error;
+            }
         }
 
         return streamName;

@@ -30,7 +30,7 @@ partial class AzureSqlServerStore : IEventStore
         var latestStoredEventVersion = latest.Value.HasValue
             ? latest.Value.Value.Version.ToOptional()
             : Optional<int>.None;
-        var @checked = this.VerifyConcurrencyCheck(streamName, latestStoredEventVersion, events.First().Version);
+        var @checked = this.VerifyContiguousCheck(streamName, latestStoredEventVersion, events.First().Version);
         if (@checked.IsFailure)
         {
             return @checked.Error;
@@ -38,10 +38,23 @@ partial class AzureSqlServerStore : IEventStore
 
         foreach (var @event in events)
         {
-            var added = await AddAsync(DetermineEventStoreContainerName(),
+            var version = @event.Version;
+            var wheres = new Dictionary<string, object>
+            {
+                { nameof(EventStoreEntity.Version), version },
+                { nameof(EventStoreEntity.StreamName), streamName }
+            };
+            var added = await AddExclusiveAsync(DetermineEventStoreContainerName(), wheres,
                 CommandEntity.FromDto(@event.ToTabulated(entityName, streamName)), cancellationToken);
             if (added.IsFailure)
             {
+                if (added.Error.Is(ErrorCode.EntityExists))
+                {
+                    return Error.EntityExists(
+                        Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
+                            streamName, version));
+                }
+
                 return added.Error;
             }
         }

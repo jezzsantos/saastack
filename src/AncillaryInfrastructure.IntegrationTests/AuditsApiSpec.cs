@@ -67,7 +67,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchAuditsForAllOrganizations_TheReturnsAudits()
+    public async Task WhenSearchAuditsForAllOrganizations_ThenReturnsAudits()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
 
@@ -99,7 +99,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenSearchAuditsForAnOrganization_TheReturnsAudits()
+    public async Task WhenSearchAuditsForAnOrganization_ThenReturnsAudits()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
         var tenantId = login.DefaultOrganizationId;

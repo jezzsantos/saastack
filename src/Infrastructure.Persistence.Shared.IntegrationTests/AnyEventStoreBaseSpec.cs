@@ -4,12 +4,12 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using FluentAssertions;
-using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using UnitTesting.Common;
 using UnitTesting.Common.Validation;
 using Xunit;
+using Resources = Infrastructure.Persistence.Common.Resources;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests;
@@ -154,7 +154,7 @@ public abstract class AnyEventStoreBaseSpec
     }
 
     [Fact]
-    public async Task WhenAddEvents_ThenEventsAdded()
+    public async Task WhenAddEventsWithFirstEvent_ThenEventsAdded()
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
@@ -166,6 +166,27 @@ public abstract class AnyEventStoreBaseSpec
 
         result.Value.Count.Should().Be(1);
         result.Value.Last().Id.Should().Be("anid_v1");
+    }
+
+    [Fact]
+    public async Task WhenAddEventsAtSameTime_ThenReturnsConcurrencyError()
+    {
+        var entityId = GetNextEntityId();
+        var sameEvent = CreateEvent(1);
+        var add1 = _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
+            [sameEvent], CancellationToken.None);
+        var add2 = _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
+            [sameEvent], CancellationToken.None);
+        var add3 = _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
+            [sameEvent], CancellationToken.None);
+
+        var result = await Task.WhenAll(add1, add2, add3);
+
+        result.Length.Should().Be(3);
+        result.Count(x => x.IsSuccessful).Should().Be(1);
+        result.Count(x => x is { IsFailure: true, Error.Code: ErrorCode.EntityExists } && x.Error.Message ==
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
+                .Format($"testentities_{entityId}", 1)).Should().Be(2);
     }
 
     [Fact]
@@ -213,7 +234,7 @@ public abstract class AnyEventStoreBaseSpec
 
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
             [CreateEvent(10)], CancellationToken.None);
-        
+
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(
                 $"testentities_{entityId}", 4, 10));
