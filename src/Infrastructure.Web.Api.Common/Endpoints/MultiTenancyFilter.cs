@@ -9,11 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructure.Web.Api.Common.Endpoints;
 
 /// <summary>
-///     Provides a request filter that rewrites the tenant ID into the request parameter
+///     Provides a request filter that rewrites the tenant ID into the current request DTO
 ///     of the current <see cref="RequestDelegate" /> of the current EndPoint, if it is either:
 ///     1. a <see cref="ITenantedRequest" />
 ///     2. a <see cref="IUnTenantedOrganizationRequest" />
-///     but no rewrite for an untenanted request
+///     There is no rewrite for any untenanted request
 /// </summary>
 public class MultiTenancyFilter : IEndpointFilter
 {
@@ -38,8 +38,8 @@ public class MultiTenancyFilter : IEndpointFilter
     )
     {
         await Task.CompletedTask;
-        var requestDto = GetRequestDtoFromEndpoint(filterContext);
-        if (!requestDto.HasValue)
+        var requestDto = filterContext.GetRequestDto();
+        if (requestDto.NotExists())
         {
             return Result.Ok;
         }
@@ -50,7 +50,7 @@ public class MultiTenancyFilter : IEndpointFilter
             return Result.Ok;
         }
 
-        if (requestDto.Value is ITenantedRequest tenantedRequest)
+        if (requestDto is ITenantedRequest tenantedRequest)
         {
             if (tenantedRequest.OrganizationId.HasNoValue())
             {
@@ -58,7 +58,7 @@ public class MultiTenancyFilter : IEndpointFilter
             }
         }
 
-        if (requestDto.Value is IUnTenantedOrganizationRequest unTenantedOrganizationRequest)
+        if (requestDto is IUnTenantedOrganizationRequest unTenantedOrganizationRequest)
         {
             if (unTenantedOrganizationRequest.Id.HasNoValue())
             {
@@ -67,22 +67,5 @@ public class MultiTenancyFilter : IEndpointFilter
         }
 
         return Result.Ok;
-    }
-
-    private static Optional<IWebRequest> GetRequestDtoFromEndpoint(EndpointFilterInvocationContext filterContext)
-    {
-        var requestHandlerParameters = filterContext.Arguments;
-        if (requestHandlerParameters.Count != 2)
-        {
-            return Optional<IWebRequest>.None;
-        }
-
-        var requestDto = filterContext.Arguments[1];
-        if (requestDto is IWebRequest webRequest)
-        {
-            return webRequest.ToOptional();
-        }
-
-        return Optional<IWebRequest>.None;
     }
 }
