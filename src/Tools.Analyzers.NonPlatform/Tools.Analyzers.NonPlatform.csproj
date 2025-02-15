@@ -336,6 +336,10 @@
         <_TargetFramework>$(RoslynTargetFramework)</_TargetFramework>
         <_AspNetFrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\$(_TargetFramework)</_AspNetFrameworkInstallFolder>
         <_FrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.NETCore.App\$(_TargetFramework)</_FrameworkInstallFolder>
+    <!-- on Mac or Linux the paths might look something like this 
+        <_AspNetFrameworkInstallFolder>/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/$(_TargetFramework)</_AspNetFrameworkInstallFolder>
+        <_FrameworkInstallFolder>/usr/local/share/dotnet/shared/Microsoft.NETCore.App/$(_TargetFramework)</_FrameworkInstallFolder>
+    -->
     </PropertyGroup>
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
