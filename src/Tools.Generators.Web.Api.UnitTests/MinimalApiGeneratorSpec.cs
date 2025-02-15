@@ -6,12 +6,12 @@ using Generators::JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using MinimalApiMediatRGenerator = Generators::Tools.Generators.Web.Api.MinimalApiMediatRGenerator;
+using MinimalApiGenerator = Generators::Tools.Generators.Web.Api.MinimalApiGenerator;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 
 [UsedImplicitly]
-public class MinimalApiMediatRGeneratorSpec
+public class MinimalApiGeneratorSpec
 {
     private static readonly string[]
         AdditionalCompilationAssemblies =
@@ -26,7 +26,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         var references = new List<MetadataReference>
         {
-            MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(MinimalApiGenerator).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
         };
         AdditionalCompilationAssemblies.ToList()
@@ -49,7 +49,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         public GivenAServiceClass()
         {
-            var generator = new MinimalApiMediatRGenerator();
+            var generator = new MinimalApiGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 
@@ -150,8 +150,19 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        await Task.CompletedTask;
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = api.AMethod(request);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -163,23 +174,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            await Task.CompletedTask;
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -234,8 +230,18 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -247,22 +253,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -319,8 +311,18 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -332,22 +334,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -405,8 +393,18 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -419,24 +417,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                #if TESTINGONLY
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-                #endif
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -493,9 +475,19 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
                                 .RequireAuthorization("HMAC")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -507,22 +499,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -579,9 +557,19 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
                                 .RequireAuthorization("Token")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -593,22 +581,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -665,30 +639,26 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var api = new global::ANamespace.AServiceClass();
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
                                 .RequireAuthorization("PrivateInterHost")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .ExcludeFromDescription();
                 
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var api = new global::ANamespace.AServiceClass();
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
+                
+                
                 """);
         }
 
@@ -755,8 +725,20 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                {
+                                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+                
+                                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                    {
+                                        var callerFactory = services.GetRequiredService<<global namespace>.ICallerContextFactory>();
+                
+                                        var api = new global::ANamespace.AServiceClass(callerFactory);
+                                        var result = await api.AMethod(request, cancellationToken);
+                                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                    }
+                                })
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -768,31 +750,8 @@ public class MinimalApiMediatRGeneratorSpec
                         }
                     }
                 }
-
-                namespace ANamespace.AServiceClassMediatRHandlers
-                {
-                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                    {
-                        private readonly global::System.IServiceProvider _serviceProvider;
                 
-                        public AMethod_ARequest_Handler(global::System.IServiceProvider serviceProvider)
-                        {
-                            _serviceProvider = serviceProvider;
-                        }
                 
-                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                        {
-                            var callerFactory = _serviceProvider.GetRequiredService<<global namespace>.ICallerContextFactory>();
-                
-                            var api = new global::ANamespace.AServiceClass(callerFactory);
-                            var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                        }
-                    }
-
-                }
-
-
                 """);
         }
 
@@ -852,10 +811,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+                   
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.PaidTrial.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Operations.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .WithOpenApi(op =>
                                        {
                                            op.OperationId = "A";
@@ -868,24 +837,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                   #if TESTINGONLY
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                           }
-                       }
-                   #endif
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -944,10 +897,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .WithOpenApi(op =>
                                        {
                                            op.OperationId = "A";
@@ -960,24 +923,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                   #if TESTINGONLY
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                           }
-                       }
-                   #endif
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1037,10 +984,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter>();
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .WithOpenApi(op =>
                                        {
                                            op.OperationId = "A";
@@ -1052,22 +1009,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                           }
-                       }
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1125,10 +1068,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPost("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1141,22 +1094,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
-                           }
-                       }
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1214,10 +1153,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPut("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1227,10 +1176,20 @@ public class MinimalApiMediatRGeneratorSpec
                                            return op;
                                        });
                                aserviceclassGroup.MapPatch("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1243,22 +1202,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
-                           }
-                       }
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1316,10 +1261,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPost("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1332,22 +1287,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
-                           }
-                       }
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1405,10 +1346,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPut("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1418,10 +1369,20 @@ public class MinimalApiMediatRGeneratorSpec
                                            return op;
                                        });
                                aserviceclassGroup.MapPatch("aroute",
-                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .DisableAntiforgery()
                                    .WithOpenApi(op =>
                                        {
@@ -1434,22 +1395,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
-                           }
-                       }
-
-                   }
-
-
+                   
+                   
                    """);
         }
 
@@ -1509,10 +1456,20 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   {
+                                       return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                                       static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                                       {
+                                           var api = new global::ANamespace.AServiceClass();
+                                           var result = await api.AMethod(request, cancellationToken);
+                                           return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                                       }
+                                   })
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
+                                   .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<ANamespace.ARequest>>()
                                    .WithOpenApi(op =>
                                        {
                                            op.OperationId = "A";
@@ -1525,24 +1482,8 @@ public class MinimalApiMediatRGeneratorSpec
                            }
                        }
                    }
-
-                   namespace ANamespace.AServiceClassMediatRHandlers
-                   {
-                   #if TESTINGONLY
-                       public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
-                       {
-                           public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
-                           {
-                               var api = new global::ANamespace.AServiceClass();
-                               var result = await api.AMethod(request, cancellationToken);
-                               return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
-                           }
-                       }
-                   #endif
-
-                   }
-
-
+                   
+                   
                    """);
         }
 

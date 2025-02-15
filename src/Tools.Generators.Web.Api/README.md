@@ -2,7 +2,7 @@
 
 This source generator project is meant to be included by every API Project for every module/subdomain.
 
-It's job is to convert any `IWebApiService` class definitions (found in the assembly) into Minimal API registrations and MediatR handlers.
+Its job is to convert any `IWebApiService` class definitions (found in the assembly) into Minimal API registrations.
 
 # Development Workarounds
 

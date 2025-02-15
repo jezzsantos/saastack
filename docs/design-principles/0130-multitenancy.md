@@ -175,7 +175,7 @@ This means that at runtime, there will always be some services that are tenant s
 
 One last point about dependency injection and multi-tenancy that is quite important:
 
-* The MediatR handlers that are used in the API layer to relay requests to the Application Layer are required to be registered in the container as either "transient" or "scoped". This is important, so that when ever a "scoped" dependency is resolved in the handler, it is resolved in the same "scope" of the HTTP request.
+* The dependencies that are used in the API layer to relay requests to the Application Layer are required to be registered in the container as either "transient" or "scoped". This is important, so that when ever a "scoped" dependency is resolved in the handler, it is resolved in the same "scope" of the HTTP request.
 
 (see [Dependency Injection](0060-dependency-injection.md) for more details)
 

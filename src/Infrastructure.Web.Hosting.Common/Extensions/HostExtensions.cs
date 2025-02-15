@@ -264,7 +264,7 @@ public static class HostExtensions
                         builder.RequireAuthenticatedUser();
                     });
                 });
-                
+
                 var configuration = appBuilder.Configuration;
                 authBuilder.AddJwtBearer(jwtOptions =>
                 {
@@ -318,16 +318,7 @@ public static class HostExtensions
         {
             services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
             services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
-            services.RegisterValidators(modules.ApiAssemblies, out var validators);
-
-            services.AddMediatR(configuration =>
-            {
-                // Note: Here we want to register MediatR handlers in Transient lifetime, so that any services resolved within the handlers
-                //can be singletons, scoped, or transient (and use the same scope the handler is resolved in).
-                configuration.Lifetime = ServiceLifetime.Transient;
-                configuration.RegisterServicesFromAssemblies(modules.ApiAssemblies.ToArray())
-                    .AddValidatorBehaviors(validators, modules.ApiAssemblies);
-            });
+            services.RegisterFluentValidators(modules.ApiAssemblies);
         }
 
         void RegisterApiDocumentation(string name, string version, bool usesApiDocumentation)

@@ -25,7 +25,6 @@
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
         <PackageReference Include="AutoMapper" Version="10.0.0" GeneratePathProperty="true" PrivateAssets="all" />
-        <PackageReference Include="MediatR.Contracts" Version="2.0.1" GeneratePathProperty="true" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
@@ -341,7 +340,6 @@
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
             <!-- We have to manually identify the assemblies here to include in this package. These will certainly change over time -->
-            <TargetPathWithTargetPlatformMoniker Include="$(PKGMediatR_Contracts)\lib\netstandard2.0\MediatR.Contracts.dll" IncludeRuntimeDependency="false" />
             <TargetPathWithTargetPlatformMoniker Include="$(PKGAutoMapper)\lib\netstandard2.0\AutoMapper.dll" IncludeRuntimeDependency="false" />
             <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Tools.Analyzers.Common.dll" IncludeRuntimeDependency="false" />
             <!-- HACK: until we can find a better way to reference these assemblies -->

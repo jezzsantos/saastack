@@ -5,18 +5,17 @@
 1. We want to leverage standard-supported Microsoft ASP.NET web infrastructure (that is well known across the developer community), rather than learning another web framework (like ServiceStack.net - as brilliant as it is).
    - We are choosing ASP.NET Minimal API's over ASP.NET Controllers.
 2. We want to deal with Request and Responses that are related and organized into one layer in the code. We favor the [REPR design pattern](https://deviq.com/design-patterns/repr-design-pattern).
-   - We are choosing to use MediatR to relate the requests responses and the endpoints into handlers
+   - We are choosing to use code generate the minimal API handlers that relate the requests responses and the endpoints
 3. Minimal API examples (that you learn from) are simple to get started with but difficult to organize and maintain in larger codebases, especially when we are separating concerns into different layers.
-   - We are seeking patterns that allow us to separate concerns and slit them into de-coupled layers
+   - We are seeking patterns that allow us to separate concerns and slit them into de-coupled layers that are testable and better organized.
 
 4. Web APIs are most often related to subdomains (and/or audiences) and typically grouped together for easier organization. We want a design that is easier to define and organize the API into pluggable modules.
    - We are choosing to encapsulate all web host configurations into one place for reuse across one or more web hosts.
    - We are choosing to implement a pluggable module pattern, (with host reusable host configuration) that makes moving and grouping multiple subdomains of APIs between web hosts easy
-   - We are choosing to support a bespoke pattern for aggregating related APIs into a single class, to simplify declarative syntaxes. We are choosing to use source generators to convert this code into Mediatr handlers
+   - We are choosing to support a bespoke pattern for aggregating related APIs into a single class, to simplify declarative syntaxes. We are choosing to use source generators to convert this code into Minimal APIs
 5. We want simple cross-cutting concerns like validation, authentication, rate-limiting, etc. to be easily applied at the module level, or at individual endpoint level.
-   - We are choosing to use FluentValidation + MediatR to wire-up and automatically validate all requests (where a validator is provided by the author)
-6. We want all aspects of the web API to be testable.
-   - We are choosing to use MediatR to support dependency injection into handlers
+   - We are choosing to use FluentValidation to wire-up and automatically validate all requests (where a validator is provided by the author)
+6. We want all aspects of the web API to be unit testable.
 7. We want to support `async` to offer the option to optimize IO-heavy request workloads further down the stack.
    - All API declarations will be `async` by default
 8. We are striving to establish simple-to-understand patterns for the API author while using essential 3rd party libraries, but at the same time, limit the number of dependencies on 3rd party libraries.
@@ -96,7 +95,7 @@ public class GetCarRequest : WebRequest<GetCarRequest, GetCarResponse>
 }
 ```
 
-AND, we prefer NOT to have to create MediatR class like this, for every single one of those methods.
+AND, we prefer NOT to have to use libraries like MediatR to make things more testable, with handlers, like these, for every single one of those methods.
 
 ```c#
     public class GetCarRequestHandler : IRequestHandler<GetCarRequest, IResult>
@@ -117,22 +116,40 @@ AND, we prefer NOT to have to create MediatR class like this, for every single o
     }
 ```
 
-AND have to register the minimal API's like this:
+AND have to register the minimal API's generated for us like this:
 
 ```c#
-            carsGroup.MapGet("/cars/{Id}",
-                async (IMediator mediator, [AsParameters] GetCarRequest request) =>
-                     await mediator.Send(request, CancellationToken.None))
-                .AddEndpointFilter<FilterA>()
-                .AddEndpointFilter<FilterB>();;
+            carsapiGroup.MapPut("/cars/{Id}/maintain",
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.Cars.ScheduleMaintenanceCarRequest request) =>
+                {
+                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::Infrastructure.Web.Api.Operations.Shared.Cars.ScheduleMaintenanceCarRequest request, global::System.Threading.CancellationToken cancellationToken)
+                    {
+                        var callerFactory = services.GetRequiredService<Infrastructure.Interfaces.ICallerContextFactory>();
+                        var carsApplication = services.GetRequiredService<CarsApplication.ICarsApplication>();
+
+                        var api = new global::CarsInfrastructure.Api.Cars.CarsApi(callerFactory, carsApplication);
+                        var result = await api.ScheduleMaintenance(request, cancellationToken);
+                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+                    }
+                })
+                .RequireAuthorization("Token")
+                .RequireCallerAuthorization("POLICY:{|Features|:{|Tenant|:[|tenant_paidtrial_features|]},|Roles|:{|Tenant|:[|tenant_member|]}}")
+                .WithOpenApi(op =>
+                    {
+                        op.OperationId = "ScheduleMaintenanceCar (Put)";
+                        op.Description = "(request type: ScheduleMaintenanceCarRequest)";
+                        op.Responses.Clear();
+                        return op;
+                    });
 ```
 
 since all the code above, is:
 
-1. Is very boilerplate, tedious to type out for every endpoint, and can easily lead to typos
-2. It repeats the same things in every handler class (like the constructor and fields)
-3. There is no design-time binding between the minimal API route registration and the MediatR handler to make sure they are properly bound when things change
-4. You need to maintain 2 pieces of code together when you make changes, otherwise the API just stops responding!
+1. Is very boilerplate and predictable, with no variance.
+2. It is very tedious for humans to type out for every endpoint, and can easily lead to typos and human error.
+3. You need to maintain 2 pieces of code together when you make changes, otherwise the API just stops responding without compiler checking.
 
 ## Implementation
 
@@ -209,10 +226,10 @@ public static class HostedModules
 
 ### Declaring APIs
 
-* We are establishing our own authoring patterns built on top of ASP.NET Minimal API, using MediatR handlers, that make it easier to declare and organize endpoints into groups within subdomains.
+* We are establishing our own authoring patterns built on top of ASP.NET Minimal API, that make it easier to declare and organize endpoints into groups within subdomains.
 * We are then leveraging FluentValidation for request validation.
 * We are integrating standard ASP.NET services like Authentication and Authorization.
-* We are adding additional `IEndpointFilter` (and MediatR `IPipelineBehavior`) to provide the request and responses we desire.
+* We are adding additional `IEndpointFilter` to provide the request and responses we desire.
 
 The design of Minimal APIs makes developing 10s or 100s of them in a single project quite unwieldy to manage well.
 
@@ -597,4 +614,4 @@ TBD
 ### Credits
 
 * The implementation of the [REPR design pattern](https://deviq.com/design-patterns/repr-design-pattern) used here was heavily influenced by the REPR design in [ServiceStack](http://www.servicestack.net), due its declarative and explicit nature, the benefits of typed clients, and its testability aspects.
-* Some of the implementation patterns (based on MediatR) were inspired by content created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)
+* Some of the considered patterns (based on MediatR) were inspired by content created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)

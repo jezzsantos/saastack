@@ -19,10 +19,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="MediatR" Version="12.2.0" />
-    </ItemGroup>
-
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
         <ProjectReference Include="..\Tools.Generators.Web.Api.Authorization\Tools.Generators.Web.Api.Authorization.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

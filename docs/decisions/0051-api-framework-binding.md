@@ -2,7 +2,7 @@
 
 * status: proposed
 
-* date: 2024-08-11
+* date: 2025-02-15
 * deciders: jezzsantos
 
 # Context and Problem Statement
@@ -10,9 +10,21 @@
 We are using minimal APIs, and we are defining all request handlers in this form:
 
 ```c#
-apiGroup.MapPut("/cars/{Id}/maintain",
-                async (IMediator mediator, ARequest request) =>
-                     await mediator.Send(request, CancellationToken.None))
+apiGroup.MapPut("/resources/{Id}/action",
+    async (global::System.IServiceProvider serviceProvider, ARequest request) =>
+    {
+        return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+        static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, ARequest request, global::System.Threading.CancellationToken cancellationToken)
+        {
+            var callerFactory = services.GetRequiredService<Infrastructure.Interfaces.ICallerContextFactory>();
+            var anApplication = services.GetRequiredService<IAnApplication>();
+
+            var api = new AnApi(callerFactory, anApplication);
+            var result = await api.AUseCase(request, cancellationToken);
+            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.PutPatch);
+        }
+    })
 ```
 
 Where `ARequest` could look like this:

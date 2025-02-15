@@ -12,12 +12,12 @@ namespace Tools.Generators.Web.Api;
 
 /// <summary>
 ///     A source generator for converting any <see cref="IWebApiService" /> classes to
-///     Minimal API registrations and MediatR handlers
+///     Minimal API registrations
 /// </summary>
 [Generator]
-public class MinimalApiMediatRGenerator : ISourceGenerator
+public class MinimalApiGenerator : ISourceGenerator
 {
-    private const string Filename = "MinimalApiMediatRGeneratedHandlers.g.cs";
+    private const string Filename = "MinimalApiGeneratedHandlers.g.cs";
     private const string RegistrationClassName = "MinimalApiRegistration";
     private const string TestingOnlyDirective = "TESTINGONLY";
 
@@ -40,8 +40,6 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
         var endpointRegistrations = new StringBuilder();
         foreach (var serviceRegistrations in serviceClasses)
         {
-            BuildHandlerClasses(serviceRegistrations, handlerClasses);
-
             BuildEndpointRegistrations(serviceRegistrations, endpointRegistrations);
         }
 
@@ -122,17 +120,18 @@ namespace {assemblyNamespace}
             foreach (var routeEndpointMethod in routeEndpointMethods)
             {
                 var endPointMethodName = $"Map{routeEndpointMethod}";
+                var methodBody = BuildHandlerBody(registration);
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
                 endpointRegistrations.AppendLine(registration.OperationMethod.CanHaveBody()
-                    ? $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDto.FullName} request) =>"
-                    : $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
+                    ? $"                async (global::System.IServiceProvider serviceProvider, global::{registration.RequestDto.FullName} request) =>"
+                    : $"                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
 
-                endpointRegistrations.Append(
-                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None))");
+                endpointRegistrations.AppendLine(
+                    $"                {methodBody})");
+
                 if (registration.OperationAccess != AccessType.Anonymous)
                 {
-                    endpointRegistrations.AppendLine();
                     var policyName = registration.OperationAccess switch
                     {
                         AccessType.Token => AuthenticationConstants.Authorization.TokenPolicyName,
@@ -142,7 +141,7 @@ namespace {assemblyNamespace}
                     };
                     if (policyName.HasValue())
                     {
-                        endpointRegistrations.Append(
+                        endpointRegistrations.AppendLine(
                             $@"                .RequireAuthorization(""{policyName}"")");
                     }
                 }
@@ -150,20 +149,19 @@ namespace {assemblyNamespace}
                 if (registration.OperationAuthorization is not null)
                 {
                     var policyName = registration.OperationAuthorization.PolicyName;
-                    endpointRegistrations.AppendLine();
-                    endpointRegistrations.Append(
+                    endpointRegistrations.AppendLine(
                         $@"                .RequireCallerAuthorization(""{policyName}"")");
                 }
+
+                endpointRegistrations.AppendLine(
+                    $"                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<{registration.RequestDto.FullName}>>()");
 
                 if (registration.IsMultipartFormData
                     || registration.IsFormUrlEncoded)
                 {
-                    endpointRegistrations.AppendLine();
-                    endpointRegistrations.Append(
+                    endpointRegistrations.AppendLine(
                         @"                .DisableAntiforgery()");
                 }
-
-                endpointRegistrations.AppendLine();
 
                 if (registration.OperationAccess == AccessType.PrivateInterHost)
                 {
@@ -258,103 +256,57 @@ namespace {assemblyNamespace}
         return builder.ToString();
     }
 
-    private static void BuildHandlerClasses(
-        IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>
-            serviceRegistrations, StringBuilder handlerClasses)
+    private static string BuildHandlerBody(WebApiAssemblyVisitor.ServiceOperationRegistration registration)
     {
-        var serviceClassNamespace = $"{serviceRegistrations.Key.FullName}MediatRHandlers";
-        handlerClasses.AppendLine($"namespace {serviceClassNamespace}");
-        handlerClasses.AppendLine("{");
+        var handlerMethod = new StringBuilder();
+        handlerMethod.AppendLine("{");
+        handlerMethod.AppendLine(
+            "                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);");
+        handlerMethod.AppendLine();
+        handlerMethod.AppendLine(
+            $"                    static async Task<global::Microsoft.AspNetCore.Http.IResult>"
+            + $" Handle(global::System.IServiceProvider services, "
+            + $"global::{registration.RequestDto.FullName} request, "
+            + $"global::System.Threading.CancellationToken cancellationToken)");
+        handlerMethod.AppendLine("                    {");
 
-        foreach (var registration in serviceRegistrations)
+        if (!registration.IsAsync)
         {
-            var handlerClassName = $"{registration.MethodName}_{registration.RequestDto.Name}_Handler";
-            var constructorAndFields = BuildInjectorConstructorAndFields(handlerClassName,
-                registration.Class.Constructors.ToList());
-
-            if (registration.IsTestingOnly)
-            {
-                handlerClasses.AppendLine($"#if {TestingOnlyDirective}");
-            }
-
-            handlerClasses.AppendLine(
-                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDto.FullName},"
-                + $" global::Microsoft.AspNetCore.Http.IResult>");
-            handlerClasses.AppendLine("    {");
-            if (constructorAndFields.HasValue())
-            {
-                handlerClasses.AppendLine(constructorAndFields);
-            }
-
-            handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>"
-                                      + $" Handle(global::{registration.RequestDto.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
-            handlerClasses.AppendLine("        {");
-            if (!registration.IsAsync)
-            {
-                handlerClasses.AppendLine(
-                    "            await Task.CompletedTask;");
-            }
-
-            var callingParameters = string.Empty;
-            var injectorCtor = registration.Class.Constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
-            if (injectorCtor is not null)
-            {
-                var parameters = injectorCtor.CtorParameters.ToList();
-                foreach (var param in parameters)
-                {
-                    handlerClasses.AppendLine(
-                        $"            var {param.VariableName} = _serviceProvider.GetRequiredService<{param.TypeName.FullName}>();");
-                }
-
-                handlerClasses.AppendLine();
-                callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
-            }
-
-            handlerClasses.AppendLine(
-                $"            var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
-            var asyncAwait = registration.IsAsync
-                ? "await "
-                : string.Empty;
-            var hasCancellationToken = registration.HasCancellationToken
-                ? ", cancellationToken"
-                : string.Empty;
-            handlerClasses.AppendLine(
-                $"            var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
-            handlerClasses.AppendLine(
-                $"            return result.HandleApiResult(global::{typeof(OperationMethod).FullName}.{registration.OperationMethod});");
-            handlerClasses.AppendLine("        }");
-            handlerClasses.AppendLine("    }");
-            if (registration.IsTestingOnly)
-            {
-                handlerClasses.AppendLine("#endif");
-            }
-
-            handlerClasses.AppendLine();
+            handlerMethod.AppendLine(
+                "                        await Task.CompletedTask;");
         }
 
-        handlerClasses.AppendLine("}");
-        handlerClasses.AppendLine();
-    }
-
-    private static string BuildInjectorConstructorAndFields(string handlerClassName,
-        List<WebApiAssemblyVisitor.Constructor> constructors)
-    {
-        var handlerClassConstructorAndFields = new StringBuilder();
-
-        var injectorCtor = constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
+        var callingParameters = string.Empty;
+        var injectorCtor = registration.Class.Constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
         if (injectorCtor is not null)
         {
-            handlerClassConstructorAndFields.AppendLine(
-                "        private readonly global::System.IServiceProvider _serviceProvider;");
-            handlerClassConstructorAndFields.AppendLine();
-            handlerClassConstructorAndFields.AppendLine(
-                $"        public {handlerClassName}(global::System.IServiceProvider serviceProvider)");
-            handlerClassConstructorAndFields.AppendLine("        {");
-            handlerClassConstructorAndFields.AppendLine("            _serviceProvider = serviceProvider;");
-            handlerClassConstructorAndFields.AppendLine("        }");
+            var parameters = injectorCtor.CtorParameters.ToList();
+            foreach (var param in parameters)
+            {
+                handlerMethod.AppendLine(
+                    $"                        var {param.VariableName} = services.GetRequiredService<{param.TypeName.FullName}>();");
+            }
+
+            handlerMethod.AppendLine();
+            callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
         }
 
-        return handlerClassConstructorAndFields.ToString();
+        handlerMethod.AppendLine(
+            $"                        var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
+        var asyncAwait = registration.IsAsync
+            ? "await "
+            : string.Empty;
+        var hasCancellationToken = registration.HasCancellationToken
+            ? ", cancellationToken"
+            : string.Empty;
+        handlerMethod.AppendLine(
+            $"                        var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
+        handlerMethod.AppendLine(
+            $"                        return result.HandleApiResult(global::{typeof(OperationMethod).FullName}.{registration.OperationMethod});");
+        handlerMethod.AppendLine("                    }");
+        handlerMethod.Append("                }");
+
+        return handlerMethod.ToString();
     }
 
     private static string BuildInjectedParameters(List<WebApiAssemblyVisitor.Constructor> constructors)

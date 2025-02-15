@@ -24,7 +24,7 @@ namespace Tools.Generators.Web.Api;
 public class WebApiAssemblyVisitor : SymbolVisitor
 {
     internal static readonly string[] IgnoredNamespaces =
-        ["System", "Microsoft", "MediatR", "MessagePack", "NerdBank*"];
+        ["System", "Microsoft", "MessagePack", "NerdBank*"];
     private readonly INamedTypeSymbol _authorizeAttributeFeaturesSymbol;
     private readonly INamedTypeSymbol _authorizeAttributeRolesSymbol;
     private readonly INamedTypeSymbol _authorizeAttributeSymbol;

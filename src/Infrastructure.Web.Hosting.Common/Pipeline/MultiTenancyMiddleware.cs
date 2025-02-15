@@ -1,4 +1,3 @@
-using System.Reflection;
 using Application.Interfaces;
 using Application.Interfaces.Extensions;
 using Application.Resources.Shared;
@@ -8,6 +7,7 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Infrastructure.Interfaces;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -56,8 +56,10 @@ public class MultiTenancyMiddleware
         ITenancyContext tenancyContext, ITenantDetective tenantDetective, IEndUsersService endUsersService,
         IOrganizationsService organizationsService, CancellationToken cancellationToken)
     {
-        var requestDtoType = GetRequestDtoType(httpContext);
-        var detected = await tenantDetective.DetectTenantAsync(httpContext, requestDtoType, cancellationToken);
+        var requestDtoType = httpContext.GetRequestDtoType();
+        var detected = await tenantDetective.DetectTenantAsync(httpContext, requestDtoType.Exists()
+            ? requestDtoType
+            : Optional<Type>.None, cancellationToken);
         if (detected.IsFailure)
         {
             return detected.Error;
@@ -185,35 +187,6 @@ public class MultiTenancyMiddleware
         tenancyContext.Set(tenantId, settings.Value);
 
         return Result.Ok;
-    }
-
-    private static Optional<Type> GetRequestDtoType(HttpContext httpContext)
-    {
-        var endpoint = httpContext.GetEndpoint();
-        if (endpoint.NotExists())
-        {
-            return Optional<Type>.None;
-        }
-
-        var method = endpoint.Metadata.GetMetadata<MethodInfo>();
-        if (method.NotExists())
-        {
-            return Optional<Type>.None;
-        }
-
-        var args = method.GetParameters();
-        if (args.Length < 2)
-        {
-            return Optional<Type>.None;
-        }
-
-        var requestDtoType = args[1].ParameterType;
-        if (!requestDtoType.IsAssignableTo(typeof(IWebRequest)))
-        {
-            return Optional<Type>.None;
-        }
-
-        return requestDtoType;
     }
 
     private async Task<Result<List<Membership>, Error>> GetMembershipsForCallerAsync(ICallerContext caller,

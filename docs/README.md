@@ -32,7 +32,7 @@ We make extensive use Roslyn Analyzers, Code Fixes and Source Generators and Arc
 
 For more details, see the [Developer Tooling](design-principles/0140-developer-tooling.md) documentation.
 
-For example, we make it trivial to define robust REST APIs, and under the covers, the tooling converts those API definitions into MediatR-brokered minimal APIs for you. But you never have to write all that minimal API boilerplate stuff.
+For example, we make it trivial to define robust REST APIs, and under the covers, the tooling converts those API definitions into minimal APIs for you. But you never have to write all that minimal API boilerplate stuff, or worry about how it is organized in code. This is all hidden away from you, not requiring any input from you.
 
 Furthermore, we have many Roslyn analyzers that continuously check your code to make sure that you and your team do not inadvertently violate certain architectural rules and constraints that are in place to manage the complexity of the source code over time, as your product develops. It is like having continuous code review, and your own plugins that understand your code.
 
