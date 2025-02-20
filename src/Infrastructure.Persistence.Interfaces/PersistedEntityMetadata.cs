@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces.Entities;
@@ -12,10 +13,11 @@ public class PersistedEntityMetadata
 {
     private const string DefaultOrderingFieldMethodName = "DefaultOrderingField";
     private const string FieldReadMappingsMethodName = "FieldReadMappings";
-    private static readonly Dictionary<Type, string?> DefaultOrderingsCache = new();
-    private static readonly Dictionary<Type, Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>>>
+    private static readonly ConcurrentDictionary<Type, string?> DefaultOrderingsCache = new();
+    private static readonly ConcurrentDictionary<Type,
+            Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>>>
         FieldReadMappingsCache = new();
-    private static readonly Dictionary<Type, IEnumerable<PropertyInfo>> TypePropertiesCache = new();
+    private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> TypePropertiesCache = new();
     private readonly Dictionary<string, Type> _propertyTypes;
 
     internal PersistedEntityMetadata(Type? type = null, Dictionary<string, Type>? propertyTypes = null)
@@ -146,10 +148,7 @@ public class PersistedEntityMetadata
 
     private static string? FromCache(Type underlyingType, string? defaultOrdering)
     {
-        if (!DefaultOrderingsCache.ContainsKey(underlyingType))
-        {
-            DefaultOrderingsCache[underlyingType] = defaultOrdering;
-        }
+        DefaultOrderingsCache.TryAdd(underlyingType, defaultOrdering);
 
         return DefaultOrderingsCache[underlyingType];
     }
@@ -157,10 +156,7 @@ public class PersistedEntityMetadata
     private static IReadOnlyDictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>> FromCache(
         Type underlyingType, Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>> mappings)
     {
-        if (!FieldReadMappingsCache.ContainsKey(underlyingType))
-        {
-            FieldReadMappingsCache[underlyingType] = mappings;
-        }
+        FieldReadMappingsCache.TryAdd(underlyingType, mappings);
 
         return FieldReadMappingsCache[underlyingType];
     }
@@ -174,10 +170,7 @@ public class PersistedEntityMetadata
 
     private static IEnumerable<PropertyInfo> FromCache(Type type, Func<Type, PropertyInfo[]> propertyInfoFactory)
     {
-        if (!TypePropertiesCache.ContainsKey(type))
-        {
-            TypePropertiesCache[type] = propertyInfoFactory(type);
-        }
+        TypePropertiesCache.TryAdd(type, propertyInfoFactory(type));
 
         return TypePropertiesCache[type];
     }

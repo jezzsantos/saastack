@@ -5,6 +5,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using FluentAssertions;
+using JetBrains.Annotations;
 using UnitTesting.Common;
 using Xunit;
 
@@ -261,7 +262,7 @@ public class TestEntityWithMappingsEntity : IDehydratableEntity
 
     public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
 
-    // ReSharper disable once UnusedMember.Global
+    [UsedImplicitly]
     public static Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>> FieldReadMappings()
     {
         return new Dictionary<string, Func<IReadOnlyDictionary<string, object?>, object?>>
@@ -284,6 +285,7 @@ public class TestEntityWithDefaultOrderingFieldEntity : IDehydratableEntity
 
     public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
 
+    [UsedImplicitly]
     public static string DefaultOrderingField()
     {
         return "asortfield";
