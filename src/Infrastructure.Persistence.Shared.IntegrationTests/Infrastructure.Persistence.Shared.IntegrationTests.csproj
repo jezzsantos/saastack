@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.OnPremises\Infrastructure.Persistence.OnPremises.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Kurrent\Infrastructure.Persistence.Kurrent.csproj" />
         <ProjectReference Include="..\IntegrationTesting.Persistence.Common\IntegrationTesting.Persistence.Common.csproj" />
     </ItemGroup>
