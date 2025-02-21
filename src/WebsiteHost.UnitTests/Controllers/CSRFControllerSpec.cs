@@ -55,6 +55,9 @@ public class CSRFControllerSpec
         var view = (ViewResult)result;
         view.Model.Should().BeOfType<IndexSpaPage>();
         var model = view.Model.As<IndexSpaPage>();
+#if HOSTEDONPREMISES
+        model.IsHostedOn.Should().Be("ONPREMISES");
+#endif
 #if HOSTEDONAZURE
         model.IsHostedOn.Should().Be("AZURE");
 #endif

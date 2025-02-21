@@ -41,7 +41,9 @@ public abstract class CSRFController : Controller
 #else
             IsTestingOnly = false,
 #endif
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+            IsHostedOn = "ONPREMISES",
+#elif HOSTEDONAZURE
             IsHostedOn = "AZURE",
 #elif HOSTEDONAWS
             IsHostedOn = "AWS",

@@ -281,7 +281,9 @@ public sealed class HostRecorder : IRecorder, IDisposable
         {
             CrashReporterOption.None => new NoOpCrashReporter(),
             CrashReporterOption.Cloud =>
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+                new NoOpCrashReporter(),
+#elif HOSTEDONAZURE
                 new ApplicationInsightsCrashReporter(container),
 #elif HOSTEDONAWS
                 new AWSCloudWatchCrashReporter(logger),
@@ -309,7 +311,9 @@ public sealed class HostRecorder : IRecorder, IDisposable
         {
             MetricReporterOption.None => new NoOpMetricReporter(),
             MetricReporterOption.Cloud =>
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+                new NoOpMetricReporter(),
+#elif HOSTEDONAZURE
                 new ApplicationInsightsMetricReporter(container),
 #elif HOSTEDONAWS
                 new AWSCloudWatchMetricReporter(container),

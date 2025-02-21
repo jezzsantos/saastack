@@ -12,6 +12,7 @@
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
+        <ProjectReference Include="..\Infrastructure.Persistence.OnPremises\Infrastructure.Persistence.OnPremises.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONPREMISES'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
     </ItemGroup>
 

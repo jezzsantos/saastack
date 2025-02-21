@@ -72,7 +72,7 @@ public sealed partial class FlagsmithHttpServiceClient : IFeatureFlags
             },
 #if TESTINGONLY || HOSTEDONAWS
             EnableClientSideEvaluation = false,
-#elif HOSTEDONAZURE
+#elif HOSTEDONAZURE || HOSTEDONPREMISES
             EnableClientSideEvaluation = true,
 #endif
             DefaultFlagHandler = _ => new Flagsmith.Flag(new Feature(UnknownFeatureName, -1), false, null, -1)
