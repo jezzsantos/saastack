@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -23,6 +24,7 @@ public sealed class TemplateArguments : SingleValueObjectBase<TemplateArguments,
 
     public List<string> Items => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<TemplateArguments> Rehydrate()
     {
         return (property, _) =>

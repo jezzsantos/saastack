@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared.Cars;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -44,6 +45,7 @@ public sealed class CarRoot : AggregateRootBase
 
     public Unavailabilities Unavailabilities { get; } = new();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
         return (identifier, container, _) => new CarRoot(container.GetRequiredService<IRecorder>(),

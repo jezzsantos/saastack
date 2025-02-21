@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -55,6 +56,7 @@ public sealed class SmsDeliveryRoot : AggregateRootBase
 
     public List<string> Tags { get; private set; } = [];
 
+    [UsedImplicitly]
     public static AggregateRootFactory<SmsDeliveryRoot> Rehydrate()
     {
         return (identifier, container, _) => new SmsDeliveryRoot(container.GetRequiredService<IRecorder>(),

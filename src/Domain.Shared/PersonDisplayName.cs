@@ -2,6 +2,7 @@
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -23,6 +24,7 @@ public sealed class PersonDisplayName : SingleValueObjectBase<PersonDisplayName,
 
     public string Text => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<PersonDisplayName> Rehydrate()
     {
         return (property, _) => new PersonDisplayName(property);

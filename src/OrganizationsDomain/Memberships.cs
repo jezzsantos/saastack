@@ -2,6 +2,7 @@ using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace OrganizationsDomain;
 
@@ -26,6 +27,7 @@ public sealed class Memberships : SingleValueObjectBase<Memberships, List<Member
 
     public List<Membership> Members => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Memberships> Rehydrate()
     {
         return (property, container) =>

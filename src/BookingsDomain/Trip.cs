@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 using QueryAny;
 
 namespace BookingsDomain;
@@ -49,6 +50,7 @@ public sealed class Trip : EntityBase
 
     public Optional<Location> To { get; private set; }
 
+    [UsedImplicitly]
     public static EntityFactory<Trip> Rehydrate()
     {
         return (identifier, container, properties) => new Trip(identifier, container, properties);

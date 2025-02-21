@@ -5,6 +5,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 using IdentityDomain.DomainServices;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -48,6 +49,7 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
 
     public Optional<DateTime> TokenExpires { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<PasswordKeep> Rehydrate()
     {
         return (property, _) =>

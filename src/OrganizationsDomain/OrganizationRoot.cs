@@ -13,6 +13,7 @@ using Domain.Shared;
 using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
 using Domain.Shared.Subscriptions;
+using JetBrains.Annotations;
 
 namespace OrganizationsDomain;
 
@@ -66,6 +67,7 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public Settings Settings { get; private set; } = Settings.Empty;
 
+    [UsedImplicitly]
     public static AggregateRootFactory<OrganizationRoot> Rehydrate()
     {
         return (identifier, container, _) => new OrganizationRoot(container.GetRequiredService<IRecorder>(),

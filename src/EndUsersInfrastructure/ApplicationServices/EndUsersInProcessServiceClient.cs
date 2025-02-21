@@ -53,10 +53,4 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.RegisterPersonAsync(caller, invitationToken, emailAddress, firstName,
             lastName, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
     }
-
-    public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext caller, string id,
-        CancellationToken cancellationToken)
-    {
-        return await _endUsersApplication.GetUserAsync(caller, id, cancellationToken);
-    }
 }

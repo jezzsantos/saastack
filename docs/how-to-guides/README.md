@@ -11,6 +11,7 @@
 * (coming soon) [Make cross-domain calls](150-application-services.md)
 * [Handle Domain Events](090-handle-domain-events.md) raised by other subdomains
 * [Build an adapter](100-build-adapter-third-party.md) to implement an integration to a 3rd party service (over HTTP)
+* [Use multiple data stores](160-use-multiple-stores.md) to learn how to use more than one database or store in your architecture
 * (coming soon) Build a new technology adapter (i.e. database persistence)
 * [Migrating a Billing Provider](900-migrate-billing-provider.md) - how to upgrade from `SimpleBillingProvider` to another one specific to your chosen Billing Management System.
 

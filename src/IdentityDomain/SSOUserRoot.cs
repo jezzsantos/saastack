@@ -7,6 +7,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -46,6 +47,7 @@ public sealed class SSOUserRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<SSOUserRoot> Rehydrate()
     {
         return (identifier, container, _) => new SSOUserRoot(container.GetRequiredService<IRecorder>(),

@@ -4,6 +4,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -44,6 +45,7 @@ public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
 
     public SSOAuthTokenType Type { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<SSOAuthToken> Rehydrate()
     {
         return (property, _) =>

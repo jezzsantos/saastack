@@ -2,6 +2,7 @@
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -37,6 +38,7 @@ public sealed class TimeSlot : ValueObjectBase<TimeSlot>
 
     public DateTime To { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<TimeSlot> Rehydrate()
     {
         return (property, _) =>

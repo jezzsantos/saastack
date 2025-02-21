@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Common.ValueObjects;
 
@@ -22,6 +23,7 @@ public sealed class Identifier : SingleValueObjectBase<Identifier, string>
 
     public string Text => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Identifier> Rehydrate()
     {
         return (property, _) => new Identifier(property);

@@ -116,6 +116,7 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
 
     public Year Year { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Manufacturer> Rehydrate()
     {
         return (property, container) =>
@@ -171,6 +172,7 @@ public sealed class NumberPlate : SingleValueObjectBase<NumberPlate, string>
 
     public string Registration => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<NumberPlate> Rehydrate()
     {
         return (property, _) =>
@@ -273,6 +275,7 @@ public sealed class VehicleManagers : SingleValueObjectBase<VehicleManagers, Lis
 
     public IReadOnlyList<Identifier> Ids => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<VehicleManagers> Rehydrate()
     {
         return (property, _) =>

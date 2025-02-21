@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared.Subscriptions;
 
@@ -57,6 +58,7 @@ public sealed class ProviderSubscription : ValueObjectBase<ProviderSubscription>
 
     public Optional<Identifier> SubscriptionReference { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<ProviderSubscription> Rehydrate()
     {
         return (property, container) =>

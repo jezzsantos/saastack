@@ -9,6 +9,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 using QueryAny;
 
 namespace BookingsDomain;
@@ -64,6 +65,7 @@ public sealed class BookingRoot : AggregateRootBase
         return properties;
     }
 
+    [UsedImplicitly]
     public static AggregateRootFactory<BookingRoot> Rehydrate()
     {
         return (identifier, container, properties) => new BookingRoot(identifier, container, properties);

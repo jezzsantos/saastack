@@ -6,6 +6,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Validations;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -31,6 +32,7 @@ public sealed class Feature : SingleValueObjectBase<Feature, string>
 
     public string Identifier => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Feature> Rehydrate()
     {
         return (property, _) =>

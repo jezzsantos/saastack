@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared.Subscriptions;
 
@@ -50,6 +51,7 @@ public sealed class ProviderPlan : ValueObjectBase<ProviderPlan>
 
     public Optional<DateTime> TrialEndDateUtc { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<ProviderPlan> Rehydrate()
     {
         return (property, _) =>

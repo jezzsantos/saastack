@@ -1,6 +1,7 @@
 ﻿using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -38,6 +39,7 @@ public sealed class LicensePlate : ValueObjectBase<LicensePlate>
 
     public NumberPlate Number { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<LicensePlate> Rehydrate()
     {
         return (property, container) =>

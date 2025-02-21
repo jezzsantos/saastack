@@ -4,6 +4,7 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace EndUsersDomain;
 
@@ -62,6 +63,7 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 
     public string? Token { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<GuestInvitation> Rehydrate()
     {
         return (property, container) =>

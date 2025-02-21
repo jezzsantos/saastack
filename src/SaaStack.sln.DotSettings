@@ -523,6 +523,7 @@ public sealed class $name$ : EntityBase
     }
 
     // TODO: delete this method if your root aggregate is using event sourcing, instead of snapshotting 
+    [JetBrains.Annotations.UsedImplicitly]
     public static Factory&lt;$name$&gt; Rehydrate()
     {
         return (identifier, container, properties) =&gt; new $name$(identifier, container, properties);
@@ -667,6 +668,7 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
     {
     }
 
+    [JetBrains.Annotations.UsedImplicitly]
     public static ValueObjectFactory&lt;$name$&gt; Rehydrate()
     {
         return (property, _) =&gt;
@@ -763,6 +765,7 @@ public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
         $param3$ = $value3$;
     }
 
+    [JetBrains.Annotations.UsedImplicitly]
     public static ValueObjectFactory&lt;$name$&gt; Rehydrate()
     {
         return (property, container) =&gt;
@@ -1390,12 +1393,14 @@ public sealed class $name$Root : AggregateRootBase
     }
 
     // TODO: DELETE this method if EventSourcing, LEAVE if Snapshotting
+    [JetBrains.Annotations.UsedImplicitly]
     public static AggregateRootFactory&lt;$name$Root&gt; Rehydrate()
     {
         return (identifier, container, properties) =&gt; new $name$Root(identifier, container, properties);
     }
 
     // TODO: LEAVE this method if EventSourcing, DELETE if Snapshotting
+    [JetBrains.Annotations.UsedImplicitly]
     public static AggregateRootFactory&lt;$name$Root&gt; Rehydrate()
     {
         return (identifier, container, properties) =&gt; new $name$Root(container.GetRequiredService&lt;IRecorder&gt;(), container.GetRequiredService&lt;IIdentifierFactory&gt;(), identifier);

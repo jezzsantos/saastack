@@ -130,6 +130,7 @@ public sealed class CarRoot : AggregateRootBase
 
     public Identifier OrganizationId { get; private set; } = Identifier.Empty();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
         return (identifier, container, properties) => new CarRoot(container.GetRequiredService<IRecorder>(),

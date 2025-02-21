@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Extensions;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Common.ValueObjects;
 
@@ -52,6 +53,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
 
     public int LastEventVersion { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<EventStream> Rehydrate()
     {
         return (property, _) =>

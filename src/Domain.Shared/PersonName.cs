@@ -1,6 +1,7 @@
 ﻿using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -47,6 +48,7 @@ public sealed class PersonName : ValueObjectBase<PersonName>
 
     public Optional<Name> LastName { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<PersonName> Rehydrate()
     {
         return (property, container) =>

@@ -4,6 +4,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Domain.Shared.Organizations;
+using JetBrains.Annotations;
 
 namespace OrganizationsDomain;
 
@@ -59,6 +60,7 @@ public sealed class Setting : ValueObjectBase<Setting>
 
     public SettingValueType ValueType { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Setting> Rehydrate()
     {
         return (property, _) =>

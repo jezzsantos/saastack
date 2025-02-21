@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace OrganizationsDomain;
 
@@ -27,6 +28,7 @@ public sealed class Settings : ValueObjectBase<Settings>
 
     public Dictionary<string, Setting> Properties { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Settings> Rehydrate()
     {
         return (property, _) =>

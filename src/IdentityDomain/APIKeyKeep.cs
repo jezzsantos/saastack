@@ -4,6 +4,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 using IdentityDomain.DomainServices;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -41,6 +42,7 @@ public sealed class APIKeyKeep : ValueObjectBase<APIKeyKeep>
 
     public string Token { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<APIKeyKeep> Rehydrate()
     {
         return (property, _) =>

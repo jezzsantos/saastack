@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared.Subscriptions;
 
@@ -30,6 +31,7 @@ public sealed class ProviderPaymentMethod : ValueObjectBase<ProviderPaymentMetho
 
     public BillingPaymentMethodType Type { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<ProviderPaymentMethod> Rehydrate()
     {
         return (property, _) =>

@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -51,6 +52,7 @@ public sealed class VerificationKeep : ValueObjectBase<VerificationKeep>
 
     public Optional<DateTime> VerifiedUtc { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<VerificationKeep> Rehydrate()
     {
         return (property, _) =>

@@ -3,6 +3,7 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -40,6 +41,7 @@ public sealed class Registration : ValueObjectBase<Registration>
 
     public PersonDisplayName Name { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Registration> Rehydrate()
     {
         return (property, container) =>

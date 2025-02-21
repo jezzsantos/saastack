@@ -2,6 +2,7 @@ using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace EndUsersDomain;
 
@@ -45,6 +46,7 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
 
     public Timezone Timezone { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<EndUserProfile> Rehydrate()
     {
         return (property, container) =>

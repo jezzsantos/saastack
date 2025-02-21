@@ -1,6 +1,7 @@
 using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -51,6 +52,7 @@ public sealed class Address : ValueObjectBase<Address>
 
     public string? Zip { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Address> Rehydrate()
     {
         return (property, _) =>

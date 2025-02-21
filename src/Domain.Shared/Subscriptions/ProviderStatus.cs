@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared.Subscriptions;
 
@@ -44,6 +45,7 @@ public sealed class ProviderStatus : ValueObjectBase<ProviderStatus>
 
     public BillingSubscriptionStatus Status { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<ProviderStatus> Rehydrate()
     {
         return (property, _) =>

@@ -6,6 +6,7 @@ using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -44,6 +45,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<AuthTokensRoot> Rehydrate()
     {
         return (identifier, container, _) => new AuthTokensRoot(container.GetRequiredService<IRecorder>(),

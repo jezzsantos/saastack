@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -76,6 +77,7 @@ public sealed class LoginMonitor : ValueObjectBase<LoginMonitor>
 
     internal bool ToggledLocked { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<LoginMonitor> Rehydrate()
     {
         return (property, _) =>

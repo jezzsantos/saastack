@@ -5,6 +5,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Extensions;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -60,6 +61,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public List<Role> Items => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Roles> Rehydrate()
     {
         return (property, container) =>

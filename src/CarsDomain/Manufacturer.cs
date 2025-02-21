@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -64,6 +65,7 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
 
     public Year Year { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Manufacturer> Rehydrate()
     {
         return (property, container) =>

@@ -11,6 +11,7 @@ using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.Subscriptions;
+using JetBrains.Annotations;
 
 namespace SubscriptionsDomain;
 
@@ -82,6 +83,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
     /// </summary>
     public Optional<string> ProviderSubscriptionReference { get; private set; }
 
+    [UsedImplicitly]
     public static AggregateRootFactory<SubscriptionRoot> Rehydrate()
     {
         return (identifier, container, _) => new SubscriptionRoot(container.GetRequiredService<IRecorder>(),

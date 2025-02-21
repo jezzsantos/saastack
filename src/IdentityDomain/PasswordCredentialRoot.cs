@@ -13,6 +13,7 @@ using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.Identities;
 using IdentityDomain.DomainServices;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -111,6 +112,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
     public VerificationKeep VerificationKeep { get; private set; } = VerificationKeep.Create().Value;
 
+    [UsedImplicitly]
     public static AggregateRootFactory<PasswordCredentialRoot> Rehydrate()
     {
         return (identifier, container, _) => new PasswordCredentialRoot(container.GetRequiredService<IRecorder>(),

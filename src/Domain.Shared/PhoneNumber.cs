@@ -4,6 +4,7 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Validations;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -31,6 +32,7 @@ public sealed class PhoneNumber : SingleValueObjectBase<PhoneNumber, string>
 
     public string Number => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<PhoneNumber> Rehydrate()
     {
         return (property, _) => new PhoneNumber(property);

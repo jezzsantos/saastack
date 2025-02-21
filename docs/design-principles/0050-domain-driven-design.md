@@ -269,6 +269,7 @@ public sealed class BookingRoot : AggregateRootBase
     }
     
     // Note: This method is called by the runtime when the aggregate is loaded from a persistence store
+    [UsedImplicitly]
     public static AggregateRootFactory<BookingRoot> Rehydrate()
     {
         return (identifier, container, properties) => new BookingRoot(identifier, container, properties);
@@ -303,6 +304,7 @@ public class CarRoot : AggregateRootBase
     }
 
     // Note: This method is called by the runtime when the aggregate is loaded from a persistence store
+    [UsedImplicitly]
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
         return (identifier, container, _) => new CarRoot(container.GetRequiredService<IRecorder>(),
@@ -919,6 +921,7 @@ public sealed class TimeSlot : ValueObjectBase<TimeSlot>
     }
 
     // Note: This method must exist on the value object
+    [UsedImplicitly]
     public static ValueObjectFactory<TimeSlot> Rehydrate()
     {
         return (property, _) =>
@@ -946,6 +949,7 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
     }
 
 	// Note: This method must exist on the value object
+	[UsedImplicitly]
     public static ValueObjectFactory<Manufacturer> Rehydrate()
     {
         return (property, container) =>

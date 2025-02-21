@@ -4,6 +4,7 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Validations;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -38,6 +39,7 @@ public sealed class Timezone : SingleValueObjectBase<Timezone, TimezoneIANA>
 
     public TimezoneIANA Code => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Timezone> Rehydrate()
     {
         return (property, _) => new Timezone(Timezones.FindOrDefault(property));

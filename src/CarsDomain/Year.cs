@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -28,6 +29,7 @@ public sealed class Year : SingleValueObjectBase<Year, int>
 
     public int Number => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Year> Rehydrate()
     {
         return (property, _) =>

@@ -10,6 +10,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared.Identities;
 using IdentityDomain.DomainServices;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -49,6 +50,7 @@ public sealed class APIKeyRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<APIKeyRoot> Rehydrate()
     {
         return (identifier, container, _) => new APIKeyRoot(container.GetRequiredService<IRecorder>(),

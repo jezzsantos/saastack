@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -31,6 +32,7 @@ public sealed class Avatar : ValueObjectBase<Avatar>
 
     public string Url { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Avatar> Rehydrate()
     {
         return (property, _) =>

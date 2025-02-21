@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -27,6 +28,7 @@ public sealed class MfaCaller : ValueObjectBase<MfaCaller>
 
     public bool IsAuthenticated { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<MfaCaller> Rehydrate()
     {
         return (property, _) =>

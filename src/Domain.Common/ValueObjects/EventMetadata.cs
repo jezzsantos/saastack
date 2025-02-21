@@ -1,4 +1,5 @@
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Common.ValueObjects;
 
@@ -18,6 +19,7 @@ public sealed class EventMetadata : SingleValueObjectBase<EventMetadata, string>
 
     public string Fqn => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<EventMetadata> Rehydrate()
     {
         return (property, _) => new EventMetadata(property);

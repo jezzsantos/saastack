@@ -8,6 +8,7 @@ using Domain.Events.Shared.Images;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace ImagesDomain;
 
@@ -46,6 +47,7 @@ public sealed class ImageRoot : AggregateRootBase
 
     public Optional<long> Size { get; private set; }
 
+    [UsedImplicitly]
     public static AggregateRootFactory<ImageRoot> Rehydrate()
     {
         return (identifier, container, _) => new ImageRoot(container.GetRequiredService<IRecorder>(),

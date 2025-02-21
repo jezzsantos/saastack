@@ -1,6 +1,7 @@
 ﻿using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -28,6 +29,7 @@ public sealed class CurrencyCode : SingleValueObjectBase<CurrencyCode, string>
 
     public static CurrencyCode Default => new(CurrencyCodes.Default.ToString()!);
 
+    [UsedImplicitly]
     public static ValueObjectFactory<CurrencyCode> Rehydrate()
     {
         return (property, _) => new CurrencyCode(property);

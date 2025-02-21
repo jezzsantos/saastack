@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -56,6 +57,7 @@ public sealed class SendingAttempts : SingleValueObjectBase<SendingAttempts, Lis
 
     public bool HasBeenAttempted => Attempts.HasAny();
 
+    [UsedImplicitly]
     public static ValueObjectFactory<SendingAttempts> Rehydrate()
     {
         return (property, _) =>

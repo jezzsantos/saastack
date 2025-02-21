@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -31,6 +32,7 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
 
     public string Name => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Jurisdiction> Rehydrate()
     {
         return (property, _) =>

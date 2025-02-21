@@ -4,6 +4,7 @@ using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared.Cars;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -41,6 +42,7 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
 
     public string? Reference { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<CausedBy> Rehydrate()
     {
         return (property, _) =>

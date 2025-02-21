@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -23,6 +24,7 @@ public sealed class Name : SingleValueObjectBase<Name, string>
 
     public string Text => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<Name> Rehydrate()
     {
         return (property, _) =>

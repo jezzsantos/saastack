@@ -12,6 +12,7 @@ using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
+using JetBrains.Annotations;
 
 namespace EndUsersDomain;
 
@@ -62,6 +63,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
 
     public UserStatus Status { get; private set; }
 
+    [UsedImplicitly]
     public static AggregateRootFactory<EndUserRoot> Rehydrate()
     {
         return (identifier, container, _) => new EndUserRoot(container.GetRequiredService<IRecorder>(),

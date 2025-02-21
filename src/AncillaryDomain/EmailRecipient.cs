@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -28,6 +29,7 @@ public sealed class EmailRecipient : ValueObjectBase<EmailRecipient>
 
     public EmailAddress EmailAddress { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<EmailRecipient> Rehydrate()
     {
         return (property, container) =>

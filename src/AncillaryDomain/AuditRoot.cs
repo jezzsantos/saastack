@@ -7,6 +7,7 @@ using Domain.Events.Shared.Ancillary.Audits;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -42,6 +43,7 @@ public sealed class AuditRoot : AggregateRootBase
 
     public Optional<TemplateArguments> TemplateArguments { get; private set; }
 
+    [UsedImplicitly]
     public static AggregateRootFactory<AuditRoot> Rehydrate()
     {
         return (identifier, container, _) => new AuditRoot(container.GetRequiredService<IRecorder>(),

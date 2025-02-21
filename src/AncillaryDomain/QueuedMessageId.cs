@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace AncillaryDomain;
 
@@ -32,6 +33,7 @@ public sealed class QueuedMessageId : SingleValueObjectBase<QueuedMessageId, str
 
     public string Identifier => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<QueuedMessageId> Rehydrate()
     {
         return (property, _) =>

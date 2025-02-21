@@ -4,6 +4,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared;
+using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
@@ -50,6 +51,7 @@ public sealed class MfaOptions : ValueObjectBase<MfaOptions>
 
     public bool IsEnabled { get; }
 
+    [UsedImplicitly]
     public static ValueObjectFactory<MfaOptions> Rehydrate()
     {
         return (property, _) =>

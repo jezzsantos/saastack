@@ -2,6 +2,7 @@
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -23,6 +24,7 @@ public sealed class VehicleOwner : SingleValueObjectBase<VehicleOwner, string>
 
     public string OwnerId => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<VehicleOwner> Rehydrate()
     {
         return (property, _) => new VehicleOwner(property);

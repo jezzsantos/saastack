@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 
 namespace CarsDomain;
 
@@ -30,6 +31,7 @@ public sealed class NumberPlate : SingleValueObjectBase<NumberPlate, string>
 
     public string Registration => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<NumberPlate> Rehydrate()
     {
         return (property, _) =>

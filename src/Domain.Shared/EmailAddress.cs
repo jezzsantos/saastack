@@ -5,6 +5,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Validations;
 using Domain.Interfaces.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Shared;
 
@@ -32,6 +33,7 @@ public sealed class EmailAddress : SingleValueObjectBase<EmailAddress, string>
 
     public string Address => Value;
 
+    [UsedImplicitly]
     public static ValueObjectFactory<EmailAddress> Rehydrate()
     {
         return (property, _) => new EmailAddress(property);

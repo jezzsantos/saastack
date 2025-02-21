@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using JetBrains.Annotations;
 
 namespace UserProfilesDomain;
 
@@ -51,6 +52,7 @@ public sealed class UserProfileRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
+    [UsedImplicitly]
     public static AggregateRootFactory<UserProfileRoot> Rehydrate()
     {
         return (identifier, container, _) => new UserProfileRoot(container.GetRequiredService<IRecorder>(),
