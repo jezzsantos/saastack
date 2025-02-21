@@ -5,6 +5,7 @@ using Domain.Interfaces;
 using FluentAssertions;
 using IdentityApplication;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
+using Infrastructure.Web.Api.Operations.Shared.Organizations;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
@@ -40,21 +41,66 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenRegisterMachineByUser_ThenRegisters()
+    public async Task WhenRegisterMachineByAuthenticatedUserInPersonalOrg_ThenRegistersMachineNotMember()
     {
         var login = await LoginUserAsync();
 
-        var result = await Api.PostAsync(new RegisterMachineRequest
+        var machine = await Api.PostAsync(new RegisterMachineRequest
         {
             Name = "amachinename"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Machine.Id.Should().NotBeEmpty();
-        result.Content.Value.Machine.Description.Should().Be("amachinename");
-        result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
-        result.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
-        result.Content.Value.Machine.ExpiresOnUtc!.Value.Should().BeNear(
+        machine.Content.Value.Machine.Id.Should().NotBeEmpty();
+        machine.Content.Value.Machine.Description.Should().Be("amachinename");
+        machine.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
+        machine.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
+        machine.Content.Value.Machine.ExpiresOnUtc!.Value.Should().BeNear(
             DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1));
+
+        await PropagateDomainEventsAsync(PropagationRounds.Twice);
+        var memberships = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = login.DefaultOrganizationId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        memberships.Content.Value.Members.Count.Should().Be(1);
+        memberships.Content.Value.Members[0].UserId.Should().Be(login.User.Id);
+        memberships.Content.Value.Members[0].IsOwner.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task WhenRegisterMachineByAuthenticatedUserInSharedOrg_ThenRegistersMachineAsMember()
+    {
+        var login = await LoginUserAsync();
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "anorganization"
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        login = await ReAuthenticateUserAsync(login);
+        var organizationId = organization.Content.Value.Organization.Id;
+        var machine = await Api.PostAsync(new RegisterMachineRequest
+        {
+            Name = "amachinename"
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        machine.Content.Value.Machine.Id.Should().NotBeEmpty();
+        machine.Content.Value.Machine.Description.Should().Be("amachinename");
+        machine.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
+        machine.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
+        machine.Content.Value.Machine.ExpiresOnUtc!.Value.Should().BeNear(
+            DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1));
+
+        var memberships = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        memberships.Content.Value.Members.Count.Should().Be(2);
+        memberships.Content.Value.Members[0].UserId.Should().Be(login.User.Id);
+        memberships.Content.Value.Members[0].IsOwner.Should().BeTrue();
+        memberships.Content.Value.Members[1].UserId.Should().Be(machine.Content.Value.Machine.Id);
+        memberships.Content.Value.Members[1].IsOwner.Should().BeFalse();
     }
 
     [Fact]
