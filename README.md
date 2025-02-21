@@ -8,15 +8,17 @@
 
 Are you about to build a new SaaS product from scratch? On .NET?
 
-Then, try starting with the SaaStack codebase template instead. It will literally take you months to years to build all the supporting services around your specific SaaS product, and in the pusuit of getting your specific product going, you are going to rush past establishing a robust, sustainable and reliable platform that is going to have to be built at some point. You will always need to authenticate your users, you will always need to establish some kind of authorization scheme, you will always need to support HTTP access to your product, you will always need to integrate with 3rd party products - and NOT have to build all that yourself from scratch.
+Then, try starting with the SaaStack codebase template instead. It will literally take you months to years to build all the supporting services around your specific SaaS product, and in the pursuit of getting your specific product going, you are inevitably going to rush past establishing a robust, sustainable and reliable platform, that will need tobe built at some point in the journey.
 
-> Not to mention, that it takes some serious experience in .NET, and some serious experience in building robust platforms and tooling, so that you dont inadvertantly create a horrible big-ball-of-mud monolith, that simply cannot scale down the road. Most founding engineers don't have that kind of deep experience under their belts from day one, and so they are going to reinvent the wheel and do a relatively poor job of it jeopodizing their business down the track just at the wrong time - should they even survive long enough to get to that point.
+You will always need to authenticate your users, you will always need to establish some kind of authorization scheme, you will always need to support HTTP access to your product, you will always need to integrate with 3rd party products - and NOT have to build all that yourself from scratch. Yes, .NET provides a bunch of this for you out of the box, but .NET is also necessarily so generic that much of getting this going, in a good way for you, is up to you and what you know, or have experienced in the past. 
 
-SaaStack is a complete template for building real-world, fully-featured SaaS web products. It looks like just another "dreaded" framework at first sight, and yes it is opinionated (as are all templates), but actually, it has very few of the problems general frameworks have, becuase you own it all from day one, and its fully documented to extend. 
+> Not to mention, that it takes some serious experience in .NET, and some serious experience in building robust platforms and tooling, that you don't inadvertently create a horrible big-ball-of-mud monolith from day one, that simply cannot scale down the road. Most founding engineers/CTOs don't have that kind of deep experience under their belts on day one, and so they are inadvertently going to stick to only what they know, or reinvent the wheel and do a relatively poor job of it jeopardizing their business down the track at just the wrong time - should they even survive long enough to get to that point. Common startup guidance is "fake it till you make it" or "Build what doesn't scale before you build what does scale", which sounds great in principle but in practice, that advice is not talking to building robust software, it is talking to finding your customer problems. Building robust software for long-lived products is a careful investment in the future, so you don't have to spend millions more every 3 years to rewrite your software over and over again. You can, of course, get away with it if you are thrown $100M dollars on day one, and hire a ton of experience and experts you couldn't otherwise afford, but for the rest of us, we simply can't afford to build the big ball of mud that slows us down in 3 years time. 
+
+SaaStack is a complete template for building real-world, fully-featured SaaS web products. It looks like just another "dreaded" framework at first sight, and yes it is opinionated (as are all templates), but actually, it has very few of the problems general frameworks have, because you own it all from day one, and it is fully documented to extend.
 
 As it is right now, it comes ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.). We have it automatically deployed into Azure in our build pipeline. AWS deployments coming soon.
 
-Don't spend months building all this stuff from scratch. You and your team simply don't need to. We've done all that for you already; just take the time to take a look to see what is already there, and then take it in your direction. There is nothing fancy here, its all built from first principles as you can see. You can always change it the way you like it as you proceed. You are not locked into anyone else's framework, and if you make changes, we have a vast regression suite to show you what you might have broken.
+Don't spend months building all this stuff from scratch. You and your team simply don't need to. We've done all that for you already; just take the time to take a look to see what is already there, and then take it in your direction. There is nothing fancy here, it is all built from first principles as you can see. You can always change it the way you like it as you proceed. You are not locked into anyone else's framework, and if you make changes, we have a vast regression suite to show you what you might have broken.
 
 SaaStack is a "template", not a nuget package. It is also not some basic code sample like those samples you would download to learn a new technology or see in simple demos online. This "template" is far more comprehensive, far more contextualized for SaaS businesses, and far more realistic about the complexities you are going to encounter in reality for your product down the road. It has already been used in anger in several SaaS products, in several early stage companies.
 
@@ -51,9 +53,21 @@ or, if you prefer hosting on AWS:
 
 ## How is the code structured?
 
-The best experience for working with this template is in an IDE like JetBrains Rider, or Visual Studio, or Visual Studio Code (opening the solution file).
+150 projects!!
 
-> However, if working in an IDE is not your team's thing, then you can also rearrange the project folders into whatever structure you like. It is a starter template after all.
+Yes, 150 projects! Why? because the world has moved on.
+
+If you are used to cramming in all your code into one or three assemblies for your API, then you are not managing dependencies very well at all. Even if you think you are, your favorite IDE makes it far too easy to violate decoupling wishes, just by adding a `using` statement to some type, you are inadvertently adding dangerous coupling. Then, later down the track, when scaling out becomes an issue, how will you factor out that code from that tight set of assemblies into another deployable unit, when the code is all tangled up with all the rest of that code?
+
+Instead, what you will want at that time is a codebase structure with a very intentional separation of "modules" and separate deployable units. That are designed to be separated. These "modules" are best contained across assemblies that are explicitly separated in layers, and backed by tooling to enforce that separation, and enforce the decoupling of types - to avoid the spaghetti code that is always ahead of your team today and tomorrow.
+
+
+
+The best experience for working with this template is in an IDE like JetBrains Rider, or Visual Studio, or Visual Studio Code (with solution file).
+
+None of these tools nowadays (since 2022 for Visual Studio) have issues anymore with loading hundreds of projects! It is simply not a design constraint anymore. Coupling dependencies is the main issue you need to focus on managing more carefully today. A .NET project (and by extension the assembly it produces) are simply just a bounded container of code, it is not the runtime process, and nor is it deployable unit.
+
+> If working in an IDE is not your team's thing, then you can also rearrange the project folders into whatever structure you like. SaaStack is a starter template after all! Nothing says you can't change the folder structure to what suits your context. Nothing says you can't combine the code in the projects. Go for it, have it your way! We simply recommend the structure we have given you as a starting point.
 
 ![Solution](docs/images/Logical-Structure.png)
 
@@ -67,9 +81,9 @@ This starter template is NOT for everyone, nor for EVERY software project, nor f
 
 * The tech stack is a .NET core backend (LTS version 8.0 or later) written in C#, using (a few) but very popular and well-supported 3rd party libraries. (We've worked very hard to find a balance between too few and far too many).
 * This starter template deliberately makes engineering trade-offs that are optimized for situations where:
-   1. High maintainability is super important to you over long periods of time (e.g., long-lived codebases)
-   2. Managing complexity over long periods of time is non-negotiable (~1-10 years), and avoiding big balls of mud (BBOMs) is paramount to you,
-   3. Where many hands will touch the codebase (i.e., over the course of its entire life). Of course, if you are working alone on a project, you will have personal preferences, free from the practical constraints of working in teams.
+  1. High maintainability is super important to you over long periods of time (e.g., long-lived codebases)
+  2. Managing complexity over long periods of time is non-negotiable (~1-10 years), and avoiding big balls of mud (BBOMs) is paramount to you,
+  3. Where many hands will touch the codebase (i.e., over the course of its entire life). Of course, if you are working alone on a project, you will have personal preferences, free from the practical constraints of working in teams.
 
 ## What is it for?
 
@@ -85,7 +99,7 @@ Can you use this template if your context is different?
 Are these trade-offs suitable for any kind of software project?
 
 * No, they are not.
-   * However, some of them may fit your specific context well.
+  * However, some of them may fit your specific context well.
 
 > Want to know what the initial design constraints, assumptions, and trade-offs are, then see our [Decisions Log](docs/decisions/README.md) and [Design Principles](docs/design-principles/README.md) for more details on that.
 
@@ -98,10 +112,10 @@ It is a starter "template," not a 3rd party library or a fancy 3rd party framewo
 * You compile it, you run its tests, and you deploy its pieces into your cloud environment (e.g., Azure, AWS, or Google Cloud).
 * You then continue to evolve and add your own features to it (by following the established code patterns).
 * You then evolve and adapt the code to wherever you need it to go.
-   * Don't like those patterns? Then change them to suit your preferences. There are no rigid frameworks or other dev teams to plead with.
+  * Don't like those patterns? Then change them to suit your preferences. There are no rigid frameworks or other dev teams to plead with.
 * At some point, you will delete the example subdomain modules (Cars and Bookings) that are provided as examples to follow and, of course, replace them with your own subdomain modules.
 * Read the [documentation](docs/README.md) to figure out what it already has and how things work.
-   * So that you either don't need to worry about those specific things yet (and can focus on more valuable things), or you can modify them to suit your specific needs. It is your code, so you do as you please to it.
+  * So that you either don't need to worry about those specific things yet (and can focus on more valuable things), or you can modify them to suit your specific needs. It is your code, so you do as you please to it.
 
 Since this starter "template" is NOT a framework (of the type you usually depend on from others downloaded from [nuget.org](https://nuget.org)), you are free from being trapped inside other people's abstractions and regimes and then waiting on them to accommodate your specific needs.
 
@@ -132,38 +146,38 @@ It demonstrates a working example of a *made-up* SaaS car-sharing platform just 
 The starter template also takes care of these specific kinds of things:
 
 * Deployment
-   * It can be deployed in Azure (e.g., App Services or Functions) or in AWS (e.g., EC2 instances or Lambdas)
-   * It is designed to be split into as many deployable pieces as you want when needed. (You simply replace the "RPC adapters" with "HttpClient adapters").
+  * It can be deployed in Azure (e.g., App Services or Functions) or in AWS (e.g., EC2 instances or Lambdas)
+  * It is designed to be split into as many deployable pieces as you want when needed. (You simply replace the "RPC adapters" with "HttpClient adapters").
 * REST API
-   * It defines a ruleset about how JSON is represented on the wire and how requests are deserialized (to cope with different client styles)
-   * It localizes developer errors
-   * It handles and maps common exceptions to standard HTTP status codes
-   * It returns standard HTTP statuses for successful requests based on the HTTP method (e.g., GET = 200, POST = 201, PUT = 202, DELETE = 204)
-   * Provides a Swagger UI.
+  * It defines a ruleset about how JSON is represented on the wire and how requests are deserialized (to cope with different client styles)
+  * It localizes developer errors
+  * It handles and maps common exceptions to standard HTTP status codes
+  * It returns standard HTTP statuses for successful requests based on the HTTP method (e.g., GET = 200, POST = 201, PUT = 202, DELETE = 204)
+  * Provides a Swagger UI.
 * Infrastructure
-   * All infrastructure components are independently testable adapters
-   * It implements multi-tenancy for inbound HTTP requests (e.g., HTTP Host headers, URL keys, etc.)
-   * It implements multi-tenancy (for data segregation) using either data partitioning, physical partitioning, or both.
-   * It implements polyglot persistence, so you can use whatever persistence technology is appropriate for each module per data load (e.g., SQLServer, Postgres, Redis, DynamoDB, Amazon RDS, LocalFile, In-Memory, etc.)
-   * It integrated 3rd party identity providers for authentication, 2FA, SSO, and credential management (e.g., Auth0, Microsoft Graph, Google, Amazon Cognito, etc.).
-   * It integrates billing subscription management providers so that you can charge for your product use and determine feature sets based on subscription levels (e.g., Stripe, ChargeBee, Chargify, etc.).
-   * It integrates feature flagging providers to control how to access your features and roll them out safely (e.g., LaunchDarkly, GitLab, Unleashed, etc.)
-   * It integrates product usage metrics to monitor and measure the actual usage of your product (e.g., MixPanel, Google Analytics, Application Insights, Amazon XRay, etc.)
-   * It integrates crash analytics and structured logging so you can plug in your own preferred monitoring (e.g., Application Insights, CloudWatch, Sentry.io, etc.).
-   * It uses dependency injection extensively so that all modules and components remain testable and configurable.
-   * It defines standard and unified configuration patterns (e.g., using `appsettings.json`) to load tenanted or non-tenanted runtime settings.
+  * All infrastructure components are independently testable adapters
+  * It implements multi-tenancy for inbound HTTP requests (e.g., HTTP Host headers, URL keys, etc.)
+  * It implements multi-tenancy (for data segregation) using either data partitioning, physical partitioning, or both.
+  * It implements polyglot persistence, so you can use whatever persistence technology is appropriate for each module per data load (e.g., SQLServer, Postgres, Redis, DynamoDB, Amazon RDS, LocalFile, In-Memory, etc.)
+  * It integrated 3rd party identity providers for authentication, 2FA, SSO, and credential management (e.g., Auth0, Microsoft Graph, Google, Amazon Cognito, etc.).
+  * It integrates billing subscription management providers so that you can charge for your product use and determine feature sets based on subscription levels (e.g., Stripe, ChargeBee, Chargify, etc.).
+  * It integrates feature flagging providers to control how to access your features and roll them out safely (e.g., LaunchDarkly, GitLab, Unleashed, etc.)
+  * It integrates product usage metrics to monitor and measure the actual usage of your product (e.g., MixPanel, Google Analytics, Application Insights, Amazon XRay, etc.)
+  * It integrates crash analytics and structured logging so you can plug in your own preferred monitoring (e.g., Application Insights, CloudWatch, Sentry.io, etc.).
+  * It uses dependency injection extensively so that all modules and components remain testable and configurable.
+  * It defines standard and unified configuration patterns (e.g., using `appsettings.json`) to load tenanted or non-tenanted runtime settings.
 * Application
-   * Supports one or more applications, agnostic to infrastructure interop (i.e., allows you to expose each application as a REST API (default) or as a reliable Queue, or any other kind of infrastructure)
-   * Supports transaction scripts + anemic domain model or Domain Driven Design
-   * Applications are aligned to audiences and subdomains
+  * Supports one or more applications, agnostic to infrastructure interop (i.e., allows you to expose each application as a REST API (default) or as a reliable Queue, or any other kind of infrastructure)
+  * Supports transaction scripts + anemic domain model or Domain Driven Design
+  * Applications are aligned to audiences and subdomains
 * Others
-   * It provides documented code examples for the most common use cases. Simply follow and learn from the existing patterns in the codebase
-   * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this until you've learned the patterns.
-   * It provides a [decision log](docs/decisions/README.md) so you can see why certain design decisions were made.
-   * It provides documentation about the [design principles](docs/design-principles/README.md) behind the codebase so you can learn about them and why they exist.
-   * It \[will\] provide an eco-system/marketplace of common adapters that other people can build and share with the community.
-   * It demonstrates extensive and overlapping testing suites (unit tests, integration tests, and end-to-end tests) to ensure that production support issues are minimized and regressions are caught early on. As well as allowing you to change any of the existing base code safely
-   * It defines and enforces coding standards and formatting rules
-   * It utilizes common patterns and abstractions around popular libraries (that are the most up-to-date in the .NET world), so you can switch them out for your preferences.
-   * It defines horizontal layers and vertical slices to make changing code in any component easier and more reliable.
-   * It enforces dependency direction rules so that layers and subdomains are not inadvertently coupled together (enforcing architectural constraints)
+  * It provides documented code examples for the most common use cases. Simply follow and learn from the existing patterns in the codebase
+  * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this until you've learned the patterns.
+  * It provides a [decision log](docs/decisions/README.md) so you can see why certain design decisions were made.
+  * It provides documentation about the [design principles](docs/design-principles/README.md) behind the codebase so you can learn about them and why they exist.
+  * It \[will\] provide an ecosystem/marketplace of common adapters that other people can build and share with the community.
+  * It demonstrates extensive and overlapping testing suites (unit tests, integration tests, and end-to-end tests) to ensure that production support issues are minimized and regressions are caught early on. As well as allowing you to change any of the existing base code safely
+  * It defines and enforces coding standards and formatting rules
+  * It utilizes common patterns and abstractions around popular libraries (that are the most up-to-date in the .NET world), so you can switch them out for your preferences.
+  * It defines horizontal layers and vertical slices to make changing code in any component easier and more reliable.
+  * It enforces dependency direction rules so that layers and subdomains are not inadvertently coupled together (enforcing architectural constraints)
