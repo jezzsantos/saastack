@@ -8,16 +8,17 @@
 
 Are you about to build a new SaaS product from scratch? On .NET?
 
-Then, try starting with the SaaStack codebase template.
+Then, try starting with the SaaStack codebase template instead. It will literally take you months to years to build all the supporting services around your specific SaaS product, and in the pusuit of getting your specific product going, you are going to rush past establishing a robust, sustainable and reliable platform that is going to have to be built at some point. You will always need to authenticate your users, you will always need to establish some kind of authorization scheme, you will always need to support HTTP access to your product, you will always need to integrate with 3rd party products - and NOT have to build all that yourself from scratch.
 
-It is a complete template for building real-world, fully-featured SaaS web products.
+> Not to mention, that it takes some serious experience in .NET, and some serious experience in building robust platforms and tooling, so that you dont inadvertantly create a horrible big-ball-of-mud monolith, that simply cannot scale down the road. Most founding engineers don't have that kind of deep experience under their belts from day one, and so they are going to reinvent the wheel and do a relatively poor job of it jeopodizing their business down the track just at the wrong time - should they even survive long enough to get to that point.
 
-Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
+SaaStack is a complete template for building real-world, fully-featured SaaS web products. It looks like just another "dreaded" framework at first sight, and yes it is opinionated (as are all templates), but actually, it has very few of the problems general frameworks have, becuase you own it all from day one, and its fully documented to extend. 
 
-> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take a look, see what is already there, and take it from here. You can always change it the way you like it as you proceed. You are not locked into anyone else's framework.
->
-> This is not some code sample like those you would download to learn a new technology or see in demos online. This is way more comprehensive, way more contextualized, and way more realistic about the complexities you are going to encounter in reality.
-> This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That next part is up to you.
+As it is right now, it comes ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.). We have it automatically deployed into Azure in our build pipeline. AWS deployments coming soon.
+
+Don't spend months building all this stuff from scratch. You and your team simply don't need to. We've done all that for you already; just take the time to take a look to see what is already there, and then take it in your direction. There is nothing fancy here, its all built from first principles as you can see. You can always change it the way you like it as you proceed. You are not locked into anyone else's framework, and if you make changes, we have a vast regression suite to show you what you might have broken.
+
+SaaStack is a "template", not a nuget package. It is also not some basic code sample like those samples you would download to learn a new technology or see in simple demos online. This "template" is far more comprehensive, far more contextualized for SaaS businesses, and far more realistic about the complexities you are going to encounter in reality for your product down the road. It has already been used in anger in several SaaS products, in several early stage companies.
 
 The codebase demonstrates common architectural styles that you are going to need in your product in the long run, such as:
 
@@ -32,7 +33,7 @@ The codebase demonstrates common architectural styles that you are going to need
 * B2B or B2C Multitenancy, you choose
 * Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows.
 
-> The fundamental design principle behind this particular combination of architectural styles is to maximize change since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run.
+> The fundamental design principles behind this particular combination of architectural styles is to maximize change since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run. Minimizing that cost, and keeping it low, is key for any new product tech business's survival.
 
 This starter template gives you most of the things all SaaS products will need from day one while maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).
 
@@ -40,9 +41,13 @@ This starter template gives you most of the things all SaaS products will need f
 
 ![Azure](docs/images/Physical-Architecture-Azure.png)
 
-or if you prefer AWS:
+> You can find the Azure [demo API here](https://saastack-apihost1.azurewebsites.net/) and the [demo WebApp here](https://saastack-websitehost.azurewebsites.net/).
+
+or, if you prefer hosting on AWS:
 
 ![AWS](docs/images/Physical-Architecture-AWS.png)
+
+> Demos on AWS coming soon.
 
 ## How is the code structured?
 
