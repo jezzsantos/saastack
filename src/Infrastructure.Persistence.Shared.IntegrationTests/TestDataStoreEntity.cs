@@ -319,3 +319,19 @@ public enum TestEnum
     AValue1 = 1,
     AValue2 = 2
 }
+
+[EntityName("testblobentities")]
+public class TestBlobStoreEntity : IHasIdentity, IQueryableEntity
+{
+    private static int _instanceCounter;
+
+    public TestBlobStoreEntity()
+    {
+        Id = $"anid{++_instanceCounter:00000}";
+    }
+    public Optional<string> Id { get; set; }
+
+    public string BlobName { get; set; }
+    public Optional<string> ContentType { get; set; }
+    public Optional<Byte> Data { get; set; }
+}
