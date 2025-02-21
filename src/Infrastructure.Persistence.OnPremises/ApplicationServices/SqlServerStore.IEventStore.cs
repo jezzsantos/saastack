@@ -51,8 +51,7 @@ namespace Infrastructure.Persistence.OnPremises.ApplicationServices
                     if (added.Error.Is(ErrorCode.EntityExists))
                     {
                         return Error.EntityExists(
-                        //HERCHRN :-: Fix - Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
-                        "Could not write new events to event stream: {0}, another process has updated the stream at the same time, since version {1}"
+                        Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
                         .Format(streamName, version));
                     }
 
