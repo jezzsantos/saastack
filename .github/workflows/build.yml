@@ -15,6 +15,11 @@ env:
   DOTNET_VERSION: 8.0.302
   NODEJS_VERSION: '22'
 
+# We want failed commands to fail the pipeline on Windows
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: windows-latest
@@ -32,13 +37,13 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build (Backend) for Azure Testing
-        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
+        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAZURE
       - name: Build (Backend) for AWS Testing
-        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
+        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAWS
       - name: Build (Backend) for Azure Deploy
-        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAZURE
       - name: Build (Backend) for AWS Deploy
-        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAWS
       - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
@@ -65,7 +70,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build for CI Testing (for Azure)
-        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
+        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAZURE
       - name: Unit Test (Backend)
         continue-on-error: false
         run: >
@@ -75,12 +80,21 @@ jobs:
           --logger:"trx"
           --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
           --test-adapter-path:. "${{env.SOLUTION_PATH}}"
-      - name: Integration Test (Backend)
-        continue-on-error: true
+      - name: Integration Test (Backend API)
+        continue-on-error: false
         run: >
           dotnet test --no-build --verbosity normal
           --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
-          --filter:"Category=Integration.API|Category=Integration.Website" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+          --filter:"Category=Integration.API" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+          --logger:"trx"
+          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+      - name: Integration Test (Backend Website)
+        continue-on-error: true # These tests can be flaky sometimes
+        run: >
+          dotnet test --no-build --verbosity normal
+          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+          --filter:"Category=Category=Integration.Website" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
           --logger:"trx"
           --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
           --test-adapter-path:. "${{env.SOLUTION_PATH}}"
