@@ -336,10 +336,12 @@
         <_TargetFramework>$(RoslynTargetFramework)</_TargetFramework>
         <_AspNetFrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\$(_TargetFramework)</_AspNetFrameworkInstallFolder>
         <_FrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.NETCore.App\$(_TargetFramework)</_FrameworkInstallFolder>
-    <!-- on Mac or Linux the paths might look something like this 
-        <_AspNetFrameworkInstallFolder>/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/$(_TargetFramework)</_AspNetFrameworkInstallFolder>
-        <_FrameworkInstallFolder>/usr/local/share/dotnet/shared/Microsoft.NETCore.App/$(_TargetFramework)</_FrameworkInstallFolder>
-    -->
+        <_AspNetFrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('Windows'))">C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\$(_TargetFramework)</_AspNetFrameworkInstallFolder>
+        <_AspNetFrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('OSX'))">/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/$(_TargetFramework)</_AspNetFrameworkInstallFolder>
+        <_AspNetFrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('Linux'))">/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/$(_TargetFramework)</_AspNetFrameworkInstallFolder>
+        <_FrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('Windows'))">C:\Program Files\dotnet\shared\Microsoft.NETCore.App\$(_TargetFramework)</_FrameworkInstallFolder>
+        <_FrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('OSX'))">/usr/local/share/dotnet/shared/Microsoft.NETCore.App/$(_TargetFramework)</_FrameworkInstallFolder>
+        <_FrameworkInstallFolder Condition="$([MSBuild]::IsOSPlatform('Linux'))">/usr/local/share/dotnet/shared/Microsoft.NETCore.App/$(_TargetFramework)</_FrameworkInstallFolder>
     </PropertyGroup>
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
