@@ -194,6 +194,43 @@ public class EndUserRootSpec
         }
 
         [Fact]
+        public void WhenAddMembershipByOtherToPersonalOrganization_ThenReturnsError()
+        {
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            var inviter = CreateOrgOwner(_recorder, "anorganizationid");
+
+            var result = _user.AddMembership(inviter, OrganizationOwnership.Personal, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
+        }
+
+        [Fact]
+        public void WhenAddMembershipByOtherToSharedOrganization_ThenAddsMembership()
+        {
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            var inviter = CreateOrgOwner(_recorder, "anorganizationid");
+            var roles = Roles.Create(TenantRoles.Member).Value;
+            var features = Features.Create(TenantFeatures.Basic).Value;
+            
+            var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                roles, features);
+
+            result.Should().BeSuccess();
+            _user.Memberships.Should().Contain(ms =>
+                ms.OrganizationId.Value == "anorganizationid"
+                && ms.IsDefault
+                && ms.Roles == roles
+                && ms.Features == features);
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
+        }
+
+        [Fact]
         public void WhenAddMembershipAndAlreadyMember_ThenReturns()
         {
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
@@ -224,43 +261,6 @@ public class EndUserRootSpec
 
             result.Should().BeError(ErrorCode.RuleViolation,
                 Resources.EndUserRoot_AddMembership_OnlyOnePersonalOrganization);
-        }
-
-        [Fact]
-        public void WhenAddMembershipToPersonsSharedOrganization_ThenAddsMembership()
-        {
-            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
-                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
-                EmailAddress.Create("auser@company.com").Value);
-            var inviter = CreateOrgOwner(_recorder, "anorganizationid");
-
-            var roles = Roles.Create(TenantRoles.Member).Value;
-            var features = Features.Create(TenantFeatures.Basic).Value;
-            var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
-                roles, features);
-
-            result.Should().BeSuccess();
-            _user.Memberships.Should().Contain(ms =>
-                ms.OrganizationId.Value == "anorganizationid"
-                && ms.IsDefault
-                && ms.Roles == roles
-                && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
-        }
-
-        [Fact]
-        public void WhenAddMembershipToPersonsPersonalOrganization_ThenReturnsError()
-        {
-            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
-                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
-                EmailAddress.Create("auser@company.com").Value);
-            var inviter = CreateOrgOwner(_recorder, "anorganizationid");
-
-            var result = _user.AddMembership(inviter, OrganizationOwnership.Personal, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
-
-            result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
         }
 
         [Fact]
@@ -303,7 +303,7 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToSelfPersonalOrganization_ThenAddsMembership()
+        public void WhenAddMembershipBySelfToPersonalOrganization_ThenAddsMembership()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -324,7 +324,7 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToSelfSharedOrganization_ThenAddsMembership()
+        public void WhenAddMembershipBySelfToSharedOrganization_ThenAddsMembership()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -393,6 +393,7 @@ public class EndUserRootSpec
                 && ms.Features == features);
             _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
+
 
 #if TESTINGONLY
         [Fact]
@@ -1343,15 +1344,15 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToPersonsSharedOrganization_ThenAddsMembership()
+        public void WhenAddMembershipByOtherToPersonsSharedOrganization_ThenAddsMembership()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
-
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
+            
             var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 roles, features);
 
@@ -1365,7 +1366,7 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToPersonsPersonalOrganization_ThenReturnsError()
+        public void WhenAddMembershipByOtherToPersonsPersonalOrganization_ThenReturnsError()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -1419,7 +1420,7 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToSelfPersonalOrganization_ThenAddsMembership()
+        public void WhenAddMembershipBySelfToPersonalOrganization_ThenAddsMembership()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -1440,7 +1441,7 @@ public class EndUserRootSpec
         }
 
         [Fact]
-        public void WhenAddMembershipToSelfSharedOrganization_ThenAddsMembership()
+        public void WhenAddMembershipBySelfToSharedOrganization_ThenAddsMembership()
         {
             _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,

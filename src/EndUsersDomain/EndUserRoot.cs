@@ -438,7 +438,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
     public Result<Error> AddMembership(EndUserRoot adder, OrganizationOwnership ownership, Identifier organizationId,
         Roles tenantRoles, Features tenantFeatures)
     {
-        var skipOwnershipCheck = adder.Id == Id;
+        var skipOwnershipCheck = IsSelf(adder);
         if (!skipOwnershipCheck)
         {
             if (!IsAnOrganizationOwner(adder, organizationId))
@@ -641,6 +641,11 @@ public sealed partial class EndUserRoot : AggregateRootBase
         }
 
         return Result.Ok;
+    }
+
+    private bool IsSelf(EndUserRoot user)
+    {
+        return user.Id == Id;
     }
 
     private static bool IsServiceAccount(Identifier userId)
