@@ -16,6 +16,9 @@
       "maxDequeueCount": 5,
       "newBatchThreshold": 8,
       "messageEncoding": "base64"
+    },
+    "serviceBus": {
+      "maxConcurrentCalls": 1
     }
   }
 }
