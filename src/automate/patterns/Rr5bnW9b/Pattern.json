@@ -1,0 +1,776 @@
+{
+  "Id": "Rr5bnW9b",
+  "Name": "SaaStackSubdomain",
+  "DisplayName": "A Subdomain",
+  "Description": "A subdomain of the code",
+  "Attributes": [
+    {
+      "Id": "YXgA0txD",
+      "Name": "SubdomainName",
+      "DataType": "string",
+      "IsRequired": true,
+      "Choices": []
+    },
+    {
+      "Id": "G141NWxV",
+      "Name": "IsTenanted",
+      "DataType": "bool",
+      "IsRequired": true,
+      "DefaultValue": "true",
+      "Choices": []
+    },
+    {
+      "Id": "Kdwr5Qsg",
+      "Name": "SubdomainType",
+      "DataType": "string",
+      "IsRequired": true,
+      "DefaultValue": "Core",
+      "Choices": [
+        "Core",
+        "Generic"
+      ]
+    }
+  ],
+  "Elements": [
+    {
+      "Id": "SCCm3J82",
+      "Name": "ServiceOperation",
+      "DisplayName": "Operations",
+      "Description": "The service operations of an API",
+      "Attributes": [
+        {
+          "Id": "eWT36KAh",
+          "Name": "ActionName",
+          "DataType": "string",
+          "IsRequired": true,
+          "Choices": []
+        },
+        {
+          "Id": "nHpqaeDh",
+          "Name": "Route",
+          "DataType": "string",
+          "IsRequired": true,
+          "Choices": []
+        },
+        {
+          "Id": "Xnr0G7uT",
+          "Name": "Kind",
+          "DataType": "string",
+          "IsRequired": true,
+          "DefaultValue": "POST",
+          "Choices": [
+            "Post",
+            "PutPatch",
+            "Get",
+            "Search",
+            "Delete"
+          ]
+        },
+        {
+          "Id": "WwhB5D5W",
+          "Name": "IsAuthorized",
+          "DataType": "bool",
+          "IsRequired": true,
+          "DefaultValue": "true",
+          "Choices": []
+        },
+        {
+          "Id": "KZbbBxUk",
+          "Name": "IsTestingOnly",
+          "DataType": "bool",
+          "IsRequired": true,
+          "DefaultValue": "false",
+          "Choices": []
+        }
+      ],
+      "CodeTemplates": [
+        {
+          "Id": "UvdpGxnp",
+          "Name": "Validator",
+          "LastModifiedUtc": "2025-03-01T23:56:22.867301Z",
+          "Metadata": {
+            "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Api\\Cars\\RegisterCarRequestValidator.cs",
+            "OriginalFileExtension": ".cs"
+          }
+        },
+        {
+          "Id": "1v0Ya3yJ",
+          "Name": "Request",
+          "LastModifiedUtc": "2025-03-01T23:56:22.8519132Z",
+          "Metadata": {
+            "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\Infrastructure.Web.Api.Operations.Shared\\Cars\\RegisterCarRequest.cs",
+            "OriginalFileExtension": ".cs"
+          }
+        },
+        {
+          "Id": "Sd092DZX",
+          "Name": "Response",
+          "LastModifiedUtc": "2025-03-01T23:56:22.8653014Z",
+          "Metadata": {
+            "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\Infrastructure.Web.Api.Operations.Shared\\Cars\\GetCarResponse.cs",
+            "OriginalFileExtension": ".cs"
+          }
+        },
+        {
+          "Id": "KJfdcqvr",
+          "Name": "ValidatorSpec",
+          "LastModifiedUtc": "2025-03-01T23:56:22.8590522Z",
+          "Metadata": {
+            "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure.UnitTests\\Api\\Cars\\RegisterCarRequestValidatorSpec.cs",
+            "OriginalFileExtension": ".cs"
+          }
+        }
+      ],
+      "Automation": [
+        {
+          "Id": "NWpdRy7S",
+          "Name": "CodeTemplateCommand1",
+          "Type": "CodeTemplateCommand",
+          "Metadata": {
+            "CodeTemplateId": "UvdpGxnp",
+            "IsOneOff": true,
+            "FilePath": "~/{{Parent.SubdomainName | string.pascalplural}}Infrastructure/Api/{{Parent.SubdomainName | string.pascalplural}}/{{ActionName}}{{if (Kind==\u0022Search\u0022)}}{{Parent.SubdomainName | string.pascalplural}}{{else}}{{Parent.SubdomainName | string.pascalsingular}}{{end}}RequestValidator.cs"
+          }
+        },
+        {
+          "Id": "eCT8kUzk",
+          "Name": "CodeTemplateCommand2",
+          "Type": "CodeTemplateCommand",
+          "Metadata": {
+            "CodeTemplateId": "KJfdcqvr",
+            "IsOneOff": true,
+            "FilePath": "~/{{Parent.SubdomainName | string.pascalplural}}Infrastructure.UnitTests/Api/{{Parent.SubdomainName | string.pascalplural}}/{{ActionName}}{{if (Kind==\u0022Search\u0022)}}{{Parent.SubdomainName | string.pascalplural}}{{else}}{{Parent.SubdomainName | string.pascalsingular}}{{end}}RequestValidatorSpec.cs"
+          }
+        },
+        {
+          "Id": "Wz8CQ8bm",
+          "Name": "CodeTemplateCommand3",
+          "Type": "CodeTemplateCommand",
+          "Metadata": {
+            "CodeTemplateId": "1v0Ya3yJ",
+            "IsOneOff": true,
+            "FilePath": "~/Infrastructure.Web.Api.Operations.Shared/{{Parent.SubdomainName | string.pascalplural}}/{{ActionName}}{{if (Kind==\u0022Search\u0022)}}{{Parent.SubdomainName | string.pascalplural}}{{else}}{{Parent.SubdomainName | string.pascalsingular}}{{end}}Request.cs"
+          }
+        },
+        {
+          "Id": "CgaZdp1r",
+          "Name": "CodeTemplateCommand4",
+          "Type": "CodeTemplateCommand",
+          "Metadata": {
+            "CodeTemplateId": "Sd092DZX",
+            "IsOneOff": true,
+            "FilePath": "~/Infrastructure.Web.Api.Operations.Shared/{{Parent.SubdomainName | string.pascalplural}}/{{ActionName}}{{if (Kind==\u0022Search\u0022)}}{{Parent.SubdomainName | string.pascalplural}}{{else}}{{Parent.SubdomainName | string.pascalsingular}}{{end}}Response.cs"
+          }
+        }
+      ],
+      "IsCollection": true,
+      "Cardinality": "ZeroOrMany",
+      "AutoCreate": false
+    }
+  ],
+  "CodeTemplates": [
+    {
+      "Id": "xvSp97Hd",
+      "Name": "InfrastructureProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8757986Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\CarsInfrastructure.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "ny7nZxA9",
+      "Name": "InfrastructureResources",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8718178Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Resources.resx",
+        "OriginalFileExtension": ".resx"
+      }
+    },
+    {
+      "Id": "CMYqfkfQ",
+      "Name": "InfrastructureResourcesDesigner",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8569942Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Resources.Designer.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "tJ5DYQUY",
+      "Name": "SubModule",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8728346Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\CarsModule.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "FCuqmKMK",
+      "Name": "SubdomainApi",
+      "LastModifiedUtc": "2025-03-02T00:17:34.3484002Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Api\\Cars\\CarsApi.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "P3uMw9gd",
+      "Name": "ServiceClient",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8610735Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\ApplicationServices\\CarsInProcessServiceClient.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "v5exnxdy",
+      "Name": "ApplicationService",
+      "LastModifiedUtc": "2025-03-01T23:56:22.873825Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\Application.Services.Shared\\ICarsService.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "AuqPU8nV",
+      "Name": "Projection",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8569942Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Persistence\\ReadModels\\CarProjection.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "PXfKBddc",
+      "Name": "Repository",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8621078Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure\\Persistence\\CarRepository.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "VdgnFJCJ",
+      "Name": "InfrastructureUnitTestProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.867301Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure.UnitTests\\CarsInfrastructure.UnitTests.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "uU9bW39T",
+      "Name": "InfrastructureIntegrationTestProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.873825Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure.IntegrationTests\\CarsInfrastructure.IntegrationTests.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "A8JeTFfU",
+      "Name": "InfrastructureIntegrationTestAppSettings",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8519132Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure.IntegrationTests\\appsettings.Testing.json",
+        "OriginalFileExtension": ".json"
+      }
+    },
+    {
+      "Id": "1b1q9tUY",
+      "Name": "InfrastructureIntegrationTestApiSpec",
+      "LastModifiedUtc": "2025-03-01T23:56:22.84343Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsInfrastructure.IntegrationTests\\CarsApiSpec.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "AXzFN5zb",
+      "Name": "ApplicationProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8519132Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication\\CarsApplication.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "KVKj59sF",
+      "Name": "ApplicationClass",
+      "LastModifiedUtc": "2025-03-02T00:17:35.3645672Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication\\CarsApplication.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "mX4DzTmF",
+      "Name": "ApplicationInterface",
+      "LastModifiedUtc": "2025-03-02T00:17:36.3645656Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication\\ICarsApplication.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "TYk7cDWb",
+      "Name": "ApplicationRepository",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8653014Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication\\Persistence\\ICarRepository.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "R0uuc833",
+      "Name": "ApplicationReadModel",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8643003Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication\\Persistence\\ReadModels\\Car.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "aZP2CpjF",
+      "Name": "ApplicationUnitTestProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8683013Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication.UnitTests\\CarsApplication.UnitTests.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "kxEeJ7fh",
+      "Name": "ApplicationUnitTestClassSpec",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8702988Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsApplication.UnitTests\\CarsApplicationSpec.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "baGtrDZs",
+      "Name": "ApplicationResourceDto",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8693011Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\Application.Resources.Shared\\Car.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "QzDdgWm0",
+      "Name": "DomainProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8633031Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\CarsDomain.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "x8UUk1Qu",
+      "Name": "DomainResources",
+      "LastModifiedUtc": "2025-03-01T23:56:22.873825Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\Resources.resx",
+        "OriginalFileExtension": ".resx"
+      }
+    },
+    {
+      "Id": "TaP2YBEx",
+      "Name": "DomainResourcesDesigner",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8663024Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\Resources.Designer.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "S2CBwEG4",
+      "Name": "DomainAggregate",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8643003Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\CarRoot.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "tzh1qgBN",
+      "Name": "DomainEvents",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8728346Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\Events.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "QfSk0j7W",
+      "Name": "DomainValidations",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8621078Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain\\Validations.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "j9y4hfyv",
+      "Name": "DomainUnitTestProject",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8702988Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain.UnitTests\\CarsDomain.UnitTests.csproj",
+        "OriginalFileExtension": ".csproj"
+      }
+    },
+    {
+      "Id": "arbfPHTU",
+      "Name": "DomainUnitTestAggregateSpec",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8683013Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\CarsDomain.UnitTests\\CarRootSpec.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    },
+    {
+      "Id": "NyHD991x",
+      "Name": "DomainCreationEvent",
+      "LastModifiedUtc": "2025-03-01T23:56:22.8599988Z",
+      "Metadata": {
+        "OriginalFilePath": "C:\\Projects\\github\\jezzsantos\\saastack\\src\\Domain.Events.Shared\\Cars\\Created.cs",
+        "OriginalFileExtension": ".cs"
+      }
+    }
+  ],
+  "Automation": [
+    {
+      "Id": "N5jksUPC",
+      "Name": "CodeTemplateCommand1",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "xvSp97Hd",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/{{SubdomainName | string.pascalplural}}Infrastructure.csproj"
+      }
+    },
+    {
+      "Id": "nK8HRgdm",
+      "Name": "CodeTemplateCommand2",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "ny7nZxA9",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/Resources.resx"
+      }
+    },
+    {
+      "Id": "kkwsw8Rv",
+      "Name": "CodeTemplateCommand3",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "CMYqfkfQ",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/Resources.Designer.cs"
+      }
+    },
+    {
+      "Id": "CAARnHNG",
+      "Name": "CodeTemplateCommand4",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "tJ5DYQUY",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/{{SubdomainName | string.pascalplural}}Module.cs"
+      }
+    },
+    {
+      "Id": "TkuZkWGM",
+      "Name": "CodeTemplateCommand5",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "FCuqmKMK",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/Api/{{SubdomainName | string.pascalplural}}/{{SubdomainName | string.pascalplural}}Api.cs"
+      }
+    },
+    {
+      "Id": "81MqZEBZ",
+      "Name": "CodeTemplateCommand6",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "P3uMw9gd",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/ApplicationServices/{{SubdomainName | string.pascalplural}}InProcessServiceClient.cs"
+      }
+    },
+    {
+      "Id": "4ST5QAJp",
+      "Name": "CodeTemplateCommand7",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "v5exnxdy",
+        "IsOneOff": true,
+        "FilePath": "~/Application.Services.Shared/I{{SubdomainName | string.pascalplural}}Service.cs"
+      }
+    },
+    {
+      "Id": "pjeQm5sP",
+      "Name": "CodeTemplateCommand8",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "AuqPU8nV",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/Persistence/ReadModels/{{SubdomainName | string.pascalsingular}}Projection.cs"
+      }
+    },
+    {
+      "Id": "jKVhpKVw",
+      "Name": "CodeTemplateCommand9",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "PXfKBddc",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure/Persistence/{{SubdomainName | string.pascalsingular}}Repository.cs"
+      }
+    },
+    {
+      "Id": "UPN44B6f",
+      "Name": "CodeTemplateCommand10",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "VdgnFJCJ",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure.UnitTests/{{SubdomainName | string.pascalplural}}Infrastructure.UnitTests.csproj"
+      }
+    },
+    {
+      "Id": "xgdgWBcX",
+      "Name": "CodeTemplateCommand11",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "uU9bW39T",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests/{{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests.csproj"
+      }
+    },
+    {
+      "Id": "6xaC5DmD",
+      "Name": "CodeTemplateCommand12",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "A8JeTFfU",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests/appsettings.Testing.json"
+      }
+    },
+    {
+      "Id": "WjZd2Ea5",
+      "Name": "CodeTemplateCommand13",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "1b1q9tUY",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests/{{SubdomainName | string.pascalplural}}ApiSpec.cs"
+      }
+    },
+    {
+      "Id": "M2e5eE2w",
+      "Name": "CodeTemplateCommand14",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "AXzFN5zb",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application/{{SubdomainName | string.pascalplural}}Application.csproj"
+      }
+    },
+    {
+      "Id": "3tZQ0caH",
+      "Name": "CodeTemplateCommand15",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "KVKj59sF",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application/{{SubdomainName | string.pascalplural}}Application.cs"
+      }
+    },
+    {
+      "Id": "8t2fRH7R",
+      "Name": "CodeTemplateCommand16",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "mX4DzTmF",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application/I{{SubdomainName | string.pascalplural}}Application.cs"
+      }
+    },
+    {
+      "Id": "JU70shPH",
+      "Name": "CodeTemplateCommand17",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "TYk7cDWb",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application/Persistence/I{{SubdomainName | string.pascalsingular}}Repository.cs"
+      }
+    },
+    {
+      "Id": "MNafYpEE",
+      "Name": "CodeTemplateCommand18",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "R0uuc833",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application/Persistence/ReadModels/{{SubdomainName | string.pascalsingular}}.cs"
+      }
+    },
+    {
+      "Id": "ypuVHgX8",
+      "Name": "CodeTemplateCommand19",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "aZP2CpjF",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application.UnitTests/{{SubdomainName | string.pascalplural}}Application.UnitTests.csproj"
+      }
+    },
+    {
+      "Id": "mFYkD4Wa",
+      "Name": "CodeTemplateCommand20",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "kxEeJ7fh",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Application.UnitTests/{{SubdomainName | string.pascalplural}}ApplicationSpec.cs"
+      }
+    },
+    {
+      "Id": "7yPQ8ewt",
+      "Name": "CodeTemplateCommand21",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "baGtrDZs",
+        "IsOneOff": true,
+        "FilePath": "~/Application.Resources.Shared/{{SubdomainName | string.pascalsingular}}.cs"
+      }
+    },
+    {
+      "Id": "3pYdKu9P",
+      "Name": "CodeTemplateCommand22",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "QzDdgWm0",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/{{SubdomainName | string.pascalplural}}Domain.csproj"
+      }
+    },
+    {
+      "Id": "4rbVJAD2",
+      "Name": "CodeTemplateCommand23",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "x8UUk1Qu",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/Resources.resx"
+      }
+    },
+    {
+      "Id": "6WQAy3MM",
+      "Name": "CodeTemplateCommand24",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "TaP2YBEx",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/Resources.Designer.cs"
+      }
+    },
+    {
+      "Id": "akEYcQpW",
+      "Name": "CodeTemplateCommand25",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "S2CBwEG4",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/{{SubdomainName | string.pascalsingular}}Root.cs"
+      }
+    },
+    {
+      "Id": "zg3ms2yn",
+      "Name": "CodeTemplateCommand26",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "tzh1qgBN",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/Events.cs"
+      }
+    },
+    {
+      "Id": "MFDgPcGs",
+      "Name": "CodeTemplateCommand27",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "QfSk0j7W",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain/Validations.cs"
+      }
+    },
+    {
+      "Id": "FtyZNJjr",
+      "Name": "CodeTemplateCommand28",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "j9y4hfyv",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain.UnitTests/{{SubdomainName | string.pascalplural}}Domain.UnitTests.csproj"
+      }
+    },
+    {
+      "Id": "ftM8MMdw",
+      "Name": "CodeTemplateCommand29",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "arbfPHTU",
+        "IsOneOff": true,
+        "FilePath": "~/{{SubdomainName | string.pascalplural}}Domain.UnitTests/{{SubdomainName | string.pascalsingular}}RootSpec.cs"
+      }
+    },
+    {
+      "Id": "NRsbhkrm",
+      "Name": "CodeTemplateCommand30",
+      "Type": "CodeTemplateCommand",
+      "Metadata": {
+        "CodeTemplateId": "NyHD991x",
+        "IsOneOff": true,
+        "FilePath": "~/Domain.Events.Shared/{{SubdomainName | string.pascalplural}}/Created.cs"
+      }
+    },
+    {
+      "Id": "7tePtbJ7",
+      "Name": "CliCommand31",
+      "Type": "CliCommand",
+      "Metadata": {
+        "ApplicationName": "dotnet",
+        "Arguments": "sln add {{SubdomainName | string.pascalplural}}Infrastructure/{{SubdomainName | string.pascalplural}}Infrastructure.csproj {{SubdomainName | string.pascalplural}}Application/{{SubdomainName | string.pascalplural}}Application.csproj {{SubdomainName | string.pascalplural}}Domain/{{SubdomainName | string.pascalplural}}Domain.csproj --solution-folder Subdomains\\{{SubdomainType}}\\{{SubdomainName | string.pascalplural}}"
+      }
+    },
+    {
+      "Id": "2ws0D1u0",
+      "Name": "CliCommand32",
+      "Type": "CliCommand",
+      "Metadata": {
+        "ApplicationName": "dotnet",
+        "Arguments": "sln add {{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests/{{SubdomainName | string.pascalplural}}Infrastructure.IntegrationTests.csproj {{SubdomainName | string.pascalplural}}Infrastructure.UnitTests/{{SubdomainName | string.pascalplural}}Infrastructure.UnitTests.csproj {{SubdomainName | string.pascalplural}}Application.UnitTests/{{SubdomainName | string.pascalplural}}Application.UnitTests.csproj  {{SubdomainName | string.pascalplural}}Domain.UnitTests/{{SubdomainName | string.pascalplural}}Domain.UnitTests.csproj --solution-folder Subdomains\\{{SubdomainType}}\\{{SubdomainName | string.pascalplural}}\\Tests"
+      }
+    },
+    {
+      "Id": "UPpXebqq",
+      "Name": "Generate",
+      "Type": "CommandLaunchPoint",
+      "Metadata": {
+        "CommandIds": "N5jksUPC;nK8HRgdm;kkwsw8Rv;CAARnHNG;TkuZkWGM;81MqZEBZ;4ST5QAJp;pjeQm5sP;jKVhpKVw;UPN44B6f;xgdgWBcX;6xaC5DmD;WjZd2Ea5;M2e5eE2w;3tZQ0caH;8t2fRH7R;JU70shPH;MNafYpEE;ypuVHgX8;mFYkD4Wa;7yPQ8ewt;3pYdKu9P;4rbVJAD2;6WQAy3MM;akEYcQpW;zg3ms2yn;MFDgPcGs;FtyZNJjr;ftM8MMdw;NRsbhkrm;7tePtbJ7;2ws0D1u0;NWpdRy7S;eCT8kUzk;Wz8CQ8bm;CgaZdp1r"
+      }
+    }
+  ],
+  "ToolkitVersion": {
+    "Current": "1.0.0",
+    "LastChanges": "NoChange"
+  },
+  "RuntimeVersion": "1.3.1"
+}

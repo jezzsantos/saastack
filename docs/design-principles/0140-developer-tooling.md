@@ -91,6 +91,20 @@ TBD
 
 TBD
 
+## Pattern Toolkits
+
+> WARNING: This feature is available as a CLI and available in JetBrains Rider as a plugin called `automate`
+
+We have at least one Pattern Toolkit for creating the solution structure for a Subdomain.
+
+Building new subdomains, and the module that goes inside them is a large task, involving many projects and initial files.
+
+This toolkit lays out all the projects and initial files, and gives the developer a head start on building out their new API, outside in.
+
+You can see [how to build any pattern toolkit](../how-to-guides/200-create-pattern-toolkit.md), like this one.
+
+Or use the provided toolkit [to create new Subdomains](../how-to-guides/200-create-pattern-toolkit.md#install-the-toolkit). 
+
 Others:
 
 Specific class properties:
@@ -105,7 +119,7 @@ Specific class properties:
 
 TBD
 
-## Swagger UI
+## Open API Documentation
 
 > a.k.a. OpenAPI documentation
 

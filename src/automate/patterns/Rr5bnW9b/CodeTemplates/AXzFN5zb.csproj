@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
+        <ProjectReference Include="..\{{SubdomainName | string.pascalplural}}Domain\{{SubdomainName | string.pascalplural}}Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+</Project>

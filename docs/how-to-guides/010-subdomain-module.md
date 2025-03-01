@@ -56,9 +56,11 @@ Your subdomain is going to be implemented in about 7-8 different projects, all i
 
 Create a new Solution folder with the name of your subdomain, in either the `Subdomains/Core` or `Subdomains/Generic` solution folder.
 
-To that solution folder, add another one called `Tests` . This is where your various test projects live.
+To that solution folder, add another one called `Tests`. This is where your various test projects live.
 
-Now follow the following sections to build out the skeleton of your subdomain in projects.
+Now, follow the following sections to build out the skeleton of your subdomain in projects manually.
+
+> As an alternative, you can automate this whole process using the Subdomain pattern toolkit, described in [Create a Pattern Toolkit](200-create-pattern-toolkit.md#install-the-toolkit)
 
 We are going to start at the innermost projects, move outwards to the project where your API is built, and then back inwards with your implementation.
 
