@@ -17,6 +17,9 @@ function initializeApiClient() {
       accept: "application/json",
       "content-type": "application/json",
       "anti-csrf-tok": csrfToken
+    },
+    paramsSerializer: {
+      indexes: null // To prevent axios from encoding array indexes in the query string
     }
   });
   websiteHost.setConfig({
@@ -25,6 +28,9 @@ function initializeApiClient() {
       accept: "application/json",
       "content-type": "application/json",
       "anti-csrf-tok": csrfToken
+    },
+    paramsSerializer: {
+      indexes: null // To prevent axios from encoding array indexes in the query string
     }
   });
 

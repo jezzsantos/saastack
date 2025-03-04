@@ -90,6 +90,26 @@ public class GeneralApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
+    public async Task WhenGetWithSimpleArrayInSimpleArray_ThenReturns()
+    {
+        var result = await HttpApi.GetAsync("/testingonly/general/get/array?anarray=a&anarray=b&anarray=c");
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await result.Content.ReadAsStringAsync();
+        content.Should().Be("{\"message\":\"a, b, c\"}");
+    }
+
+    [Fact]
+    public async Task WhenGetWithSimpleArrayInAxiosArray_ThenReturnsNoArray()
+    {
+        var result = await HttpApi.GetAsync("/testingonly/general/get/array?anarray[]=a&anarray[]=b&anarray[]=c");
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await result.Content.ReadAsStringAsync();
+        content.Should().Be("{\"message\":\"\"}");
+    }
+
+    [Fact]
     public async Task WhenPostWithEmptyBodyAndMissingRequiredProperties_ThenThrows()
     {
         try
