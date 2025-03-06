@@ -23,10 +23,18 @@ public class CarsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenDeleteCar_ThenDeletes()
+    public async Task WhenDeleteCarWithUnavailabilities_ThenDeletes()
     {
         var login = await LoginUserAsync();
         var car = await RegisterNewCarAsync(login);
+        var datum = DateTime.UtcNow.AddDays(2);
+
+        await Api.PutAsync(new TakeOfflineCarRequest
+        {
+            Id = car.Id,
+            FromUtc = datum,
+            ToUtc = datum.AddHours(1)
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.DeleteAsync(new DeleteCarRequest { Id = car.Id },
             req => req.SetJWTBearerToken(login.AccessToken));

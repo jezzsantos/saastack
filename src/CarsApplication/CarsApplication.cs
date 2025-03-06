@@ -40,6 +40,12 @@ public class CarsApplication : ICarsApplication
             return deleted.Error;
         }
 
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
         _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Id);
         return Result.Ok;
     }

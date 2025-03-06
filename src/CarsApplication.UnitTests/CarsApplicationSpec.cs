@@ -69,6 +69,9 @@ public class CarsApplicationSpec
             await _application.DeleteCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
 
         result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<CarRoot>(c =>
+            c.IsDeleted
+        ), It.IsAny<CancellationToken>()));
     }
 
     [Fact]

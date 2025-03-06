@@ -72,6 +72,11 @@ public class CarProjection : IReadModelProjection
             case UnavailabilitySlotRemoved e:
                 return await _unavailabilities.HandleDeleteAsync(e.UnavailabilityId, cancellationToken);
 
+            case Deleted e:
+                return await Tasks.WhenAllAsync(
+                    _unavailabilities.HandleDeleteRelatedAsync(e.RootId, dto => dto.CarId, cancellationToken),
+                    _cars.HandleDeleteAsync(e.RootId, cancellationToken));
+
             default:
                 return false;
         }
