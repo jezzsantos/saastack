@@ -17,6 +17,9 @@
 # AWS User-specific
 .idea/**/aws.xml
 
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
 # Generated files
 .idea/**/contentModel.xml
 
