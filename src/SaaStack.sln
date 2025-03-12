@@ -420,6 +420,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQLServer", "SQLServer", "{
 		..\iac\Azure\SQLServer\AzureSQLServer-Seed-Snapshotting-Generic.sql = ..\iac\Azure\SQLServer\AzureSQLServer-Seed-Snapshotting-Generic.sql
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Persistence.OnPremises", "Infrastructure.Persistence.OnPremises\Infrastructure.Persistence.OnPremises.csproj", "{D43A1CB8-337B-4E64-BA63-426766445AA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1333,6 +1335,12 @@ Global
 		{7549CF63-1BA4-44EC-B4AF-32C2145A71E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7549CF63-1BA4-44EC-B4AF-32C2145A71E2}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{7549CF63-1BA4-44EC-B4AF-32C2145A71E2}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{D43A1CB8-337B-4E64-BA63-426766445AA8}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}

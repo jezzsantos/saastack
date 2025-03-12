@@ -1,6 +1,8 @@
 ﻿#if !TESTINGONLY
 using Infrastructure.Persistence.Common.ApplicationServices;
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+using Infrastructure.Persistence.OnPremises.ApplicationServices;
+#elif HOSTEDONAZURE
 using Infrastructure.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
 using Infrastructure.Persistence.AWS.ApplicationServices;
@@ -33,7 +35,9 @@ public class QueuedAuditReporter : IAuditReporter
         : this(new AuditMessageQueueRepository(NoOpRecorder.Instance,
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+            RabbitMqQueueStore.Create(NoOpRecorder.Instance, RabbitMqStoreOptions.FromCredentials(settings))
+#elif HOSTEDONAZURE
             AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, AzureStorageAccountStoreOptions.Credentials(settings))
 #elif HOSTEDONAWS
             AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)

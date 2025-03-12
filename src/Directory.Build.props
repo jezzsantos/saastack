@@ -76,7 +76,7 @@
         <Platforms>AnyCPU</Platforms>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-        <HostingPlatform>HOSTEDONAZURE</HostingPlatform> <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
+        <HostingPlatform>HOSTEDONPREMISES</HostingPlatform> <!-- Hosting platform (`HOSTEDONPREMISES` or `HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
@@ -84,7 +84,7 @@
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>$(DefineConstants);DEBUG;TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>

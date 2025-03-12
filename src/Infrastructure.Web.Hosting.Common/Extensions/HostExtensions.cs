@@ -46,7 +46,10 @@ using Microsoft.OpenApi.Models;
 #if !TESTINGONLY
 using Infrastructure.Persistence.Common.ApplicationServices;
 
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+using Infrastructure.Persistence.OnPremises.ApplicationServices;
+
+#elif HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 
@@ -129,7 +132,9 @@ public static class HostExtensions
 
         void RegisterConfiguration(bool isMultiTenanted)
         {
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+            appBuilder.Configuration.AddJsonFile("appsettings.OnPremises.json", true);
+#elif HOSTEDONAZURE
             appBuilder.Configuration.AddJsonFile("appsettings.Azure.json", true);
 #elif HOSTEDONAWS
             appBuilder.Configuration.AddJsonFile("appsettings.AWS.json", true);
@@ -167,7 +172,7 @@ public static class HostExtensions
             {
                 builder.ClearProviders();
                 builder.AddConfiguration(appBuilder.Configuration.GetSection(LoggingSettingName));
-#if TESTINGONLY
+#if TESTINGONLY || HOSTEDONPREMISES
                 builder.AddSimpleConsole(options =>
                 {
                     options.TimestampFormat = "hh:mm:ss ";
@@ -215,9 +220,9 @@ public static class HostExtensions
             }
 
             var onlyHMAC = authentication is
-                { UsesHMAC: true, UsesTokens: false, UsesApiKeys: false };
+            { UsesHMAC: true, UsesTokens: false, UsesApiKeys: false };
             var onlyApiKey = authentication is
-                { UsesApiKeys: true, UsesTokens: false, UsesHMAC: false };
+            { UsesApiKeys: true, UsesTokens: false, UsesHMAC: false };
             if (onlyHMAC || onlyApiKey)
             {
                 // Note: This is necessary in some versions of dotnet so that the only scheme is not applied to all endpoints by default
@@ -486,7 +491,57 @@ public static class HostExtensions
 #if TESTINGONLY
             TestingOnlyHostExtensions.RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else
-#if HOSTEDONAZURE
+#if HOSTEDONPREMISES
+            // EXTEND: Add your production stores here
+            services.AddForPlatform<IDataStore, IEventStore, SqlServerStore>(c =>
+                SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                    SqlServerStoreOptions.Credentials(c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IBlobStore>(c =>
+                SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                    SqlServerStoreOptions.Credentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IQueueStore>(c =>
+                RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                    RabbitMqStoreOptions.FromCredentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IMessageBusStore>(c =>
+                RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                    RabbitMqStoreOptions.FromCredentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+
+            if (isMultiTenanted)
+            {
+                services.AddPerHttpRequest<IDataStore, IEventStore, SqlServerStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IBlobStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IQueueStore>(c =>
+                    RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IMessageBusStore>(c =>
+                    RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+            }
+            else
+            {
+                services.AddSingleton<IDataStore, IEventStore, SqlServerStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+                services.AddSingleton<IBlobStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddSingleton<IQueueStore>(c =>
+                    RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddSingleton<IMessageBusStore>(c =>
+                    RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+            }
+#elif HOSTEDONAZURE
             // EXTEND: Add your production stores here
             services.AddForPlatform<IDataStore, IEventStore, AzureSqlServerStore>(c =>
                 AzureSqlServerStore.Create(c.GetRequiredService<IRecorder>(),
