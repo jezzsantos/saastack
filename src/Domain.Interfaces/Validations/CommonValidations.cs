@@ -1,6 +1,5 @@
 ﻿using Common;
 using Common.Extensions;
-using PhoneNumbers;
 
 namespace Domain.Interfaces.Validations;
 
@@ -21,29 +20,7 @@ public static class CommonValidations
     /// <summary>
     ///     Validations for International
     /// </summary>
-    public static readonly Validation PhoneNumber = new(value =>
-    {
-        if (!value.HasValue())
-        {
-            return false;
-        }
-
-        if (!value.StartsWith("+"))
-        {
-            return false;
-        }
-
-        var util = PhoneNumberUtil.GetInstance();
-        try
-        {
-            var number = util.Parse(value, null);
-            return util.IsValidNumber(number);
-        }
-        catch (NumberParseException)
-        {
-            return false;
-        }
-    });
+    public static readonly Validation PhoneNumber = new(Common.PhoneNumbers.IsValidInternational);
 
     public static readonly Validation RoleLevel = new(@"^[\w\d]{4,30}$", 4, 30);
     public static readonly Validation Timezone = new(Timezones.Exists);

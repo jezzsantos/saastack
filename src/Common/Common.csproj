@@ -15,6 +15,7 @@
         <PackageReference Include="ISO.4217.CurrencyCodes" Version="1.0.10" />
         <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
         <PackageReference Include="NodaTime" Version="3.1.6" />
+        <PackageReference Include="libphonenumber-csharp" Version="8.13.55" />
     </ItemGroup>
 
     <ItemGroup>

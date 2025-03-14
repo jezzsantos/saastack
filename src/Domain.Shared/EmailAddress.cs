@@ -58,7 +58,7 @@ public sealed class EmailAddress : SingleValueObjectBase<EmailAddress, string>
         }
 
         const char usernameDelimiter = '.';
-        var parts = emailAddress.Split(new[] { '+', '@' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = emailAddress.Split(['+', '@'], StringSplitOptions.RemoveEmptyEntries);
         var username = parts[0];
 
         var usernameParts = username.Split(usernameDelimiter);
