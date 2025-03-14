@@ -4,6 +4,8 @@ using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
 using Infrastructure.Persistence.AWS.ApplicationServices;
+#elif HOSTEDONPREMISES
+using Infrastructure.Persistence.OnPremises.ApplicationServices;
 #endif
 #else
 using Infrastructure.Persistence.Interfaces;
@@ -38,6 +40,8 @@ public class QueuedUsageReporter : IUsageReporter
             AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, AzureStorageAccountStoreOptions.Credentials(settings))
 #elif HOSTEDONAWS
             AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
+#elif  HOSTEDONPREMISES
+            RabbitMqQueueStore.Create(NoOpRecorder.Instance, RabbitMqStoreOptions.FromCredentials(settings))
 #endif
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()
