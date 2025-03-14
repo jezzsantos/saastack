@@ -156,7 +156,7 @@ public static class Optional
     /// </summary>
     public static bool TryGetContainedValue(this object? value, out object? contained)
     {
-        contained = default;
+        contained = null;
         if (value is null)
         {
             return false;
@@ -180,8 +180,8 @@ public static class Optional
     private static object ChangeOptionalType(object? value, Type targetType)
     {
         var targetOptionalType = typeof(Optional<>).MakeGenericType(targetType);
-        var ctor = targetOptionalType.GetConstructor(new[] { targetType });
-        var instance = ctor!.Invoke(new[] { value });
+        var ctor = targetOptionalType.GetConstructor([targetType]);
+        var instance = ctor!.Invoke([value]);
         return instance;
     }
 }
@@ -327,7 +327,12 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
             return !other.HasValue;
         }
 
-        return EqualityComparer<TValue>.Default.Equals(Value, other.Value);
+        if (other.HasValue)
+        {
+            return EqualityComparer<TValue>.Default.Equals(Value, other.Value);
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -339,7 +339,7 @@ public class OptionalOfTSpec
     }
 
     [Fact]
-    public void WhenEqualsOperatorWithEmptyOptionalAndWithNone_ThenReturnsTrue()
+    public void WhenEqualsOperatorWithEmptyAndNone_ThenReturnsTrue()
     {
         var optional1 = new Optional<TestClass>();
         var optional2 = Optional<TestClass>.None;
@@ -350,7 +350,18 @@ public class OptionalOfTSpec
     }
 
     [Fact]
-    public void WhenEqualsOperatorWithNoneAndWithNone_ThenReturnsTrue()
+    public void WhenEqualsOperatorWithNoneAndEmpty_ThenReturnsTrue()
+    {
+        var optional1 = Optional<TestClass>.None;
+        var optional2 = new Optional<TestClass>();
+
+        var result = optional1 == optional2;
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithNoneAndNone_ThenReturnsTrue()
     {
         var optional1 = Optional<TestClass>.None;
         var optional2 = Optional<TestClass>.None;
@@ -361,7 +372,7 @@ public class OptionalOfTSpec
     }
 
     [Fact]
-    public void WhenEqualsOperatorWithEmptyOptionals_ThenReturnsTrue()
+    public void WhenEqualsOperatorWithEmptyAndEmpty_ThenReturnsTrue()
     {
         var optional1 = new Optional<TestClass>();
         var optional2 = new Optional<TestClass>();
@@ -371,8 +382,65 @@ public class OptionalOfTSpec
         result.Should().BeTrue();
     }
 
+    
     [Fact]
-    public void WhenEqualsOperatorWithSameOptionals_ThenReturnsTrue()
+    public void WhenEqualsOperatorWithEmptyAndSome_ThenReturnsFalse()
+    {
+        var optional1 = new Optional<TestClass>();
+        var optional2 = new Optional<TestClass>(new TestClass
+        {
+            AProperty = "avalue"
+        });
+
+        var result = optional1 == optional2;
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithSomeAndEmpty_ThenReturnsFalse()
+    {
+        var optional1 = new Optional<TestClass>(new TestClass
+        {
+            AProperty = "avalue"
+        });
+        var optional2 = new Optional<TestClass>();
+
+        var result = optional1 == optional2;
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithNoneAndSome_ThenReturnsFalse()
+    {
+        var optional1 = Optional<TestClass>.None;
+        var optional2 = new Optional<TestClass>(new TestClass
+        {
+            AProperty = "avalue"
+        });
+
+        var result = optional1 == optional2;
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithSomeAndNone_ThenReturnsFalse()
+    {
+        var optional1 = new Optional<TestClass>(new TestClass
+        {
+            AProperty = "avalue"
+        });
+        var optional2 = Optional<TestClass>.None;
+
+        var result = optional1 == optional2;
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithSameInstance_ThenReturnsTrue()
     {
         var instance = new TestClass { AProperty = "avalue" };
         var optional1 = new Optional<TestClass>(instance);
