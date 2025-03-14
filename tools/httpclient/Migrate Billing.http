@@ -1,8 +1,7 @@
 ### Register and authenticate user
-
 run ./CreateUser.http
 
-###
+### Export all subscriptions
 
 GET {{apihost1}}/subscriptions/export
 Accept: application/json

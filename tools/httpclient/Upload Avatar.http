@@ -1,5 +1,4 @@
 ### Register and authenticate
-
 run ./CreateUser.http
 
 ### Upload an image from the local machine

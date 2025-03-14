@@ -1,6 +1,3 @@
-### Reset all data
-
-run ./ResetAllData.http
 
 ### Register a user
 
@@ -41,7 +38,7 @@ Content-Type: application/json
 
 ### Drain all events, must be done before any other operation
 
-POST {{apihost1}}/domain_events/drain
+POST {{apihost1}}/event_notifications/drain
 Accept: application/json
 X-Hub-Signature: {{hmac_signature}}
 Content-Type: application/json

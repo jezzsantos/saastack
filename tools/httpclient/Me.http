@@ -1,5 +1,4 @@
 ### Register and authenticate user
-
 run ./CreateUser.http
 
 ### What is my profile?

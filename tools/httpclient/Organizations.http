@@ -1,0 +1,66 @@
+### Register and authenticate user
+run ./CreateUser.http
+
+### Create a shared organization
+
+POST {{apihost1}}/organizations
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Name": "My Company"
+}
+
+### Drain all events, must be done before any other operation
+
+POST {{apihost1}}/event_notifications/drain
+Accept: application/json
+X-Hub-Signature: {{hmac_signature}}
+Content-Type: application/json
+
+{ }
+
+### What Orgs do I have?
+
+GET {{apihost1}}/memberships/me
+Accept: application/json
+Authorization: Bearer {{access_token}}
+
+### Add a machine account to my default organization
+
+POST {{apihost1}}/machines/register
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Name": "My Machine2",
+  "CountryCode": "US",
+  "Timezone": "EST",
+  "ApiKeyExpiresOnUtc": null
+}
+
+
+> {%
+    client.global.set("machine_apikey", response.body.machine.apiKey);
+%}
+
+### Drain all events, must be done before any other operation
+
+POST {{apihost1}}/event_notifications/drain
+Accept: application/json
+X-Hub-Signature: {{hmac_signature}}
+Content-Type: application/json
+
+{ }
+
+### What Orgs does the machine have?
+
+< {%
+    const credentials = Window.btoa(client.global.get('machine_apikey') + ":");
+    request.variables.set("credentials", credentials);
+%}
+GET {{apihost1}}/memberships/me
+Accept: application/json
+Authorization: Basic {{credentials}}

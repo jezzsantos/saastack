@@ -1,5 +1,4 @@
 ### Register and authenticate Operator
-
 run ./CreateUser.http (@username = {{operator_username}})
 
 ### View Email deliveries
