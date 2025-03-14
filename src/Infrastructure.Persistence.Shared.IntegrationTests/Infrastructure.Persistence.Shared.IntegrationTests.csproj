@@ -26,6 +26,10 @@
         <Content Include="appsettings.Testing.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <None Remove="OnPremises\TestDatabaseSchema.sql" />
+        <Content Include="OnPremises\TestDatabaseSchema.sql">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>

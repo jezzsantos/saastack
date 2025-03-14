@@ -217,6 +217,26 @@ public class SecondJoiningTestQueryStoreEntity : IHasIdentity, IQueryableEntity
     public Optional<string> Id { get; set; }
 }
 
+[EntityName("testblobstore")]
+public class TestDataBlobStoreEntity : IHasIdentity, IQueryableEntity
+{
+    private static int _instanceCounter;
+
+    public TestDataBlobStoreEntity(string blobName)
+    {
+        BlobName = blobName;
+        Id = $"anid{++_instanceCounter:00000}";
+    }
+
+    public string BlobName { get; set; }
+
+    public Optional<string> ContentType { get; set; }
+
+    public byte[] Data { get; set; } = null!;
+
+    public Optional<string> Id { get; set; }
+}
+
 public class TestComplexObject
 {
     public string APropertyValue { get; set; } = null!;
