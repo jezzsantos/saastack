@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
+        <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Persistence.Shared.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+</Project>
