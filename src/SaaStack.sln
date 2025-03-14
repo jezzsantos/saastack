@@ -422,6 +422,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQLServer", "SQLServer", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Persistence.OnPremises", "Infrastructure.Persistence.OnPremises\Infrastructure.Persistence.OnPremises.csproj", "{4217419E-FB6E-4F65-B72C-4F2512D49694}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnPremisesWorkerService", "OnPremisesWorkerService\OnPremisesWorkerService.csproj", "{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1341,6 +1343,12 @@ Global
 		{4217419E-FB6E-4F65-B72C-4F2512D49694}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4217419E-FB6E-4F65-B72C-4F2512D49694}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{4217419E-FB6E-4F65-B72C-4F2512D49694}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -1540,5 +1548,6 @@ Global
 		{F39B3109-A863-46EA-AC73-317207764ADE} = {5C263252-2914-4FC0-8AEF-7E936C77CAFD}
 		{1E28068B-6B6A-4808-A09A-25CD0EABB748} = {F39B3109-A863-46EA-AC73-317207764ADE}
 		{4217419E-FB6E-4F65-B72C-4F2512D49694} = {3782A767-2274-4F44-80C6-D6C6EEB9C9A5}
+		{9F60D34D-2D11-42A6-BC8A-A571A5BC151B} = {4B1A213C-36A7-41A7-BFC7-B3CFF5795912}
 	EndGlobalSection
 EndGlobal
