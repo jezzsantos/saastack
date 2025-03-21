@@ -25,7 +25,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
 [Route(""/apath"", OperationMethod.Post)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-[Authorize(Roles.Platform_Operations, Features.Platform_PaidTrial)]
+[Authorize(Roles.Platform_Operations)]
 public class ARequest : IWebRequest
 {
     public string AProperty { get; set; }
@@ -41,7 +41,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Test;
 /// <response code=""405"">A description of an optional specific error response (if desired)</response>
 [Route(""/apath"", OperationMethod.Post)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-[Authorize(Roles.Platform_Operations, Features.Platform_PaidTrial)]
+[Authorize(Roles.Platform_Operations)]
 public class ARequest : IWebRequest
 {
     public string AProperty { get; set; }

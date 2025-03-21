@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Resets the user MFA status back to the default for all users
 /// </summary>
 [Route("/passwords/mfa/reset", OperationMethod.PutPatch, AccessType.Token)]
-[Authorize(Roles.Platform_Operations, Features.Platform_PaidTrial)]
+[Authorize(Roles.Platform_Operations)]
 public class ResetPasswordMfaRequest : UnTenantedRequest<ResetPasswordMfaRequest, ChangePasswordMfaResponse>
 {
     public string? UserId { get; set; }
