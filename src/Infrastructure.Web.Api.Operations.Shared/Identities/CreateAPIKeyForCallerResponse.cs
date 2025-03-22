@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
-public class CreateAPIKeyResponse : IWebResponse
+public class CreateAPIKeyForCallerResponse : IWebResponse
 {
     public required string ApiKey { get; set; }
 }
