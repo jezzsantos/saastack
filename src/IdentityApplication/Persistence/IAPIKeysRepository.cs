@@ -12,6 +12,9 @@ public interface IAPIKeysRepository : IApplicationRepository
     Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,
         CancellationToken cancellationToken);
 
+    Task<Result<QueryResults<APIKey>, Error>>
+        SearchAllUnexpiredForUserAsync(Identifier userId, CancellationToken cancellationToken);
+
     Task<Result<APIKeyRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken);
 
     Task<Result<APIKeyRoot, Error>> SaveAsync(APIKeyRoot apiKey, CancellationToken cancellationToken);

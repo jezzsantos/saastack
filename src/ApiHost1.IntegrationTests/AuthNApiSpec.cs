@@ -106,7 +106,7 @@ public class AuthNApiSpec : WebApiSpec<Program>
     public async Task WhenGetApiKeyRequestWithAPIKey_ThenReturnsSuccess()
     {
         var login = await LoginUserAsync();
-        var apiKey = await Api.PostAsync(new CreateAPIKeyForCallerRequest(),
+        var apiKey = await Api.PostAsync(new CreateAPIKeyRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),

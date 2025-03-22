@@ -18,16 +18,16 @@ public class APIKeysApi : IWebApiService
         _apiKeysApplication = apiKeysApplication;
     }
 
-#if TESTINGONLY
-    public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> Create(
-        CreateAPIKeyForCallerRequest request, CancellationToken cancellationToken)
+    public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> CreateAPIKey(
+        CreateAPIKeyRequest request, CancellationToken cancellationToken)
     {
-        var apiKey = await _apiKeysApplication.CreateAPIKeyForCallerAsync(_callerFactory.Create(), cancellationToken);
+        var apiKey =
+            await _apiKeysApplication.CreateAPIKeyForCallerAsync(_callerFactory.Create(), request.ExpiresOnUtc,
+                cancellationToken);
 
         return () => apiKey.HandleApplicationResult<APIKey, CreateAPIKeyResponse>(x =>
             new PostResult<CreateAPIKeyResponse>(new CreateAPIKeyResponse { ApiKey = x.Key }));
     }
-#endif
 
     public async Task<ApiDeleteResult> DeleteAPIKey(DeleteAPIKeyRequest request, CancellationToken cancellationToken)
     {

@@ -1,5 +1,3 @@
-#if TESTINGONLY
-
 using Common.Extensions;
 using FluentValidation;
 using IdentityDomain;
@@ -7,7 +5,7 @@ using Infrastructure.Web.Api.Operations.Shared.Identities;
 
 namespace IdentityInfrastructure.Api.APIKeys;
 
-public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyForCallerRequest>
+public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyRequest>
 {
     public CreateAPIKeyRequestValidator()
     {
@@ -19,4 +17,3 @@ public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyForCal
                 Validations.ApiKey.MinimumExpiryPeriod.TotalHours, Validations.ApiKey.MaximumExpiryPeriod.TotalHours));
     }
 }
-#endif

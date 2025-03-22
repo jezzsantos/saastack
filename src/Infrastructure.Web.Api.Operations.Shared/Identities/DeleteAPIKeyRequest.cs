@@ -4,7 +4,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 /// <summary>
-///     Deletes the API key
+///     Deletes the API key of the authenticated user
 /// </summary>
 [Route("/apikeys/{Id}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]

@@ -53,7 +53,7 @@ public static class Validations
     public static class ApiKey
     {
         public static readonly Validation Description = CommonValidations.DescriptiveName();
-        public static readonly TimeSpan MaximumExpiryPeriod = TimeSpan.FromDays(30);
+        public static readonly TimeSpan MaximumExpiryPeriod = TimeSpan.FromDays(90);
         public static readonly TimeSpan MinimumExpiryPeriod = TimeSpan.FromHours(1);
     }
 }

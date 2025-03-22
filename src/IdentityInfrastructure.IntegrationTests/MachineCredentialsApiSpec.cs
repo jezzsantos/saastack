@@ -104,7 +104,7 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenCallingSecureApiWithMachineApiKey_ThenReturnsResponse()
+    public async Task WhenCallingSecureApiWithNewApiKey_ThenAuthenticates()
     {
         var machine = await Api.PostAsync(new RegisterMachineRequest
         {

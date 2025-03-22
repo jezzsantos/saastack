@@ -97,7 +97,14 @@ public sealed class APIKeyRoot : AggregateRootBase
 
             case KeyVerified _:
             {
-                Recorder.TraceDebug(null, "ApiKey {Id} verified", Id);
+                Recorder.TraceDebug(null, "ApiKey {Id} was verified", Id);
+                return Result.Ok;
+            }
+
+            case Expired changed:
+            {
+                ExpiresOn = changed.ExpiredOn;
+                Recorder.TraceDebug(null, "ApiKey {Id} was expired", Id);
                 return Result.Ok;
             }
 
@@ -108,12 +115,27 @@ public sealed class APIKeyRoot : AggregateRootBase
 
     public Result<Error> Delete(Identifier deleterId)
     {
-        if (UserId != deleterId)
+        if (!IsOwner(deleterId))
         {
             return Error.RuleViolation(Resources.ApiKeyRoot_NotOwner);
         }
 
         return RaisePermanentDeleteEvent(IdentityDomain.Events.APIKeys.Deleted(Id, deleterId));
+    }
+
+    public Result<Error> ForceExpire(Identifier userId)
+    {
+        if (!IsOwner(userId))
+        {
+            return Error.RuleViolation(Resources.ApiKeyRoot_NotOwner);
+        }
+
+        if (IsKeyExpired)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(IdentityDomain.Events.APIKeys.Expired(Id, UserId));
     }
 
     public Result<Error> SetParameters(string description, DateTime expiresOn)
@@ -133,7 +155,8 @@ public sealed class APIKeyRoot : AggregateRootBase
         }
 
         if (expiresOn.IsInvalidParameter(
-                exp => exp.IsBefore(DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MaximumExpiryPeriod)),
+                exp => exp.IsBefore(DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MaximumExpiryPeriod)
+                    .AddSeconds(1)),
                 nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooLate, out var error3))
         {
             return error3;
@@ -141,6 +164,13 @@ public sealed class APIKeyRoot : AggregateRootBase
 
         return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged(Id, description, expiresOn));
     }
+
+#if TESTINGONLY
+    public void TestingOnly_Expire()
+    {
+        ExpiresOn = DateTime.UtcNow.SubtractSeconds(1);
+    }
+#endif
 
     public Result<bool, Error> VerifyKey(string key)
     {
@@ -174,5 +204,10 @@ public sealed class APIKeyRoot : AggregateRootBase
         }
 
         return verified;
+    }
+
+    private bool IsOwner(Identifier userId)
+    {
+        return UserId == userId;
     }
 }
