@@ -13,9 +13,10 @@ public class APIKeysService : IAPIKeysService
         _apiKeysApplication = apiKeysApplication;
     }
 
-    public async Task<Result<APIKey, Error>> CreateApiKeyAsync(ICallerContext caller, string userId,
+    public async Task<Result<APIKey, Error>> CreateApiKeyForUserAsync(ICallerContext caller, string userId,
         string description, DateTime? expiresOn, CancellationToken cancellationToken)
     {
-        return await _apiKeysApplication.CreateAPIKeyAsync(caller, userId, description, expiresOn, cancellationToken);
+        return await _apiKeysApplication.CreateAPIKeyForUserAsync(caller, userId, description, expiresOn,
+            cancellationToken);
     }
 }

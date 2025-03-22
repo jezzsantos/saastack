@@ -17,7 +17,7 @@ namespace IdentityApplication;
 public class APIKeysApplication : IAPIKeysApplication
 {
     private const string ProviderName = "apikey";
-    public static readonly TimeSpan DefaultAPIKeyExpiry = TimeSpan.FromHours(1);
+    public static readonly TimeSpan DefaultAPIKeyExpiry = Validations.ApiKey.MaximumExpiryPeriod;
     private readonly IAPIKeyHasherService _apiKeyHasherService;
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
@@ -59,9 +59,14 @@ public class APIKeysApplication : IAPIKeysApplication
             return Error.NotAuthenticated();
         }
 
+        var root = retrievedApiKey.Value.Value;
+        if (root.IsKeyExpired)
+        {
+            return Error.NotAuthenticated();
+        }
+
         var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(caller, retrievedApiKey.Value.Value.UserId,
-                cancellationToken);
+            await _endUsersService.GetMembershipsPrivateAsync(caller, root.UserId, cancellationToken);
         if (retrievedUser.IsFailure)
         {
             return Error.NotAuthenticated();
@@ -98,7 +103,13 @@ public class APIKeysApplication : IAPIKeysApplication
         return user;
     }
 
-    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId,
+    public async Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller, DateTime? expiresOn,
+        CancellationToken cancellationToken)
+    {
+        return await CreateAPIKeyForUserAsync(caller, caller.CallerId, caller.CallerId, expiresOn, cancellationToken);
+    }
+
+    public async Task<Result<APIKey, Error>> CreateAPIKeyForUserAsync(ICallerContext caller, string userId,
         string description, DateTime? expiresOn, CancellationToken cancellationToken)
     {
         var keyToken = _tokensService.CreateAPIKey();
@@ -110,8 +121,8 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var apiKey = created.Value;
-        var parameterized = apiKey.SetParameters(description,
-            expiresOn ?? DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry));
+        var defaultExpiresOn = DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry);
+        var parameterized = apiKey.SetParameters(description, expiresOn ?? defaultExpiresOn);
         if (parameterized.IsFailure)
         {
             return parameterized.Error;
@@ -124,16 +135,15 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         apiKey = saved.Value;
+        var expired = await ExpireAllOtherAPIKeysForUserAsync(caller, userId.ToId(), apiKey.Id, cancellationToken);
+        if (expired.IsFailure)
+        {
+            return expired.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "API key {Id} was created for user {User}", apiKey.Id, userId);
         return apiKey.ToApiKey(keyToken.ApiKey, description);
     }
-
-#if TESTINGONLY
-    public async Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller,
-        CancellationToken cancellationToken)
-    {
-        return await CreateAPIKeyAsync(caller, caller.CallerId, caller.CallerId, null, cancellationToken);
-    }
-#endif
 
     public async Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
@@ -179,6 +189,50 @@ public class APIKeysApplication : IAPIKeysApplication
         _recorder.TraceInformation(caller.ToCall(), "All keys were fetched for user {User}", userId);
 
         return searchOptions.ApplyWithMetadata(apiKeys.Select(key => key.ToApiKey()));
+    }
+
+    private async Task<Result<Error>> ExpireAllOtherAPIKeysForUserAsync(ICallerContext caller, Identifier userId,
+        Identifier apiKeyIdToIgnore, CancellationToken cancellationToken)
+    {
+        var retrievedUnexpired = await _repository.SearchAllUnexpiredForUserAsync(userId, cancellationToken);
+        if (retrievedUnexpired.IsFailure)
+        {
+            return retrievedUnexpired.Error;
+        }
+
+        var unexpiredApiKeys = retrievedUnexpired.Value.Results;
+        foreach (var unexpiredApiKey in unexpiredApiKeys)
+        {
+            var unexpiredAPIKeyId = unexpiredApiKey.Id.Value.ToId();
+            if (unexpiredAPIKeyId == apiKeyIdToIgnore)
+            {
+                continue;
+            }
+
+            var retrieved = await _repository.LoadAsync(unexpiredAPIKeyId, cancellationToken);
+            if (retrieved.IsFailure)
+            {
+                return retrieved.Error;
+            }
+
+            var apiKey = retrieved.Value;
+            var expired = apiKey.ForceExpire(userId);
+            if (expired.IsFailure)
+            {
+                return expired.Error;
+            }
+
+            var saved = await _repository.SaveAsync(apiKey, cancellationToken);
+            if (saved.IsFailure)
+            {
+                return saved.Error;
+            }
+
+            apiKey = saved.Value;
+            _recorder.TraceInformation(caller.ToCall(), "API key {Id} was expired for {User}", apiKey.Id, userId);
+        }
+
+        return Result.Ok;
     }
 }
 

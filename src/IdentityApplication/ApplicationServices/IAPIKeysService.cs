@@ -6,7 +6,7 @@ namespace IdentityApplication.ApplicationServices;
 
 public interface IAPIKeysService
 {
-    Task<Result<APIKey, Error>> CreateApiKeyAsync(ICallerContext caller, string userId, string description,
+    Task<Result<APIKey, Error>> CreateApiKeyForUserAsync(ICallerContext caller, string userId, string description,
         DateTime? expiresOn,
         CancellationToken cancellationToken);
 }

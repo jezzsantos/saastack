@@ -1,5 +1,3 @@
-#if TESTINGONLY
-
 using Common.Extensions;
 using FluentValidation;
 using IdentityDomain;
@@ -19,4 +17,3 @@ public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyForCal
                 Validations.ApiKey.MinimumExpiryPeriod.TotalHours, Validations.ApiKey.MaximumExpiryPeriod.TotalHours));
     }
 }
-#endif

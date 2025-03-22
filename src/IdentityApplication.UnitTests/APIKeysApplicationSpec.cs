@@ -28,7 +28,6 @@ public class APIKeysApplicationSpec
     private readonly APIKeysApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEndUsersService> _endUsersService;
-    private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IAPIKeysRepository> _repository;
     private readonly Mock<ITokensService> _tokensService;
@@ -40,8 +39,8 @@ public class APIKeysApplicationSpec
         _caller = new Mock<ICallerContext>();
         _caller.Setup(cc => cc.CallerId)
             .Returns("auserid");
-        _idFactory = new Mock<IIdentifierFactory>();
-        _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
+        var idFactory = new Mock<IIdentifierFactory>();
+        idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateAPIKey())
@@ -71,7 +70,7 @@ public class APIKeysApplicationSpec
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<APIKeyRoot>(), It.IsAny<CancellationToken>()))
             .Returns((APIKeyRoot root, CancellationToken _) => Task.FromResult<Result<APIKeyRoot, Error>>(root));
 
-        _application = new APIKeysApplication(_recorder.Object, _idFactory.Object, _tokensService.Object,
+        _application = new APIKeysApplication(_recorder.Object, idFactory.Object, _tokensService.Object,
             _apiKeyHasherService.Object, _endUsersService.Object, _userProfilesService.Object, _repository.Object);
     }
 
@@ -120,6 +119,23 @@ public class APIKeysApplicationSpec
             eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
     }
 
+    [Fact]
+    public async Task WhenAuthenticateAsyncAndExpired_ThenReturnsError()
+    {
+        var apiKey = CreateApiKey();
+        apiKey.ForceExpire("auserid".ToId());
+        _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiKey.ToOptional());
+
+        var result =
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.NotAuthenticated);
+        _endUsersService.Verify(
+            eus => eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+    
     [Fact]
     public async Task WhenAuthenticateAsyncAndUserNotRegistered_ThenReturnsError()
     {
@@ -227,14 +243,16 @@ public class APIKeysApplicationSpec
             ), "auserid", It.IsAny<CancellationToken>()));
     }
 
-#if TESTINGONLY
     [Fact]
     public async Task WhenCreateApiKeyWithNoInformationAsync_ThenCreates()
     {
         _caller.Setup(cc => cc.CallerId).Returns("acallerid");
+        _repository.Setup(rep =>
+                rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new QueryResults<APIKey>([]));
 
         var result =
-            await _application.CreateAPIKeyForCallerAsync(_caller.Object, CancellationToken.None);
+            await _application.CreateAPIKeyForCallerAsync(_caller.Object, null, CancellationToken.None);
 
         result.Value.Id.Should().Be("anid");
         result.Value.Key.Should().Be("anapikey");
@@ -253,15 +271,81 @@ public class APIKeysApplicationSpec
                 DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1))
         ), It.IsAny<CancellationToken>()));
     }
-#endif
 
     [Fact]
-    public async Task WhenCreateApiKeyAsync_ThenCreates()
+    public async Task WhenCreateAPIKeyForUserAsyncWithExistingApiKey_ThenCreatesNewAndExpiresExisting()
     {
-        var expiresOn = DateTime.UtcNow.Add(APIKeysApplication.DefaultAPIKeyExpiry).AddMinutes(1);
+        var expiresOn = DateTime.UtcNow.Add(APIKeysApplication.DefaultAPIKeyExpiry).SubtractHours(1);
+        _repository.Setup(rep =>
+                rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new QueryResults<APIKey>([
+                new APIKey
+                {
+                    Id = "anid",
+                    ExpiresOn = DateTime.UtcNow.AddHours(1),
+                    UserId = "auserid"
+                },
+
+                new APIKey
+                {
+                    Id = "anapikeyid1",
+                    ExpiresOn = DateTime.UtcNow.AddHours(1),
+                    UserId = "auserid"
+                },
+
+                new APIKey
+                {
+                    Id = "anapikeyid2",
+                    ExpiresOn = DateTime.UtcNow.SubtractHours(1),
+                    UserId = "auserid"
+                }
+            ]));
+        _repository.Setup(rep => rep.LoadAsync("anapikeyid1".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateApiKey("anapikeyid1"));
+        _repository.Setup(rep => rep.LoadAsync("anapikeyid2".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateApiKey("anapikeyid2"));
 
         var result =
-            await _application.CreateAPIKeyAsync(_caller.Object, "auserid", "adescription", expiresOn,
+            await _application.CreateAPIKeyForUserAsync(_caller.Object, "auserid", "adescription", expiresOn,
+                CancellationToken.None);
+
+        result.Value.Id.Should().Be("anid");
+        result.Value.Key.Should().Be("anapikey");
+        result.Value.UserId.Should().Be("auserid");
+        result.Value.Description.Should().Be("adescription");
+        result.Value.ExpiresOnUtc.Should().Be(expiresOn);
+        _tokensService.Verify(ts => ts.CreateAPIKey());
+        _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
+            ak.ApiKey.Value.Token == "atoken"
+            && ak.ApiKey.Value.KeyHash == "akeyhash"
+            && ak.Description == "adescription"
+            && ak.UserId == "auserid"
+            && ak.ExpiresOn.Value == expiresOn
+        ), It.IsAny<CancellationToken>()), Times.Once);
+        _repository.Verify(rep => rep.LoadAsync("anapikeyid1".ToId(), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
+            ak.Id == "anapikeyid1"
+            && ak.UserId == "auserid"
+            && ak.ExpiresOn.Value < DateTime.UtcNow
+        ), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
+            ak.Id == "anapikeyid2"
+            && ak.UserId == "auserid"
+            && ak.ExpiresOn.Value < DateTime.UtcNow
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenCreateAPIKeyForUserAsync_ThenCreatesNew()
+    {
+        var expiresOn = DateTime.UtcNow.Add(APIKeysApplication.DefaultAPIKeyExpiry).SubtractHours(1);
+        _repository.Setup(rep =>
+                rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new QueryResults<APIKey>([]));
+
+        var result =
+            await _application.CreateAPIKeyForUserAsync(_caller.Object, "auserid", "adescription", expiresOn,
                 CancellationToken.None);
 
         result.Value.Id.Should().Be("anid");
@@ -336,9 +420,9 @@ public class APIKeysApplicationSpec
         ), It.IsAny<CancellationToken>()));
     }
 
-    private APIKeyRoot CreateApiKey()
+    private APIKeyRoot CreateApiKey(string apikeyId = "anid")
     {
-        return APIKeyRoot.Create(_recorder.Object, _idFactory.Object, _apiKeyHasherService.Object,
+        return APIKeyRoot.Create(_recorder.Object, apikeyId.ToIdentifierFactory(), _apiKeyHasherService.Object,
             "auserid".ToId(), new APIKeyToken
             {
                 Key = "akey",

@@ -138,4 +138,34 @@ public class APIKeyRootSpec
         result.Should().BeSuccess();
         _apiKey.Events.Last().Should().BeOfType<Deleted>();
     }
+
+    [Fact]
+    public void WhenForceExpireAndNotOwner_ThenReturnsError()
+    {
+        var result = _apiKey.ForceExpire("anotheruserid".ToId());
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.ApiKeyRoot_NotOwner);
+    }
+
+    [Fact]
+    public void WhenForceExpireAndExpired_ThenDoesNothing()
+    {
+#if TESTINGONLY
+        _apiKey.TestingOnly_Expire();
+#endif
+
+        var result = _apiKey.ForceExpire("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _apiKey.Events.Last().Should().NotBeOfType<Expired>();
+    }
+
+    [Fact]
+    public void WhenForceExpireAndNotExpired_ThenExpires()
+    {
+        var result = _apiKey.ForceExpire("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _apiKey.Events.Last().Should().BeOfType<Expired>();
+    }
 }

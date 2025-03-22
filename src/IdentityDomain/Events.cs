@@ -280,6 +280,15 @@ public static class Events
             return new Deleted(id, deletedById);
         }
 
+        public static Expired Expired(Identifier id, Identifier userId)
+        {
+            return new Expired(id)
+            {
+                ExpiredOn = DateTime.UtcNow,
+                UserId = userId
+            };
+        }
+
         public static KeyVerified KeyVerified(Identifier id, bool isVerified)
         {
             return new KeyVerified(id)

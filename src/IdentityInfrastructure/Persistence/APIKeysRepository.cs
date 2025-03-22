@@ -40,7 +40,7 @@ public class APIKeysRepository : IAPIKeysRepository
         CancellationToken cancellationToken)
     {
         var query = Query.From<APIKey>()
-            .Where<string>(at => at.KeyToken, ConditionOperator.EqualTo, keyToken);
+            .Where<string>(key => key.KeyToken, ConditionOperator.EqualTo, keyToken);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
@@ -70,8 +70,18 @@ public class APIKeysRepository : IAPIKeysRepository
         SearchOptions options, CancellationToken cancellationToken)
     {
         var query = Query.From<APIKey>()
-            .Where<string>(at => at.UserId, ConditionOperator.EqualTo, userId)
+            .Where<string>(key => key.UserId, ConditionOperator.EqualTo, userId)
             .WithSearchOptions(options);
+
+        return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
+    }
+
+    public async Task<Result<QueryResults<APIKey>, Error>> SearchAllUnexpiredForUserAsync(Identifier userId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<APIKey>()
+            .Where<string>(key => key.UserId, ConditionOperator.EqualTo, userId)
+            .AndWhere<DateTime>(key => key.ExpiresOn, ConditionOperator.GreaterThan, DateTime.UtcNow);
 
         return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
     }
@@ -91,12 +101,12 @@ public class APIKeysRepository : IAPIKeysRepository
             return Optional<APIKeyRoot>.None;
         }
 
-        var tokens = await _apiKeys.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (tokens.IsFailure)
+        var keys = await _apiKeys.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (keys.IsFailure)
         {
-            return tokens.Error;
+            return keys.Error;
         }
 
-        return tokens.Value.ToOptional();
+        return keys.Value.ToOptional();
     }
 }

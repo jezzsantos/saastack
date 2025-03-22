@@ -49,7 +49,7 @@ public class MachineCredentialsApplicationSpec
             Description = "adescription"
         };
         _apiKeysService.Setup(aks =>
-                aks.CreateApiKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                aks.CreateApiKeyForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime?>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(apiKey);

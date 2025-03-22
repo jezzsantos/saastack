@@ -32,7 +32,7 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         }
 
         var machine = registered.Value;
-        var keys = await _apiKeyService.CreateApiKeyAsync(caller, machine.Id, name, apiKeyExpiresOn,
+        var keys = await _apiKeyService.CreateApiKeyForUserAsync(caller, machine.Id, name, apiKeyExpiresOn,
             cancellationToken);
         if (keys.IsFailure)
         {
