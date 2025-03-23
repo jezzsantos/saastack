@@ -22,7 +22,7 @@ public static class QueueMessageHandlerExtensions
                 var handled = await handler(message);
                 if (handled.IsFailure)
                 {
-                    handled.Error.Throw();
+                    handled.Error.Throw<InvalidOperationException>();
                 }
 
                 return Result.Ok;

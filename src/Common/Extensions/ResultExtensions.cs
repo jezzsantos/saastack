@@ -9,7 +9,7 @@ public static class ResultExtensions
     {
         if (result.IsFailure)
         {
-            result.Error.Throw();
+            result.Error.Throw<InvalidOperationException>();
         }
     }
 
@@ -20,7 +20,7 @@ public static class ResultExtensions
     {
         if (result.IsFailure)
         {
-            result.Error.Throw();
+            result.Error.Throw<InvalidOperationException>();
         }
     }
 }
