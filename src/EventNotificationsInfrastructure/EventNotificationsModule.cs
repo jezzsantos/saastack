@@ -2,7 +2,6 @@ using System.Reflection;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
 using Common;
-using Common.Configuration;
 using Domain.Interfaces;
 using EventNotificationsApplication;
 using EventNotificationsApplication.Persistence;
@@ -12,7 +11,6 @@ using EventNotificationsInfrastructure.Persistence;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
-using Infrastructure.Shared.ApplicationServices;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -43,18 +41,9 @@ public class EventNotificationsModule : ISubdomainModule
                     new DomainEventingMessageBusTopic(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageBusTopicMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IMessageBusStore>()));
-                services.AddSingleton<IDomainEventingSubscriber>(c =>
-                    new ApiHostDomainEventingSubscriber(
-                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                        c.GetRequiredServiceForPlatform<IMessageBusStore>()));
-                services.AddPerHttpRequest<IDomainEventConsumerService, DomainEventConsumerService>();
-
-                services.AddPerHttpRequest<IDomainEventsApplication>(c =>
-                    new DomainEventsApplication(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IEventNotificationRepository>(),
-                        c.GetRequiredService<IDomainEventingMessageBusTopic>(),
-                        c.GetRequiredService<IDomainEventingSubscriber>(),
-                        c.GetRequiredService<IDomainEventConsumerService>()));
+                services
+                    .AddPerHttpRequest<IDomainEventingSubscriptionService, ApiHostDomainEventingSubscriptionService>();
+                services.AddPerHttpRequest<IDomainEventsApplication, DomainEventsApplication>();
                 services.AddPerHttpRequest<IEventNotificationRepository>(c =>
                     new EventNotificationRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),

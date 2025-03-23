@@ -24,8 +24,13 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AnyQueueMessageValidator_InvalidMessage" xml:space="preserve">
+    <data name="NotifyDomainEventRequestValidator_InvalidMessage" xml:space="preserve">
         <value>The 'Message' is either missing or invalid</value>
     </data>
-
+    <data name="NotifyDomainEventRequestValidator_InvalidSubscriptionName" xml:space="preserve">
+        <value>The 'SubscriptionName' is either missing or invalid</value>
+    </data>
+    <data name="DomainEventingSubscriber_ConsumerFailed" xml:space="preserve">
+        <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
+    </data>
 </root>

@@ -60,11 +60,29 @@ namespace EventNotificationsInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to notify consumer: {0}, with event: {1} ({2}).
+        /// </summary>
+        internal static string DomainEventingSubscriber_ConsumerFailed {
+            get {
+                return ResourceManager.GetString("DomainEventingSubscriber_ConsumerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; is either missing or invalid.
         /// </summary>
-        internal static string AnyQueueMessageValidator_InvalidMessage {
+        internal static string NotifyDomainEventRequestValidator_InvalidMessage {
             get {
-                return ResourceManager.GetString("AnyQueueMessageValidator_InvalidMessage", resourceCulture);
+                return ResourceManager.GetString("NotifyDomainEventRequestValidator_InvalidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;SubscriptionName&apos; is either missing or invalid.
+        /// </summary>
+        internal static string NotifyDomainEventRequestValidator_InvalidSubscriptionName {
+            get {
+                return ResourceManager.GetString("NotifyDomainEventRequestValidator_InvalidSubscriptionName", resourceCulture);
             }
         }
     }

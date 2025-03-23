@@ -11,6 +11,9 @@ public class NotifyDomainEventRequestValidator : AbstractValidator<NotifyDomainE
     {
         RuleFor(req => req.Message)
             .NotEmpty()
-            .WithMessage(Resources.AnyQueueMessageValidator_InvalidMessage);
+            .WithMessage(Resources.NotifyDomainEventRequestValidator_InvalidMessage);
+        RuleFor(req => req.SubscriptionName)
+            .NotEmpty()
+            .WithMessage(Resources.NotifyDomainEventRequestValidator_InvalidSubscriptionName);
     }
 }

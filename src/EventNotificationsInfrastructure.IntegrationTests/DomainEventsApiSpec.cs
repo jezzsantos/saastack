@@ -24,7 +24,7 @@ namespace EventNotificationsInfrastructure.IntegrationTests;
 [Collection("API")]
 public class DomainEventsApiSpec : WebApiSpec<Program>
 {
-    private readonly StubDomainEventConsumerService _consumerService;
+    private readonly StubDomainEventingSubscriptionService _subscriptionService;
 
     public DomainEventsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
@@ -33,11 +33,13 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
 #if TESTINGONLY
         domainEventingMessageBusTopic.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
 #endif
-        _consumerService = setup.GetRequiredService<IDomainEventConsumerService>().As<StubDomainEventConsumerService>();
+        _subscriptionService = setup.GetRequiredService<IDomainEventingSubscriptionService>()
+            .As<StubDomainEventingSubscriptionService>();
+        _subscriptionService.Reset();
     }
 
     [Fact]
-    public async Task WhenNotifyDomainEventing_ThenNotifies()
+    public async Task WhenNotifyDomainEvent_ThenNotifies()
     {
 #if TESTINGONLY
         var @event = new Happened
@@ -69,12 +71,13 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsSent.Should().BeTrue();
-        _consumerService.LastEventId.Should().Be("aneventid");
+        _subscriptionService.LastEventId.Should().Be("aneventid");
+        _subscriptionService.LastEventSubscriptionName.Should().Be("asubscriptionname");
 #endif
     }
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.AddSingleton<IDomainEventConsumerService, StubDomainEventConsumerService>();
+        services.AddSingleton<IDomainEventingSubscriptionService, StubDomainEventingSubscriptionService>();
     }
 }
