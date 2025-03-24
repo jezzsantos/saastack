@@ -26,13 +26,15 @@ Content-Type: application/json
 
 ### Change a users roles
 
-@user_id = "anotheruserid"
+@user_id = anotheruserid
 
 POST {{apihost1}}/users/{{user_id}}/roles
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "Roles": "platform_operations"
+  "Roles": [
+    "platform_operations"
+  ]
 }
 
