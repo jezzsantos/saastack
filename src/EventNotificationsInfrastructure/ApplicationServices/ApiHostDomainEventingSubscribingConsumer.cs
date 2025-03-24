@@ -13,14 +13,14 @@ namespace EventNotificationsInfrastructure.ApplicationServices;
 /// <summary>
 ///     Provides message bus subscriber for domain events notifications
 /// </summary>
-public class DomainEventingSubscriber : IDomainEventingSubscriber
+public class ApiHostDomainEventingSubscribingConsumer : IDomainEventingSubscribingConsumer
 {
     internal const string SubscriptionNameSettingName = "ApplicationServices:EventNotifications:SubscriptionName";
     private readonly IDomainEventNotificationConsumer _consumer;
     private readonly IEventSourcedChangeEventMigrator _migrator;
     private readonly IRecorder _recorder;
 
-    public DomainEventingSubscriber(IRecorder recorder, IConfigurationSettings settings,
+    public ApiHostDomainEventingSubscribingConsumer(IRecorder recorder, IConfigurationSettings settings,
         IEventSourcedChangeEventMigrator migrator,
         IDomainEventNotificationConsumer consumer)
     {

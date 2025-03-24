@@ -21,7 +21,7 @@ public class DomainEventingSubscriberSpec
     private readonly Mock<IDomainEventNotificationConsumer> _consumer;
     private readonly Mock<IEventSourcedChangeEventMigrator> _migrator;
     private readonly Mock<IRecorder> _recorder;
-    private readonly DomainEventingSubscriber _subscriber;
+    private readonly ApiHostDomainEventingSubscribingConsumer _subscriber;
 
     public DomainEventingSubscriberSpec()
     {
@@ -30,11 +30,11 @@ public class DomainEventingSubscriberSpec
         _consumer = new Mock<IDomainEventNotificationConsumer>();
         var settings = new Mock<IConfigurationSettings>();
         settings.Setup(s =>
-                s.Platform.GetString(DomainEventingSubscriber.SubscriptionNameSettingName, It.IsAny<string>()))
+                s.Platform.GetString(ApiHostDomainEventingSubscribingConsumer.SubscriptionNameSettingName, It.IsAny<string>()))
             .Returns("ahostname");
 
         _subscriber =
-            new DomainEventingSubscriber(_recorder.Object, settings.Object, _migrator.Object, _consumer.Object);
+            new ApiHostDomainEventingSubscribingConsumer(_recorder.Object, settings.Object, _migrator.Object, _consumer.Object);
     }
 
     [Fact]

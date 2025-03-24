@@ -15,30 +15,30 @@ public class DomainEventsApplication : IDomainEventsApplication
 {
     private readonly IRecorder _recorder;
     private readonly IEventNotificationRepository _eventNotificationRepository;
-    private readonly IDomainEventingSubscriptionService _domainEventingSubscriptionService;
+    private readonly IDomainEventingConsumerService _domainEventingConsumerService;
 #if TESTINGONLY
     private readonly IDomainEventingMessageBusTopic _domainEventMessageBusTopic;
 
     public DomainEventsApplication(IRecorder recorder,
         IEventNotificationRepository eventNotificationRepository,
         IDomainEventingMessageBusTopic domainEventMessageBusTopic,
-        IDomainEventingSubscriptionService domainEventingSubscriptionService)
+        IDomainEventingConsumerService domainEventingConsumerService)
     {
         _recorder = recorder;
         _eventNotificationRepository = eventNotificationRepository;
         _domainEventMessageBusTopic = domainEventMessageBusTopic;
-        _domainEventingSubscriptionService = domainEventingSubscriptionService;
+        _domainEventingConsumerService = domainEventingConsumerService;
     }
 #else
     public DomainEventsApplication(IRecorder recorder,
         IEventNotificationRepository eventNotificationRepository,
         // ReSharper disable once UnusedParameter.Local
         IDomainEventingMessageBusTopic domainEventMessageBusTopic,
-        IDomainEventConsumerService domainEventingSubscriptionService)
+        IDomainEventingConsumerService domainEventingConsumerService)
     {
         _recorder = recorder;
         _eventNotificationRepository = eventNotificationRepository;
-        _domainEventingSubscriptionService = domainEventingSubscriptionService;
+        _domainEventingConsumerService = domainEventingConsumerService;
     }
 #endif
 
@@ -46,7 +46,7 @@ public class DomainEventsApplication : IDomainEventsApplication
     public async Task<Result<Error>> DrainAllDomainEventsAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        await DrainAllOnTopicAsync(_domainEventingSubscriptionService, _domainEventMessageBusTopic,
+        await DrainAllOnTopicAsync(_domainEventingConsumerService, _domainEventMessageBusTopic,
             (subscriptionName, message) =>
                 NotifyDomainEventInternalAsync(caller, subscriptionName, message, cancellationToken),
             cancellationToken);
@@ -96,12 +96,12 @@ public class DomainEventsApplication : IDomainEventsApplication
 
 #if TESTINGONLY
     private static async Task DrainAllOnTopicAsync<TBusMessage>(
-        IDomainEventingSubscriptionService domainEventingSubscriptionService,
+        IDomainEventingConsumerService domainEventingConsumerService,
         IMessageBusTopicStore<TBusMessage> repository,
         Func<string, TBusMessage, Task<Result<bool, Error>>> handler, CancellationToken cancellationToken)
         where TBusMessage : IQueuedMessage, new()
     {
-        var subscriptionNames = domainEventingSubscriptionService.SubscriptionNames;
+        var subscriptionNames = domainEventingConsumerService.SubscriptionNames;
         foreach (var subscriptionName in subscriptionNames)
         {
             var found = new Result<bool, Error>(true);
@@ -160,7 +160,7 @@ public class DomainEventsApplication : IDomainEventsApplication
         }
 
         var notified =
-            await _domainEventingSubscriptionService.NotifySubscriberAsync(subscriptionName, message.Event!,
+            await _domainEventingConsumerService.NotifySubscriberAsync(subscriptionName, message.Event!,
                 cancellationToken);
         if (notified.IsFailure)
         {

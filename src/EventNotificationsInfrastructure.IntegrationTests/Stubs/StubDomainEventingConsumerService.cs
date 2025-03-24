@@ -4,7 +4,7 @@ using Common;
 
 namespace EventNotificationsInfrastructure.IntegrationTests.Stubs;
 
-public class StubDomainEventingSubscriptionService : IDomainEventingSubscriptionService
+public class StubDomainEventingConsumerService : IDomainEventingConsumerService
 {
     public string? LastEventId { get; private set; }
 
@@ -16,12 +16,6 @@ public class StubDomainEventingSubscriptionService : IDomainEventingSubscription
         await Task.CompletedTask;
         LastEventId = changeEvent.Id;
         LastEventSubscriptionName = subscriptionName;
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> RegisterAllSubscribersAsync(CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
         return Result.Ok;
     }
 

@@ -2,6 +2,7 @@ using System.Reflection;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
 using Domain.Interfaces;
 using EventNotificationsApplication;
 using EventNotificationsApplication.Persistence;
@@ -41,8 +42,13 @@ public class EventNotificationsModule : ISubdomainModule
                     new DomainEventingMessageBusTopic(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageBusTopicMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IMessageBusStore>()));
+                services.AddSingleton<IDomainEventingSubscriberService>(c =>
+                    new ApiHostDomainEventingSubscriberService(
+                        c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredServiceForPlatform<IMessageBusStore>()));
                 services
-                    .AddPerHttpRequest<IDomainEventingSubscriptionService, ApiHostDomainEventingSubscriptionService>();
+                    .AddPerHttpRequest<IDomainEventingConsumerService, ApiHostDomainEventingConsumerService>();
                 services.AddPerHttpRequest<IDomainEventsApplication, DomainEventsApplication>();
                 services.AddPerHttpRequest<IEventNotificationRepository>(c =>
                     new EventNotificationRepository(c.GetRequiredService<IRecorder>(),

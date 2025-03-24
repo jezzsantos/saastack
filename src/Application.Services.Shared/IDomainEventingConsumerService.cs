@@ -9,6 +9,11 @@ namespace Application.Services.Shared;
 public interface IDomainEventingConsumerService
 {
     /// <summary>
+    ///     Returns all the subscription names for the consumers that are subscribed to consume domain events
+    /// </summary>
+    public IReadOnlyList<string> SubscriptionNames { get; }
+
+    /// <summary>
     ///     Notifies the subscriber for the specified <see cref="subscriptionName" /> with the specified
     ///     <see cref="changeEvent" />
     /// </summary>

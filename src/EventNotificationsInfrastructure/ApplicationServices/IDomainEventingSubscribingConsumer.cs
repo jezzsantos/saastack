@@ -7,7 +7,7 @@ namespace EventNotificationsInfrastructure.ApplicationServices;
 /// <summary>
 ///     Defines a consumer that subscribes to domain events notifications
 /// </summary>
-public interface IDomainEventingSubscriber
+public interface IDomainEventingSubscribingConsumer
 {
     /// <summary>
     ///     Returns the name of the subscription for this subscriber
