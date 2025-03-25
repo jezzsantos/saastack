@@ -335,7 +335,7 @@ namespace {assemblyNamespace}
     private static List<WebApiAssemblyVisitor.ServiceOperationRegistration> GetWebApiServiceOperationsFromAssembly(
         GeneratorExecutionContext context)
     {
-        var visitor = new WebApiAssemblyVisitor(context.CancellationToken, context.Compilation);
+        var visitor = new WebApiAssemblyVisitor(context.Compilation, context.CancellationToken);
         visitor.Visit(context.Compilation.Assembly);
         return visitor.OperationRegistrations;
     }

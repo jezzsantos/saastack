@@ -18,7 +18,8 @@ public class NotifyDomainEventRequestValidatorSpec
         _validator = new NotifyDomainEventRequestValidator();
         _dto = new NotifyDomainEventRequest
         {
-            Message = "amessage"
+            Message = "amessage",
+            SubscriptionName = "asubscriber"
         };
     }
 
@@ -35,6 +36,16 @@ public class NotifyDomainEventRequestValidatorSpec
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AnyQueueMessageValidator_InvalidMessage);
+            .WithMessageLike(Resources.NotifyDomainEventRequestValidator_InvalidMessage);
+    }
+
+    [Fact]
+    public void WhenSubscriberIsNull_ThenThrows()
+    {
+        _dto.SubscriptionName = null!;
+
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.NotifyDomainEventRequestValidator_InvalidSubscriptionName);
     }
 }

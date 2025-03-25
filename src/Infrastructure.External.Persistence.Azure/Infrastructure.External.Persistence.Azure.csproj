@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.5" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
         <PackageReference Include="Azure.Storage.Queues" Version="12.17.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.21.2" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />

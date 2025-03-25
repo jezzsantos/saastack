@@ -154,14 +154,22 @@ public static class WebApplicationExtensions
             });
         }, "Pipeline: Event Projections/Notifications are enabled"));
 
-        var subscriber = builder.Services.GetService<IDomainEventingSubscriber>();
-        if (subscriber.Exists())
+        var subscriberService = builder.Services.GetService<IDomainEventingSubscriberService>();
+        if (subscriberService.Exists())
         {
-            var subscriptionName = subscriber.SubscriptionName;
+            var subscribers = subscriberService.SubscriptionNames;
+            var subscriptionNames = subscribers.JoinAsOredChoices(", ");
             middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 45,
-                _ => { subscriber.Subscribe(CancellationToken.None).GetAwaiter().GetResult(); },
-                $"Feature: Subscribed to {EventingConstants.Topics.DomainEvents} for -> {{Subscription}}",
-                subscriptionName));
+                _ =>
+                {
+                    var registered = subscriberService.RegisterAllSubscribersAsync(CancellationToken.None)
+                        .GetAwaiter().GetResult();
+                    if (registered.IsFailure)
+                    {
+                        throw new InvalidOperationException(registered.Error.Message);
+                    }
+                },
+                $"Feature: Registered the following {subscribers.Count} subscribers to topic {EventingConstants.Topics.DomainEvents}, subscribers: {subscriptionNames}"));
         }
     }
 

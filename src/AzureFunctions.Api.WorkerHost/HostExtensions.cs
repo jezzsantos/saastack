@@ -44,6 +44,8 @@ public static class HostExtensions
         services.AddSingleton<IRecorder>(c =>
             new CrashTraceOnlyRecorder("Azure API Workers", c.GetRequiredService<ILoggerFactory>(),
                 c.GetRequiredService<ICrashReporter>()));
+        services.AddSingleton<IWorkersRuntime, AzureFunctionWorkersRuntime>();
+        services.AddSingleton<IEnvironmentVariables, EnvironmentVariables>();
         services.AddSingleton<IServiceClientFactory>(c =>
             new InterHostServiceClientFactory(c.GetRequiredService<IHttpClientFactory>(),
                 c.GetRequiredService<JsonSerializerOptions>(), c.GetRequiredService<IHostSettings>()));

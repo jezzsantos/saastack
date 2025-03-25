@@ -25,6 +25,6 @@
         </value>
     </resheader>
     <data name="DeliverDomainEventingRelayWorker_SubscriberNotFound" xml:space="preserve">
-        <value>Subscriber with name: {0} cannot be found in the configuration</value>
+        <value>Subscriber host with name: {0} cannot be found in the configuration</value>
     </data>
 </root>

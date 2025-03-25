@@ -409,6 +409,9 @@
         "hidden-link: /app-insights-resource-id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('resourceGroup_name'), '/providers/microsoft.insights/components/', parameters('insights_name'))]"
       },
       "kind": "functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "enabled": true,
         "hostNameSslStates": [
@@ -435,7 +438,7 @@
               "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccounts_name'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_name')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
             },
             {
-              "name": "AzureWebJobsServiceBus",
+              "name": "ServiceBusConnection",
               "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBus_namespace_name'), 'RootManageSharedAccessKey'), providers('Microsoft.ServiceBus', 'namespaces').apiVersions[0]).primaryConnectionString]"
             },
             {

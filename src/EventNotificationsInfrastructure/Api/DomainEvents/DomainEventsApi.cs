@@ -36,7 +36,8 @@ public class DomainEventsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var notified =
-            await _domainEventsApplication.NotifyDomainEventAsync(_callerFactory.Create(), request.Message!,
+            await _domainEventsApplication.NotifyDomainEventAsync(_callerFactory.Create(), request.SubscriptionName!,
+                request.Message!,
                 cancellationToken);
 
         return () => notified.HandleApplicationResult<bool, DeliverMessageResponse>(nt =>

@@ -10,7 +10,8 @@ public interface IDomainEventsApplication
     Task<Result<Error>> DrainAllDomainEventsAsync(ICallerContext caller, CancellationToken cancellationToken);
 #endif
 
-    Task<Result<bool, Error>> NotifyDomainEventAsync(ICallerContext caller, string messageAsJson,
+    Task<Result<bool, Error>> NotifyDomainEventAsync(ICallerContext caller, string subscriptionName,
+        string messageAsJson,
         CancellationToken cancellationToken);
 
 #if TESTINGONLY

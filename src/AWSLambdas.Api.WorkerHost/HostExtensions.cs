@@ -39,6 +39,8 @@ public static class HostExtensions
         services.AddSingleton<IRecorder>(c =>
             new CrashTraceOnlyRecorder("AWS API Lambdas", c.GetRequiredService<ILoggerFactory>(),
                 c.GetRequiredService<ICrashReporter>()));
+        services.AddSingleton<IWorkersRuntime, AWSLambdaWorkerRuntime>();
+        services.AddSingleton<IEnvironmentVariables, EnvironmentVariables>();
         services.AddSingleton<IServiceClientFactory>(c =>
             new InterHostServiceClientFactory(c.GetRequiredService<IHttpClientFactory>(),
                 c.GetRequiredService<JsonSerializerOptions>(), c.GetRequiredService<IHostSettings>()));

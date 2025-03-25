@@ -15,8 +15,8 @@ namespace TestingStubApiHost.Workers;
 
 /// <summary>
 ///     Provides an asynchronous background service that regularly and continuously polls all the
-///     queues and message bus topics of <see cref="TestingStubApiHost.QueuedMappings" /> and when found relays them to
-///     the Ancillary API and EventNotifications API to drains any messages accumulated.
+///     queues and message bus topics of <see cref="TestingStubApiHost.QueuedMappings" /> and when messages are detected,
+///     relays them to the Ancillary API and EventNotifications API to drains any messages accumulated.
 ///     Essentially, this stub replaces stands in for the Azure Functions/AWS Lambdas that are triggered, and call the
 ///     respective APIs directly, except that these API calls, do the draining themselves.
 ///     Note: Used only in TESTINGONLY, and only by specific <see cref="IDataStore" /> implementations,
@@ -144,7 +144,7 @@ public class StubCloudWorkerService : BackgroundService
 
     private async Task DrainMessageBusTopicsAsync(CancellationToken cancellationToken)
     {
-        var subscribers = _settings.GetEventNotificationSubscriberHosts();
+        var subscribingHosts = _settings.GetEventNotificationSubscriberHosts();
         while (!cancellationToken.IsCancellationRequested)
         {
             var topicName = _monitor.NextTopicName();
@@ -154,15 +154,15 @@ public class StubCloudWorkerService : BackgroundService
                 {
                     if (_monitorMessageBusTopicMappings.TryGetValue(topicName, out var webRequest))
                     {
-                        foreach (var subscriber in subscribers)
+                        foreach (var host in subscribingHosts)
                         {
                             var apiClient = CreateApiEndpointClient("topics", _httpClientFactory, _jsonOptions,
-                                subscriber.BaseUrl);
+                                host.BaseUrl);
                             await apiClient.PostAsync(webRequest,
-                                req => req.SetHMACAuth(webRequest, subscriber.HmacSecret),
+                                req => req.SetHMACAuth(webRequest, host.HmacSecret),
                                 cancellationToken);
                             _logger.LogDebug("Drained messages on bus topic: {Topic}, for: {Subscriber}", topicName,
-                                subscriber.Id);
+                                host.HostName);
                         }
                     }
                 }

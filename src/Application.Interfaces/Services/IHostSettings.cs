@@ -57,4 +57,4 @@ public interface IHostSettings
 /// <summary>
 ///     Defines an event notification subscriber host
 /// </summary>
-public record SubscriberHost(string Id, string BaseUrl, string HmacSecret);
+public record SubscriberHost(string HostName, string BaseUrl, string HmacSecret);

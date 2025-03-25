@@ -81,11 +81,7 @@ partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTrigger
             return false;
         }
 
-        if (!_subscriptions.TryGetValue(subscriptionName, out _))
-        {
-            _subscriptions.Add(subscriptionName, new SubscriptionPosition(topicName));
-            return false;
-        }
+        EnsureSubscriptionExists();
 
         var subscription = _subscriptions[subscriptionName];
         var latestMessage = GetRecentMessages(messages, subscription.Current).FirstOrDefault();
@@ -112,6 +108,14 @@ partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTrigger
         //Note: update the subscription position to latest
         subscription.Current = latestMessage.Key;
         return true;
+
+        void EnsureSubscriptionExists()
+        {
+            if (!_subscriptions.TryGetValue(subscriptionName, out _))
+            {
+                _subscriptions.Add(subscriptionName, new SubscriptionPosition(topicName));
+            }
+        }
     }
 #endif
 

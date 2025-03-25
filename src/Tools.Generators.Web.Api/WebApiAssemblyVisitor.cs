@@ -40,7 +40,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
 
-    public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
+    public WebApiAssemblyVisitor(Compilation compilation, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;

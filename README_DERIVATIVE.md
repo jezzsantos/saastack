@@ -68,9 +68,15 @@ In the `AzureFunctions.Api.WorkersHost` project:
       "Values": {
          "DebugMode": true,
          "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-         "AzureWebJobsServiceBus": "",
+         "ServiceBusConnection": "",
          "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-         "APPINSIGHTS_INSTRUMENTATIONKEY": ""
+         "APPINSIGHTS_INSTRUMENTATIONKEY": "",
+         "AZURE_TENANT_ID": "",
+         "AZURE_CLIENT_ID": "",
+         "AZURE_CLIENT_SECRET": "",
+         "WEBSITE_SITE_NAME": "",
+         "WEBSITE_OWNER_NAME": "",
+         "WEBSITE_RESOURCE_GROUP": ""
       }
    }
    ```

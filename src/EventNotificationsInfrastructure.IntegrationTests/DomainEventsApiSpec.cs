@@ -24,7 +24,7 @@ namespace EventNotificationsInfrastructure.IntegrationTests;
 [Collection("API")]
 public class DomainEventsApiSpec : WebApiSpec<Program>
 {
-    private readonly StubDomainEventConsumerService _consumerService;
+    private readonly StubDomainEventingConsumerService _stubConsumerService;
 
     public DomainEventsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
@@ -33,11 +33,13 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
 #if TESTINGONLY
         domainEventingMessageBusTopic.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
 #endif
-        _consumerService = setup.GetRequiredService<IDomainEventConsumerService>().As<StubDomainEventConsumerService>();
+        _stubConsumerService = setup.GetRequiredService<IDomainEventingConsumerService>()
+            .As<StubDomainEventingConsumerService>();
+        _stubConsumerService.Reset();
     }
 
     [Fact]
-    public async Task WhenNotifyDomainEventing_ThenNotifies()
+    public async Task WhenNotifyDomainEvent_ThenNotifies()
     {
 #if TESTINGONLY
         var @event = new Happened
@@ -47,6 +49,7 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
         };
         var request = new NotifyDomainEventRequest
         {
+            SubscriptionName = "asubscriptionname",
             Message = new DomainEventingMessage
             {
                 MessageId = "amessageid",
@@ -69,12 +72,13 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsSent.Should().BeTrue();
-        _consumerService.LastEventId.Should().Be("aneventid");
+        _stubConsumerService.LastEventId.Should().Be("aneventid");
+        _stubConsumerService.LastEventSubscriptionName.Should().Be("asubscriptionname");
 #endif
     }
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.AddSingleton<IDomainEventConsumerService, StubDomainEventConsumerService>();
+        services.AddSingleton<IDomainEventingConsumerService, StubDomainEventingConsumerService>();
     }
 }

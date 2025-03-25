@@ -16,8 +16,8 @@ using SubscriptionsApplication.ApplicationServices;
 using SubscriptionsApplication.Persistence;
 using SubscriptionsDomain;
 using SubscriptionsInfrastructure.Api.Subscriptions;
+using SubscriptionsInfrastructure.Notifications;
 using SubscriptionsInfrastructure.Persistence;
-using SubscriptionsInfrastructure.Persistence.Notifications;
 using SubscriptionsInfrastructure.Persistence.ReadModels;
 
 namespace SubscriptionsInfrastructure;

@@ -2,7 +2,7 @@
 
 This source generator project is only meant to be included by the `Common` project only.
 
-It's job is to convert all `FeatureFlags` definition (found in the assembly) into instances of the `Flag` class.
+Its job is to convert all `FeatureFlags` definition (found in the assembly) into instances of the `Flag` class.
 
 # Development Workarounds
 
@@ -19,7 +19,7 @@ If any dependencies are taken, special workarounds (in the project file of this 
 
 We are avoiding including certain types from any projects in this solution (e.g. from the `Common` project) even though we need it in the code of the Source generator, since that project is dependent on types in AspNet framework.
 
-To workaround this, we have file-linked certain source files from projects in the solution, so that we can use those symbols in the Source Generator code.
+To work around this, we have file-linked certain source files from projects in the solution, so that we can use those symbols in the Source Generator code.
 
 We have had to hardcode certain other types to avoid referencing AspNet, and these cannot be tracked by tooling if they are changed elsewhere.
 
@@ -27,12 +27,11 @@ We have had to hardcode certain other types to avoid referencing AspNet, and the
 
 # Debugging Generators
 
-You can debug the analyzers easily from the unit tests.
+You can debug the source generator easily from the unit tests.
 
 You can debug your source generator by setting a breakpoint in the code, and then running the `Common-SourceGenerators-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
 
-
-> Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise you breakpoints may not hit.
+> Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise, your breakpoints may not hit.
 
 The most reliable way to reset the generators:
 

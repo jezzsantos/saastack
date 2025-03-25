@@ -32,10 +32,9 @@ public class MinimalApiGeneratorSpec
         AdditionalCompilationAssemblies.ToList()
             .ForEach(item => references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, item))));
         var compilation = CSharpCompilation.Create("compilation",
-            new[]
-            {
+            [
                 CSharpSyntaxTree.ParseText(sourceCode)
-            },
+            ],
             references,
             new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 

@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
+        <DefineConstants>$(DefineConstants);GENERATORS_WORKERS_PROJECT</DefineConstants>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <IsPlatformProject>true</IsPlatformProject>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Common\Annotations.cs">
+            <Link>Reference\Common\Annotations.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Error.cs">
+            <Link>Reference\Common\Error.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Result.cs">
+            <Link>Reference\Common\Result.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Optional.cs">
+            <Link>Reference\Common\Optional.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\CollectionExtensions.cs">
+            <Link>Reference\Common\Extensions\CollectionExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\ObjectExtensions.cs">
+            <Link>Reference\Common\Extensions\ObjectExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\StringExtensions.cs">
+            <Link>Reference\Common\Extensions\StringExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\DictionaryExtensions.cs">
+            <Link>Reference\Common\Extensions\DictionaryExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Entities\IDomainEvent.cs">
+            <Link>Reference\Domain.Interfaces\Entities\IDomainEvent.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Resources.Designer.cs">
+            <Link>Reference\Common\Resources.Designer.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Eventing.Interfaces\Notifications\IDomainEventNotificationConsumer.cs">
+            <Link>Reference\Infrastructure.Eventing.Interfaces\Notifications\IDomainEventNotificationConsumer.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Eventing.Common\Extensions\EventingExtensions.cs">
+            <Link>Reference\Infrastructure.Eventing.Common\Extensions\EventingExtensions.cs</Link>
+        </Compile>
+        <Compile Update="Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+</Project>

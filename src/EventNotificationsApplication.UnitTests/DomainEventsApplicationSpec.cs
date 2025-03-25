@@ -22,7 +22,7 @@ public class DomainEventsApplicationSpec
 {
     private readonly DomainEventsApplication _application;
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<IDomainEventConsumerService> _domainEventConsumerService;
+    private readonly Mock<IDomainEventingConsumerService> _domainEventingConsumerService;
     private readonly Mock<IDomainEventingMessageBusTopic> _domainEventMessageTopic;
     private readonly Mock<IEventNotificationRepository> _domainEventRepository;
 
@@ -32,22 +32,20 @@ public class DomainEventsApplicationSpec
         _caller = new Mock<ICallerContext>();
         _domainEventRepository = new Mock<IEventNotificationRepository>();
         _domainEventMessageTopic = new Mock<IDomainEventingMessageBusTopic>();
-        _domainEventConsumerService = new Mock<IDomainEventConsumerService>();
-        var eventingSubscriber = new Mock<IDomainEventingSubscriber>();
-        eventingSubscriber.Setup(es => es.SubscriptionName)
-            .Returns("asubscriptionname");
-        _domainEventConsumerService.Setup(dec => dec.GetSubscriber())
-            .Returns("asubscriberref");
+        _domainEventingConsumerService = new Mock<IDomainEventingConsumerService>();
+        _domainEventingConsumerService.Setup(dec => dec.SubscriptionNames)
+            .Returns(["asubscription1", "asubscription2"]);
 
         _application = new DomainEventsApplication(recorder.Object, _domainEventRepository.Object,
-            _domainEventMessageTopic.Object, eventingSubscriber.Object, _domainEventConsumerService.Object);
+            _domainEventMessageTopic.Object, _domainEventingConsumerService.Object);
     }
 
     [Fact]
     public async Task WhenNotifyDomainEventAsyncAndMessageIsNotRehydratable_ThenReturnsError()
     {
         var result =
-            await _application.NotifyDomainEventAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
+            await _application.NotifyDomainEventAsync(_caller.Object, "asubscriber", "anunknownmessage",
+                CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.DomainEventsApplication_InvalidBusMessage.Format(nameof(DomainEventingMessage),
@@ -80,7 +78,9 @@ public class DomainEventsApplicationSpec
             Event = changeEvent
         }.ToJson()!;
 
-        var result = await _application.NotifyDomainEventAsync(_caller.Object, messageAsJson, CancellationToken.None);
+        var result =
+            await _application.NotifyDomainEventAsync(_caller.Object, "asubscriptionname", messageAsJson,
+                CancellationToken.None);
 
         result.Should().BeSuccess();
         _domainEventRepository.Verify(
@@ -91,11 +91,10 @@ public class DomainEventsApplicationSpec
                 && en.Metadata == new EventMetadata("unknowntype")
                 && en.Version == 1
                 && en.StreamName == "astreamname"
-                && en.SubscriberRef == "asubscriberref"
+                && en.SubscriberRef == "asubscriptionname"
             ), It.IsAny<CancellationToken>()));
-        _domainEventConsumerService.Verify(dec => dec.GetSubscriber());
-        _domainEventConsumerService.Verify(
-            dec => dec.NotifyAsync(It.Is<EventStreamChangeEvent>(ce =>
+        _domainEventingConsumerService.Verify(
+            dec => dec.NotifySubscriberAsync("asubscriptionname", It.Is<EventStreamChangeEvent>(ce =>
                 ce.Id == "anid"
                 && ce.RootAggregateType == "anaggregatetype"
                 && ce.StreamName == "astreamname"
@@ -103,12 +102,12 @@ public class DomainEventsApplicationSpec
     }
 
 #if TESTINGONLY
-
     [Fact]
     public async Task WhenDrainAllDomainEventsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
     {
-        _domainEventMessageTopic.Setup(umr =>
-                umr.ReceiveSingleAsync(It.IsAny<string>(),
+        // There are two subscriptions, and no messages on either subscription
+        _domainEventMessageTopic.Setup(det =>
+                det.ReceiveSingleAsync(It.IsAny<string>(),
                     It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -119,13 +118,16 @@ public class DomainEventsApplicationSpec
         _domainEventMessageTopic.Verify(
             mt => mt.ReceiveSingleAsync(It.IsAny<string>(),
                 It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()));
-        _domainEventConsumerService.Verify(
-            dec => dec.NotifyAsync(It.IsAny<EventStreamChangeEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _domainEventingConsumerService.Verify(
+            dec => dec.NotifySubscriberAsync(It.IsAny<string>(), It.IsAny<EventStreamChangeEvent>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
+#endif
 
+#if TESTINGONLY
     [Fact]
-    public async Task WhenDrainAllDomainEventsAsyncAndSomeOnQueue_ThenDeliversAll()
+    public async Task WhenDrainAllDomainEventsAsyncAndSomeOnBus_ThenDeliversAll()
     {
         var changeEvent1 = new EventStreamChangeEvent
         {
@@ -138,7 +140,7 @@ public class DomainEventsApplicationSpec
             Version = 1,
             Metadata = new EventMetadata("unknowntype1"),
             EventType = "aneventtype1",
-            LastPersistedAtUtc = default,
+            LastPersistedAtUtc = null,
             StreamName = "astreamname1"
         };
         var message1 = new DomainEventingMessage
@@ -157,7 +159,7 @@ public class DomainEventsApplicationSpec
             Version = 1,
             Metadata = new EventMetadata("unknowntype2"),
             EventType = "aneventtype2",
-            LastPersistedAtUtc = default,
+            LastPersistedAtUtc = null,
             StreamName = "astreamname2"
         };
         var message2 = new DomainEventingMessage
@@ -166,20 +168,21 @@ public class DomainEventsApplicationSpec
             Event = changeEvent2
         };
         var callbackCount = 1;
-        _domainEventMessageTopic.Setup(umr =>
-                umr.ReceiveSingleAsync(It.IsAny<string>(),
+        _domainEventMessageTopic.Setup(det =>
+                det.ReceiveSingleAsync(It.IsAny<string>(),
                     It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .Callback(
                 (string _, Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>> action,
                     CancellationToken _) =>
                 {
-                    if (callbackCount == 1)
+                    // There are two subscriptions, and two messages for each subscription
+                    if (callbackCount == 1 || callbackCount == 4)
                     {
                         action(message1, CancellationToken.None);
                     }
 
-                    if (callbackCount == 2)
+                    if (callbackCount == 2 || callbackCount == 5)
                     {
                         action(message2, CancellationToken.None);
                     }
@@ -188,7 +191,7 @@ public class DomainEventsApplicationSpec
                 CancellationToken _) =>
             {
                 callbackCount++;
-                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2);
+                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2 or 4 or 5);
             });
 
         var result = await _application.DrainAllDomainEventsAsync(_caller.Object, CancellationToken.None);
@@ -197,16 +200,20 @@ public class DomainEventsApplicationSpec
         _domainEventMessageTopic.Verify(
             mt => mt.ReceiveSingleAsync(It.IsAny<string>(),
                 It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _domainEventConsumerService.Verify(dec => dec.GetSubscriber(), Times.Exactly(2));
-        _domainEventConsumerService.Verify(
-            dec => dec.NotifyAsync(changeEvent1, It.IsAny<CancellationToken>()));
-        _domainEventConsumerService.Verify(dec => dec.NotifyAsync(changeEvent2, It.IsAny<CancellationToken>()));
-        _domainEventConsumerService.Verify(
-            dec => dec.NotifyAsync(It.IsAny<EventStreamChangeEvent>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(2));
+                It.IsAny<CancellationToken>()), Times.Exactly(7));
+        _domainEventingConsumerService.Verify(
+            dec => dec.NotifySubscriberAsync("asubscription1", changeEvent1, It.IsAny<CancellationToken>()));
+        _domainEventingConsumerService.Verify(
+            dec => dec.NotifySubscriberAsync("asubscription2", changeEvent1, It.IsAny<CancellationToken>()));
+        _domainEventingConsumerService.Verify(dec =>
+            dec.NotifySubscriberAsync("asubscription1", changeEvent2, It.IsAny<CancellationToken>()));
+        _domainEventingConsumerService.Verify(dec =>
+            dec.NotifySubscriberAsync("asubscription2", changeEvent2, It.IsAny<CancellationToken>()));
+        _domainEventingConsumerService.Verify(
+            dec => dec.NotifySubscriberAsync(It.IsAny<string>(), It.IsAny<EventStreamChangeEvent>(),
+                It.IsAny<CancellationToken>()),
+            Times.Exactly(4));
     }
-
 #endif
 }
 

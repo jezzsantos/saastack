@@ -1,9 +1,11 @@
-
-using System.Diagnostics;
 #if COMMON_PROJECT
 using AutoMapper;
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
+
+using System.Diagnostics;
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM || GENERATORS_WORKERS_PROJECT
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 #endif
@@ -25,7 +27,7 @@ public static class ObjectExtensions
         return mapper.Map<TTarget>(source);
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the object does exist
     /// </summary>
@@ -35,7 +37,7 @@ public static class ObjectExtensions
         return instance is not null;
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the object does not exist
     /// </summary>
@@ -45,7 +47,7 @@ public static class ObjectExtensions
         return instance is null;
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
     ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
@@ -134,7 +136,7 @@ public static class ObjectExtensions
         }
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> does not have a value
     /// </summary>

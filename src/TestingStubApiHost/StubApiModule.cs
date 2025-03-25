@@ -57,8 +57,7 @@ public class StubApiModule : ISubdomainModule
                             //Nothing to register
                         },
                         "Feature: Background worker for message draining is enabled, on: queues -> {Queues}, and bus topics -> {Topics}",
-                        queues,
-                        topics));
+                        queues, topics));
                 }
 #endif
             };

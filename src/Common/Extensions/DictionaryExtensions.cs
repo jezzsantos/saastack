@@ -1,9 +1,12 @@
+# if !GENERATORS_WORKERS_PROJECT
 using AutoMapper;
+#endif
 
 namespace Common.Extensions;
 
 public static class DictionaryExtensions
 {
+#if !GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Constructs a new instance of the <see cref="TObject" /> with the <see cref="values" />
     /// </summary>
@@ -14,7 +17,8 @@ public static class DictionaryExtensions
 
         return mapper.Map<TObject>(values);
     }
-
+#endif
+    
     /// <summary>
     ///     Merges the values from <see cref="other" /> into the existing values of <see cref="source" />,
     ///     Where there are not duplications
@@ -26,6 +30,7 @@ public static class DictionaryExtensions
             .ForEach(entry => { source[entry.Key] = entry.Value; });
     }
 
+#if !GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Converts the instance of the <see cref="TObject" /> to a <see cref="IReadOnlyDictionary{String,Object}" />
     /// </summary>
@@ -88,4 +93,5 @@ public static class DictionaryExtensions
             dictionary.TryAdd(key, value);
         }
     }
+#endif
 }

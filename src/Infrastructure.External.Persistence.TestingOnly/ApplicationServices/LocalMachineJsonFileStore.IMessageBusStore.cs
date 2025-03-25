@@ -90,12 +90,7 @@ partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrig
         }
 
         var subscriptionsStore = EnsureContainer(GetSubscriptionStoreContainerPath(topicName));
-        if (subscriptionsStore.NotExists(subscriptionName))
-        {
-            await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
-                cancellationToken);
-            return false;
-        }
+        await EnsureSubscriptionExists();
 
         var subscription = await LoadSubscriptionAsync(subscriptionsStore, subscriptionName, cancellationToken);
         if (subscription.NotExists())
@@ -143,6 +138,15 @@ partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrig
         subscription.Current = latestMessageId;
         await SaveSubscriptionAsync(subscriptionsStore, subscription, cancellationToken);
         return true;
+
+        async Task EnsureSubscriptionExists()
+        {
+            if (subscriptionsStore.NotExists(subscriptionName))
+            {
+                await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
+                    cancellationToken);
+            }
+        }
     }
 #endif
 

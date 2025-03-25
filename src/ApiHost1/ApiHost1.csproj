@@ -2,6 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <!-- Outputs the source generated files locally -->
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,6 +30,14 @@
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
         <ProjectReference Include="..\Tools.Generators.Web.Api\Tools.Generators.Web.Api.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Tools.Generators.Workers\Tools.Generators.Workers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <!-- Exclude the output of source generators from the compilation -->
+        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Required for the Tools.Generators.Workers generator -->
+        <AdditionalFiles Include="appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,6 +46,7 @@
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
+
     <ItemGroup>
         <Compile Update="Resources.Designer.cs">
             <DesignTime>True</DesignTime>

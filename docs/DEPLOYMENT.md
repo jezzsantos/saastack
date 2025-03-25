@@ -343,6 +343,18 @@ Now, just copy and paste the whole output JSON (`{` to `}` like the above) into 
 
 * sec: `DEPLOY_AZURE_CREDENTIALS` either at the GitHub repository level, or as a secret into the GitHub deployment environment you are using.
 
+Finally, one last task, is to give permissions to the Azure Functions to call APIs on the Azure FunctionHost.
+
+In the Azure Portal, go to the Azure Function App, and select Identity tab. Turn ON the  'System assigned' identity, and then click the 'Azure role assignments'.
+You now need to assign the following role: 
+* Scope: Resource group
+* Resource group: `<resourcegroupname>`
+* Role: Contributor
+
+Then Save, and exit.
+
+> This last step is critical so that the Circuit breaker can be opened when messages cannot be processed by the Azure Functions that deliver them from the Azure Service Bus to the API hosts.
+
 #### Deployment variables and secrets
 
 Now, that your Azure environment is provisioned, you need to update the following variables and secrets in your GitHub Project.

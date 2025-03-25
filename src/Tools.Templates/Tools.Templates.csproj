@@ -6,19 +6,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="AnyProject/**/*.cs" />
         <Compile Include="InfrastructureProject\Notifications\{SubDomainName}Notifier.cs" />
+        <Compile Remove="AnyProject/**/*.cs" />
         <None Include="AnyProject/**/*.*" />
-
         <Compile Remove="HostProject/**/*.cs" />
         <None Include="HostProject/**/*.*" />
-
         <Compile Remove="InfrastructureProject/**/*.cs" />
         <None Include="InfrastructureProject/**/*.*" />
-
         <Compile Remove="IntegrationTestProject/**/*.cs" />
         <None Include="IntegrationTestProject/**/*.*" />
-
         <Compile Remove="UnitTestProject/**/*.cs" />
         <None Include="UnitTestProject/**/*.*" />
     </ItemGroup>
@@ -26,6 +22,16 @@
     <ItemGroup>
         <Content Update="IntegrationTestProject\appsettings.Testing.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="HostProject\appsettings.AWS.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Update="HostProject\appsettings.Azure.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
 

@@ -11,5 +11,6 @@ public interface IMessageBusMonitoringApiRelayWorker<in TQueuedMessage>
     /// <summary>
     ///     Relays the topic message
     /// </summary>
-    Task RelayMessageOrThrowAsync(string subscriptionName, TQueuedMessage message, CancellationToken cancellationToken);
+    Task RelayMessageOrThrowAsync(string subscriberHostName, string subscriptionName, TQueuedMessage message,
+        CancellationToken cancellationToken);
 }

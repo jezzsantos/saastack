@@ -14,10 +14,13 @@ namespace Infrastructure.External.Persistence.Azure.ApplicationServices;
 ///     existing messages pushed to the topic will appear for the subscription.
 ///     Which means that the subscriptions need to be in place before the messages are sent to the topic, otherwise
 ///     they will be unrecoverable by the subscription when it is created.
+///     Note: IN almost all use cases, we want to ensure FIFO delivery, and thus we must use sessions.
+///     By default, we will support one single default session for all messages.
 /// </summary>
 [UsedImplicitly]
 public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
 {
+    private const string DefaultSessionId = "default_session";
     private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(5);
     private readonly AzureServiceBusStoreOptions.ConnectionOptions _connectionOptions;
     private readonly IRecorder _recorder;
@@ -95,11 +98,16 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         ArgumentNullException.ThrowIfNull(messageHandlerAsync);
 
         await using var receiver = await ConnectReceiverAsync(topicName, subscriptionName, cancellationToken);
+        if (receiver.NotExists())
+        {
+            return false;
+        }
 
         Result<ServiceBusReceivedMessage?, Error> received;
         try
         {
-            received = await RetrieveNextMessageInternalAsync(topicName, subscriptionName, receiver, cancellationToken);
+            received = await RetrieveNextMessageInternalAsync(topicName, subscriptionName, receiver,
+                cancellationToken);
             if (received.IsFailure)
             {
                 return received.Error;
@@ -183,7 +191,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
     }
 
     private async Task<Result<ServiceBusReceivedMessage?, Error>> RetrieveNextMessageInternalAsync(string topicName,
-        string subscriptionName, ServiceBusReceiver receiver, CancellationToken cancellationToken)
+        string subscriptionName, ServiceBusSessionReceiver receiver, CancellationToken cancellationToken)
     {
         var command = async () => await receiver.ReceiveMessageAsync(ReceiveTimeout, cancellationToken);
 
@@ -209,14 +217,12 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         var command = async () =>
         {
             await using var sender = await ConnectToTopicAsync(topicName, cancellationToken);
-
-            using var batch = await sender.CreateMessageBatchAsync(cancellationToken);
-            if (!batch.TryAddMessage(new ServiceBusMessage(message)))
+            var msg = new ServiceBusMessage(message)
             {
-                return Error.RuleViolation(Resources.AzureServiceBusStore_MessageTooLarge);
-            }
+                SessionId = DefaultSessionId
+            };
 
-            await sender.SendMessagesAsync(batch, cancellationToken);
+            await sender.SendMessageAsync(msg, cancellationToken);
 
             return Result.Ok;
         };
@@ -227,6 +233,11 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         }
         catch (ServiceBusException ex)
         {
+            if (ex.Reason == ServiceBusFailureReason.MessageSizeExceeded)
+            {
+                return Error.RuleViolation(Resources.AzureServiceBusStore_MessageTooLarge);
+            }
+
             if (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
             {
                 await CreateTopicAsync(topicName, cancellationToken);
@@ -303,7 +314,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await _adminClient.CreateTopicAsync(new CreateTopicOptions(sanitizedTopicName)
             {
                 EnablePartitioning = false,
-                SupportOrdering = true
+                SupportOrdering = true // We want order preserved
             }, cancellationToken);
         }
     }
@@ -320,12 +331,17 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         if (!await _adminClient!.SubscriptionExistsAsync(sanitizedTopicName, sanitizedSubscriptionName,
                 cancellationToken))
         {
+            var options = new CreateSubscriptionOptions(sanitizedTopicName, sanitizedSubscriptionName)
+            {
+                MaxDeliveryCount = 2000, //Ensures it never gets to DLQ
+                RequiresSession = true // Ensures FIFO delivery
+            };
             await _adminClient.CreateSubscriptionAsync(
-                new CreateSubscriptionOptions(sanitizedTopicName, sanitizedSubscriptionName), cancellationToken);
+                options, cancellationToken);
         }
     }
 
-    private async Task<ServiceBusReceiver> ConnectReceiverAsync(string topicName, string subscriptionName,
+    private async Task<ServiceBusSessionReceiver?> ConnectReceiverAsync(string topicName, string subscriptionName,
         CancellationToken cancellationToken)
     {
         EnsureConnected();
@@ -336,11 +352,23 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await CreateSubscriptionAsync(sanitizedTopicName, sanitizedSubscriptionName, cancellationToken);
         }
 
-        return _busClient!.CreateReceiver(sanitizedTopicName, sanitizedSubscriptionName, new ServiceBusReceiverOptions
+        try
         {
-            ReceiveMode = ServiceBusReceiveMode.PeekLock, // we want to manually complete messages
-            PrefetchCount = 1 // we only want one (and only one) message at a time
-        });
+            return await _busClient!.AcceptNextSessionAsync(sanitizedTopicName, new ServiceBusSessionReceiverOptions
+            {
+                ReceiveMode = ServiceBusReceiveMode.PeekLock, // we want to manually complete messages
+                PrefetchCount = 1 // we only want one (and only one) message at a time
+            }, cancellationToken);
+        }
+        catch (ServiceBusException ex)
+        {
+            if (ex.Reason == ServiceBusFailureReason.ServiceTimeout)
+            {
+                return null;
+            }
+
+            throw;
+        }
     }
 
     private bool IsTopicExistenceCheckPerformed(string topicName)

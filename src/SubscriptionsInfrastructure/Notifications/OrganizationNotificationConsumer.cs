@@ -5,7 +5,7 @@ using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Interfaces;
 using SubscriptionsApplication;
 
-namespace SubscriptionsInfrastructure.Persistence.Notifications;
+namespace SubscriptionsInfrastructure.Notifications;
 
 public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
 {
