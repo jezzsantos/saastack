@@ -24,9 +24,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="DomainEventConsumerService_ConsumerFailed" xml:space="preserve">
-        <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
-    </data>
     <data name="BillingProvider_ProviderNameNotMatch" xml:space="preserve">
         <value>The ProviderName does not match this provider</value>
     </data>

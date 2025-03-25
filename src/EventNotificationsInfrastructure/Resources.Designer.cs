@@ -60,11 +60,56 @@ namespace EventNotificationsInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No consumer was not registered to receive notification events for subscription: {0}.
+        /// </summary>
+        internal static string ApiHostDomainEventingConsumerService_NotifySubscriberAsync_MissingConsumer {
+            get {
+                return ResourceManager.GetString("ApiHostDomainEventingConsumerService_NotifySubscriberAsync_MissingConsumer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following consumers were found in the assemblies of the current running host, but not registered into the DI container: {0}.
+        /// </summary>
+        internal static string ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromInjection {
+            get {
+                return ResourceManager.GetString("ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromInjection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following consumers were not found in the assemblies of the current running host, and not registered at startup: {0}.
+        /// </summary>
+        internal static string ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromRegistration {
+            get {
+                return ResourceManager.GetString("ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromRegistration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to notify consumer: {0}, with event: {1} ({2}).
+        /// </summary>
+        internal static string DomainEventingSubscriber_ConsumerFailed {
+            get {
+                return ResourceManager.GetString("DomainEventingSubscriber_ConsumerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; is either missing or invalid.
         /// </summary>
-        internal static string AnyQueueMessageValidator_InvalidMessage {
+        internal static string NotifyDomainEventRequestValidator_InvalidMessage {
             get {
-                return ResourceManager.GetString("AnyQueueMessageValidator_InvalidMessage", resourceCulture);
+                return ResourceManager.GetString("NotifyDomainEventRequestValidator_InvalidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;SubscriptionName&apos; is either missing or invalid.
+        /// </summary>
+        internal static string NotifyDomainEventRequestValidator_InvalidSubscriptionName {
+            get {
+                return ResourceManager.GetString("NotifyDomainEventRequestValidator_InvalidSubscriptionName", resourceCulture);
             }
         }
     }

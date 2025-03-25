@@ -24,8 +24,22 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AnyQueueMessageValidator_InvalidMessage" xml:space="preserve">
+    <data name="NotifyDomainEventRequestValidator_InvalidMessage" xml:space="preserve">
         <value>The 'Message' is either missing or invalid</value>
     </data>
-
+    <data name="NotifyDomainEventRequestValidator_InvalidSubscriptionName" xml:space="preserve">
+        <value>The 'SubscriptionName' is either missing or invalid</value>
+    </data>
+    <data name="DomainEventingSubscriber_ConsumerFailed" xml:space="preserve">
+        <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
+    </data>
+    <data name="ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromRegistration" xml:space="preserve">
+        <value>The following consumers were not found in the assemblies of the current running host, and not registered at startup: {0}</value>
+    </data>
+    <data name="ApiHostDomainEventingConsumerService_WrapConsumers_MissingFromInjection" xml:space="preserve">
+        <value>The following consumers were found in the assemblies of the current running host, but not registered into the DI container: {0}</value>
+    </data>
+    <data name="ApiHostDomainEventingConsumerService_NotifySubscriberAsync_MissingConsumer" xml:space="preserve">
+        <value>No consumer was not registered to receive notification events for subscription: {0}</value>
+    </data>
 </root>

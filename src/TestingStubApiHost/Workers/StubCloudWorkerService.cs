@@ -15,8 +15,8 @@ namespace TestingStubApiHost.Workers;
 
 /// <summary>
 ///     Provides an asynchronous background service that regularly and continuously polls all the
-///     queues and message bus topics of <see cref="TestingStubApiHost.QueuedMappings" /> and when found relays them to
-///     the Ancillary API and EventNotifications API to drains any messages accumulated.
+///     queues and message bus topics of <see cref="TestingStubApiHost.QueuedMappings" /> and when messages are detected,
+///     relays them to the Ancillary API and EventNotifications API to drains any messages accumulated.
 ///     Essentially, this stub replaces stands in for the Azure Functions/AWS Lambdas that are triggered, and call the
 ///     respective APIs directly, except that these API calls, do the draining themselves.
 ///     Note: Used only in TESTINGONLY, and only by specific <see cref="IDataStore" /> implementations,
