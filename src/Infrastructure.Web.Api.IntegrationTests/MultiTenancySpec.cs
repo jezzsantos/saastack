@@ -4,6 +4,7 @@ using Application.Resources.Shared;
 using CarsDomain;
 using Common.Extensions;
 using FluentAssertions;
+using Infrastructure.External.Persistence.TestingOnly.ApplicationServices;
 using Infrastructure.Web.Api.IntegrationTests.Stubs;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
