@@ -78,92 +78,11 @@ namespace Infrastructure.Shared {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot cancel a subscription for a customer that is not immediate or scheduled to cancel in the past.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_Cancel_ScheduleInvalid {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_Cancel_ScheduleInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The CustomerId is missing.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_InvalidCustomerId {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidCustomerId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The PlanId is missing.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_InvalidPlanId {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidPlanId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The Subscriber is missing.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_InvalidSubscriber {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidSubscriber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The SubscriptionId is missing.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_InvalidSubscriptionId {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidSubscriptionId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot create a subscription for a customer that is not immediate or scheduled to start in the past.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A subscription with ID: {0}, does not exist in Chargebee.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_SubscriptionNotFound {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_SubscriptionNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot transfer a subscription to another buyer without the buyer information.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_Transfer_BuyerInvalid {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_Transfer_BuyerInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to notify consumer: {0}, with event: {1} ({2}).
         /// </summary>
         internal static string DomainEventConsumerService_ConsumerFailed {
             get {
                 return ResourceManager.GetString("DomainEventConsumerService_ConsumerFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The feature &apos;{0}&apos; has not be defined in Flagsmith.
-        /// </summary>
-        internal static string FlagsmithHttpServiceClient_UnknownFeature {
-            get {
-                return ResourceManager.GetString("FlagsmithHttpServiceClient_UnknownFeature", resourceCulture);
             }
         }
         

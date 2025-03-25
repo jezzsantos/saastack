@@ -2,7 +2,9 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
-using Infrastructure.Persistence.Shared.ApplicationServices;
+#if TESTINGONLY
+using Infrastructure.External.Persistence.TestingOnly.ApplicationServices;
+#endif
 
 namespace Infrastructure.Web.Api.IntegrationTests.Stubs;
 

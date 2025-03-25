@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ApiHost1\ApiHost1.csproj" />
+        <ProjectReference Include="..\Infrastructure.External.Persistence.TestingOnly\Infrastructure.External.Persistence.TestingOnly.csproj" />
         <ProjectReference Include="..\IntegrationTesting.WebApi.Common\IntegrationTesting.WebApi.Common.csproj" />
     </ItemGroup>
 

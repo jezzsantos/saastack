@@ -24,9 +24,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="FlagsmithHttpServiceClient_UnknownFeature" xml:space="preserve">
-        <value>The feature '{0}' has not be defined in Flagsmith</value>
-    </data>
     <data name="DomainEventConsumerService_ConsumerFailed" xml:space="preserve">
         <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
     </data>
@@ -48,29 +45,4 @@
     <data name="InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description" xml:space="preserve">
         <value>All features</value>
     </data>
-    <data name="ChargebeeHttpServiceClient_InvalidCustomerId" xml:space="preserve">
-        <value>The CustomerId is missing</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_InvalidSubscriptionId" xml:space="preserve">
-        <value>The SubscriptionId is missing</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_InvalidPlanId" xml:space="preserve">
-        <value>The PlanId is missing</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_InvalidSubscriber" xml:space="preserve">
-        <value>The Subscriber is missing</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid" xml:space="preserve">
-        <value>Cannot create a subscription for a customer that is not immediate or scheduled to start in the past</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_SubscriptionNotFound" xml:space="preserve">
-        <value>A subscription with ID: {0}, does not exist in Chargebee</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_Cancel_ScheduleInvalid" xml:space="preserve">
-        <value>Cannot cancel a subscription for a customer that is not immediate or scheduled to cancel in the past</value>
-    </data>
-    <data name="ChargebeeHttpServiceClient_Transfer_BuyerInvalid" xml:space="preserve">
-        <value>Cannot transfer a subscription to another buyer without the buyer information</value>
-    </data>
-
 </root>

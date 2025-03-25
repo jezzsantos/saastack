@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="AnyStore_MissingId" xml:space="preserve">
+        <value>Id cannot be empty</value>
+    </data>
+    <data name="AnyStore_MissingContainerName" xml:space="preserve">
+        <value>ContainerName cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingBlobName" xml:space="preserve">
+        <value>BlobName cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingContentType" xml:space="preserve">
+        <value>ContentType cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingQueueName" xml:space="preserve">
+        <value>QueueName cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingQueueMessage" xml:space="preserve">
+        <value>Message cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingEntityName" xml:space="preserve">
+        <value>EntityName cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingEntityId" xml:space="preserve">
+        <value>EntityId cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingTopicName" xml:space="preserve">
+        <value>TopicName cannot be empty</value>
+    </data>
+    <data name="InProcessInMemDataStore_MissingSubscriptionName" xml:space="preserve">
+        <value>SubscriptionName cannot be empty</value>
+    </data>
+    <data name="LocalMachineJsonFileStore_VerifyRootPath_CreateFailed" xml:space="preserve">
+        <value>The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine.</value>
+    </data>
+</root>

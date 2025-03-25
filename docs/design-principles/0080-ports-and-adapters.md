@@ -101,7 +101,7 @@ In practice, to build one of these 3rd party adapters, you need to take extra ti
 
 #### Adapter
 
-Most external adapters for 3rd party integrations, that you build, should be built and maintained in the `Infrastructure.Shared` project in a folder called: `ApplicationServices/External`.
+Most external adapters for 3rd party integrations, that you build, should be built and maintained in the `Infrastructure.External` project in a folder called: `ApplicationServices`.
 > This single project would be the only project that would take a dependency on any 3rd party NuGet packages required by these adapters, which should be kept to a minimum.
 
 Your adapter will likely act as an HTTPS "Service Client" to a remote 3rd party service (in the cloud or deployed in your cloud, a.k.a. on-premise). Thus, the name of your adapter is likely to follow the naming pattern: `VendorHttpServiceClient`.

@@ -6,13 +6,13 @@ using Common.Configuration;
 using Common.Extensions;
 using Domain.Services.Shared;
 using Domain.Shared.Subscriptions;
-using Infrastructure.Shared.ApplicationServices.External;
+using Infrastructure.External.ApplicationServices;
 using Subscription = ChargeBee.Models.Subscription;
 
 namespace SubscriptionsInfrastructure.IntegrationTests.Stubs;
 
 /// <summary>
-///     In this stub we can use the real <see cref="ChargebeeStateInterpreter" />,
+///     In this stub we can use the real <see cref="Infrastructure.External.ChargebeeStateInterpreter" />,
 ///     but we have to stub out the behaviour of the <see cref="IBillingGatewayService" /> for Chargebee
 /// </summary>
 public class StubChargebeeBillingProvider : IBillingProvider

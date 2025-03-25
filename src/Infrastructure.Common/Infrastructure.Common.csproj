@@ -10,8 +10,8 @@
         <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
         <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
+        <ProjectReference Include="..\Infrastructure.External.Persistence.AWS\Infrastructure.External.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
+        <ProjectReference Include="..\Infrastructure.External.Persistence.Azure\Infrastructure.External.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
     </ItemGroup>
 

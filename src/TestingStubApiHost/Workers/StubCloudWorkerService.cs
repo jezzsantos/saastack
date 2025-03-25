@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Infrastructure.External.Persistence.TestingOnly.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
-using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -21,7 +21,8 @@ namespace TestingStubApiHost.Workers;
 ///     respective APIs directly, except that these API calls, do the draining themselves.
 ///     Note: Used only in TESTINGONLY, and only by specific <see cref="IDataStore" /> implementations,
 ///     that implement <see cref="IQueueStoreTrigger" /> and <see cref="IMessageBusStoreTrigger" />.
-///     Note: We need to inject the singleton of the <see cref="LocalMachineJsonFileStore" />
+///     Note: We need to inject the singleton of the
+///     <see cref="Infrastructure.External.Persistence.TestingOnly.ApplicationServices.LocalMachineJsonFileStore" />
 ///     so that we are monitoring the local disk for changes in other processes
 /// </summary>
 public class StubCloudWorkerService : BackgroundService

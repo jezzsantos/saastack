@@ -137,7 +137,7 @@ docker compose up -d localstack
 
 > You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twilio, etc.)
 
-In the `Infrastructure.Shared.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
+In the `Infrastructure.External.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
 
 > DO NOT add this file to source control!
 

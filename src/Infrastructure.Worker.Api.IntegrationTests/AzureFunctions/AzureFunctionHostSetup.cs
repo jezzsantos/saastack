@@ -1,8 +1,8 @@
 using AzureFunctions.Api.WorkerHost;
 using Common.Extensions;
 using Common.Recording;
+using Infrastructure.External.Persistence.Azure.ApplicationServices;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;

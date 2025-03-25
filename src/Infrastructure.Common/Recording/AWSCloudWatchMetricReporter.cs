@@ -6,8 +6,8 @@ using Common.Configuration;
 using Common.Extensions;
 using Common.Recording;
 using Domain.Interfaces.Services;
-using Infrastructure.Persistence.AWS;
-using Infrastructure.Persistence.AWS.Extensions;
+using Infrastructure.External.Persistence.AWS;
+using Infrastructure.External.Persistence.AWS.Extensions;
 
 namespace Infrastructure.Common.Recording;
 
@@ -38,14 +38,14 @@ public class AWSCloudWatchMetricReporter : IMetricReporter
         _client.PutMetricDataAsync(new PutMetricDataRequest
         {
             Namespace = "SaaStack",
-            MetricData = new List<MetricDatum>
-            {
-                new()
+            MetricData =
+            [
+                new MetricDatum
                 {
                     MetricName = eventName,
                     Value = 1
                 }
-            }
+            ]
         });
     }
 }

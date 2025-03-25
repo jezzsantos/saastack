@@ -232,7 +232,7 @@ These services require the following secrets and variables in your GitHub deploy
 * var: `APPLICATIONSERVICES_USERPILOT_BASEURL` (Should be: `https://analytex-eu.userpilot.io/v1`)
 * sec: `APPLICATIONSERVICES_USERPILOT_APIKEY` (Sign in to your UserPilot account, Configure -> Environment, and copy the API Key)
 
-> Tip: Depending on the specific deployment environment you are deploying, you may find some of these values defined in your own copy of `appsettings.Testing.json` and `appsettings.Testing.local.json` in the `Infrastructure.Shared.IntegrationTests` project.  
+> Tip: Depending on the specific deployment environment you are deploying, you may find some of these values defined in your own copy of `appsettings.Testing.json` and `appsettings.Testing.local.json` in the `Infrastructure.External.IntegrationTests` project.  
 
 #### Azure deployments
 

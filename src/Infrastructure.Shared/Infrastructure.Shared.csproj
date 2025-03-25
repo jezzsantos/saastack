@@ -6,21 +6,13 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
-        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Interfaces\Infrastructure.Eventing.Interfaces.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
-        <ProjectReference Include="..\Integration.Events.Shared\Integration.Events.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="chargebee" Version="3.18.1" />
-        <PackageReference Include="Flagsmith" Version="5.2.2" />
-        <PackageReference Include="Microsoft.Identity.Client" Version="4.63.0" />
     </ItemGroup>
 
     <ItemGroup>

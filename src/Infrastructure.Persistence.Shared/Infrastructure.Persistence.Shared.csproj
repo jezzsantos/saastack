@@ -6,8 +6,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
-        <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>

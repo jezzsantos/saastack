@@ -7,7 +7,7 @@ using Common;
 using Common.Configuration;
 using Common.Extensions;
 using IdentityApplication.ApplicationServices;
-using Infrastructure.Shared.ApplicationServices.External;
+using Infrastructure.External.ApplicationServices;
 
 namespace IdentityInfrastructure.ApplicationServices;
 

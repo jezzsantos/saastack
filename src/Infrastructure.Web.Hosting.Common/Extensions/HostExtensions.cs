@@ -20,6 +20,7 @@ using Infrastructure.Common.Extensions;
 using Infrastructure.Eventing.Common.Notifications;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Eventing.Interfaces.Notifications;
+using Infrastructure.External.ApplicationServices;
 using Infrastructure.Hosting.Common;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Hosting.Common.Recording;
@@ -27,7 +28,6 @@ using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices;
-using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
@@ -48,7 +48,7 @@ using Infrastructure.Persistence.Common.ApplicationServices;
 
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
-using Infrastructure.Persistence.Azure.ApplicationServices;
+using Infrastructure.External.Persistence.Azure.ApplicationServices;
 
 #elif HOSTEDONAWS
 using Amazon.XRay.Recorder.Core;

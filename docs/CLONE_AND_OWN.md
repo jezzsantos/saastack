@@ -104,17 +104,17 @@ Consider the following projects/components:
 
 * AWS:
    * `AWSLambdas.Api.WorkerHost` project
-   * `Infrastructure.Persistence.AWS` project
+   * `Infrastructure.External.Persistence.AWS` project
    * `appsettings.AWS.json` (in the projects: `ApiHost`, `WebsiteHost` and `TestingStubApiHost`)
-   * `AWS` folder in the `Infrastructure.Persistence.Shared.IntegrationTests` project
+   * `AWS` folder in the `Infrastructure.External.Persistence.IntegrationTests` project
    * `AWSLocalStackEmulator.cs` in the `IntegrationTesting.Persistence.Common` project
    * `AWSCloudWatchCrashReporter` and `AWSCloudWatchMetricReporter` in the `Infrastructure.Common` project
    * Any `AWS.*` nuget packages used in any project of the solution
 * Azure:
    * `AzureFunctions.Api.WorkerHost` project
-   * `Infrastructure.Persistence.Azure` project
+   * `Infrastructure.External.Persistence.Azure` project
    * `appsettings.Azure.json` (in the projects: `ApiHost`, `WebsiteHost,` and `TestingStubApiHost`)
-   * `Azure` folder in the `Infrastructure.Persistence.Shared.IntegrationTests` project
+   * `Azure` folder in the `Infrastructure.External.Persistence.IntegrationTests` project
    * `AzuriteStorageEmulator.cs` in the `IntegrationTesting.Persistence.Common` project
    * `ApplicationInsightsCrashReporter` and `ApplicationInsightsMetricReporter` in the `Infrastructure.Common` project
    * The `tools/azurite` folder
@@ -163,4 +163,4 @@ You can change them all before you publish your codebase, or tackle them as you 
 
 ## 6. Cleanup
 
-Delete this file `CLONE_AND_Own.md`
+Delete this file `CLONE_AND_OWN.md`

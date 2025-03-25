@@ -16,7 +16,7 @@ Or you may wish to store data in a new database technology, like: Azure SQL, Mon
 
 ## Where to start?
 
-All "external" adapters are created in the `Infrastructure.Shared` project in the folder: `ApplicationServices/External`.
+All "external" adapters are created in the `Infrastructure.External` project in the folder: `ApplicationServices`.
 
 > Here you will find the other adapters to 3rd party services.
 
@@ -44,7 +44,7 @@ These are some of the things that make building an adapter to a 3rd party servic
 
 ## How to build the adapter
 
-Start by creating a new `sealed class` in the `Infrastructure.Shared` project in the folder: `ApplicationServices/External`.
+Start by creating a new `sealed class` in the `Infrastructure.External` project in the folder: `ApplicationServices`.
 
 If the 3rd party service you are integrating with is a cloud service, then you are likely building a class of adapter called a `HttpServiceClient`. So use that suffix for the name of your class.
 
@@ -58,7 +58,7 @@ Next you will create a constructor. You will likely need to inject at least thes
 
 ### Use a vendor SDK
 
-In many cases, you will likely be using a public SDK that has been provided by the vendor to access their service remotely using HTTP. These SDKS are usually available as NuGet packages, and you can add them to only the `Infrastructure.Shared` project.
+In many cases, you will likely be using a public SDK that has been provided by the vendor to access their service remotely using HTTP. These SDKS are usually available as NuGet packages, and you can add them to only the `Infrastructure.External` project.
 
 > Warning: Make sure that you choose the Nuget package carefully, and only from a trusted publisher - ideally the vendor themselves. Check their developer documentation. If there is not one for C#.NET, then you might have to build one yourself.
 
@@ -80,7 +80,7 @@ This means that you need to do some extra work, but this will be worth it in the
 2. You can focus on the processing logic and mapping in your adapter (which most adapters will have).
 3. Your custom `IServiceClient` implementation can focus on all aspects of logging and error handling when issuing remote HTTP calls, and you can keep this code separate from the logic and mapping code in your adapter.
 
-> You can see several examples of custom service clients being used by other adapters in the `Infrastructure.Shared` project, particularly the `ChargebeeHttpServiceClient`, or `UserPilotHttpServiceClient`.
+> You can see several examples of custom service clients being used by other adapters in the `Infrastructure.External` project, particularly the `ChargebeeHttpServiceClient`, or `UserPilotHttpServiceClient`.
 
 > Notice that the `FlagsmithHttpServiceClient` is an example of an adapter that is not using a custom service client abstraction, and you can also see that there are no unit tests for it either. Arguably it should have some unit tests as well, since it is not trivial code, and if it did, a custom service client would need to be built for it to be able to do that.
 
@@ -183,7 +183,7 @@ Now you can implement your methods of the port, and make your requests through y
 
 ### Unit testing
 
-Write your unit tests in the `Infrastructure.Shared.UnitTests` project, and verify the behavior of your adapter.
+Write your unit tests in the `Infrastructure.External.UnitTests` project, and verify the behavior of your adapter.
 
 > Unit tests are always marked with the `Category=Unit` trait, and these tests are run very frequently and in every build.
 
@@ -204,7 +204,7 @@ There are two kinds of integration testing that both need to be done for a 3rd p
 
 These kinds of integration tests test the adapter directly against a live/sandboxed 3rd party service, whether that service is running on the local machine (i.e, in a docker container), or running in the cloud behind an HTTP API.
 
-Write your "external" integration tests in the `Infrastructure.Shared.IntegrationTests` project, and verify the behavior of your adapter against real 3rd party systems (locally or in the cloud).
+Write your "external" integration tests in the `Infrastructure.External.IntegrationTests` project, and verify the behavior of your adapter against real 3rd party systems (locally or in the cloud).
 
 Please take note. Integration testing 3rd party adapters is different from other kinds of integration tests in this codebase.
 
@@ -220,7 +220,7 @@ These are just some of the reasons why these integration tests should be tagged 
 
 ##### Write your tests
 
-Create a new test class in the `Infrastructure.Shared.IntegrationTests` project.
+Create a new test class in the `Infrastructure.External.IntegrationTests` project.
 
 Mark up your class with the attributes: `[Trait("Category", "Integration.External")]` and `[Collection("EXTERNAL")]`.
 
@@ -231,7 +231,7 @@ Inherit from the `ExternalApiSpec` class, which will require you to inject the `
 
 Add any dependencies you want to be replaced during testing in the `OverrideDependencies()` method.
 
-Lastly, add any configuration settings you might need in testing that are different that in local development, into the `appsettings.Testing.json` (or your own copy of the `appsettings.Testing.local.json`, which is not source controlled) file in the `Infrastructure.Shared.IntegrationTests` project.
+Lastly, add any configuration settings you might need in testing that are different that in local development, into the `appsettings.Testing.json` (or your own copy of the `appsettings.Testing.local.json`, which is not source controlled) file in the `Infrastructure.External.IntegrationTests` project.
 
 > Please follow the same testing patterns that you see already in use in the tests of the other adapters in the same project.
 

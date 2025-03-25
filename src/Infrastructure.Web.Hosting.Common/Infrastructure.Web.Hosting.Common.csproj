@@ -10,6 +10,8 @@
         <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.External.Persistence.TestingOnly\Infrastructure.External.Persistence.TestingOnly.csproj" />
+        <ProjectReference Include="..\Infrastructure.External\Infrastructure.External.csproj" />
         <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />

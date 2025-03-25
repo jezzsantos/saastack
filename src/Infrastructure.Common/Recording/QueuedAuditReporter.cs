@@ -1,9 +1,9 @@
 ﻿#if !TESTINGONLY
 using Infrastructure.Persistence.Common.ApplicationServices;
 #if HOSTEDONAZURE
-using Infrastructure.Persistence.Azure.ApplicationServices;
+using Infrastructure.External.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
-using Infrastructure.Persistence.AWS.ApplicationServices;
+using Infrastructure.External.Persistence.AWS.ApplicationServices;
 #endif
 #else
 using Infrastructure.Persistence.Interfaces;

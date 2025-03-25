@@ -1,6 +1,6 @@
 using Common.Extensions;
 using Common.Recording;
-using Infrastructure.Persistence.AWS.ApplicationServices;
+using Infrastructure.External.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
