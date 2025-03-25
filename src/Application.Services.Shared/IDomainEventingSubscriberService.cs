@@ -10,12 +10,12 @@ public interface IDomainEventingSubscriberService
     /// <summary>
     ///     Returns all the consumers that are subscribed to consume domain events
     /// </summary>
-    public IReadOnlyList<Type> ConsumerTypes { get; }
+    IReadOnlyDictionary<Type, string> Consumers { get; }
 
     /// <summary>
-    ///     Returns all the subscription names for the consumers that are subscribed to consume domain events
+    ///     Returns all the names of all subscriptions that consume domain events
     /// </summary>
-    public IReadOnlyList<string> SubscriptionNames { get; }
+    IReadOnlyList<string> SubscriptionNames { get; }
 
     /// <summary>
     ///     Registers all subscribers to the message bus topic for consuming domain events

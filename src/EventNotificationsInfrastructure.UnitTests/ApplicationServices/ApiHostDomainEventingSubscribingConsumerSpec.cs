@@ -1,6 +1,5 @@
 using Application.Persistence.Interfaces;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Common.Recording;
 using Domain.Common.ValueObjects;
@@ -8,7 +7,6 @@ using Domain.Interfaces.Entities;
 using EventNotificationsInfrastructure.ApplicationServices;
 using FluentAssertions;
 using Infrastructure.Eventing.Interfaces.Notifications;
-using Infrastructure.Persistence.Interfaces;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
@@ -16,44 +14,29 @@ using Xunit;
 namespace EventNotificationsInfrastructure.UnitTests.ApplicationServices;
 
 [Trait("Category", "Unit")]
-public class DomainEventingSubscriberSpec
+public class ApiHostDomainEventingSubscribingConsumerSpec
 {
-    private readonly Mock<IDomainEventNotificationConsumer> _consumer;
+    private readonly ApiHostDomainEventingConsumerService.ApiHostDomainEventingSubscribingConsumer _consumer;
     private readonly Mock<IEventSourcedChangeEventMigrator> _migrator;
+    private readonly Mock<IDomainEventNotificationConsumer> _notificationConsumer;
     private readonly Mock<IRecorder> _recorder;
-    private readonly ApiHostDomainEventingSubscribingConsumer _subscriber;
 
-    public DomainEventingSubscriberSpec()
+    public ApiHostDomainEventingSubscribingConsumerSpec()
     {
         _recorder = new Mock<IRecorder>();
         _migrator = new Mock<IEventSourcedChangeEventMigrator>();
-        _consumer = new Mock<IDomainEventNotificationConsumer>();
-        var settings = new Mock<IConfigurationSettings>();
-        settings.Setup(s =>
-                s.Platform.GetString(ApiHostDomainEventingSubscribingConsumer.SubscriptionNameSettingName, It.IsAny<string>()))
-            .Returns("ahostname");
+        _notificationConsumer = new Mock<IDomainEventNotificationConsumer>();
 
-        _subscriber =
-            new ApiHostDomainEventingSubscribingConsumer(_recorder.Object, settings.Object, _migrator.Object, _consumer.Object);
+        _consumer = new ApiHostDomainEventingConsumerService.ApiHostDomainEventingSubscribingConsumer(_recorder.Object,
+            "asubscriptionname", _migrator.Object, _notificationConsumer.Object);
     }
 
     [Fact]
-    public void WhenGetSubscriptionName_ThenReturns()
+    public void WhenConstructed_ThenSubscriptionName()
     {
-        var result = _subscriber.SubscriptionName;
+        var result = _consumer.SubscriptionName;
 
-        result.Should().Be("avalue");
-    }
-
-    [Fact]
-    public async Task WhenSubscribe_ThenSubscribesToStore()
-    {
-        var store = new Mock<IMessageBusStore>();
-
-        var result = await _subscriber.SubscribeAsync(store.Object, "atopicname", CancellationToken.None);
-
-        result.Should().BeSuccess();
-        store.Verify(s => s.SubscribeAsync("atopicname", "avalue", It.IsAny<CancellationToken>()));
+        result.Should().Be("asubscriptionname");
     }
 
     [Fact]
@@ -61,7 +44,7 @@ public class DomainEventingSubscriberSpec
     {
         _migrator.Setup(m => m.Rehydrate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(new TestDomainEvent());
-        _consumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+        _notificationConsumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.RuleViolation("amessage"));
         var changeEvent = new EventStreamChangeEvent
         {
@@ -75,7 +58,7 @@ public class DomainEventingSubscriberSpec
             Version = 1
         };
 
-        var result = await _subscriber.NotifyAsync(changeEvent, CancellationToken.None);
+        var result = await _consumer.NotifyAsync(changeEvent, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.Unexpected, Error.RuleViolation("amessage")
             .Wrap(Resources.DomainEventingSubscriber_ConsumerFailed.Format(
@@ -84,7 +67,7 @@ public class DomainEventingSubscriberSpec
         _migrator.Verify(m => m.Rehydrate("anid", "{}", "anfqn"));
         _recorder.Verify(rec =>
             rec.Crash(null, CrashLevel.Critical, It.Is<Exception>(ex =>
-                ex.Message == "amessage"
+                ex.Message.Contains("amessage")
             ), It.IsAny<string>(), It.IsAny<object[]>()));
     }
 
@@ -99,7 +82,7 @@ public class DomainEventingSubscriberSpec
         };
         _migrator.Setup(m => m.Rehydrate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(domainEvent);
-        _consumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+        _notificationConsumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Ok);
         var eventJson = domainEvent.ToJson()!;
         var changeEvent = new EventStreamChangeEvent
@@ -108,29 +91,20 @@ public class DomainEventingSubscriberSpec
             RootAggregateType = "atype",
             EventType = "aneventtype",
             Id = "anid",
-            LastPersistedAtUtc = default,
+            LastPersistedAtUtc = null,
             Metadata = new EventMetadata("anfqn"),
             StreamName = "astreamname",
             Version = 1
         };
 
-        var result = await _subscriber.NotifyAsync(changeEvent, CancellationToken.None);
+        var result = await _consumer.NotifyAsync(changeEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
         _migrator.Verify(m => m.Rehydrate("anid", eventJson, "anfqn"));
-        _consumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(evt =>
+        _notificationConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(evt =>
             evt.RootId == "arootid"
             && evt.OccurredUtc.HasValue()
             && evt.AProperty == "avalue"
         ), It.IsAny<CancellationToken>()));
     }
-}
-
-public class TestDomainEvent : IDomainEvent
-{
-    public string? AProperty { get; set; }
-
-    public DateTime OccurredUtc { get; set; }
-
-    public string RootId { get; set; } = "arootid";
 }

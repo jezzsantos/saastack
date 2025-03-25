@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Common.Extensions;
 
 public static class ErrorExtensions
@@ -24,8 +22,7 @@ public static class ErrorExtensions
             : error.Code.ToString();
 
         var exception =
-            (Exception)Activator.CreateInstance(typeof(TException), BindingFlags.Public, null,
-                new object[] { message })!;
+            (Exception)Activator.CreateInstance(typeof(TException), message)!;
         return exception;
     }
 }
