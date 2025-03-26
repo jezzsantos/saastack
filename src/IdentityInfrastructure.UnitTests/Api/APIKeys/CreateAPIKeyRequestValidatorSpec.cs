@@ -39,16 +39,6 @@ public class CreateAPIKeyRequestValidatorSpec
     }
 
     [Fact]
-    public void WhenExpiresIsTooLong_ThenThrows()
-    {
-        _dto.ExpiresOnUtc = DateTime.UtcNow.AddYears(1);
-
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.CreateAPIKeyRequestValidator_InvalidExpiresOn);
-    }
-
-    [Fact]
     public void WhenExpiresIsValid_ThenSucceeds()
     {
         _dto.ExpiresOnUtc = DateTime.UtcNow.AddHours(1);

@@ -1,5 +1,4 @@
 using Common;
-using Common.Extensions;
 using FluentAssertions;
 using FluentValidation;
 using IdentityDomain;
@@ -94,20 +93,9 @@ public class RegisterMachineRequestValidatorSpec
     }
 
     [Fact]
-    public void WhenApiKeyExpiresOnUtcIsMoreThanMaximum_ThenThrows()
-    {
-        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod).AddMinutes(1);
-
-        _validator
-            .Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterMachineRequestValidator_InvalidExpiresOn);
-    }
-
-    [Fact]
     public void WhenApiKeyExpiresOnUtc_ThenSucceeds()
     {
-        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod).SubtractHours(1);
+        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow.Add(Validations.ApiKey.MinimumExpiryPeriod).AddMinutes(1);
 
         _validator.ValidateAndThrow(_dto);
     }

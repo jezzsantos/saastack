@@ -4,10 +4,10 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
-using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Services.Shared;
+using Domain.Shared;
 using IdentityApplication.Persistence;
 using IdentityDomain;
 using IdentityDomain.DomainServices;
@@ -17,7 +17,6 @@ namespace IdentityApplication;
 public class APIKeysApplication : IAPIKeysApplication
 {
     private const string ProviderName = "apikey";
-    public static readonly TimeSpan DefaultAPIKeyExpiry = Validations.ApiKey.MaximumExpiryPeriod;
     private readonly IAPIKeyHasherService _apiKeyHasherService;
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
@@ -60,7 +59,7 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var root = retrievedApiKey.Value.Value;
-        if (root.IsKeyExpired)
+        if (!root.IsStillValid)
         {
             return Error.NotAuthenticated();
         }
@@ -121,8 +120,9 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var apiKey = created.Value;
-        var defaultExpiresOn = DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry);
-        var parameterized = apiKey.SetParameters(description, expiresOn ?? defaultExpiresOn);
+        var parameterized = apiKey.SetParameters(description, expiresOn.HasValue
+            ? expiresOn.Value
+            : Optional<DateTime>.None);
         if (parameterized.IsFailure)
         {
             return parameterized.Error;
@@ -170,6 +170,40 @@ public class APIKeysApplication : IAPIKeysApplication
 
         apiKey = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "API key {Id} was deleted by {User}", apiKey.Id, deleterId);
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> RevokeAPIKeyAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var apiKey = retrieved.Value;
+        var revokerRoles = Roles.Create(caller.Roles.All);
+        if (revokerRoles.IsFailure)
+        {
+            return revokerRoles.Error;
+        }
+
+        var revoked = apiKey.Revoke(revokerRoles.Value);
+        if (revoked.IsFailure)
+        {
+            return revoked.Error;
+        }
+
+        var saved = await _repository.SaveAsync(apiKey, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        apiKey = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "API key {Id} was revoked for {User}", apiKey.Id, apiKey.UserId);
 
         return Result.Ok;
     }
@@ -243,7 +277,9 @@ internal static class APIKeyConversionExtensions
         return new APIKey
         {
             Description = description,
-            ExpiresOnUtc = apiKey.ExpiresOn,
+            ExpiresOnUtc = apiKey.ExpiresOn.HasValue
+                ? apiKey.ExpiresOn.Value
+                : null,
             Key = key,
             UserId = apiKey.UserId,
             Id = apiKey.Id
@@ -255,7 +291,9 @@ internal static class APIKeyConversionExtensions
         return new APIKey
         {
             Description = apiKey.Description,
-            ExpiresOnUtc = apiKey.ExpiresOn,
+            ExpiresOnUtc = apiKey.ExpiresOn.HasValue
+                ? apiKey.ExpiresOn.Value
+                : null,
             Key = apiKey.KeyToken,
             UserId = apiKey.UserId,
             Id = apiKey.Id

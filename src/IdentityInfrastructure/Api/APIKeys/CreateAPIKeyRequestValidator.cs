@@ -10,10 +10,9 @@ public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyReques
     public CreateAPIKeyRequestValidator()
     {
         RuleFor(req => req.ExpiresOnUtc)
-            .InclusiveBetween(DateTime.UtcNow.Add(Validations.ApiKey.MinimumExpiryPeriod),
-                DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod))
+            .GreaterThanOrEqualTo(DateTime.UtcNow.Add(Validations.ApiKey.MinimumExpiryPeriod))
             .When(req => req.ExpiresOnUtc.HasValue)
             .WithMessage(Resources.CreateAPIKeyRequestValidator_InvalidExpiresOn.Format(
-                Validations.ApiKey.MinimumExpiryPeriod.TotalHours, Validations.ApiKey.MaximumExpiryPeriod.TotalHours));
+                Validations.ApiKey.MinimumExpiryPeriod.TotalHours));
     }
 }

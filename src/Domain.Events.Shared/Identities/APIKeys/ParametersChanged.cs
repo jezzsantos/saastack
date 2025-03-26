@@ -17,5 +17,5 @@ public sealed class ParametersChanged : DomainEvent
 
     public required string Description { get; set; }
 
-    public required DateTime ExpiresOn { get; set; }
+    public DateTime? ExpiresOn { get; set; }
 }

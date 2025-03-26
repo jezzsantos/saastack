@@ -1,7 +1,6 @@
 using System.Net;
 using ApiHost1;
 using FluentAssertions;
-using IdentityDomain;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Extensions;
@@ -36,8 +35,7 @@ public class APIKeyApiSpec : WebApiSpec<Program>
         keys.Count.Should().Be(1);
         keys[0].Description.Should().Be(login.User.Id);
         keys[0].Key.Should().NotBeNullOrEmpty();
-        keys[0].ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod),
-            TimeSpan.FromMinutes(1));
+        keys[0].ExpiresOnUtc.Should().BeNull();
     }
 
     [Fact]
@@ -55,8 +53,7 @@ public class APIKeyApiSpec : WebApiSpec<Program>
         keys.Count.Should().Be(2);
         keys[0].Description.Should().Be(login.User.Id);
         keys[0].Key.Should().NotBeNullOrEmpty();
-        keys[0].ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod),
-            TimeSpan.FromMinutes(1));
+        keys[0].ExpiresOnUtc.Should().BeNull();
         keys[1].Description.Should().Be(login.User.Id);
         keys[1].Key.Should().NotBeNullOrEmpty();
         keys[1].ExpiresOnUtc.Should().BeNear(DateTime.UtcNow, TimeSpan.FromMinutes(1));
@@ -74,6 +71,53 @@ public class APIKeyApiSpec : WebApiSpec<Program>
 
         authenticate2.StatusCode.Should().Be(HttpStatusCode.OK);
         authenticate2.Content.Value.CallerId.Should().Be(login.User.Id);
+#endif
+    }
+
+    [Fact]
+    public async Task WhenDeleteAPIKeyByCreator_ThenDeletes()
+    {
+        var login = await LoginUserAsync();
+        var apiKey = (await Api.PostAsync(new CreateAPIKeyRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.ApiKey;
+
+        var keys = (await Api.GetAsync(new SearchAllAPIKeysForCallerRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Keys;
+
+        await Api.DeleteAsync(new DeleteAPIKeyRequest
+        {
+            Id = keys[0].Id
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+#if TESTINGONLY
+        var authenticate1 = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
+            req => req.SetAPIKey(apiKey));
+
+        authenticate1.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+#endif
+    }
+
+    [Fact]
+    public async Task WhenRevokeAPIKeyByOperations_ThenRevokes()
+    {
+        var login = await LoginUserAsync();
+        var apiKey = (await Api.PostAsync(new CreateAPIKeyRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.ApiKey;
+
+        var keys = (await Api.GetAsync(new SearchAllAPIKeysForCallerRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Keys;
+
+        var operations = await LoginUserAsync(LoginUser.Operator);
+        await Api.DeleteAsync(new RevokeAPIKeyRequest
+        {
+            Id = keys[0].Id
+        }, req => req.SetJWTBearerToken(operations.AccessToken));
+
+#if TESTINGONLY
+        var authenticate1 = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
+            req => req.SetAPIKey(apiKey));
+
+        authenticate1.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 #endif
     }
 

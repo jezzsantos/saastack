@@ -93,9 +93,6 @@
     <data name="APIKeyRoot_ExpiresOnTooSoon" xml:space="preserve">
         <value>The expiry date cannot be less than one hour into the future</value>
     </data>
-    <data name="APIKeyRoot_ExpiresOnTooLate" xml:space="preserve">
-        <value>The expiry date cannot be more than 30 days into the future</value>
-    </data>
     <data name="ApiKeyKeep_InvalidDescription" xml:space="preserve">
         <value>The Description is not valid</value>
     </data>
@@ -110,6 +107,9 @@
     </data>
     <data name="ApiKeyRoot_NotOwner" xml:space="preserve">
         <value>You must be an owner of this API key to perform this action</value>
+    </data>
+    <data name="ApiKeyRoot_NotOperator" xml:space="preserve">
+        <value>This user is not a member of the operations team</value>
     </data>
     <data name="APIKeyRoot_Verify_NoApiKey" xml:space="preserve">
         <value>The is no API key to verify yet</value>

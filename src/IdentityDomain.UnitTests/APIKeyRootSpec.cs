@@ -2,7 +2,9 @@ using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
+using Domain.Shared;
 using Domain.Shared.Identities;
 using FluentAssertions;
 using IdentityDomain.DomainServices;
@@ -75,13 +77,12 @@ public class APIKeyRootSpec
     [Fact]
     public void WhenSetParametersWithNoExpiresOn_ThenAssigns()
     {
-        var expires = DateTime.UtcNow.AddDays(1);
-        _apiKey.SetParameters("adescription", expires);
+        _apiKey.SetParameters("adescription", Optional<DateTime>.None);
 
         _apiKey.ApiKey.Value.Token.Should().Be("atoken");
         _apiKey.ApiKey.Value.KeyHash.Should().Be("akeyhash");
         _apiKey.Description.Should().BeSome("adescription");
-        _apiKey.ExpiresOn.Should().BeSome(expires);
+        _apiKey.ExpiresOn.Should().BeNone();
         _apiKey.UserId.Should().Be("auserid".ToId());
         _apiKey.Events.Last().Should().BeOfType<ParametersChanged>();
     }
@@ -167,5 +168,35 @@ public class APIKeyRootSpec
 
         result.Should().BeSuccess();
         _apiKey.Events.Last().Should().BeOfType<Expired>();
+    }
+
+    [Fact]
+    public void WhenRevokeAndNotOperations_ThenReturnsError()
+    {
+        var result = _apiKey.Revoke(Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.ApiKeyRoot_NotOperator);
+    }
+
+    [Fact]
+    public void WhenRevokeAndExpired_ThenRevokes()
+    {
+#if TESTINGONLY
+        _apiKey.TestingOnly_Expire();
+#endif
+
+        var result = _apiKey.Revoke(Roles.Create(PlatformRoles.Operations).Value);
+
+        result.Should().BeSuccess();
+        _apiKey.Events.Last().Should().BeOfType<Revoked>();
+    }
+
+    [Fact]
+    public void WhenRevokeAndNotExpired_ThenRevokes()
+    {
+        var result = _apiKey.Revoke(Roles.Create(PlatformRoles.Operations).Value);
+
+        result.Should().BeSuccess();
+        _apiKey.Events.Last().Should().BeOfType<Revoked>();
     }
 }

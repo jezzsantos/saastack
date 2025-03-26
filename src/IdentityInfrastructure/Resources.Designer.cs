@@ -206,7 +206,7 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;ExpiresOnUtc&apos; must be between &apos;{0}hr&apos; and &apos;{1}hrs&apos;.
+        ///   Looks up a localized string similar to The &apos;ExpiresOnUtc&apos; must be greater than &apos;{0}hr&apos;.
         /// </summary>
         internal static string CreateAPIKeyRequestValidator_InvalidExpiresOn {
             get {
@@ -278,7 +278,7 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;ApiKeyExpiresOnUtc&apos; must be between &apos;{0}hr&apos; and &apos;{1}hrs&apos;.
+        ///   Looks up a localized string similar to The &apos;ApiKeyExpiresOnUtc&apos; must be greater than &apos;{0}hr&apos;.
         /// </summary>
         internal static string RegisterMachineRequestValidator_InvalidExpiresOn {
             get {

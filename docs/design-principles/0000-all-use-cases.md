@@ -124,6 +124,7 @@ API Key are the way a user (person or machine) can authenticate with the platfor
 1. Create a new API key for the current (Authenticated) user, and expires existing <sup>$$$</sup>
 2. List all API keys of the current (Authenticated) user <sup>$$$</sup>
 3. Delete an API Key <sup>$$$</sup>
+4. Revoke an API Key <sup>OPS</sup>
 
 #### Auth Tokens
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
@@ -6,8 +7,10 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using Domain.Shared;
 using Domain.Shared.Identities;
 using IdentityDomain.DomainServices;
 using JetBrains.Annotations;
@@ -44,9 +47,15 @@ public sealed class APIKeyRoot : AggregateRootBase
 
     public Optional<string> Description { get; private set; }
 
-    public Optional<DateTime?> ExpiresOn { get; private set; }
+    public Optional<DateTime> ExpiresOn { get; private set; }
 
-    public bool IsKeyExpired => ExpiresOn.HasValue && ExpiresOn < DateTime.UtcNow;
+    public bool IsExpired => ExpiresOn.HasValue && ExpiresOn < DateTime.UtcNow;
+
+    public bool IsRevoked => RevokedOn.HasValue && RevokedOn < DateTime.UtcNow;
+
+    public bool IsStillValid => !IsExpired && !IsRevoked;
+
+    public Optional<DateTime> RevokedOn { get; private set; }
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
@@ -90,8 +99,13 @@ public sealed class APIKeyRoot : AggregateRootBase
             case ParametersChanged changed:
             {
                 Description = changed.Description;
-                ExpiresOn = changed.ExpiresOn;
-                Recorder.TraceDebug(null, "ApiKey {Id} set its parameters", Id);
+                ExpiresOn = changed.ExpiresOn.ToOptional();
+                var expiresInHours = changed.ExpiresOn.HasValue
+                    ? DateTime.UtcNow.Subtract(changed.ExpiresOn.Value).TotalHours
+                        .ToString(CultureInfo.InvariantCulture)
+                    : "never";
+                Recorder.TraceDebug(null, "ApiKey {Id} set its parameters, and expires in {ExpiresOn} hours", Id,
+                    expiresInHours);
                 return Result.Ok;
             }
 
@@ -105,6 +119,13 @@ public sealed class APIKeyRoot : AggregateRootBase
             {
                 ExpiresOn = changed.ExpiredOn;
                 Recorder.TraceDebug(null, "ApiKey {Id} was expired", Id);
+                return Result.Ok;
+            }
+
+            case Revoked changed:
+            {
+                RevokedOn = changed.RevokedOn;
+                Recorder.TraceDebug(null, "ApiKey {Id} was revoked", Id);
                 return Result.Ok;
             }
 
@@ -130,7 +151,7 @@ public sealed class APIKeyRoot : AggregateRootBase
             return Error.RuleViolation(Resources.ApiKeyRoot_NotOwner);
         }
 
-        if (IsKeyExpired)
+        if (IsExpired)
         {
             return Result.Ok;
         }
@@ -138,7 +159,17 @@ public sealed class APIKeyRoot : AggregateRootBase
         return RaiseChangeEvent(IdentityDomain.Events.APIKeys.Expired(Id, UserId));
     }
 
-    public Result<Error> SetParameters(string description, DateTime expiresOn)
+    public Result<Error> Revoke(Roles revokerRoles)
+    {
+        if (!IsOperations(revokerRoles))
+        {
+            return Error.RuleViolation(Resources.ApiKeyRoot_NotOperator);
+        }
+
+        return RaiseChangeEvent(IdentityDomain.Events.APIKeys.Revoked(Id, UserId));
+    }
+
+    public Result<Error> SetParameters(string description, Optional<DateTime> expiresOn)
     {
         if (description.IsInvalidParameter(Validations.ApiKey.Description, nameof(description),
                 Resources.ApiKeyKeep_InvalidDescription, out var error1))
@@ -146,20 +177,15 @@ public sealed class APIKeyRoot : AggregateRootBase
             return error1;
         }
 
-        var lowerLimit = DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MinimumExpiryPeriod);
-        if (expiresOn.IsInvalidParameter(
-                exp => exp == lowerLimit || exp.IsAfter(lowerLimit),
-                nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooSoon, out var error2))
+        if (expiresOn.HasValue)
         {
-            return error2;
-        }
-
-        if (expiresOn.IsInvalidParameter(
-                exp => exp.IsBefore(DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MaximumExpiryPeriod)
-                    .AddSeconds(1)),
-                nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooLate, out var error3))
-        {
-            return error3;
+            var lowerLimit = DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MinimumExpiryPeriod);
+            if (expiresOn.Value.IsInvalidParameter(
+                    exp => exp == lowerLimit || exp.IsAfter(lowerLimit),
+                    nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooSoon, out var error2))
+            {
+                return error2;
+            }
         }
 
         return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged(Id, description, expiresOn));
@@ -185,7 +211,7 @@ public sealed class APIKeyRoot : AggregateRootBase
             return Error.RuleViolation(Resources.APIKeyRoot_Verify_NoApiKey);
         }
 
-        if (IsKeyExpired)
+        if (!IsStillValid)
         {
             return false;
         }
@@ -204,6 +230,11 @@ public sealed class APIKeyRoot : AggregateRootBase
         }
 
         return verified;
+    }
+
+    private static bool IsOperations(Roles roles)
+    {
+        return roles.HasRole(PlatformRoles.Operations);
     }
 
     private bool IsOwner(Identifier userId)

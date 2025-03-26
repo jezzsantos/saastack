@@ -298,12 +298,23 @@ public static class Events
         }
 
         public static ParametersChanged ParametersChanged(Identifier id, string description,
-            DateTime expiresOn)
+            Optional<DateTime> expiresOn)
         {
             return new ParametersChanged(id)
             {
                 Description = description,
-                ExpiresOn = expiresOn
+                ExpiresOn = expiresOn.HasValue
+                    ? expiresOn.Value
+                    : null
+            };
+        }
+
+        public static Revoked Revoked(Identifier id, Identifier userId)
+        {
+            return new Revoked(id)
+            {
+                RevokedOn = DateTime.UtcNow,
+                UserId = userId
             };
         }
     }

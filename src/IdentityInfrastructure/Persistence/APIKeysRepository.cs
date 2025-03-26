@@ -81,7 +81,9 @@ public class APIKeysRepository : IAPIKeysRepository
     {
         var query = Query.From<APIKey>()
             .Where<string>(key => key.UserId, ConditionOperator.EqualTo, userId)
-            .AndWhere<DateTime>(key => key.ExpiresOn, ConditionOperator.GreaterThan, DateTime.UtcNow);
+            .AndWhere(subquery => subquery
+                .Where<DateTime?>(key => key.ExpiresOn, ConditionOperator.EqualTo, null)
+                .OrWhere<DateTime?>(key => key.ExpiresOn, ConditionOperator.GreaterThan, DateTime.UtcNow));
 
         return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
     }

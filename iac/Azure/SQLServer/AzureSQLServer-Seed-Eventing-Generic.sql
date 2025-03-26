@@ -145,6 +145,7 @@ CREATE TABLE [dbo].[APIKey]
     [Description]        [nvarchar](100) NULL,
     [ExpiresOn]          [datetime]      NULL,
     [KeyToken]           [nvarchar](450) NULL,
+    [RevokedOn]          [datetime]      NULL,
     [UserId]             [nvarchar](100) NULL,
 ) ON [PRIMARY]
 GO
