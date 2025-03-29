@@ -60,11 +60,12 @@ public class StubBillingGatewayService : IBillingGatewayService
         });
     }
 
-    public Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
+    public Task<Result<SearchResults<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller,
+        BillingProvider provider,
         DateTime fromUtc, DateTime toUtc,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        return Task.FromResult<Result<List<Invoice>, Error>>(new List<Invoice>());
+        return Task.FromResult<Result<SearchResults<Invoice>, Error>>(new SearchResults<Invoice>());
     }
 
     public Task<Result<SubscriptionMetadata, Error>> SubscribeAsync(ICallerContext caller,

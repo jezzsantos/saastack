@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using ChargeBee.Models;
@@ -394,7 +395,7 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
     /// <summary>
     ///     Searches for all invoices for the customer, given the specified date range, and options
     /// </summary>
-    public async Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller,
+    public async Task<Result<SearchResults<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller,
         BillingProvider provider, DateTime fromUtc, DateTime toUtc, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
@@ -415,7 +416,9 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
         _recorder.TraceInformation(caller.ToCall(), "Searched Chargebee for {Count} invoices for {Customer}",
             invoices.Count, customerId);
 
-        return invoices.ConvertAll(invoice => invoice.ToInvoice());
+        return invoices
+            .ConvertAll(invoice => invoice.ToInvoice())
+            .ToSearchResults(searchOptions);
     }
 
     /// <summary>

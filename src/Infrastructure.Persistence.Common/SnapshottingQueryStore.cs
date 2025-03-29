@@ -98,8 +98,8 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
             return queryResults.Error;
         }
 
-        var entities = queryResults.Value;
-
+        var totalCount = queryResults.Value.TotalCount;
+        var entities = queryResults.Value.Results;
         entities = entities
             .Where(e => !e.IsDeleted.ValueOrDefault || includeDeleted)
             .ToList();
@@ -107,6 +107,6 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
         _recorder.TraceDebug(null, "{Count} entities were retrieved from the {Store} store", entities.Count,
             _dataStore.GetType().Name);
         return new QueryResults<TQueryableEntity>(entities.ConvertAll(x =>
-            x.ToDomainEntity<TQueryableEntity>(_domainFactory)));
+            x.ToDomainEntity<TQueryableEntity>(_domainFactory)), totalCount);
     }
 }

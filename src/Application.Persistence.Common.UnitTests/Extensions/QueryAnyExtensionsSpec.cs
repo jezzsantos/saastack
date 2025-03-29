@@ -4,7 +4,7 @@ using FluentAssertions;
 using QueryAny;
 using Xunit;
 
-namespace Application.Persistence.Common.UnitTests;
+namespace Application.Persistence.Common.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class QueryAnyExtensionsSpec
@@ -29,6 +29,15 @@ public class QueryAnyExtensionsSpec
             .WithSearchOptions(new SearchOptions { Offset = 9 });
 
         query.ResultOptions.Offset.Should().Be(9);
+    }
+
+    [Fact]
+    public void WhenWithSearchOptionsWithOffsetAtZero_ThenReturnsQuery()
+    {
+        var query = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Offset = 0 });
+
+        query.ResultOptions.Offset.Should().Be(0);
     }
 
     [Fact]
@@ -106,5 +115,64 @@ public class QueryAnyExtensionsSpec
         query.PrimaryEntity.Selects[0].FieldName.Should().Be(nameof(TestEntity.APropertyName));
         query.PrimaryEntity.Selects[0].JoinedEntityName.Should().BeNull();
         query.PrimaryEntity.Selects[0].JoinedFieldName.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndNoSearchOptions_ThenReturnsFalse()
+    {
+        var result = Query.Empty<TestEntity>()
+            .IsPaginating(50);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndResultsAreLessThanLimit_ThenReturnsFalse()
+    {
+        var result = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Limit = 51 })
+            .IsPaginating(50);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndResultsAreSameAsLimit_ThenReturnsTrue()
+    {
+        var result = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Limit = 50 })
+            .IsPaginating(50);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndResultsAreGreaterThanLimit_ThenReturnsTrue()
+    {
+        var result = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Limit = 50 })
+            .IsPaginating(51);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndAndZeroOffset_ThenReturnsTrue()
+    {
+        var result = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Offset = 0 })
+            .IsPaginating(50);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsPaginatingAndAndCustomOffset_ThenReturnsTrue()
+    {
+        var result = Query.Empty<TestEntity>()
+            .WithSearchOptions(new SearchOptions { Offset = 1 })
+            .IsPaginating(50);
+
+        result.Should().BeTrue();
     }
 }

@@ -19,6 +19,6 @@ public interface IBookingRepository : IApplicationRepository
 
     Task<Result<BookingRoot, Error>> SaveAsync(BookingRoot booking, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Booking>, Error>> SearchAllBookingsAsync(Identifier organizationId, DateTime from,
+    Task<Result<QueryResults<Booking>, Error>> SearchAllBookingsAsync(Identifier organizationId, DateTime from,
         DateTime to, SearchOptions searchOptions, CancellationToken cancellationToken);
 }

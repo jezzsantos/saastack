@@ -88,7 +88,7 @@ public class BlobStoreSpec
     [Fact]
     public async Task WhenSaveAndEmptyBlobName_ThenReturnsError()
     {
-        var stream = new MemoryStream(new byte[] { 0x01 });
+        var stream = new MemoryStream([0x01]);
 
         var result = await _store.SaveAsync(string.Empty, "acontenttype", stream, CancellationToken.None);
 
@@ -98,7 +98,7 @@ public class BlobStoreSpec
     [Fact]
     public async Task WhenSaveAndEmptyContentType_ThenReturnsError()
     {
-        var stream = new MemoryStream(new byte[] { 0x01 });
+        var stream = new MemoryStream([0x01]);
 
         var result = await _store.SaveAsync("ablobname", string.Empty, stream, CancellationToken.None);
 
@@ -108,7 +108,7 @@ public class BlobStoreSpec
     [Fact]
     public async Task WhenSave_ThenUploadsToStore()
     {
-        var stream = new MemoryStream(new byte[] { 0x01 });
+        var stream = new MemoryStream([0x01]);
 
         await _store.SaveAsync("ablobname", "acontenttype", stream, CancellationToken.None);
 

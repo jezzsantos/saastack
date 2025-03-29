@@ -346,7 +346,7 @@ public class ChargebeeHttpServiceClientSpec
                 new SearchOptions(), CancellationToken.None);
 
             result.Should().BeSuccess();
-            result.Value.Count.Should().Be(0);
+            result.Value.Results.Count.Should().Be(0);
         }
 
         [Fact]
@@ -564,29 +564,29 @@ public class ChargebeeHttpServiceClientSpec
                 new SearchOptions(), CancellationToken.None);
 
             result.Should().BeSuccess();
-            result.Value.Count.Should().Be(1);
-            result.Value[0].Id.Should().NotBeEmpty();
-            result.Value[0].Amount.Should().Be(100);
-            result.Value[0].Currency.Should().Be(CurrencyCodes.Default.Code);
-            result.Value[0].IncludesTax.Should().BeFalse();
-            result.Value[0].InvoicedOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
-            result.Value[0].LineItems.Count.Should().Be(1);
-            result.Value[0].LineItems[0].Amount.Should().Be(100);
-            result.Value[0].LineItems[0].Currency.Should().Be(CurrencyCodes.Default.Code);
-            result.Value[0].LineItems[0].Description.Should().Be("Paid");
-            result.Value[0].LineItems[0].IsTaxed.Should().BeFalse();
-            result.Value[0].LineItems[0].Reference.Should().NotBeEmpty();
-            result.Value[0].LineItems[0].TaxAmount.Should().Be(0);
-            result.Value[0].Notes.Count.Should().Be(1);
-            result.Value[0].Notes[0].Description.Should().Be("Paid plan");
-            result.Value[0].Payment!.Amount.Should().Be(100);
-            result.Value[0].Payment!.Currency.Should().Be(CurrencyCodes.Default.Code);
-            result.Value[0].Payment!.PaidOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
-            result.Value[0].Payment!.Reference.Should().NotBeEmpty();
-            result.Value[0].PeriodEndUtc!.Value.Should().BeNear(to, TimeSpan.FromMinutes(1));
-            result.Value[0].PeriodStartUtc!.Value.Should().BeNear(from, TimeSpan.FromMinutes(1));
-            result.Value[0].Status.Should().Be(InvoiceStatus.Paid);
-            result.Value[0].TaxAmount.Should().Be(0);
+            result.Value.Results.Count.Should().Be(1);
+            result.Value.Results[0].Id.Should().NotBeEmpty();
+            result.Value.Results[0].Amount.Should().Be(100);
+            result.Value.Results[0].Currency.Should().Be(CurrencyCodes.Default.Code);
+            result.Value.Results[0].IncludesTax.Should().BeFalse();
+            result.Value.Results[0].InvoicedOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
+            result.Value.Results[0].LineItems.Count.Should().Be(1);
+            result.Value.Results[0].LineItems[0].Amount.Should().Be(100);
+            result.Value.Results[0].LineItems[0].Currency.Should().Be(CurrencyCodes.Default.Code);
+            result.Value.Results[0].LineItems[0].Description.Should().Be("Paid");
+            result.Value.Results[0].LineItems[0].IsTaxed.Should().BeFalse();
+            result.Value.Results[0].LineItems[0].Reference.Should().NotBeEmpty();
+            result.Value.Results[0].LineItems[0].TaxAmount.Should().Be(0);
+            result.Value.Results[0].Notes.Count.Should().Be(1);
+            result.Value.Results[0].Notes[0].Description.Should().Be("Paid plan");
+            result.Value.Results[0].Payment!.Amount.Should().Be(100);
+            result.Value.Results[0].Payment!.Currency.Should().Be(CurrencyCodes.Default.Code);
+            result.Value.Results[0].Payment!.PaidOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
+            result.Value.Results[0].Payment!.Reference.Should().NotBeEmpty();
+            result.Value.Results[0].PeriodEndUtc!.Value.Should().BeNear(to, TimeSpan.FromMinutes(1));
+            result.Value.Results[0].PeriodStartUtc!.Value.Should().BeNear(from, TimeSpan.FromMinutes(1));
+            result.Value.Results[0].Status.Should().Be(InvoiceStatus.Paid);
+            result.Value.Results[0].TaxAmount.Should().Be(0);
         }
 
         [Fact]

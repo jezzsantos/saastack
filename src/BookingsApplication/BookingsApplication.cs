@@ -1,5 +1,6 @@
 ﻿using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using BookingsApplication.Persistence;
@@ -143,8 +144,7 @@ public class BookingsApplication : IBookingsApplication
         var bookings = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All bookings were fetched");
 
-        return searchOptions.ApplyWithMetadata(
-            bookings.Select(booking => booking.ToBooking()));
+        return bookings.ToSearchResults(searchOptions, booking => booking.ToBooking());
     }
 }
 

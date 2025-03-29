@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -77,7 +78,9 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
         }
 
         var subscriptions = searched.Value;
-        return searchOptions.ApplyWithMetadata(subscriptions.Select(subscription =>
+        _recorder.TraceInformation(caller.ToCall(), "All subscriptions were fetched");
+
+        return subscriptions.ToSearchResults(searchOptions, subscription =>
         {
             var buyer = CreateBuyerAsync(caller, subscription.BuyerId.Value.ToId(),
                 subscription.OwningEntityId.Value.ToId(), cancellationToken).GetAwaiter().GetResult();
@@ -87,7 +90,7 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
             }
 
             return subscription.ToSubscriptionForMigration(buyer.Value);
-        }));
+        });
     }
 
     public async Task<Result<SubscriptionWithPlan, Error>> ForceCancelSubscriptionAsync(ICallerContext caller,
@@ -198,17 +201,17 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
 
         var subscription = retrieved.Value;
         var (from, to) = CalculatedSearchRange(fromUtc, toUtc);
-        var invoices = await _billingProvider.GatewayService.SearchAllInvoicesAsync(caller, subscription.Provider,
+        var searched = await _billingProvider.GatewayService.SearchAllInvoicesAsync(caller, subscription.Provider,
             from, to, searchOptions, cancellationToken);
-        if (invoices.IsFailure)
+        if (searched.IsFailure)
         {
-            return invoices.Error;
+            return searched.Error;
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Retrieved subscription invoices for: {OwningEntity}",
             owningEntityId);
 
-        return searchOptions.ApplyWithMetadata(invoices.Value);
+        return searched;
     }
 
     public async Task<Result<SubscriptionWithPlan, Error>> TransferSubscriptionAsync(ICallerContext caller,

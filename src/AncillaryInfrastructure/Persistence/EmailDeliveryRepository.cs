@@ -68,7 +68,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
             : delivery;
     }
 
-    public async Task<Result<List<EmailDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc,
+    public async Task<Result<QueryResults<EmailDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc,
         string? organizationId, IReadOnlyList<string>? tags, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
@@ -99,8 +99,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
             return queried.Error;
         }
 
-        var deliveries = queried.Value.Results;
-        return deliveries;
+        return queried.Value;
     }
 
     private async Task<Result<EmailDeliveryRoot, Error>> LoadAsync(Identifier id,

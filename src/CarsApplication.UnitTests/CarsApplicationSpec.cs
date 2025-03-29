@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using CarsApplication.Persistence;
 using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
@@ -320,9 +321,8 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllAvailableCarsAsync(It.IsAny<Identifier>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(),
                     It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Car>
-            {
-                new()
+            .ReturnsAsync(new QueryResults<Car>([
+                new Car
                 {
                     Id = "acarid",
                     LicenseJurisdiction = "ajurisdiction",
@@ -335,7 +335,7 @@ public class CarsApplicationSpec
                     Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
-            });
+            ]));
 
         var result =
             await _application.SearchAllAvailableCarsAsync(_caller.Object, "anorganizationid", DateTime.UtcNow,
@@ -360,9 +360,8 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllCarsAsync(It.IsAny<Identifier>(), It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Car>
-            {
-                new()
+            .ReturnsAsync(new QueryResults<Car>([
+                new Car
                 {
                     Id = "acarid",
                     LicenseJurisdiction = "ajurisdiction",
@@ -375,7 +374,7 @@ public class CarsApplicationSpec
                     Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
-            });
+            ]));
 
         var result =
             await _application.SearchAllCarsAsync(_caller.Object, "anorganizationid", new SearchOptions(),

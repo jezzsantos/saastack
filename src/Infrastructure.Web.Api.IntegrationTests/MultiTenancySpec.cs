@@ -147,10 +147,10 @@ public class MultiTenancySpec
                         .WhereAll()
                         .OrderBy(car => car.LastPersistedAtUtc), PersistedEntityMetadata.FromType<Car>(),
                     CancellationToken.None))
-                .Value;
+                .Value.Results;
             var carsRaw2 = (await repository2.QueryAsync(typeof(Car).GetEntityNameSafe(),
                 Query.From<Car>().WhereAll().OrderBy(car => car.LastPersistedAtUtc),
-                PersistedEntityMetadata.FromType<Car>(), CancellationToken.None)).Value;
+                PersistedEntityMetadata.FromType<Car>(), CancellationToken.None)).Value.Results;
 
             // Proves the Data was physically partitioned 
             carsRaw1.Count.Should().Be(3);

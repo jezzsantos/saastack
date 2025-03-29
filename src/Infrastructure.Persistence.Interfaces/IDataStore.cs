@@ -1,3 +1,4 @@
+using Application.Persistence.Interfaces;
 using Common;
 using QueryAny;
 
@@ -20,7 +21,7 @@ public interface IDataStore
     Task<Result<Error>> DestroyAllAsync(string containerName, CancellationToken cancellationToken);
 #endif
 
-    Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
+    Task<Result<QueryResults<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata, CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity;
 

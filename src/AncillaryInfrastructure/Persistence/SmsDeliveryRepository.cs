@@ -68,7 +68,7 @@ public class SmsDeliveryRepository : ISmsDeliveryRepository
             : delivery;
     }
 
-    public async Task<Result<List<SmsDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc,
+    public async Task<Result<QueryResults<SmsDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc,
         string? organizationId, IReadOnlyList<string>? tags, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
@@ -99,8 +99,7 @@ public class SmsDeliveryRepository : ISmsDeliveryRepository
             return queried.Error;
         }
 
-        var deliveries = queried.Value.Results;
-        return deliveries;
+        return queried.Value;
     }
 
     private async Task<Result<SmsDeliveryRoot, Error>> LoadAsync(Identifier id,

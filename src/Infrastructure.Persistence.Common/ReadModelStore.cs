@@ -144,15 +144,15 @@ public class ReadModelStore<TReadModelEntity> : IReadModelStore<TReadModelEntity
             return queryResults.Error;
         }
 
-        var entities = queryResults.Value;
-
+        var totalCount = queryResults.Value.TotalCount;
+        var entities = queryResults.Value.Results;
         entities = entities
             .Where(e => !e.IsDeleted.ValueOrDefault || includeDeleted)
             .ToList();
 
         _recorder.TraceDebug(null, "{Count} readmodel entities were retrieved from the {Store} store", entities.Count,
             _dataStore.GetType().Name);
-        return new QueryResults<TReadModelEntity>(entities.ConvertAll(x => x.ToDto<TReadModelEntity>()));
+        return new QueryResults<TReadModelEntity>(entities.ConvertAll(x => x.ToDto<TReadModelEntity>()), totalCount);
     }
 
     public async Task<Result<TReadModelEntity, Error>> UpdateAsync(string id, Action<TReadModelEntity> action,

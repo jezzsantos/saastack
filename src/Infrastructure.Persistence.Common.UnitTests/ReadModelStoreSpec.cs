@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using Application.Persistence.Interfaces;
+using Common;
 using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Persistence.Interfaces;
@@ -233,10 +234,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -259,10 +257,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -284,10 +279,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, true, CancellationToken.None);
 

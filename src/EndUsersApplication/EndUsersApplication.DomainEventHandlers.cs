@@ -296,7 +296,7 @@ partial class EndUsersApplication
             return searched.Error;
         }
 
-        var memberships = searched.Value;
+        var memberships = searched.Value.Results;
         foreach (var membership in memberships)
         {
             var retrievedUser = await _endUserRepository.LoadAsync(membership.UserId.Value.ToId(), cancellationToken);

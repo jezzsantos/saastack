@@ -1,4 +1,6 @@
 using System.Text;
+using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces.ValueObjects;
@@ -42,14 +44,13 @@ partial class AzureSqlServerStore : IDataStore
 
         var executed = await ExecuteSqlScalarCommandAsync(
             $"SELECT COUNT({nameof(CommandEntity.Id).ToColumnName()}) FROM {containerName.ToTableName()}",
-            cancellationToken);
+            new Dictionary<string, object>(), cancellationToken);
         if (executed.IsFailure)
         {
             return executed.Error;
         }
 
-        var count = executed.Value;
-        return Convert.ToInt64(count);
+        return Convert.ToInt64(executed.Value);
     }
 
 #if TESTINGONLY
@@ -63,7 +64,7 @@ partial class AzureSqlServerStore : IDataStore
 #endif
     public int MaxQueryResults => 1000;
 
-    public async Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
+    public async Task<Result<QueryResults<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata, CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity
     {
@@ -74,27 +75,41 @@ partial class AzureSqlServerStore : IDataStore
 
         if (query.NotExists() || query.Options.IsEmpty)
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
         var take = query.GetDefaultTake(MaxQueryResults);
         if (take == 0)
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
-        var (select, queryParameters) = query.ToSqlServerQuery(metadata, containerName, this);
-
-        var executed = await ExecuteSqlSelectCommandAsync(select, queryParameters, cancellationToken);
-        if (executed.IsFailure)
+        var (command, queryParameters) = query.ToSqlServerQuery(metadata, containerName, this);
+        var selected = await ExecuteSqlSelectCommandAsync(command, queryParameters, cancellationToken);
+        if (selected.IsFailure)
         {
-            return executed.Error;
+            return selected.Error;
         }
 
-        var results = executed.Value;
-        return results
+        var results = selected.Value;
+        var totalCount = results.Count;
+        if (query.IsPaginating(totalCount))
+        {
+            var (countCommand, countQueryParameters) = query.ToSqlServerCountQuery(containerName);
+            var counted = await ExecuteSqlScalarCommandAsync(countCommand, countQueryParameters, cancellationToken);
+            if (counted.IsFailure)
+            {
+                return counted.Error;
+            }
+
+            totalCount = Convert.ToInt32(counted.Value);
+            _recorder.TraceInformation(null, "SQLServer executed additional COUNT() command, with result {Count}",
+                totalCount);
+        }
+
+        return new QueryResults<QueryEntity>(results
             .Select(properties => QueryEntity.FromProperties(properties.FromTableEntity(metadata), metadata))
-            .ToList();
+            .ToList(), totalCount);
     }
 
     public async Task<Result<Error>> RemoveAsync(string containerName, string id, CancellationToken cancellationToken)
@@ -166,6 +181,29 @@ partial class AzureSqlServerStore : IDataStore
 
 internal static class SqlServerQueryBuilderExtensions
 {
+    public static (string Query, Dictionary<string, object> Parameters) ToSqlServerCountQuery<TQueryableEntity>(
+        this QueryClause<TQueryableEntity> query, string tableName)
+        where TQueryableEntity : IQueryableEntity
+    {
+        var builder = new StringBuilder();
+        builder.Append("SELECT COUNT(*)");
+        builder.Append($" FROM {tableName.ToAliasedTableName()}");
+
+        var joins = query.JoinedEntities.ToJoinClause();
+        if (joins.HasValue)
+        {
+            builder.Append($"{joins}");
+        }
+
+        var (wheres, queryParameters) = query.Wheres.ToWhereClause(query.JoinedEntities);
+        if (wheres.HasValue)
+        {
+            builder.Append($" WHERE {wheres}");
+        }
+
+        return (builder.ToString(), queryParameters);
+    }
+
     public static (string Query, Dictionary<string, object> Parameters) ToSqlServerQuery<TQueryableEntity>(
         this QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata, string tableName, IDataStore store)
         where TQueryableEntity : IQueryableEntity

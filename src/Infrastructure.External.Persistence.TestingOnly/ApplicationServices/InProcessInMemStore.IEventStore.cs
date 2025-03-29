@@ -115,7 +115,7 @@ partial class InProcessInMemStore : IEventStore
             () => Task.FromResult(_events[entityName]),
             _ => Task.FromResult(new Dictionary<string, HydrationProperties>()));
 
-        return results;
+        return results.Results;
     }
 
     private static string GetEventStreamName(string entityName, string entityId)

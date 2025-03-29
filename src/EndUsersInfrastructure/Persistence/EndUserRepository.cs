@@ -70,7 +70,7 @@ public class EndUserRepository : IEndUserRepository
             : user;
     }
 
-    public async Task<Result<List<MembershipJoinInvitation>, Error>> SearchAllMembershipsByOrganizationAsync(
+    public async Task<Result<QueryResults<MembershipJoinInvitation>, Error>> SearchAllMembershipsByOrganizationAsync(
         Identifier organizationId, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         var query = Query.From<MembershipJoinInvitation>()
@@ -94,7 +94,6 @@ public class EndUserRepository : IEndUserRepository
             return queried.Error;
         }
 
-        var memberships = queried.Value.Results;
-        return memberships;
+        return queried.Value;
     }
 }

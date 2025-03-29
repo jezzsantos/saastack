@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -89,8 +90,9 @@ public class DomainEventsApplication : IDomainEventsApplication
         }
 
         var events = searched.Value;
+        _recorder.TraceInformation(caller.ToCall(), "All notifications were fetched");
 
-        return searchOptions.ApplyWithMetadata(events.Select(evt => evt.ToNotification()));
+        return events.ToSearchResults(searchOptions, evt => evt.ToNotification());
     }
 #endif
 

@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -471,7 +472,7 @@ public class SubscriptionsApplicationSpec
         _billingProvider.Setup(bp => bp.GatewayService.SearchAllInvoicesAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<BillingProvider>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Invoice>());
+            .ReturnsAsync(new SearchResults<Invoice>());
 
         var result = await _application.SearchSubscriptionHistoryAsync(_caller.Object, "anowningentityid", null, null,
             new SearchOptions(), new GetOptions(),
@@ -497,7 +498,7 @@ public class SubscriptionsApplicationSpec
         _billingProvider.Setup(bp => bp.GatewayService.SearchAllInvoicesAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<BillingProvider>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Invoice>());
+            .ReturnsAsync(new SearchResults<Invoice>());
         var start = DateTime.UtcNow.SubtractHours(1);
 
         var result = await _application.SearchSubscriptionHistoryAsync(_caller.Object, "anowningentityid", start, null,
@@ -523,7 +524,7 @@ public class SubscriptionsApplicationSpec
         _billingProvider.Setup(bp => bp.GatewayService.SearchAllInvoicesAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<BillingProvider>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Invoice>());
+            .ReturnsAsync(new SearchResults<Invoice>());
         var end = DateTime.UtcNow.AddHours(1);
 
         var result = await _application.SearchSubscriptionHistoryAsync(_caller.Object, "anowningentityid", null, end,
@@ -544,9 +545,8 @@ public class SubscriptionsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllByProviderAsync(It.IsAny<string>(), It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Subscription>
-            {
-                new()
+            .ReturnsAsync(new QueryResults<Subscription>([
+                new Subscription
                 {
                     Id = "asubscriptionid",
                     BuyerId = "abuyerid",
@@ -557,7 +557,7 @@ public class SubscriptionsApplicationSpec
                         { "aname", "avalue" }
                     }.ToJson()
                 }
-            });
+            ]));
         _userProfilesService.Setup(usp =>
                 usp.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))

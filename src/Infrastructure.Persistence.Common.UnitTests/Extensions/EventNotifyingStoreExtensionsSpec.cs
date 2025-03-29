@@ -31,7 +31,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
         var store = new Mock<IEventNotifyingStore>();
         var aggregate = new Mock<IChangeEventProducingAggregateRoot>();
         aggregate.Setup(a => a.GetChanges())
-            .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>()));
+            .Returns(new Result<List<EventSourcedChangeEvent>, Error>([]));
 
         var wasCalled = false;
         var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
@@ -56,10 +56,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
-            .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>
-            {
-                change
-            }));
+            .Returns(new Result<List<EventSourcedChangeEvent>, Error>([change]));
 
         var wasCalled = false;
         var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
@@ -85,10 +82,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
-            .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>
-            {
-                change
-            }));
+            .Returns(new Result<List<EventSourcedChangeEvent>, Error>([change]));
         _failHandler = true;
 
         var wasCalled = false;
@@ -124,10 +118,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
-            .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>
-            {
-                change1, change2, change3
-            }));
+            .Returns(new Result<List<EventSourcedChangeEvent>, Error>([change1, change2, change3]));
 
         var wasCalled = false;
         var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,

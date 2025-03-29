@@ -81,7 +81,7 @@ public class BookingRepository : IBookingRepository
         return await SaveAsync(booking, false, cancellationToken);
     }
 
-    public async Task<Result<IReadOnlyList<Booking>, Error>> SearchAllBookingsAsync(Identifier organizationId,
+    public async Task<Result<QueryResults<Booking>, Error>> SearchAllBookingsAsync(Identifier organizationId,
         DateTime from, DateTime to, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
@@ -95,7 +95,6 @@ public class BookingRepository : IBookingRepository
             return queried.Error;
         }
 
-        var bookings = queried.Value.Results;
-        return bookings;
+        return queried.Value;
     }
 }

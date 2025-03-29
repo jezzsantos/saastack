@@ -12,6 +12,6 @@ public interface IAuditRepository : IApplicationRepository
 
     Task<Result<AuditRoot, Error>> SaveAsync(AuditRoot audit, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Audit>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
+    Task<Result<QueryResults<Audit>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken);
 }

@@ -223,6 +223,7 @@ public sealed partial class AzureSqlServerStore
     }
 
     private async Task<Result<object, Error>> ExecuteSqlScalarCommandAsync(string commandText,
+        IDictionary<string, object> parameterValuesByParameter,
         CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionOptions.ConnectionString);
@@ -232,6 +233,11 @@ public sealed partial class AzureSqlServerStore
             await connection.OpenAsync(cancellationToken);
             await using (var command = new SqlCommand(commandText, connection))
             {
+                foreach (var pair in parameterValuesByParameter)
+                {
+                    command.Parameters.AddWithValue(pair.Key, pair.Value);
+                }
+
                 result = await command.ExecuteScalarAsync(cancellationToken);
             }
 

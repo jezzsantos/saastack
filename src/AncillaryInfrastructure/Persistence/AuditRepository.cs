@@ -55,7 +55,7 @@ public class AuditRepository : IAuditRepository
         return await SaveAsync(audit, false, cancellationToken);
     }
 
-    public async Task<Result<IReadOnlyList<Audit>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
+    public async Task<Result<QueryResults<Audit>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         var query = Query.From<Audit>().WhereNoOp();
@@ -77,8 +77,7 @@ public class AuditRepository : IAuditRepository
             return queried.Error;
         }
 
-        var audits = queried.Value.Results;
-        return audits;
+        return queried.Value;
     }
 
     private async Task<Result<AuditRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,

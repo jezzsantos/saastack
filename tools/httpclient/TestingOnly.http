@@ -2,4 +2,7 @@
 POST https://{{apihost1}}/testingonly/general/body/empty/required
 Content-Type: application/json
 
-###
+### GET search results with pagination
+
+GET https://{{apihost1}}/testingonly/search?limit=50&offset=1&filter=aproperty&sort=-aproperty&
+    embed=anembeddedresourcename

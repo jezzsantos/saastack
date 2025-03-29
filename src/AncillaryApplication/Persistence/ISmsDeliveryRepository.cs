@@ -17,7 +17,7 @@ public interface ISmsDeliveryRepository : IApplicationRepository
     Task<Result<SmsDeliveryRoot, Error>> SaveAsync(SmsDeliveryRoot delivery, bool reload,
         CancellationToken cancellationToken);
 
-    Task<Result<List<SmsDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
+    Task<Result<QueryResults<SmsDelivery>, Error>> SearchAllAsync(DateTime? sinceUtc, string? organizationId,
         IReadOnlyList<string>? tags,
         SearchOptions searchOptions, CancellationToken cancellationToken);
 }

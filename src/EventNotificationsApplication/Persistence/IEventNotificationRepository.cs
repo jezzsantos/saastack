@@ -9,6 +9,6 @@ public interface IEventNotificationRepository : IApplicationRepository
 {
     Task<Result<Error>> SaveAsync(EventNotification notification, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<EventNotification>, Error>> SearchAllAsync(SearchOptions searchOptions,
+    Task<Result<QueryResults<EventNotification>, Error>> SearchAllAsync(SearchOptions searchOptions,
         CancellationToken cancellationToken);
 }

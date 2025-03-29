@@ -130,15 +130,15 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
             return queryResults.Error;
         }
 
-        var entities = queryResults.Value;
-
+        var totalCount = queryResults.Value.TotalCount;
+        var entities = queryResults.Value.Results;
         entities = entities
             .Where(e => !e.IsDeleted.ValueOrDefault || includeDeleted)
             .ToList();
 
         _recorder.TraceDebug(null, "{Count} entities were retrieved from the {Store} store", entities.Count,
             _dataStore.GetType().Name);
-        return new QueryResults<TDto>(entities.ConvertAll(x => x.ToDto<TDto>()));
+        return new QueryResults<TDto>(entities.ConvertAll(x => x.ToDto<TDto>()), totalCount);
     }
 
     public async Task<Result<TDto, Error>> ResurrectDeletedAsync(string id,

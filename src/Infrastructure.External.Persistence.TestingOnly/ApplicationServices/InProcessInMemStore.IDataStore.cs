@@ -1,4 +1,5 @@
 ﻿#if TESTINGONLY
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -57,7 +58,7 @@ partial class InProcessInMemStore : IDataStore
 
     public int MaxQueryResults => 1000;
 
-    public async Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
+    public async Task<Result<QueryResults<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata,
         CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity
@@ -69,12 +70,12 @@ partial class InProcessInMemStore : IDataStore
 
         if (query.NotExists() || query.Options.IsEmpty)
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
         if (!_documents.ContainsKey(containerName))
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
         var results = await query.FetchAllIntoMemoryAsync(MaxQueryResults, metadata,

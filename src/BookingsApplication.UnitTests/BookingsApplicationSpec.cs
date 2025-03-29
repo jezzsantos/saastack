@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using BookingsApplication.Persistence;
@@ -275,9 +276,8 @@ public class BookingsApplicationSpec
         var end = start.AddHours(1);
         _repository.Setup(rep => rep.SearchAllBookingsAsync(It.IsAny<Identifier>(), It.IsAny<DateTime>(),
                 It.IsAny<DateTime>(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Booking>
-            {
-                new()
+            .ReturnsAsync(new QueryResults<Booking>([
+                new Booking
                 {
                     Id = "abookingid",
                     BorrowerId = "aborrowerid",
@@ -286,7 +286,7 @@ public class BookingsApplicationSpec
                     OrganizationId = "anorganizationid",
                     Start = start
                 }
-            });
+            ]));
 
         var result = await _application.SearchAllBookingsAsync(_caller.Object, "anorganizationid", start, end,
             new SearchOptions(), new GetOptions(), CancellationToken.None);

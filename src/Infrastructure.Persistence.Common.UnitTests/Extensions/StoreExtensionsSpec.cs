@@ -131,8 +131,9 @@ public class StoreExtensionsSpec
                 () => Task.FromResult(primaryEntities),
                 _ => Task.FromResult(joinedEntities));
 
-        result.Count.Should().Be(1);
-        result[0].Id.Should().Be("anid");
+        result.TotalCount.Should().Be(1);
+        result.Results.Count.Should().Be(1);
+        result.Results[0].Id.Should().Be("anid");
     }
 
     [Fact]
@@ -198,11 +199,11 @@ public class StoreExtensionsSpec
     }
 
     [Fact]
-    public void WhenGetDefaultSkipAndDefaultOffset_ThenReturnsZero()
+    public void WhenGetDefaultSkipAndZeroOffset_ThenReturnsZeroOffset()
     {
         var query = Query.From<TestQueryEntityWithId>()
             .WhereAll()
-            .Skip(ResultOptions.DefaultOffset);
+            .Skip(0);
 
         var result = query.GetDefaultSkip();
 

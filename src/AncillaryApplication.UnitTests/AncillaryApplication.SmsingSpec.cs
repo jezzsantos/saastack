@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -207,7 +208,7 @@ public class AncillaryApplicationSmsingSpec
                     It.IsAny<IReadOnlyList<string>>(),
                     It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<SmsDelivery> { delivery });
+            .ReturnsAsync(new QueryResults<SmsDelivery>([delivery]));
 
         var result = await _application.SearchAllSmsDeliveriesAsync(_caller.Object, null, null, null,
             new SearchOptions(),

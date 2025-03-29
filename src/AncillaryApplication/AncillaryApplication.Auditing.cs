@@ -1,6 +1,7 @@
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -56,8 +57,9 @@ partial class AncillaryApplication
         }
 
         var audits = searched.Value;
+        _recorder.TraceInformation(caller.ToCall(), "All audits were fetched");
 
-        return searchOptions.ApplyWithMetadata(audits.Select(audit => audit.ToAudit()));
+        return audits.ToSearchResults(searchOptions, audit => audit.ToAudit());
     }
 
     private async Task<Result<bool, Error>> DeliverAuditInternalAsync(ICallerContext caller, AuditMessage message,

@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -113,7 +114,7 @@ public class AncillaryApplicationAuditingSpec
                 edr.SearchAllAsync(It.IsAny<DateTime?>(), It.IsAny<string?>(),
                     It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Audit> { audit });
+            .ReturnsAsync(new QueryResults<Audit>([audit]));
 
         var result = await _application.SearchAllAuditsAsync(_caller.Object, null, null,
             new SearchOptions(), new GetOptions(), CancellationToken.None);

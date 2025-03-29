@@ -141,7 +141,7 @@ partial class LocalMachineJsonFileStore : IEventStore
             () => QueryPrimaryEntitiesAsync(container, metadata, cancellationToken),
             _ => Task.FromResult(new Dictionary<string, HydrationProperties>()));
 
-        return results;
+        return results.Results;
     }
 
     private static string GetEventStreamName(string entityName, string entityId)

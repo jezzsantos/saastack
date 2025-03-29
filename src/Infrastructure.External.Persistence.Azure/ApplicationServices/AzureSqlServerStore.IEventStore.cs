@@ -53,7 +53,7 @@ partial class AzureSqlServerStore : IEventStore
                     return Error.EntityExists(
                         Infrastructure.Persistence.Common.Resources
                             .EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
-                            streamName, version));
+                                streamName, version));
                 }
 
                 return added.Error;
@@ -92,7 +92,7 @@ partial class AzureSqlServerStore : IEventStore
             return queried.Error;
         }
 
-        return queried.Value
+        return queried.Value.Results
             .ConvertAll(entity => entity.ToDto<EventSourcedChangeEvent>());
     }
 
@@ -112,7 +112,7 @@ partial class AzureSqlServerStore : IEventStore
             return queried.Error;
         }
 
-        var latest = queried.Value.FirstOrDefault();
+        var latest = queried.Value.Results.FirstOrDefault();
         return latest.Exists()
             ? latest.ToDto<EventStoreEntity>().ToOptional()
             : Optional<EventStoreEntity>.None;

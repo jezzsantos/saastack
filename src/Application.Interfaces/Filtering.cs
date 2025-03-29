@@ -1,4 +1,5 @@
 using Common.Extensions;
+using JetBrains.Annotations;
 
 namespace Application.Interfaces;
 
@@ -7,7 +8,7 @@ namespace Application.Interfaces;
 /// </summary>
 public class Filtering
 {
-    private readonly List<string> _fields = new();
+    private List<string> _fields = new();
 
     public Filtering()
     {
@@ -33,5 +34,9 @@ public class Filtering
         }
     }
 
-    public IReadOnlyList<string> Fields => _fields;
+    public IReadOnlyList<string> Fields
+    {
+        get => _fields;
+        [UsedImplicitly] set => _fields = value.ToList();
+    }
 }

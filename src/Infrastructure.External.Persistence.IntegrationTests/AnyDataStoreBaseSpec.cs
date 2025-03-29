@@ -1,3 +1,6 @@
+using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Common.Recording;
@@ -20,8 +23,8 @@ public abstract class AnyDataStoreBaseSpec
     private static readonly TimeSpan ReasonableTimeDelayBetweenTimestamps = TimeSpan.FromMilliseconds(20);
     private static readonly IRecorder Recorder = NoOpRecorder.Instance;
     private readonly DataStoreInfo _firstJoiningSetup;
-    private readonly DataStoreInfo _secondJoiningSetup;
     private readonly DataStoreInfo _incompatibleSetup;
+    private readonly DataStoreInfo _secondJoiningSetup;
     protected readonly DataStoreInfo Setup;
 
     static AnyDataStoreBaseSpec()
@@ -150,7 +153,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -167,8 +171,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity.Value.Id);
     }
 
     [Fact]
@@ -180,7 +185,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -196,7 +202,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -213,8 +220,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity.Id);
     }
 
     [Fact]
@@ -236,9 +244,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -254,8 +263,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Id);
     }
 
     [Fact]
@@ -271,8 +281,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -288,8 +299,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -304,8 +316,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -319,7 +332,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -335,8 +349,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -352,9 +367,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -370,9 +386,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -388,8 +405,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -405,8 +423,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -423,8 +442,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -441,7 +461,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -460,8 +481,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -482,8 +504,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -503,8 +526,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -524,8 +548,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -544,8 +569,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -566,8 +592,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -587,8 +614,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -607,8 +635,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -627,9 +656,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -648,9 +678,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -669,8 +700,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -690,9 +722,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -711,8 +744,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -733,8 +767,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -755,9 +790,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -778,8 +814,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -800,9 +837,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -823,8 +861,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -844,8 +883,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -865,9 +905,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -887,8 +928,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -908,8 +950,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -929,9 +972,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -951,9 +995,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -973,8 +1018,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -994,8 +1040,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1017,8 +1064,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1038,9 +1086,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1060,8 +1109,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1081,9 +1131,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1103,8 +1154,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1119,7 +1171,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1134,8 +1187,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1151,8 +1205,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1166,7 +1221,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1181,8 +1237,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1195,7 +1252,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1210,8 +1268,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1227,9 +1286,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1244,8 +1304,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1261,9 +1322,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1278,8 +1340,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1295,8 +1358,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1312,8 +1376,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1329,9 +1394,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1347,8 +1413,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1364,9 +1431,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(2);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1382,8 +1450,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1398,8 +1467,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1415,8 +1485,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1430,7 +1501,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1445,8 +1517,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1462,8 +1535,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1477,7 +1551,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1492,8 +1567,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1509,8 +1585,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1524,7 +1601,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1541,8 +1619,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1560,8 +1639,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1575,7 +1655,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1593,8 +1674,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -1609,7 +1691,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1629,9 +1712,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0]
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[0]
             .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
             .Should().Be(complex2);
     }
@@ -1652,9 +1736,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0]
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[0]
             .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue)).Should()
             .BeNull();
     }
@@ -1675,9 +1760,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0]
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0]
             .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
             .Should().Be(complex1);
     }
@@ -1699,9 +1785,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
             DomainFactory).Should().BeEquivalentTo(complex2);
     }
 
@@ -1721,9 +1808,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
             DomainFactory).Should().BeNull();
     }
 
@@ -1743,9 +1831,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
             DomainFactory).Should().BeEquivalentTo(complex1);
     }
 
@@ -1780,8 +1869,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        var result = results.Value[0];
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        var result = results.Value.Results[0];
         result.Id.Should().Be(entity.Id);
         result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!.SequenceEqual(new byte[] { 0x01 })
             .Should().BeTrue();
@@ -1834,8 +1924,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        var result = results.Value[0];
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        var result = results.Value.Results[0];
         result.Id.Should().Be(entity.Id);
         result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!.SequenceEqual(new byte[] { 0x01 })
             .Should().BeTrue();
@@ -1868,7 +1959,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1891,8 +1983,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1907,8 +2000,9 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -1933,10 +2027,11 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(3);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
-        results.Value[2].Id.Should().Be(entity3.Value.Id);
+        results.Value.TotalCount.Should().Be(3);
+        results.Value.Results.Count.Should().Be(3);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[2].Id.Should().Be(entity3.Value.Id);
     }
 
     [Fact]
@@ -1952,7 +2047,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -1977,10 +2073,12 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
-        results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
+        results.Value.Results[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should()
+            .Be(false);
     }
 
     [Fact]
@@ -2006,10 +2104,13 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AFirstIntValue)).Should().Be(9);
-        results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AFirstIntValue)).Should()
+            .Be(9);
+        results.Value.Results[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should()
+            .Be(false);
     }
 
     [Fact]
@@ -2038,9 +2139,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
     }
 
     [Fact]
@@ -2057,9 +2159,10 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
     }
 
     [Fact]
@@ -2087,15 +2190,16 @@ public abstract class AnyDataStoreBaseSpec
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
-        results = results.Value.OrderBy(x => x.Id.Value).ToList();
+        results = new QueryResults<QueryEntity>(results.Value.Results.OrderBy(x => x.Id.Value).ToList());
 
-        results.Value.Count.Should().Be(3);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
-        results.Value[1].Id.Should().Be(entity2.Value.Id);
-        results.Value[1].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
-        results.Value[2].Id.Should().Be(entity3.Value.Id);
-        results.Value[2].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
+        results.Value.TotalCount.Should().Be(3);
+        results.Value.Results.Count.Should().Be(3);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
+        results.Value.Results[1].Id.Should().Be(entity2.Value.Id);
+        results.Value.Results[1].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
+        results.Value.Results[2].Id.Should().Be(entity3.Value.Id);
+        results.Value.Results[2].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
     }
 
     [Fact]
@@ -2128,10 +2232,11 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
-        results.Value[0].GetValueOrDefault<long>(nameof(TestJoinedDataStoreEntity.ALongValue)).Should().Be(8);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
+        results.Value.Results[0].GetValueOrDefault<long>(nameof(TestJoinedDataStoreEntity.ALongValue)).Should().Be(8);
     }
 
     [Fact]
@@ -2158,10 +2263,12 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().BeSome(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
-        results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().BeSome(entity1.Value.Id);
+        results.Value.Results[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
+        results.Value.Results[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should()
+            .Be(false);
     }
 
     [Fact]
@@ -2259,7 +2366,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -2367,7 +2475,8 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(0);
+        results.Value.TotalCount.Should().Be(50);
+        results.Value.Results.Count.Should().Be(0);
     }
 
     [Fact]
@@ -2390,27 +2499,134 @@ public abstract class AnyDataStoreBaseSpec
         var results = await Setup.Store.QueryAsync(_incompatibleSetup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreIncompatibleReadEntity>(), CancellationToken.None);
 
-        results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be("anid1");
-        results.Value[0].GetValueOrDefault<long>(nameof(TestDataStoreIncompatibleReadEntity.AUnixTimeStamp)).Should()
+        results.Value.TotalCount.Should().Be(1);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be("anid1");
+        results.Value.Results[0].GetValueOrDefault<long>(nameof(TestDataStoreIncompatibleReadEntity.AUnixTimeStamp))
+            .Should()
             .Be(datum.ToUnixSeconds());
-        results.Value[0].GetValueOrDefault<DateTime>(nameof(TestDataStoreIncompatibleReadEntity.DefaultSortByUtc))
+        results.Value.Results[0]
+            .GetValueOrDefault<DateTime>(nameof(TestDataStoreIncompatibleReadEntity.DefaultSortByUtc))
             .Should()
             .Be(datum);
-        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnSourceProperty))
+        results.Value.Results[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnSourceProperty))
             .Should()
             .Be("asourcevalue");
-        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetOnlyProperty))
+        results.Value.Results[0]
+            .GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetOnlyProperty))
             .Should()
             .BeNull();
-        results.Value[0].GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetMappedProperty))
+        results.Value.Results[0]
+            .GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetMappedProperty))
             .Should()
             .Be("asourcevalue");
-        results.Value[0]
+        results.Value.Results[0]
             .GetValueOrDefault<string>(nameof(TestDataStoreIncompatibleReadEntity.AnTargetCalculatedProperty))
             .Should().Be("acalculatedvalue");
     }
-    
+
+    [Fact]
+    public async Task WhenQueryWithManyAndNoLimitNorOffset_ThenReturnsResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll();
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(entities.Count);
+    }
+
+    [Fact]
+    public async Task WhenQueryWithManyAndLimitIsTotalButNoOffset_ThenReturnsResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll()
+            .WithSearchOptions(new SearchOptions { Limit = 5 });
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(entities.Count);
+    }
+
+    [Fact]
+    public async Task WhenQueryWithManyAndLimitIsLessThanTotalButNoOffset_ThenReturnsPagedResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll()
+            .WithSearchOptions(new SearchOptions { Limit = 2 });
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entities[0].Value);
+        results.Value.Results[1].Id.Should().Be(entities[1].Value);
+    }
+
+    [Fact]
+    public async Task WhenQueryWithManyAndLimitIsLessThanTotalAndOffsetIsFirstItem_ThenReturnsPagedResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll()
+            .WithSearchOptions(new SearchOptions { Limit = 2, Offset = 0 });
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entities[0].Value);
+        results.Value.Results[1].Id.Should().Be(entities[1].Value);
+    }
+
+    [Fact]
+    public async Task WhenQueryWithManyAndLimitIsLessThanTotalAndOffsetIsMiddleItem_ThenReturnsPagedResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll()
+            .WithSearchOptions(new SearchOptions { Limit = 2, Offset = 2 });
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(2);
+        results.Value.Results[0].Id.Should().Be(entities[2].Value);
+        results.Value.Results[1].Id.Should().Be(entities[3].Value);
+    }
+
+    [Fact]
+    public async Task WhenQueryWithManyAndLimitIsLessThanTotalAndOffsetIsLastItem_ThenReturnsLastPagedResults()
+    {
+        var entities = CreateMultipleEntities(5);
+
+        var query = Query.From<TestDataStoreEntity>()
+            .WhereAll()
+            .WithSearchOptions(new SearchOptions { Limit = 2, Offset = 4 });
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(entities.Count);
+        results.Value.Results.Count.Should().Be(1);
+        results.Value.Results[0].Id.Should().Be(entities[4].Value);
+    }
+
     [Fact]
     public async Task WhenRemoveWithNullId_ThenThrows()
     {
@@ -2850,7 +3066,7 @@ public abstract class AnyDataStoreBaseSpec
         }
     }
 
-    private static void VerifyOrderedResultsInReverse(Result<List<QueryEntity>, Error> results,
+    private static void VerifyOrderedResultsInReverse(Result<QueryResults<QueryEntity>, Error> results,
         List<Optional<string>> entities,
         int? offset = null, int? limit = null)
     {
@@ -2858,16 +3074,16 @@ public abstract class AnyDataStoreBaseSpec
         VerifyOrderedResults(results, entities, offset, limit);
     }
 
-    private static void VerifyOrderedResults(Result<List<QueryEntity>, Error> results,
+    private static void VerifyOrderedResults(Result<QueryResults<QueryEntity>, Error> results,
         IReadOnlyList<Optional<string>> entities,
         int? offset = null, int? limit = null)
     {
         var expectedResultCount = limit ?? entities.Count;
-        results.Value.Count.Should().Be(expectedResultCount);
+        results.Value.Results.Count.Should().Be(expectedResultCount);
 
         var resultIndex = 0;
         var entityCount = 0;
-        results.Value.ForEach(result =>
+        results.Value.Results.ForEach(result =>
         {
             if (limit.HasValue && entityCount >= limit.Value)
             {

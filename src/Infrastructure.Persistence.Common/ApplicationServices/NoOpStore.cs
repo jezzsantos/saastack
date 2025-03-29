@@ -68,12 +68,14 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
 
     public int MaxQueryResults => 0;
 
-    public Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
+    public Task<Result<QueryResults<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata,
         CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity
     {
-        return Task.FromResult(Result<List<QueryEntity>, Error>.FromResult(new List<QueryEntity>()));
+        return Task.FromResult(
+            Result<QueryResults<QueryEntity>, Error>.FromResult(
+                new QueryResults<QueryEntity>([])));
     }
 
     public Task<Result<Error>> RemoveAsync(string containerName, string id, CancellationToken cancellationToken)

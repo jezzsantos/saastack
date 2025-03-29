@@ -1,6 +1,8 @@
 #if TESTINGONLY
 using System.Net;
 using System.Net.Http.Json;
+using Application.Interfaces;
+using Application.Resources.Shared;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -122,6 +124,44 @@ public class GeneralApiSpec : WebApiSpec<Program>
                 .Which.Message.Should().Contain(
                     "JSON deserialization for type 'Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest' was missing required properties, including the following: requiredField");
         }
+    }
+
+    [Fact]
+    public async Task WhenGetSearchApiWithNoPagination_ThenReturns()
+    {
+        var result = await Api.GetAsync(new SearchTestingOnlyRequest());
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Items.Count.Should().Be(3);
+        result.Content.Value.Metadata.Filter!.Fields
+            .Should().BeEmpty();
+        result.Content.Value.Metadata.Sort.Should().BeNull();
+        result.Content.Value.Metadata.Offset.Should().Be(SearchOptions.NoOffset);
+        result.Content.Value.Metadata.Limit.Should().Be(SearchOptions.DefaultLimit);
+        result.Content.Value.Metadata.Total.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task WhenGetSearchApiWithPagination_ThenReturns()
+    {
+        var result = await Api.GetAsync(new SearchTestingOnlyRequest
+        {
+            Limit = 50,
+            Offset = 1,
+            Filter = nameof(TestResource.AProperty),
+            Sort = $"-{nameof(TestResource.AProperty)}",
+            Embed = "anembeddedresourcename"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Items.Count.Should().Be(3);
+        result.Content.Value.Metadata.Filter!.Fields.Count.Should().Be(1);
+        result.Content.Value.Metadata.Filter!.Fields[0].Should().Be(nameof(TestResource.AProperty));
+        result.Content.Value.Metadata.Sort!.By.Should().Be(nameof(TestResource.AProperty));
+        result.Content.Value.Metadata.Sort.Direction.Should().Be(SortDirection.Descending);
+        result.Content.Value.Metadata.Offset.Should().Be(1);
+        result.Content.Value.Metadata.Limit.Should().Be(50);
+        result.Content.Value.Metadata.Total.Should().Be(3);
     }
 }
 #endif

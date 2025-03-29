@@ -79,9 +79,9 @@ public class DynamicLinqWhereExtensionsSpec
             new()
             {
                 Operator = LogicalOperator.And,
-                NestedWheres = new List<WhereExpression>
-                {
-                    new()
+                NestedWheres =
+                [
+                    new WhereExpression
                     {
                         Condition = new WhereCondition
                         {
@@ -90,7 +90,8 @@ public class DynamicLinqWhereExtensionsSpec
                             Value = "astringvalue2"
                         }
                     },
-                    new()
+
+                    new WhereExpression
                     {
                         Operator = LogicalOperator.Or,
                         Condition = new WhereCondition
@@ -100,7 +101,7 @@ public class DynamicLinqWhereExtensionsSpec
                             Value = "astringvalue3"
                         }
                     }
-                }
+                ]
             }
         };
 

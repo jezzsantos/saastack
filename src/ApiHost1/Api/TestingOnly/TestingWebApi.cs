@@ -1,9 +1,12 @@
 #if TESTINGONLY
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
@@ -176,6 +179,36 @@ public sealed class TestingWebApi : IWebApiService
             new PostResult<StringMessageTestingOnlyResponse>(
                 new StringMessageTestingOnlyResponse { Message = $"amessage{request.AnEnum}" },
                 "alocation");
+    }
+
+    public async Task<ApiGetResult<string, SearchTestingOnlyResponse>> GeneralSearch(
+        SearchTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        var searchOptions = request.ToSearchOptions();
+        var items = new List<TestResource>
+        {
+            new()
+            {
+                Id = "anid1"
+            },
+            new()
+            {
+                Id = "anid2"
+            },
+            new()
+            {
+                Id = "anid3"
+            }
+        };
+
+        var results = items.ToSearchResults(searchOptions);
+        return () =>
+            new Result<SearchTestingOnlyResponse, Error>(new SearchTestingOnlyResponse
+            {
+                Items = results.Results,
+                Metadata = results.Metadata
+            });
     }
 
     public async Task<ApiEmptyResult> GetInsecure(

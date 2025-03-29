@@ -1,8 +1,4 @@
-﻿using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Exceptions;
-using Application.Interfaces.Extensions;
-using Common;
-using Common.Extensions;
+﻿using Common;
 
 namespace Application.Interfaces;
 
@@ -23,7 +19,6 @@ public class SearchOptions
         ';'
     ];
 
-
     public static readonly char[] SortSigns =
     {
         SortSignAscending,
@@ -43,7 +38,7 @@ public class SearchOptions
     public int Limit { get; set; } = DefaultLimit;
 
     /// <summary>
-    ///     The offset of the first search result
+    ///     The offset of the first search result. Zero based.
     /// </summary>
     public int Offset { get; set; } = NoOffset;
 
@@ -52,95 +47,9 @@ public class SearchOptions
     /// </summary>
     public Optional<Sorting> Sort { get; set; }
 
-    public SearchResults<TResult> ApplyWithMetadata<TResult>(IEnumerable<TResult> results)
-    {
-        return ApplyWithMetadata(results, SearchOptions<TResult>.DynamicOrderByFunc);
-    }
-
     public void ClearLimitAndOffset()
     {
         Offset = NoOffset;
         Limit = DefaultLimit;
     }
-
-    private SearchResults<TResult> ApplyWithMetadata<TResult>(IEnumerable<TResult> results,
-        Func<IEnumerable<TResult>, Sorting, IEnumerable<TResult>> orderByFunc)
-    {
-        var searchResults = new SearchResults<TResult>
-        {
-            Metadata = this.ToMetadata()
-        };
-
-        var unsorted = results.ToList();
-        searchResults.Metadata.Total = unsorted.Count;
-
-        if (Sort.HasValue)
-        {
-            unsorted = orderByFunc(unsorted, Sort.Value)
-                .ToList();
-        }
-
-        IEnumerable<TResult> unPaged = unsorted.ToArray();
-
-        if (IsOffSet())
-        {
-            unPaged = unPaged.Skip(Offset);
-        }
-
-        if (IsLimited())
-        {
-            var limit = Math.Min(MaxLimit, Limit);
-            unPaged = unPaged.Take(limit);
-        }
-        else
-        {
-            unPaged = unPaged.Take(DefaultLimit);
-        }
-
-        searchResults.Results = unPaged.ToList();
-
-        return searchResults;
-    }
-
-    private bool IsLimited()
-    {
-        return Limit > NoLimit;
-    }
-
-    private bool IsOffSet()
-    {
-        return Offset > NoOffset;
-    }
-}
-
-internal static class SearchOptions<TResult>
-{
-    public static readonly Func<IEnumerable<TResult>, Sorting, IEnumerable<TResult>> DynamicOrderByFunc =
-        (items, sorting) =>
-        {
-            var by = sorting.By;
-            if (by.HasNoValue())
-            {
-                return items;
-            }
-
-            var expression = sorting.Direction switch
-            {
-                SortDirection.Ascending => $"{by} ascending",
-                SortDirection.Descending => $"{by} descending",
-                _ => throw new InvalidOperationException(nameof(sorting.Direction))
-            };
-
-            var itemsToSort = items.ToArray();
-            try
-            {
-                return itemsToSort.AsQueryable()
-                    .OrderBy(expression);
-            }
-            catch (ParseException)
-            {
-                // Ignore exception. Possibly an invalid sorting expression?
-                return itemsToSort;
-            }
-        };
 }

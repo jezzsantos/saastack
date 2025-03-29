@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -297,13 +298,12 @@ public class EndUsersApplicationDomainEventHandlersSpec
             });
         _endUserRepository.Setup(rep => rep.SearchAllMembershipsByOrganizationAsync(It.IsAny<Identifier>(),
                 It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<MembershipJoinInvitation>
-            {
-                new()
+            .ReturnsAsync(new QueryResults<MembershipJoinInvitation>([
+                new MembershipJoinInvitation
                 {
                     UserId = "auserid"
                 }
-            });
+            ]));
         var member = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(member);

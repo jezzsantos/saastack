@@ -35,7 +35,7 @@ public class EventNotificationRepository : IEventNotificationRepository
             : Result.Ok;
     }
 
-    public async Task<Result<IReadOnlyList<EventNotification>, Error>> SearchAllAsync(SearchOptions searchOptions,
+    public async Task<Result<QueryResults<EventNotification>, Error>> SearchAllAsync(SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
         var queried = await _events.QueryAsync(Query.From<EventNotification>()
@@ -46,6 +46,6 @@ public class EventNotificationRepository : IEventNotificationRepository
             return queried.Error;
         }
 
-        return queried.Value.Results;
+        return queried.Value;
     }
 }

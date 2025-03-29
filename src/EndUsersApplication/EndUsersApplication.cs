@@ -1,6 +1,8 @@
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Resources.Shared.Extensions;
 using Application.Services.Shared;
@@ -185,29 +187,29 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         _recorder.TraceInformation(caller.ToCall(), "Retrieved memberships for user: {Id}", user.Id);
 
-        return searchOptions.ApplyWithMetadata(memberships);
+        return memberships.ToSearchResults(searchOptions);
     }
 
     public async Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller, string organizationId, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
     {
-        var retrieved =
+        var searched =
             await _endUserRepository.SearchAllMembershipsByOrganizationAsync(organizationId.ToId(), searchOptions,
                 cancellationToken);
-        if (retrieved.IsFailure)
+        if (searched.IsFailure)
         {
-            return retrieved.Error;
+            return searched.Error;
         }
 
-        var members = retrieved.Value;
-        if (!IsMember(caller.ToCallerId(), members))
+        var members = searched.Value;
+        if (!IsMember(caller.ToCallerId(), members.Results))
         {
             return Error.ForbiddenAccess(Resources.EndUsersApplication_CallerNotMember);
         }
 
-        return searchOptions.ApplyWithMetadata(
-            await WithGetOptionsAsync(caller, members, getOptions, cancellationToken));
+        var get = await WithGetOptionsAsync(caller, members, getOptions, cancellationToken);
+        return get.ToSearchResults(searchOptions);
     }
 
     public async Task<Result<EndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
@@ -478,10 +480,10 @@ public partial class EndUsersApplication : IEndUsersApplication
         }
     }
 
-    private async Task<IEnumerable<MembershipWithUserProfile>> WithGetOptionsAsync(ICallerContext caller,
-        List<MembershipJoinInvitation> memberships, GetOptions options, CancellationToken cancellationToken)
+    private async Task<List<MembershipWithUserProfile>> WithGetOptionsAsync(ICallerContext caller,
+        QueryResults<MembershipJoinInvitation> memberships, GetOptions options, CancellationToken cancellationToken)
     {
-        var ids = memberships
+        var ids = memberships.Results
             .Where(membership => membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered)
                                  == EndUserStatus.Registered)
             .Select(membership => membership.UserId.Value).ToList();
@@ -497,7 +499,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             }
         }
 
-        return memberships.ConvertAll(membership =>
+        return memberships.Results.ConvertAll(membership =>
         {
             // These can be a person with a profile, or a machine without a profile
             var member = membership.ToMembership();

@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -266,7 +267,8 @@ public class InProcessInMemSimpleBillingGatewayService : IBillingGatewayService
     /// <summary>
     ///     Returns a zero-invoice for every 1st of the month in the date range
     /// </summary>
-    public Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
+    public Task<Result<SearchResults<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller,
+        BillingProvider provider,
         DateTime fromUtc, DateTime toUtc,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
@@ -292,7 +294,7 @@ public class InProcessInMemSimpleBillingGatewayService : IBillingGatewayService
             .Select(CreateInvoice)
             .ToList();
 
-        return Task.FromResult<Result<List<Invoice>, Error>>(invoices);
+        return Task.FromResult<Result<SearchResults<Invoice>, Error>>(invoices.ToSearchResults(searchOptions));
 
         Invoice CreateInvoice(DateTime date)
         {

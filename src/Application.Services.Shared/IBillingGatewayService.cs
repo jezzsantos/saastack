@@ -37,7 +37,7 @@ public interface IBillingGatewayService
     /// <summary>
     ///     Lists all invoices for the subscription, given the specified date range, and options
     /// </summary>
-    Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
+    Task<Result<SearchResults<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
         DateTime fromUtc, DateTime toUtc, SearchOptions searchOptions, CancellationToken cancellationToken);
 
     /// <summary>

@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
@@ -122,8 +123,7 @@ partial class AncillaryApplication
         _recorder.TraceInformation(caller.ToCall(), "All email deliveries since {Since} were fetched",
             sinceUtc.ToIso8601());
 
-        return searchOptions.ApplyWithMetadata(
-            deliveries.Select(delivery => delivery.ToDeliveredEmail()));
+        return deliveries.ToSearchResults(searchOptions, delivery => delivery.ToDeliveredEmail());
     }
 
     public async Task<Result<bool, Error>> SendEmailAsync(ICallerContext caller, string messageAsJson,

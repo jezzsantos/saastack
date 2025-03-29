@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -67,7 +68,6 @@ public class AncillaryApplicationEmailingSpec
             smsMessageQueue.Object, smsDeliveryService.Object, smsDeliveryRepository.Object,
             provisioningMessageQueue.Object, provisioningDeliveryService.Object);
     }
-
 
     [Fact]
     public async Task WhenSendEmailAsyncAndMessageHasNoHtmlNorTemplate_ThenReturnsError()
@@ -364,7 +364,7 @@ public class AncillaryApplicationEmailingSpec
                     It.IsAny<IReadOnlyList<string>>(),
                     It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<EmailDelivery> { delivery });
+            .ReturnsAsync(new QueryResults<EmailDelivery>([delivery]));
 
         var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, null, null,
             new SearchOptions(),

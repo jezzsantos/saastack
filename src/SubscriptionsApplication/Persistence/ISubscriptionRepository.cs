@@ -22,6 +22,6 @@ public interface ISubscriptionRepository : IApplicationRepository
 
     Task<Result<SubscriptionRoot, Error>> SaveAsync(SubscriptionRoot subscription, CancellationToken cancellationToken);
 
-    Task<Result<List<Subscription>, Error>> SearchAllByProviderAsync(string providerName,
+    Task<Result<QueryResults<Subscription>, Error>> SearchAllByProviderAsync(string providerName,
         SearchOptions searchOptions, CancellationToken cancellationToken);
 }

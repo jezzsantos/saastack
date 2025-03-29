@@ -417,7 +417,7 @@ public class ChargebeeHttpServiceClientSpec
         result.Should().BeSuccess();
         var today = DateTime.Today.ToUniversalTime();
         var yesterday = today.SubtractDays(1);
-        result.Value.Should().ContainSingle(invoice =>
+        result.Value.Results.Should().ContainSingle(invoice =>
             invoice.Id == "aninvoiceid"
             && invoice.Amount == 0.09M
             && invoice.Currency == "USD"

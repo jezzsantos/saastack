@@ -83,7 +83,7 @@ public class SubscriptionRepository : ISubscriptionRepository
         return subscription;
     }
 
-    public async Task<Result<List<Subscription>, Error>> SearchAllByProviderAsync(string providerName,
+    public async Task<Result<QueryResults<Subscription>, Error>> SearchAllByProviderAsync(string providerName,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
@@ -95,7 +95,7 @@ public class SubscriptionRepository : ISubscriptionRepository
             return queried.Error;
         }
 
-        return queried.Value.Results;
+        return queried.Value;
     }
 
     private async Task<Result<Optional<SubscriptionRoot>, Error>> FindFirstByQueryAsync(QueryClause<Subscription> query,

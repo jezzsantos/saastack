@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using CarsApplication.Persistence;
 using CarsDomain;
@@ -256,7 +257,7 @@ public class CarsApplication : ICarsApplication
         var cars = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All available cars were fetched");
 
-        return searchOptions.ApplyWithMetadata(cars.Select(car => car.ToCar()));
+        return cars.ToSearchResults(searchOptions, car => car.ToCar());
     }
 
     public async Task<Result<SearchResults<Car>, Error>> SearchAllCarsAsync(ICallerContext caller,
@@ -271,7 +272,7 @@ public class CarsApplication : ICarsApplication
         var cars = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All cars were fetched");
 
-        return searchOptions.ApplyWithMetadata(cars.Select(car => car.ToCar()));
+        return cars.ToSearchResults(searchOptions, car => car.ToCar());
     }
 
 #if TESTINGONLY
@@ -291,8 +292,7 @@ public class CarsApplication : ICarsApplication
         var unavailabilities = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All unavailabilities for car {Id} were fetched", carId);
 
-        return searchOptions.ApplyWithMetadata(
-            unavailabilities.Select(unavailability => unavailability.ToUnavailability()));
+        return unavailabilities.ToSearchResults(searchOptions, unavailability => unavailability.ToUnavailability());
     }
 #endif
 

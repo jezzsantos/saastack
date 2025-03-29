@@ -1,4 +1,5 @@
 ﻿using System.Linq.Dynamic.Core;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -78,7 +79,7 @@ public static class StoreExtensions
     ///     This operation will perform the joins (if any) in memory.
     ///     HACK: this operation is not recommended for use in large production workloads
     /// </summary>
-    public static async Task<List<QueryEntity>> FetchAllIntoMemoryAsync<TQueryableEntity>(
+    public static async Task<QueryResults<QueryEntity>> FetchAllIntoMemoryAsync<TQueryableEntity>(
         this QueryClause<TQueryableEntity> query,
         int maxQueryResults, PersistedEntityMetadata metadata,
         Func<Task<Dictionary<string, HydrationProperties>>> getPrimaryEntitiesAsync,
@@ -88,13 +89,13 @@ public static class StoreExtensions
         var take = query.GetDefaultTake(maxQueryResults);
         if (take == 0)
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
         var primaryEntities = await getPrimaryEntitiesAsync();
         if (!primaryEntities.HasAny())
         {
-            return new List<QueryEntity>();
+            return new QueryResults<QueryEntity>();
         }
 
         var joinedContainers =
@@ -143,7 +144,8 @@ public static class StoreExtensions
                 .Where(whereBy);
         }
 
-        return results
+        var totalCount = results.Count();
+        var items = results
             .OrderBy(orderBy)
             .Skip(skip)
             .Take(take)
@@ -151,6 +153,8 @@ public static class StoreExtensions
             .CherryPickSelectedProperties(query)
             .Select(ped => QueryEntity.FromProperties(ped.Value, metadata))
             .ToList();
+
+        return new QueryResults<QueryEntity>(items, totalCount);
     }
 
     /// <summary>

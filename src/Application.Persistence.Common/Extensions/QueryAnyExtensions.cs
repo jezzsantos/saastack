@@ -10,6 +10,32 @@ namespace Application.Persistence.Common.Extensions;
 public static class QueryAnyExtensions
 {
     /// <summary>
+    ///     Determines whether the specified query is for paginated results.
+    /// </summary>
+    public static bool IsPaginating<TEntity>(this QueryClause<TEntity> query, int resultsCount)
+        where TEntity : IQueryableEntity
+    {
+        if (query.ResultOptions.Offset > ResultOptions.DefaultOffset)
+        {
+            return true;
+        }
+
+        var hasCustomLimit = query.ResultOptions.Limit > ResultOptions.DefaultLimit;
+        if (!hasCustomLimit)
+        {
+            return false;
+        }
+
+        var hasMoreResultsThanLimit = resultsCount >= query.ResultOptions.Limit;
+        if (hasMoreResultsThanLimit)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     ///     Updates the specified <see cref="query" /> with the specified <see cref="options" />
     /// </summary>
     public static QueryClause<TEntity> WithSearchOptions<TEntity>(this QueryClause<TEntity> query,

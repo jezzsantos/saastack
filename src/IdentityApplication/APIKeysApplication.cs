@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -219,10 +220,10 @@ public class APIKeysApplication : IAPIKeysApplication
             return searched.Error;
         }
 
-        var apiKeys = searched.Value.Results;
-        _recorder.TraceInformation(caller.ToCall(), "All keys were fetched for user {User}", userId);
+        var apiKeys = searched.Value;
+        _recorder.TraceInformation(caller.ToCall(), "All APIkeys were fetched for user {User}", userId);
 
-        return searchOptions.ApplyWithMetadata(apiKeys.Select(key => key.ToApiKey()));
+        return apiKeys.ToSearchResults(searchOptions, key => key.ToApiKey());
     }
 
     private async Task<Result<Error>> ExpireAllOtherAPIKeysForUserAsync(ICallerContext caller, Identifier userId,

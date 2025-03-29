@@ -448,17 +448,22 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         var org = retrieved.Value;
-        var memberships =
+        var listed =
             await _endUsersService.ListMembershipsForOrganizationAsync(caller, org.Id, searchOptions,
                 getOptions, cancellationToken);
-        if (memberships.IsFailure)
+        if (listed.IsFailure)
         {
-            return memberships.Error;
+            return listed.Error;
         }
 
+        var memberships = listed.Value;
         _recorder.TraceInformation(caller.ToCall(), "Organization {Id} listed its members", org.Id);
 
-        return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
+        return new SearchResults<OrganizationMember>
+        {
+            Results = memberships.Results.ConvertAll(x => x.ToMember()),
+            Metadata = memberships.Metadata
+        };
     }
 
     public async Task<Result<Organization, Error>> UnassignRolesFromOrganizationAsync(ICallerContext caller, string id,

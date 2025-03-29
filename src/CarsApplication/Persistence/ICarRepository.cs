@@ -17,12 +17,12 @@ public interface ICarRepository : IApplicationRepository
 
     Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Car>, Error>> SearchAllAvailableCarsAsync(Identifier organizationId, DateTime from,
+    Task<Result<QueryResults<Car>, Error>> SearchAllAvailableCarsAsync(Identifier organizationId, DateTime from,
         DateTime to, SearchOptions searchOptions, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId, SearchOptions searchOptions,
+    Task<Result<QueryResults<Car>, Error>> SearchAllCarsAsync(Identifier organizationId, SearchOptions searchOptions,
         CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Unavailability>, Error>> SearchAllCarUnavailabilitiesAsync(Identifier organizationId,
+    Task<Result<QueryResults<Unavailability>, Error>> SearchAllCarUnavailabilitiesAsync(Identifier organizationId,
         Identifier id, SearchOptions searchOptions, CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using Application.Persistence.Interfaces;
+using Common;
 using FluentAssertions;
 using Infrastructure.Persistence.Interfaces;
 using Moq;
@@ -242,10 +243,7 @@ public class SnapshottingStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestDto>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -268,10 +266,7 @@ public class SnapshottingStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestDto>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -293,10 +288,7 @@ public class SnapshottingStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestDto>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<QueryEntity>
-            {
-                entity
-            });
+            .ReturnsAsync(new QueryResults<QueryEntity>([entity]));
 
         var result = await _store.QueryAsync(query, true, CancellationToken.None);
 

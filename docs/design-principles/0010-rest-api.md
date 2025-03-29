@@ -354,13 +354,14 @@ These properties generally don't form part of the route.
 
 In the API the naming convention for search type API's has been the following:
 
-* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString.
+* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString. OR you could define a specific kind of search if you have to distinguish between searches:
   * For example, to determine if a user exists for a specified email address, we have the SearchUsers API: `GET /users/search?email=bob@company.com`.
-
+  * For example, you have several search methods each one quite distinct, you could use: ` GET /users/byname` and `GET /users/byid` each with other filters in the query.
+  
 * For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention: `GET /resources`, and defining any parameters in the QueryString also.
   * For example, to list the car that you own, we have the ListForCallerCars API: `GET /cars`.
 
-The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part.
+The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part, or other distinguishing action `/byid`.
 
 #### Search Metadata
 
@@ -433,13 +434,25 @@ For limiting search results and for paging results.
 > Most commonly available on search APIs only
 
 * An `offset` (or start) for where to begin the result set (zero-based)
-* A `limit` (or count) for how many results to return
+* A `limit` (or count) for how many results to return for each page
 
-For example, to fetch the 3rd page of results (a page containing 50 results):
+For example, to fetch only the first page of results (of a page containing 50 results):
 
 ```
-?offset=2&limit=50
+?offset=0&limit=50
 ```
+
+For example, to fetch the 3rd page of results (of a page containing 50 results):
+
+```
+?offset=100&limit=50
+```
+
+> By default, a limit of -1 or 0 means no limiting, and an offset of 0 means no offset.
+>
+> The default limit, and maximum of all search results will be 100, by default.
+>
+> An offset of 0 means the first page of results.
 
 #### Sorting
 
@@ -675,8 +688,8 @@ These are the common HTTP status codes for errors:
   * Resource already exists
 * `423 - Locked` (the target resource is locked)
   * Resource is locked
-*
-`500 - InternalServerError` (something bad happened in our code that we did not expect, and did not handle in the code)
+  *
+  `500 - InternalServerError` (something bad happened in our code that we did not expect, and did not handle in the code)
   * Unhandled/Unexpected exception (not covered above)
 
 > HTTP Status codes are explained in detail here: [HTTP Status Codes](http://en.wikipedia.org/wiki/Http_error_codes)
