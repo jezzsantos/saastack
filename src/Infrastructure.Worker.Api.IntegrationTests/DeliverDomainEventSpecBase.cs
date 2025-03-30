@@ -40,7 +40,7 @@ public abstract class DeliverDomainEventSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
 #if TESTINGONLY
         (await Setup.MessageBusStore.CountAsync(WorkerConstants.MessageBuses.Topics.DomainEvents,
-                WorkerConstants.MessageBuses.Subscribers.ApiHost1, CancellationToken.None))
+                WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1, CancellationToken.None))
             .Should().Be(0);
 #endif
         _serviceClientFactory.LastPostedMessage.Should().BeNone();
@@ -74,7 +74,7 @@ public abstract class DeliverDomainEventSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
 #if TESTINGONLY
         (await Setup.MessageBusStore.CountAsync(WorkerConstants.MessageBuses.Topics.DomainEvents,
-                WorkerConstants.MessageBuses.Subscribers.ApiHost1, CancellationToken.None))
+                WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1, CancellationToken.None))
             .Should().Be(0);
 #endif
         _serviceClientFactory.LastPostedMessage.Value.Should()

@@ -29,7 +29,7 @@ public static class SqsEventExtensions
     }
 
     public static async Task<bool> RelayRecordsAsync<TMessage>(this SQSEvent sqsEvent,
-        IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriptionName,
+        IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriberHostName, string subscriptionName,
         CancellationToken cancellationToken)
         where TMessage : IQueuedMessage
     {
@@ -38,7 +38,7 @@ public static class SqsEventExtensions
         {
             var message = JsonSerializer.Deserialize<TMessage>(body, JsonOptions)!;
 
-            await worker.RelayMessageOrThrowAsync(subscriptionName, message, cancellationToken);
+            await worker.RelayMessageOrThrowAsync(subscriberHostName, subscriptionName, message, cancellationToken);
         }
 
         return true;

@@ -162,7 +162,7 @@ public class StubCloudWorkerService : BackgroundService
                                 req => req.SetHMACAuth(webRequest, host.HmacSecret),
                                 cancellationToken);
                             _logger.LogDebug("Drained messages on bus topic: {Topic}, for: {Subscriber}", topicName,
-                                host.Id);
+                                host.HostName);
                         }
                     }
                 }

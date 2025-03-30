@@ -18,11 +18,10 @@ public sealed class DeliverDomainEventApiHost1
 
     [Function(nameof(DeliverDomainEventApiHost1))]
     public Task Run(
-        [ServiceBusTrigger(WorkerConstants.MessageBuses.Topics.DomainEvents,
-            WorkerConstants.MessageBuses.Subscribers.ApiHost1)]
+        [ServiceBusTrigger(WorkerConstants.MessageBuses.Topics.DomainEvents, "asubscriptionname")]
         DomainEventingMessage message, FunctionContext context)
     {
-        return _worker.RelayMessageOrThrowAsync(WorkerConstants.MessageBuses.Subscribers.ApiHost1, message,
-            context.CancellationToken);
+        return _worker.RelayMessageOrThrowAsync(WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1,
+            "asubscriptionname", message, context.CancellationToken);
     }
 }

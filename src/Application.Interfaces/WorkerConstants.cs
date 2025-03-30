@@ -57,9 +57,9 @@ public static class WorkerConstants
             public const string IntegrationEvents = EventingConstants.Topics.IntegrationEvents;
         }
 
-        public static class Subscribers
+        public static class SubscriberHosts
         {
-            // EXTEND: add other subscribers here
+            // EXTEND: add other subscriber hosts here
             public const string ApiHost1 = "ApiHost1";
         }
     }

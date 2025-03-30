@@ -60,7 +60,7 @@ namespace Infrastructure.Workers.Api {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Subscriber with name: {0} cannot be found in the configuration.
+        ///   Looks up a localized string similar to Subscriber host with name: {0} cannot be found in the configuration.
         /// </summary>
         internal static string DeliverDomainEventingRelayWorker_SubscriberNotFound {
             get {

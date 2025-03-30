@@ -128,7 +128,7 @@ public class HostSettingsSpec
         var result = _service.GetEventNotificationSubscriberHosts();
 
         result.Should().OnlyContain(x =>
-            x.Id == "asubscribedhost" && x.BaseUrl == "http://localhost/api" && x.HmacSecret == "asecret");
+            x.HostName == "asubscribedhost" && x.BaseUrl == "http://localhost/api" && x.HmacSecret == "asecret");
     }
 
     [Fact]

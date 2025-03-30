@@ -20,7 +20,7 @@ public class DeliverDomainEventApiHost1
     [LambdaFunction]
     public async Task<bool> Run(SQSEvent sqsEvent, ILambdaContext context)
     {
-        return await sqsEvent.RelayRecordsAsync(_worker, WorkerConstants.MessageBuses.Subscribers.ApiHost1,
-            CancellationToken.None);
+        return await sqsEvent.RelayRecordsAsync(_worker, WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1,
+            "asubscriptionname", CancellationToken.None);
     }
 }
