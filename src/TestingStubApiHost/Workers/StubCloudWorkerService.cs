@@ -144,7 +144,7 @@ public class StubCloudWorkerService : BackgroundService
 
     private async Task DrainMessageBusTopicsAsync(CancellationToken cancellationToken)
     {
-        var subscribers = _settings.GetEventNotificationSubscriberHosts();
+        var subscribingHosts = _settings.GetEventNotificationSubscriberHosts();
         while (!cancellationToken.IsCancellationRequested)
         {
             var topicName = _monitor.NextTopicName();
@@ -154,15 +154,15 @@ public class StubCloudWorkerService : BackgroundService
                 {
                     if (_monitorMessageBusTopicMappings.TryGetValue(topicName, out var webRequest))
                     {
-                        foreach (var subscriber in subscribers)
+                        foreach (var host in subscribingHosts)
                         {
                             var apiClient = CreateApiEndpointClient("topics", _httpClientFactory, _jsonOptions,
-                                subscriber.BaseUrl);
+                                host.BaseUrl);
                             await apiClient.PostAsync(webRequest,
-                                req => req.SetHMACAuth(webRequest, subscriber.HmacSecret),
+                                req => req.SetHMACAuth(webRequest, host.HmacSecret),
                                 cancellationToken);
                             _logger.LogDebug("Drained messages on bus topic: {Topic}, for: {Subscriber}", topicName,
-                                subscriber.Id);
+                                host.Id);
                         }
                     }
                 }

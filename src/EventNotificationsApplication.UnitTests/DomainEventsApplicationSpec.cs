@@ -105,8 +105,9 @@ public class DomainEventsApplicationSpec
     [Fact]
     public async Task WhenDrainAllDomainEventsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
     {
-        _domainEventMessageTopic.Setup(umr =>
-                umr.ReceiveSingleAsync(It.IsAny<string>(),
+        // There are two subscriptions, and no messages on either subscription
+        _domainEventMessageTopic.Setup(det =>
+                det.ReceiveSingleAsync(It.IsAny<string>(),
                     It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -117,7 +118,7 @@ public class DomainEventsApplicationSpec
         _domainEventMessageTopic.Verify(
             mt => mt.ReceiveSingleAsync(It.IsAny<string>(),
                 It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()));
+                It.IsAny<CancellationToken>()), Times.Exactly(2));
         _domainEventingConsumerService.Verify(
             dec => dec.NotifySubscriberAsync(It.IsAny<string>(), It.IsAny<EventStreamChangeEvent>(),
                 It.IsAny<CancellationToken>()), Times.Never);
@@ -167,8 +168,8 @@ public class DomainEventsApplicationSpec
             Event = changeEvent2
         };
         var callbackCount = 1;
-        _domainEventMessageTopic.Setup(umr =>
-                umr.ReceiveSingleAsync(It.IsAny<string>(),
+        _domainEventMessageTopic.Setup(det =>
+                det.ReceiveSingleAsync(It.IsAny<string>(),
                     It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .Callback(
@@ -199,7 +200,7 @@ public class DomainEventsApplicationSpec
         _domainEventMessageTopic.Verify(
             mt => mt.ReceiveSingleAsync(It.IsAny<string>(),
                 It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()), Times.Exactly(5));
+                It.IsAny<CancellationToken>()), Times.Exactly(7));
         _domainEventingConsumerService.Verify(
             dec => dec.NotifySubscriberAsync("asubscription1", changeEvent1, It.IsAny<CancellationToken>()));
         _domainEventingConsumerService.Verify(

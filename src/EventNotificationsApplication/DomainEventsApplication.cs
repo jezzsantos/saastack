@@ -47,7 +47,7 @@ public class DomainEventsApplication : IDomainEventsApplication
     public async Task<Result<Error>> DrainAllDomainEventsAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        await DrainAllOnTopicAsync(_domainEventingConsumerService, _domainEventMessageBusTopic,
+        await DrainAllOnTopicAsync(_recorder, _domainEventingConsumerService, _domainEventMessageBusTopic,
             (subscriptionName, message) =>
                 NotifyDomainEventInternalAsync(caller, subscriptionName, message, cancellationToken),
             cancellationToken);
@@ -97,31 +97,64 @@ public class DomainEventsApplication : IDomainEventsApplication
 #endif
 
 #if TESTINGONLY
-    private static async Task DrainAllOnTopicAsync<TBusMessage>(
+    /// <summary>
+    ///     Round robins all subscriptions until no messages are left on the topic for that subscription.
+    ///     We need to keep going again and again until all subscriptions are empty otherwise,
+    ///     during handling of a subscriptions, the consumers might produce more messages,
+    ///     that would need to be processed by other subscriptions, that have already been checked.
+    /// </summary>
+    private static async Task DrainAllOnTopicAsync<TBusMessage>(IRecorder recorder,
         IDomainEventingConsumerService domainEventingConsumerService,
-        IMessageBusTopicStore<TBusMessage> repository,
+        IMessageBusTopicStore<TBusMessage> messageBusTopic,
         Func<string, TBusMessage, Task<Result<bool, Error>>> handler, CancellationToken cancellationToken)
         where TBusMessage : IQueuedMessage, new()
     {
+        var maxGenerations = 5;
         var subscriptionNames = domainEventingConsumerService.SubscriptionNames;
-        foreach (var subscriptionName in subscriptionNames)
+        bool foundAnyMessages;
+        do
         {
-            var found = new Result<bool, Error>(true);
-            while (found.Value)
-            {
-                found = await repository.ReceiveSingleAsync(subscriptionName, OnMessageReceivedAsync,
-                    cancellationToken);
-                continue;
+            foundAnyMessages = false;
+            await DrainEachSubscription();
+            maxGenerations--;
+        } while (foundAnyMessages && maxGenerations > 1);
 
-                async Task<Result<Error>> OnMessageReceivedAsync(TBusMessage message, CancellationToken _)
+        return;
+
+        async Task DrainEachSubscription()
+        {
+            foreach (var subscriptionName in subscriptionNames)
+            {
+                var found = new Result<bool, Error>(true);
+                while (found.Value)
                 {
-                    var handled = await handler(subscriptionName, message);
-                    if (handled.IsFailure)
+                    found = await messageBusTopic.ReceiveSingleAsync(subscriptionName, OnMessageReceivedAsync,
+                        cancellationToken);
+                    if (found.IsFailure)
                     {
-                        handled.Error.Throw<InvalidOperationException>();
+                        recorder.TraceError(null,
+                            "Failed to receive message for subscription {Subscription}. Error was: {Error}",
+                            subscriptionName, found.Error.Message);
+                        continue;
                     }
 
-                    return Result.Ok;
+                    if (found.Value)
+                    {
+                        foundAnyMessages = true;
+                    }
+
+                    continue;
+
+                    async Task<Result<Error>> OnMessageReceivedAsync(TBusMessage message, CancellationToken _)
+                    {
+                        var handled = await handler(subscriptionName, message);
+                        if (handled.IsFailure)
+                        {
+                            handled.Error.Throw<InvalidOperationException>();
+                        }
+
+                        return Result.Ok;
+                    }
                 }
             }
         }

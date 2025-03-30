@@ -89,8 +89,8 @@ public sealed class TestingWebApi : IWebApiService
         var repositoryTypes = GetAllRepositoryTypes();
         var repositories = GetRepositories(_serviceProvider, repositoryTypes);
 
-        DestroyAllRepositories(repositories);
-
+        await DestroyAllRepositories(repositories);
+        
         return () => new Result<EmptyResponse, Error>();
     }
 
@@ -394,12 +394,12 @@ public sealed class TestingWebApi : IWebApiService
         return _allRepositories;
     }
 
-    private static void DestroyAllRepositories(IEnumerable<IApplicationRepository> repositories)
+    private static async Task DestroyAllRepositories(IEnumerable<IApplicationRepository> repositories)
     {
-        foreach (var repository in repositories)
-        {
-            repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
-        }
+        var tasks = repositories
+            .ToList()
+            .Select(repo => repo.DestroyAllAsync(CancellationToken.None));
+        await Task.WhenAll(tasks);
     }
 }
 #endif
