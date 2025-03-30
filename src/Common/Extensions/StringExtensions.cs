@@ -86,7 +86,8 @@ public static class StringExtensions
             PropertyNameCaseInsensitive = true,
             Converters =
             {
-                new OptionalConverterFactory()
+                new OptionalConverterFactory(),
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             }
         });
     }
@@ -136,7 +137,11 @@ public static class StringExtensions
 
         return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            }
         });
     }
 #endif
@@ -411,7 +416,8 @@ public static class StringExtensions
                 : JsonIgnoreCondition.WhenWritingNull,
             Converters =
             {
-                new OptionalConverterFactory()
+                new OptionalConverterFactory(),
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             }
         });
     }

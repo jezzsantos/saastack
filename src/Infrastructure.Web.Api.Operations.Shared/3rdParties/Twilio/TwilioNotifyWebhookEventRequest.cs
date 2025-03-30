@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Application.Resources.Shared;
 using Infrastructure.Web.Api.Interfaces;
 
@@ -18,12 +17,10 @@ public class TwilioNotifyWebhookEventRequest : WebRequestEmpty<TwilioNotifyWebho
 
     public string? MessageSid { get; set; }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public TwilioMessageStatus? MessageStatus { get; set; }
 
     public long? RawDlrDoneDate { get; set; }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public TwilioMessageStatus? SmsStatus { get; set; }
 
     public string? To { get; set; }

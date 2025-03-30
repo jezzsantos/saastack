@@ -10,6 +10,5 @@ public class TwilioSendResponse : IWebResponse
 
     [JsonPropertyName("sid")] public string? Sid { get; set; }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     [JsonPropertyName("status")] public TwilioMessageStatus? Status { get; set; }
 }

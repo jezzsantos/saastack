@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Application.Resources.Shared;
 using Infrastructure.Web.Api.Interfaces;
 
@@ -16,9 +15,7 @@ public class
     VerifyPasswordMfaAuthenticatorForCallerRequest : UnTenantedRequest<VerifyPasswordMfaAuthenticatorForCallerRequest,
     AuthenticateResponse>
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Required]
-    public PasswordCredentialMfaAuthenticatorType? AuthenticatorType { get; set; }
+    [Required] public PasswordCredentialMfaAuthenticatorType? AuthenticatorType { get; set; }
 
     [Required] public string? ConfirmationCode { get; set; }
 

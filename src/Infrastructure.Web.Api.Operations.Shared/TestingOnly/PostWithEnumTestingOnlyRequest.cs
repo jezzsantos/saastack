@@ -1,5 +1,4 @@
 #if TESTINGONLY
-using System.Text.Json.Serialization;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -11,7 +10,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 public class
     PostWithEnumTestingOnlyRequest : WebRequest<PostWithEnumTestingOnlyRequest, StringMessageTestingOnlyResponse>
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public TestEnum? AnEnum { get; set; }
 
     public string? AProperty { get; set; }
