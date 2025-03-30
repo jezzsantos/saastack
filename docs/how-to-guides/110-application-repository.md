@@ -52,8 +52,7 @@ public interface ICarRepository : IApplicationRepository
 
     Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId, SearchOptions searchOptions,
-        CancellationToken cancellationToken);
+    Task<Result<QueryResults<Car>, Error>> SearchAllCarsAsync(Identifier organizationId, SearchOptions searchOptions, CancellationToken cancellationToken);
     
     ... other methods
 }
@@ -105,7 +104,7 @@ public class CarRepository : ICarRepository
         throw new NotImplementedException();
     }
     
-    public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
+    public async Task<Result<QueryResults<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
@@ -244,7 +243,7 @@ public class CarRepository : ICarRepository
         return await SaveAsync(car, false, cancellationToken);
     }
     
-    public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
+    public async Task<Result<QueryResults<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         var queried = await _carQueries.QueryAsync(Query.From<Car>()
@@ -255,8 +254,7 @@ public class CarRepository : ICarRepository
             return queried.Error;
         }
 
-        var cars = queried.Value.Results;
-        return cars;
+        return queried.Value;
     }
     
     ...other methods
