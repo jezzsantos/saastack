@@ -13,7 +13,7 @@ namespace Common.Extensions;
 
 public static class CollectionExtensions
 {
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
     /// </summary>
@@ -67,7 +67,7 @@ public static class CollectionExtensions
         return !collection.ContainsIgnoreCase(target);
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
@@ -79,7 +79,7 @@ public static class CollectionExtensions
         }
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
         return !collection.HasNone();
-#elif GENERATORS_WEB_API_PROJECT
+#elif GENERATORS_WEB_API_PROJECT || GENERATORS_WORKERS_PROJECT
         return !collection!.HasNone();
 #endif
     }

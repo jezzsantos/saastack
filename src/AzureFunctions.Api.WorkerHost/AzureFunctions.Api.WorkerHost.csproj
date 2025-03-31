@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <DefineConstants>$(DefineConstants);REVEALGENERATEDFORAZUREFUNCTIONS</DefineConstants>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
@@ -45,5 +46,11 @@
 
     <ItemGroup>
         <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\ApiHost1/Generated/Tools.Generators.Workers/Tools.Generators.Workers.WorkerGenerator/DeliverDomainEvents.g.cs">
+            <Link>Functions/DeliverDomainEvents.g.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

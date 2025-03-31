@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <DefineConstants>$(DefineConstants);REVEALGENERATEDFORAWSLAMBDAS</DefineConstants>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
         <AWSProjectType>Lambda</AWSProjectType>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -42,4 +43,9 @@
         <ProjectReference Include="..\Infrastructure.Workers.Api\Infrastructure.Workers.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Include="..\ApiHost1/Generated/Tools.Generators.Workers/Tools.Generators.Workers.WorkerGenerator/DeliverDomainEvents.g.cs">
+            <Link>Lambdas/DeliverDomainEvents.g.cs</Link>
+        </Compile>
+    </ItemGroup>
 </Project>

@@ -23,8 +23,7 @@ public sealed class DeliverDomainEventingRelayWorker : IMessageBusMonitoringApiR
     }
 
     public async Task RelayMessageOrThrowAsync(string subscriberHostName, string subscriptionName,
-        DomainEventingMessage message,
-        CancellationToken cancellationToken)
+        DomainEventingMessage message, CancellationToken cancellationToken)
     {
         var subscriberHost = _subscriberHosts.FirstOrDefault(s => s.HostName.EqualsIgnoreCase(subscriberHostName));
         if (subscriberHost.NotExists())

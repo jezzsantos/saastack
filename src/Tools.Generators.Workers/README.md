@@ -1,8 +1,8 @@
 # Source Generator
 
-This source generator project is only meant to be included by the `Common` project only.
+This source generator project is meant to be included by every ApiHost Project.
 
-Its job is to convert all `FeatureFlags` definition (found in the assembly) into instances of the `Flag` class.
+Its job is to create Azure Functions and AWS Lambdas handler definitions, that are triggered by the Azure Service Bus and SNS respectively.
 
 # Development Workarounds
 
@@ -17,7 +17,7 @@ This is especially problematic when those referenced projects have transient dep
 
 If any dependencies are taken, special workarounds (in the project file of this project) are required in order for this source generators to work properly.
 
-We are avoiding including certain types from any projects in this solution (e.g. from the `Common` project) even though we need it in the code of the Source generator, since that project is dependent on types in AspNet framework.
+We are avoiding including certain types from any projects in this solution (e.g. from the `Infrastructure.Web.Api.Interfaces` project) even though we need it in the code of the Source generator, since that project is dependent on types in AspNet framework.
 
 To work around this, we have file-linked certain source files from projects in the solution, so that we can use those symbols in the Source Generator code.
 
@@ -29,7 +29,7 @@ We have had to hardcode certain other types to avoid referencing AspNet, and the
 
 You can debug the analyzers easily from the unit tests.
 
-You can debug your source generator by setting a breakpoint in the code, and then running the `Common-SourceGenerators-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
+You can debug your source generator by setting a breakpoint in the code, and then running the `Api-SourceGenerators-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
 
 
 > Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise, your breakpoints may not hit.
@@ -40,4 +40,4 @@ The most reliable way to reset the generators:
 2. Kill any remaining `.Net Host (dotnet.exe)` processes on your machine, and any remaining `Jetbrains Rider` processes on your machine
 3. Restart Rider
 4. Set your breakpoints
-5. Start debugging the `Common-SourceGenerators-Development` run configuration
+5. Start debugging the `Api-SourceGenerators-Development` run configuration

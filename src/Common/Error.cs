@@ -1,4 +1,4 @@
-#if !ANALYZERS_NONPLATFORM
+#if !ANALYZERS_NONPLATFORM && !GENERATORS_WORKERS_PROJECT
 using Common.Extensions;
 #endif
 
@@ -36,7 +36,7 @@ public readonly struct Error
 
     public string? AdditionalCode { get; }
 
-#if !ANALYZERS_NONPLATFORM
+#if !ANALYZERS_NONPLATFORM && !GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Wraps the existing message within the specified message
     /// </summary>

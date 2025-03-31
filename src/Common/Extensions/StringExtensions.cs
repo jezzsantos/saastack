@@ -5,13 +5,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 #endif
 
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -30,7 +30,7 @@ namespace Common.Extensions;
 #endif
 public static class StringExtensions
 {
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Defines the casing used in JSON serialization
     /// </summary>
@@ -43,7 +43,7 @@ public static class StringExtensions
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
@@ -61,7 +61,7 @@ public static class StringExtensions
         return string.Equals(value, other, StringComparison.Ordinal);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Formats the <see cref="value" /> with the <see cref="arguments" />
     /// </summary>
@@ -145,7 +145,7 @@ public static class StringExtensions
         });
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
@@ -421,7 +421,7 @@ public static class StringExtensions
             }
         });
     }
-#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     public static string? ToJson<TObject>(this TObject? value, bool? prettyPrint = true, JsonCasing casing =
         JsonCasing.Pascal)
     {
