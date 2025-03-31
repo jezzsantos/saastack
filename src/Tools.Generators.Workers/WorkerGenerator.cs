@@ -30,9 +30,10 @@ public class WorkerGenerator : ISourceGenerator
             "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer"
         };
 
+        var filename = $"{assemblyName}_{Filename}";
         var fileSource = BuildFile(assemblyName!, subscriptionNames);
 
-        context.AddSource(Filename, SourceText.From(fileSource, Encoding.UTF8));
+        context.AddSource(filename, SourceText.From(fileSource, Encoding.UTF8));
 
         return;
 

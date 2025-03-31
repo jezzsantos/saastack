@@ -10,6 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Workers.Api\Infrastructure.Workers.Api.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <PackageReference Include="Amazon.Lambda.AspNetCoreServer.Hosting" Version="1.3.1" />
         <PackageReference Include="Amazon.Lambda.Annotations" Version="1.1.0" />
         <PackageReference Include="Amazon.Lambda.Core" Version="2.2.0" />
@@ -37,15 +44,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Workers.Api\Infrastructure.Workers.Api.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Include="..\ApiHost1/Generated/Tools.Generators.Workers/Tools.Generators.Workers.WorkerGenerator/DeliverDomainEvents.g.cs">
-            <Link>Lambdas/DeliverDomainEvents.g.cs</Link>
+        <Compile Include="..\ApiHost1\Generated\Tools.Generators.Workers\Tools.Generators.Workers.WorkerGenerator\ApiHost1_DeliverDomainEvents.g.cs">
+            <Link>Lambdas/ApiHost1_DeliverDomainEvents.g.cs</Link>
         </Compile>
     </ItemGroup>
 </Project>

@@ -49,8 +49,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\ApiHost1/Generated/Tools.Generators.Workers/Tools.Generators.Workers.WorkerGenerator/DeliverDomainEvents.g.cs">
-            <Link>Functions/DeliverDomainEvents.g.cs</Link>
+        <Compile Include="..\ApiHost1\Generated\Tools.Generators.Workers\Tools.Generators.Workers.WorkerGenerator\ApiHost1_DeliverDomainEvents.g.cs">
+            <Link>Functions/ApiHost1_DeliverDomainEvents.g.cs</Link>
         </Compile>
     </ItemGroup>
 </Project>
