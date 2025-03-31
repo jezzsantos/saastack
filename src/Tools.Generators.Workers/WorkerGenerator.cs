@@ -95,9 +95,7 @@ public class WorkerGenerator : ISourceGenerator
                                      """);
             }
 
-            builder.AppendLine("""
-                               #endif
-                               """);
+            builder.AppendLine("#endif");
             return builder.ToString();
         }
     }

@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using Xunit;
-using Api_WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
+using WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 
@@ -28,16 +28,15 @@ public class WebApiAssemblyVisitorSpec
         var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
         var references = new List<MetadataReference>
         {
-            MetadataReference.CreateFromFile(typeof(Api_WebApiAssemblyVisitor).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(WebApiAssemblyVisitor).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
         };
         AdditionalCompilationAssemblies.ToList()
             .ForEach(item => references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, item))));
         var compilation = CSharpCompilation.Create("compilation",
-            new[]
-            {
+            [
                 CSharpSyntaxTree.ParseText(sourceCode)
-            },
+            ],
             references,
             new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
@@ -47,12 +46,12 @@ public class WebApiAssemblyVisitorSpec
     [Trait("Category", "Unit.Tooling")]
     public class GivenAnyClass
     {
-        private readonly Api_WebApiAssemblyVisitor _visitor;
+        private readonly WebApiAssemblyVisitor _visitor;
 
         public GivenAnyClass()
         {
             var compilation = CreateCompilation(CompilationSourceCode);
-            _visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
+            _visitor = new WebApiAssemblyVisitor(compilation, CancellationToken.None);
         }
 
         [Fact]
@@ -71,7 +70,7 @@ public class WebApiAssemblyVisitorSpec
         public void WhenVisitNamespaceAndIgnoredNamespace_ThenStopsVisiting()
         {
             var @namespace = new Mock<INamespaceSymbol>();
-            @namespace.Setup(ns => ns.Name).Returns(Api_WebApiAssemblyVisitor.IgnoredNamespaces[0]);
+            @namespace.Setup(ns => ns.Name).Returns(WebApiAssemblyVisitor.IgnoredNamespaces[0]);
 
             _visitor.VisitNamespace(@namespace.Object);
 
@@ -196,7 +195,7 @@ public class WebApiAssemblyVisitorSpec
             var classBaseType = new Mock<INamedTypeSymbol>();
             type.Setup(t => t.IsStatic).Returns(false);
             type.Setup(t => t.IsAbstract).Returns(false);
-            type.Setup(t => t.AllInterfaces).Returns(ImmutableArray.Create(classBaseType.Object));
+            type.Setup(t => t.AllInterfaces).Returns([classBaseType.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -209,12 +208,12 @@ public class WebApiAssemblyVisitorSpec
     public class GivenAServiceClass
     {
         private readonly CSharpCompilation _compilation;
-        private readonly Api_WebApiAssemblyVisitor _visitor;
+        private readonly WebApiAssemblyVisitor _visitor;
 
         public GivenAServiceClass()
         {
             _compilation = CreateCompilation(CompilationSourceCode);
-            _visitor = new Api_WebApiAssemblyVisitor(_compilation, CancellationToken.None);
+            _visitor = new WebApiAssemblyVisitor(_compilation, CancellationToken.None);
         }
 
         [Fact]
@@ -264,7 +263,7 @@ public class WebApiAssemblyVisitorSpec
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
             method.Setup(m => m.ReturnType).Returns(voidMetadata);
-            type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
+            type.Setup(t => t.GetMembers()).Returns([method.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -281,8 +280,8 @@ public class WebApiAssemblyVisitorSpec
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
             method.Setup(m => m.ReturnType).Returns(taskMetadata);
-            method.Setup(m => m.Parameters).Returns(ImmutableArray.Create<IParameterSymbol>());
-            type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
+            method.Setup(m => m.Parameters).Returns([]);
+            type.Setup(t => t.GetMembers()).Returns([method.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -301,9 +300,9 @@ public class WebApiAssemblyVisitorSpec
             method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var parameter = new Mock<IParameterSymbol>();
             var classBaseType = new Mock<INamedTypeSymbol>();
-            parameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(classBaseType.Object));
-            method.Setup(m => m.Parameters).Returns(ImmutableArray.Create(parameter.Object));
-            type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
+            parameter.Setup(p => p.Type.AllInterfaces).Returns([classBaseType.Object]);
+            method.Setup(m => m.Parameters).Returns([parameter.Object]);
+            type.Setup(t => t.GetMembers()).Returns([method.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -323,12 +322,12 @@ public class WebApiAssemblyVisitorSpec
             method.Setup(m => m.IsStatic).Returns(false);
             method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var firstParameter = new Mock<IParameterSymbol>();
-            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestMetadata));
+            firstParameter.Setup(p => p.Type.AllInterfaces).Returns([requestMetadata]);
             var secondParameter = new Mock<IParameterSymbol>();
             secondParameter.Setup(p => p.Type).Returns(stringMetadata);
             method.Setup(m => m.Parameters)
-                .Returns(ImmutableArray.Create(firstParameter.Object, secondParameter.Object));
-            type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
+                .Returns([firstParameter.Object, secondParameter.Object]);
+            type.Setup(t => t.GetMembers()).Returns([method.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -348,13 +347,13 @@ public class WebApiAssemblyVisitorSpec
             method.Setup(m => m.IsStatic).Returns(false);
             method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var firstParameter = new Mock<IParameterSymbol>();
-            firstParameter.Setup(p => p.Type.GetAttributes()).Returns(ImmutableArray.Create<AttributeData>());
-            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestMetadata));
+            firstParameter.Setup(p => p.Type.GetAttributes()).Returns([]);
+            firstParameter.Setup(p => p.Type.AllInterfaces).Returns([requestMetadata]);
             var secondParameter = new Mock<IParameterSymbol>();
             secondParameter.Setup(p => p.Type).Returns(cancellationTokenMetadata);
             method.Setup(m => m.Parameters)
-                .Returns(ImmutableArray.Create(firstParameter.Object, secondParameter.Object));
-            type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
+                .Returns([firstParameter.Object, secondParameter.Object]);
+            type.Setup(t => t.GetMembers()).Returns([method.Object]);
 
             _visitor.VisitNamedType(type.Object);
 
@@ -391,7 +390,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
+                var visitor = new WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -446,7 +445,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
+                var visitor = new WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -503,7 +502,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
+                var visitor = new WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -560,7 +559,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
+                var visitor = new WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -579,7 +578,7 @@ public class WebApiAssemblyVisitorSpec
             type.Setup(t => t.DeclaredAccessibility).Returns(Accessibility.Public);
             type.Setup(t => t.IsStatic).Returns(false);
             type.Setup(t => t.IsAbstract).Returns(false);
-            type.Setup(t => t.AllInterfaces).Returns(ImmutableArray.Create(serviceClassMetadata));
+            type.Setup(t => t.AllInterfaces).Returns([serviceClassMetadata]);
             var @namespace = new Mock<INamespaceSymbol>();
             @namespace.As<ISymbol>().Setup(ns => ns.ToDisplayString(It.IsAny<SymbolDisplayFormat?>()))
                 .Returns("adisplaystring");
