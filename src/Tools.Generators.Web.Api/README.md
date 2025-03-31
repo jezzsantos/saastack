@@ -27,10 +27,9 @@ We have had to hardcode certain other types to avoid referencing AspNet, and the
 
 # Debugging Generators
 
-You can debug the analyzers easily from the unit tests.
+You can debug the source generator easily from the unit tests.
 
 You can debug your source generator by setting a breakpoint in the code, and then running the `Api-SourceGenerators-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
-
 
 > Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise, your breakpoints may not hit.
 

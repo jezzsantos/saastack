@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
+using Infrastructure.Eventing.Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Persistence.Interfaces;
 
@@ -65,13 +66,29 @@ public class ApiHostDomainEventingSubscriberService : IDomainEventingSubscriberS
             .SelectMany(assembly => assembly.GetTypes()
                 .Where(type => typeof(IDomainEventNotificationConsumer).IsAssignableFrom(type)
                                && type.IsClass
+                               && (IsPublic(type) || IsInternal(type))
                                && type != typeof(IDomainEventNotificationConsumer)))
             .ToList();
+
+        bool IsPublic(Type type)
+        {
+            return type.IsVisible
+                   && type.IsPublic
+                   && !type.IsNotPublic
+                   && !type.IsNested;
+        }
+
+        bool IsInternal(Type type)
+        {
+            return !type.IsVisible
+                   && !type.IsPublic
+                   && type.IsNotPublic
+                   && !type.IsNested;
+        }
     }
 
-    private static string CreateSubscriptionName(Type consumerType, string prefix)
+    private static string CreateSubscriptionName(Type consumerType, string assemblyName)
     {
-        var fullName = consumerType.FullName!.Replace(".", "_");
-        return $"{prefix}_{fullName}";
+        return EventingExtensions.CreateSubscriptionName(consumerType.FullName!, assemblyName);
     }
 }

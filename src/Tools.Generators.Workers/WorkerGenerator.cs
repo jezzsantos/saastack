@@ -1,4 +1,6 @@
 using System.Text;
+using Infrastructure.Eventing.Common.Extensions;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -6,7 +8,9 @@ namespace Tools.Generators.Workers;
 
 /// <summary>
 ///     A source generator for creating Azure Functions and AWS Lambdas definitions for each of the
-///     <see cref="IDomainEventNotificationConsumer" /> found in the host project
+///     <see cref="IDomainEventNotificationConsumer" /> found in the host project.
+///     The code that is source generated is generated from an API Host project and then included in another Worker Host
+///     project, hence the need to hide the generated code from compiling the API Host project (using #if statements).
 /// </summary>
 [Generator]
 public class WorkerGenerator : ISourceGenerator
@@ -15,20 +19,14 @@ public class WorkerGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var assemblyName = context.Compilation.AssemblyName;
+        var assemblyName = context.Compilation.AssemblyName!;
 
-        //TODO: load all IDomainEventNotificationConsumer types from all assemblies of this compilation
-        var subscriptionNames = new[]
-        {
-            "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer",
-            "ApiHost1_EndUsersInfrastructure_Notifications_SubscriptionNotificationConsumer",
-            "ApiHost1_OrganizationsInfrastructure_Notifications_EndUserNotificationConsumer",
-            "ApiHost1_OrganizationsInfrastructure_Notifications_ImageNotificationConsumer",
-            "ApiHost1_OrganizationsInfrastructure_Notifications_SubscriptionNotificationConsumer",
-            "ApiHost1_SubscriptionsInfrastructure_Persistence_Notifications_OrganizationNotificationConsumer",
-            "ApiHost1_UserProfilesInfrastructure_Notifications_EndUserNotificationConsumer",
-            "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer"
-        };
+        var consumerTypes = GetConsumersFromAssemblies(context);
+        var subscriptionNames = consumerTypes
+            .Select(consumerType =>
+                EventingExtensions.CreateSubscriptionName($"{consumerType.Name.Namespace}.{consumerType.Name.Name}",
+                    assemblyName))
+            .ToArray();
 
         var filename = $"{assemblyName}_{Filename}";
         var fileSource = BuildFile(assemblyName!, subscriptionNames);
@@ -71,7 +69,7 @@ public class WorkerGenerator : ISourceGenerator
 
             builder.AppendLine("""
                                #elif REVEALGENERATEDFORAWSLAMBDAS
-                                namespace AWSLambdas.Api.WorkerHost.Lambdas;
+                               namespace AWSLambdas.Api.WorkerHost.Lambdas;
                                """);
             foreach (var subscriptionName in subscriptionNames)
             {
@@ -107,5 +105,13 @@ public class WorkerGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         // No initialization
+    }
+
+    private static IReadOnlyList<ApiHostModuleVisitor.NotificationConsumer> GetConsumersFromAssemblies(
+        GeneratorExecutionContext context)
+    {
+        var visitor = new ApiHostModuleVisitor(context.Compilation, context.CancellationToken);
+        visitor.Visit(context.Compilation.GlobalNamespace);
+        return visitor.ConsumerTypes;
     }
 }

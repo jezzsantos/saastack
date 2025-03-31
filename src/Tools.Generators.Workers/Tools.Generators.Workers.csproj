@@ -55,5 +55,8 @@
         <Compile Include="..\Infrastructure.Eventing.Interfaces\Notifications\IDomainEventNotificationConsumer.cs">
             <Link>Reference\Infrastructure.Eventing.Interfaces\Notifications\IDomainEventNotificationConsumer.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Eventing.Common\Extensions\EventingExtensions.cs">
+            <Link>Reference\Infrastructure.Eventing.Common\Extensions\EventingExtensions.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

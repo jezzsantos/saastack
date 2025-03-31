@@ -138,7 +138,7 @@ public sealed class DeliverDomainEventToApiHost1UserProfilesInfrastructureNotifi
     }
 }
 #elif REVEALGENERATEDFORAWSLAMBDAS
- namespace AWSLambdas.Api.WorkerHost.Lambdas;
+namespace AWSLambdas.Api.WorkerHost.Lambdas;
 
 [JetBrains.Annotations.UsedImplicitly]
 public sealed class DeliverDomainEventToApiHost1EndUsersInfrastructureNotificationsOrganizationNotificationConsumer

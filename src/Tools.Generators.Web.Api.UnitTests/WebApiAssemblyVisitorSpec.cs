@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using Xunit;
-using WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
+using Api_WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 
@@ -28,7 +28,7 @@ public class WebApiAssemblyVisitorSpec
         var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
         var references = new List<MetadataReference>
         {
-            MetadataReference.CreateFromFile(typeof(WebApiAssemblyVisitor).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Api_WebApiAssemblyVisitor).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
         };
         AdditionalCompilationAssemblies.ToList()
@@ -47,12 +47,12 @@ public class WebApiAssemblyVisitorSpec
     [Trait("Category", "Unit.Tooling")]
     public class GivenAnyClass
     {
-        private readonly WebApiAssemblyVisitor _visitor;
+        private readonly Api_WebApiAssemblyVisitor _visitor;
 
         public GivenAnyClass()
         {
             var compilation = CreateCompilation(CompilationSourceCode);
-            _visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+            _visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ public class WebApiAssemblyVisitorSpec
         public void WhenVisitNamespaceAndIgnoredNamespace_ThenStopsVisiting()
         {
             var @namespace = new Mock<INamespaceSymbol>();
-            @namespace.Setup(ns => ns.Name).Returns(WebApiAssemblyVisitor.IgnoredNamespaces[0]);
+            @namespace.Setup(ns => ns.Name).Returns(Api_WebApiAssemblyVisitor.IgnoredNamespaces[0]);
 
             _visitor.VisitNamespace(@namespace.Object);
 
@@ -209,12 +209,12 @@ public class WebApiAssemblyVisitorSpec
     public class GivenAServiceClass
     {
         private readonly CSharpCompilation _compilation;
-        private readonly WebApiAssemblyVisitor _visitor;
+        private readonly Api_WebApiAssemblyVisitor _visitor;
 
         public GivenAServiceClass()
         {
             _compilation = CreateCompilation(CompilationSourceCode);
-            _visitor = new WebApiAssemblyVisitor(CancellationToken.None, _compilation);
+            _visitor = new Api_WebApiAssemblyVisitor(_compilation, CancellationToken.None);
         }
 
         [Fact]
@@ -391,7 +391,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -446,7 +446,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -503,7 +503,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
@@ -560,7 +560,7 @@ public class WebApiAssemblyVisitorSpec
                                                     """);
 
                 var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
-                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+                var visitor = new Api_WebApiAssemblyVisitor(compilation, CancellationToken.None);
 
                 visitor.VisitNamedType(serviceClass);
 
