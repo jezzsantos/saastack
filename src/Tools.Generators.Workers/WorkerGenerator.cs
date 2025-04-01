@@ -2,9 +2,9 @@ using System.Text;
 using Common.Extensions;
 using Infrastructure.Eventing.Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.Extensions.Configuration;
 
 namespace Tools.Generators.Workers;
 
@@ -107,6 +107,11 @@ public class WorkerGenerator : ISourceGenerator
         // No initialization
     }
 
+    /// <summary>
+    ///     Note: we use primitive JSON deserialization because using the .NET standard 2.0 configuration libraries is
+    ///     problematic,
+    ///     given that this assembly is netstandard2.0
+    /// </summary>
     private static string GetProjectNameFromConfiguration(GeneratorExecutionContext context)
     {
         var currentAssemblyName = context.Compilation.Assembly.Identity.Name;
@@ -122,10 +127,9 @@ public class WorkerGenerator : ISourceGenerator
         var appSettingsText = appSettingsFile
             .GetText(context.CancellationToken)?.ToString() ?? "{}";
 
-        var configuration = new ConfigurationBuilder()
-            .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(appSettingsText))).Build();
+        var settings = appSettingsText.FromJson<AppSettingsJsonSchema>();
 
-        var projectName = configuration[ProjectNameSettingName];
+        var projectName = settings.ApplicationServices?.EventNotifications?.SubscriptionName;
         if (projectName.HasNoValue())
         {
             throw new InvalidOperationException(
@@ -142,5 +146,23 @@ public class WorkerGenerator : ISourceGenerator
         var visitor = new ApiHostModuleVisitor(context.Compilation, context.CancellationToken);
         visitor.Visit(context.Compilation.GlobalNamespace);
         return visitor.ConsumerTypes;
+    }
+
+    // ReSharper disable once MemberCanBePrivate.Global
+    public class AppSettingsJsonSchema
+    {
+        public ApplicationServicesSchema? ApplicationServices { get; set; }
+    }
+
+    [UsedImplicitly]
+    public class ApplicationServicesSchema
+    {
+        public EventNotificationsSchema? EventNotifications { get; set; }
+    }
+
+    [UsedImplicitly]
+    public class EventNotificationsSchema
+    {
+        public string? SubscriptionName { get; set; }
     }
 }

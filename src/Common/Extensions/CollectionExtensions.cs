@@ -1,6 +1,3 @@
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
-#endif
-
 #if COMMON_PROJECT
 using JetBrains.Annotations;
 #endif
@@ -77,11 +74,7 @@ public static class CollectionExtensions
         {
             return false;
         }
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
         return !collection.HasNone();
-#elif GENERATORS_WEB_API_PROJECT || GENERATORS_WORKERS_PROJECT
-        return !collection!.HasNone();
-#endif
     }
 
     /// <summary>

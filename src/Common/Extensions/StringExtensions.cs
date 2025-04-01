@@ -1,26 +1,49 @@
 #if COMMON_PROJECT
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-#endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 #endif
 
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if GENERATORS_WEB_API_PROJECT
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 #endif
 
 #if GENERATORS_COMMON_PROJECT
 using System.Globalization;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using JetBrains.Annotations;
+#endif
+
+#if ANALYZERS_NONPLATFORM
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
+#endif
+
+#if GENERATORS_WORKERS_PROJECT
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using JetBrains.Annotations;
 #endif
 
 namespace Common.Extensions;
@@ -91,7 +114,7 @@ public static class StringExtensions
             }
         });
     }
-#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     public static TObject FromJson<TObject>(this string json)
         where TObject : new()
     {
