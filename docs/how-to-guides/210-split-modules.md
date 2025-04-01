@@ -20,7 +20,7 @@ Start by creating another API Host project in the solution (like `ApiHost1` proj
 
 > If you use another project template, you will need to update the *.csproj file with some special directives, that you can copy from the existing `ApiHost1` project.
 
-#### IP Address
+### IP Address
 
 Your new host project will be configured to run at `https://localhost:5002`.
 
@@ -33,8 +33,6 @@ Review and change this port number in the `Properties/launchsettings.json` file 
 The first thing to do is open the `Program.cs` file and double check the `WebHostOptions.BackEndHostApi` setting, is right for you for this host.
 
 > If you are simply splitting you API into different modules, then `WebHostOptions.BackEndHostApi` is the correct choice, as long as you are not splitting out the Ancillary submodule. Notice that the `Progra,.cs` of the `ApiHost1` project is `WebHostOptions.BackEndAncillaryApiHost`.
-
-
 
 ### Submodules
 
@@ -66,6 +64,21 @@ Once, you have created those Service Client classes, in the module that consumes
 
 For example, inject an instance of the `CarsHttpServiceClient` instead of injecting the `CarsInProcessServiceClient` in the host that consumes the Cars subdomain.
 
+### Configuration
+
+1. Ensure the value of `ApplicationServices:EventNotifications:SubscriptionName` in your `appsettings.json` file match the name of your new host project.  For example:
+
+   ```json
+    "ApplicationServices": {
+       "EventNotifications": {
+         "SubscriptionName": "ApiHost2"
+       },
+   ```
+
+2. Edit the `appsettings.json` (and `appsettings.Azure.json` or `appsettings.AWS.json`) and ensure all the settings are present for all the services, and technology adapters required by the modules in your host project, to operate correctly.
+
+   1. Be sure to set the relevant `Deploy:Required:Keys` key with the relevant values.
+
 ### Event Notifications
 
 Most of the subdomain modules that you move into your new host project will contain consumers that subscribe to the Eventing mechanisms that are used to communicate domain events across the system. 
@@ -90,12 +103,23 @@ To ensure this mechanism is operational for your new host project, you need to m
       </Compile>
       ```
       
-### Configuration
 
-1. Ensure the value of `ApplicationServices:EventNotifications:SubscriptionName` in your `appsettings.json` file match the name of your new host project. 
+3. You need to add configuration to the `appsettings.json` file of the `AzureFunctions.Api.WorkerHost` project (or the `AWSLambdas.Api.WorkerHost` project. 
 
-2. Edit the `appsettings.json` (and `appsettings.Azure.json` or `appsettings.AWS.json`) and ensure all the settings are present for all the services, and technology adapters required by the modules in your host project, to operate correctly.
+   1. Edit `appsettings.json`, and add a new key to the `Hosts` section, and then add the name of the host to the key `Hosts:EventNotificationApi` in a semi-colon list. For example:
 
-   1. Be sure to set the relevant `Deploy:Required:Keys` key with the relevant values.
+   ```json
+     "Hosts": {
+       "EventNotificationApi": {
+         "SubscribedHosts": "ApiHost1;ApiHost2"
+       },
+       "ApiHost2": {
+         "BaseUrl": "https://localhost:5002",
+         "HMACAuthNSecret": "asecret"
+       }
+   ```
 
-3. Edit the relevant `deploy-azure` (or `deploay-aws.yml`) scripts, and add your new host to the deploy steps.
+
+### CI/CD
+
+1. Edit the relevant `deploy-azure` (or `deploy-aws.yml`) scripts, and add your new host to the deploy steps.

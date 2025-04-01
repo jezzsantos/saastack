@@ -32,9 +32,9 @@ public class ApiHostDomainEventingSubscriberService : IDomainEventingSubscriberS
     {
         _recorder = recorder;
         _store = store;
-        var subscriptionNamePrefix = settings.Platform.GetString(SubscriptionNameSettingName);
+        var assemblyName = settings.Platform.GetString(SubscriptionNameSettingName);
         _consumers =
-            consumerTypes.ToDictionary(type => type, type => CreateSubscriptionName(type, subscriptionNamePrefix));
+            consumerTypes.ToDictionary(type => type, type => CreateSubscriptionName(type, assemblyName));
     }
 
     public IReadOnlyDictionary<Type, string> Consumers => _consumers;
