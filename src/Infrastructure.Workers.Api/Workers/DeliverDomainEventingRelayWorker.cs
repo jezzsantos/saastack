@@ -28,12 +28,14 @@ public sealed class DeliverDomainEventingRelayWorker : IMessageBusMonitoringApiR
         var subscriberHost = _subscriberHosts.FirstOrDefault(s => s.HostName.EqualsIgnoreCase(subscriberHostName));
         if (subscriberHost.NotExists())
         {
-            throw new InvalidOperationException(
+            var ex = new InvalidOperationException(
                 Resources.DeliverDomainEventingRelayWorker_SubscriberNotFound.Format(subscriberHostName));
+            _recorder.TraceError(null, ex, "No registered subscriber host with name: {Host} found from configuration",
+                subscriberHostName);
+            throw ex;
         }
 
         var serviceClient = _serviceClientFactory.CreateServiceClient(subscriberHost.BaseUrl);
-
         await serviceClient.PostQueuedMessageToApiOrThrowAsync(_recorder,
             message, new NotifyDomainEventRequest
             {

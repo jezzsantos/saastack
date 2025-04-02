@@ -18,7 +18,14 @@
       "messageEncoding": "base64"
     },
     "serviceBus": {
-      "maxConcurrentCalls": 1
+      "maxConcurrentCalls": 1,
+      "clientRetryOptions": {
+        "mode": "exponential",
+        "tryTimeout": "00:01:00",
+        "delay": "00:00:00.80",
+        "maxDelay": "00:00:01",
+        "maxRetries": 3
+      }
     }
   }
 }
