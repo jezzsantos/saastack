@@ -1,3 +1,6 @@
+using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Api.Operations.Shared._3rdParties.Microsoft;
 using Infrastructure.Workers.Api;
 
 namespace AzureFunctions.Api.WorkerHost;
@@ -7,15 +10,26 @@ namespace AzureFunctions.Api.WorkerHost;
 /// </summary>
 public class AzureFunctionWorkersRuntime : IWorkersRuntime
 {
+    private readonly IServiceClient _serviceClient;
+
+    public AzureFunctionWorkersRuntime(IServiceClientFactory serviceClientFactory)
+    {
+        _serviceClient = serviceClientFactory.CreateServiceClient("https://management.azure.com");
+    }
+
     public async Task CircuitBreakWorkerAsync(string workerName, CancellationToken cancellationToken)
     {
-        //TODO: disable the Azure function
+        var result = await _serviceClient.PostAsync(
+            null, new StopAzureFunctionRequest
+            {
+                SubscriptionId = "asubscriptionid",
+                ResourceGroupName = "aresourcegroupname",
+                FunctionName = workerName
+            }, null, cancellationToken);
 
-        // var stopFunctionRequest = new DurableHttpRequest(
-        //     HttpMethod.Post, 
-        //     new Uri($"https://management.azure.com{resourceId}/stop?api-version=2016-08-01"),
-        //     tokenSource: new ManagedIdentityTokenSource("https://management.core.windows.net"));
-        //
-        throw new NotImplementedException();
+        if (result.IsFailure)
+        {
+            throw result.Error.ToException();
+        }
     }
 }

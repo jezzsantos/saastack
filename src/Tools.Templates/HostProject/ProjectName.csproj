@@ -26,4 +26,9 @@
         <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Required for the Tools.Generators.Workers generator -->
+        <AdditionalFiles Include="appsettings.json" />
+    </ItemGroup>
+
 </Project>

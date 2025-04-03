@@ -36,6 +36,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- Required for the Tools.Generators.Workers generator -->
+        <AdditionalFiles Include="appsettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -1,0 +1,36 @@
+using Application.Persistence.Interfaces;
+using Azure.Messaging.ServiceBus;
+using Infrastructure.Workers.Api;
+
+namespace AzureFunctions.Api.WorkerHost.Extensions;
+
+public static class FunctionExtensions
+{
+    /// <summary>
+    ///     Handles the delivery of the message
+    /// </summary>
+    public static async Task HandleDelivery<TMessage>(this IMessageDeliveryHandler handler,
+        ServiceBusReceivedMessage receivedMessage,
+        IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriberHostName, string subscriptionName,
+        CancellationToken cancellationToken)
+        where TMessage : IQueuedMessage
+    {
+        var deliveryCount = receivedMessage.DeliveryCount;
+        var retryCount =
+            receivedMessage.ApplicationProperties.TryGetValue("x-opt-abort-retry-count", out var retryCountValue)
+                ? (int)retryCountValue
+                : 0;
+        try
+        {
+            var message = receivedMessage.Body.ToObjectFromJson<TMessage>();
+            await worker.RelayMessageOrThrowAsync(subscriberHostName, subscriptionName, message, cancellationToken);
+            await handler.CompleteMessageAsync(receivedMessage, cancellationToken);
+        }
+        catch (Exception)
+        {
+            await handler.AbandonMessageAsync(receivedMessage, cancellationToken);
+            await handler.CheckCircuitAsync(handler.FunctionName, deliveryCount, retryCount, cancellationToken);
+            throw;
+        }
+    }
+}

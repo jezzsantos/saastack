@@ -28,7 +28,7 @@ public static class SqsEventExtensions
         return true;
     }
 
-    public static async Task<bool> RelayRecordsAsync<TMessage>(this SQSEvent sqsEvent,
+    public static async Task RelayRecordsAsync<TMessage>(this SQSEvent sqsEvent,
         IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriberHostName, string subscriptionName,
         CancellationToken cancellationToken)
         where TMessage : IQueuedMessage
@@ -40,7 +40,5 @@ public static class SqsEventExtensions
 
             await worker.RelayMessageOrThrowAsync(subscriberHostName, subscriptionName, message, cancellationToken);
         }
-
-        return true;
     }
 }
