@@ -65,15 +65,9 @@ public class WorkerGenerator : ISourceGenerator
                                          }
                                      
                                          [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventTo{{className}}))]
-                                         public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-                                         {
-                                             return _worker.RelayMessageOrThrowAsync("{{assemblyName}}", "{{subscriptionName}}", message, context.CancellationToken);
-                                         }
-                                         
-                                         [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventTo{{className}}))]
                                          public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "{{subscriptionName}}", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
                                          {
-                                             var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+                                             var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
                                              await handler.HandleDelivery(receivedMessage, _worker, "{{assemblyName}}", "{{subscriptionName}}", context.CancellationToken);
                                          }
                                      }
@@ -106,7 +100,7 @@ public class WorkerGenerator : ISourceGenerator
                                          [Amazon.Lambda.Annotations.LambdaFunction]
                                          public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
                                          {
-                                             var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+                                             var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
                                              return await handler.HandleDelivery(sqsEvent, _worker, "{{assemblyName}}", "{{subscriptionName}}", CancellationToken.None);
                                          }
                                      }

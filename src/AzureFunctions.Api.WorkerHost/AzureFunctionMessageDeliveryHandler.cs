@@ -10,11 +10,12 @@ public class AzureFunctionMessageDeliveryHandler : IMessageDeliveryHandler
     private readonly IWorkersRuntime _runtime;
 
     public AzureFunctionMessageDeliveryHandler(ServiceBusMessageActions actions, IWorkersRuntime runtime,
-        string functionName)
+        string functionName, int retryCount)
     {
         _actions = actions;
         _runtime = runtime;
         FunctionName = functionName;
+        RetryCount = retryCount;
     }
 
     public Task AbandonMessageAsync(ServiceBusReceivedMessage receivedMessage, CancellationToken cancellationToken)
@@ -25,9 +26,16 @@ public class AzureFunctionMessageDeliveryHandler : IMessageDeliveryHandler
     public async Task CheckCircuitAsync(string workerName, int deliveryCount, int retryCount,
         CancellationToken cancellationToken)
     {
-        if (deliveryCount >= retryCount)
+        if (ShouldOpenCircuit())
         {
             await _runtime.CircuitBreakWorkerAsync(workerName, cancellationToken);
+        }
+
+        return;
+
+        bool ShouldOpenCircuit()
+        {
+            return deliveryCount >= retryCount - 1;
         }
     }
 
@@ -37,4 +45,6 @@ public class AzureFunctionMessageDeliveryHandler : IMessageDeliveryHandler
     }
 
     public string FunctionName { get; }
+
+    public int RetryCount { get; }
 }

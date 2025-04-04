@@ -9,6 +9,8 @@ public interface IMessageDeliveryHandler
 {
     string FunctionName { get; }
 
+    int RetryCount { get; }
+
     Task AbandonMessageAsync(ServiceBusReceivedMessage receivedMessage, CancellationToken cancellationToken);
 
     Task CheckCircuitAsync(string workerName, int deliveryCount, int retryCount, CancellationToken cancellationToken);

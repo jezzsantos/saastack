@@ -7,21 +7,18 @@ namespace AzureFunctions.Api.WorkerHost.Extensions;
 public static class FunctionExtensions
 {
     internal const string ServiceBusReceivedMessageDeliveryCountPropertyName = "x-opt-abort-retry-count";
+
     /// <summary>
     ///     Handles the delivery of the message
     /// </summary>
     public static async Task HandleDelivery<TMessage>(this IMessageDeliveryHandler handler,
-        ServiceBusReceivedMessage receivedMessage,
-        IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriberHostName, string subscriptionName,
-        CancellationToken cancellationToken)
+        ServiceBusReceivedMessage receivedMessage, IMessageBusMonitoringApiRelayWorker<TMessage> worker,
+        string subscriberHostName, string subscriptionName, CancellationToken cancellationToken)
         where TMessage : IQueuedMessage
     {
         var deliveryCount = receivedMessage.DeliveryCount;
-        var retryCount =
-            receivedMessage.ApplicationProperties.TryGetValue(ServiceBusReceivedMessageDeliveryCountPropertyName,
-                out var retryCountValue)
-                ? (int)retryCountValue
-                : 0;
+        var retryCount = handler.RetryCount;
+        
         try
         {
             var message = receivedMessage.Body.ToObjectFromJson<TMessage>();
@@ -30,8 +27,8 @@ public static class FunctionExtensions
         }
         catch (Exception)
         {
-            await handler.AbandonMessageAsync(receivedMessage, cancellationToken);
             await handler.CheckCircuitAsync(handler.FunctionName, deliveryCount, retryCount, cancellationToken);
+            await handler.AbandonMessageAsync(receivedMessage, cancellationToken);
             throw;
         }
     }

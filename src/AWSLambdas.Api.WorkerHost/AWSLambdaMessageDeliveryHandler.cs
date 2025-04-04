@@ -7,10 +7,11 @@ public class AWSLambdaMessageDeliveryHandler : IMessageDeliveryHandler
 {
     private readonly IWorkersRuntime _runtime;
 
-    public AWSLambdaMessageDeliveryHandler(IWorkersRuntime runtime, string functionName)
+    public AWSLambdaMessageDeliveryHandler(IWorkersRuntime runtime, string functionName, int retryCount)
     {
         _runtime = runtime;
         FunctionName = functionName;
+        RetryCount = retryCount;
     }
 
     public Task AbandonMessageAsync(SQSEvent receivedMessage, CancellationToken cancellationToken)
@@ -22,9 +23,16 @@ public class AWSLambdaMessageDeliveryHandler : IMessageDeliveryHandler
     public async Task CheckCircuitAsync(string workerName, int deliveryCount, int retryCount,
         CancellationToken cancellationToken)
     {
-        if (deliveryCount >= retryCount)
+        if (ShouldOpenCircuit())
         {
             await _runtime.CircuitBreakWorkerAsync(workerName, cancellationToken);
+        }
+
+        return;
+
+        bool ShouldOpenCircuit()
+        {
+            return deliveryCount >= retryCount - 1;
         }
     }
 
@@ -35,4 +43,6 @@ public class AWSLambdaMessageDeliveryHandler : IMessageDeliveryHandler
     }
 
     public string FunctionName { get; }
+
+    public int RetryCount { get; }
 }

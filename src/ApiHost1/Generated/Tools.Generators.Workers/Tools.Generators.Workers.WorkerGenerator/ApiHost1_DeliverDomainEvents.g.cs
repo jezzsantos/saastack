@@ -17,15 +17,9 @@ public sealed class DeliverDomainEventToApiHost1EndUsersInfrastructureNotificati
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersInfrastructureNotificationsOrganizationNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersInfrastructureNotificationsOrganizationNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer", context.CancellationToken);
     }
 }
@@ -43,15 +37,9 @@ public sealed class DeliverDomainEventToApiHost1EndUsersInfrastructureNotificati
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersInfrastructureNotificationsSubscriptionNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_SubscriptionNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersInfrastructureNotificationsSubscriptionNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_SubscriptionNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_SubscriptionNotificationConsumer", context.CancellationToken);
     }
 }
@@ -69,15 +57,9 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsEndUserNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_EndUserNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsEndUserNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_OrganizationsInfrastructure_Notifications_EndUserNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_EndUserNotificationConsumer", context.CancellationToken);
     }
 }
@@ -95,15 +77,9 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsImageNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_ImageNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsImageNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_OrganizationsInfrastructure_Notifications_ImageNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_ImageNotificationConsumer", context.CancellationToken);
     }
 }
@@ -121,15 +97,9 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsSubscriptionNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_SubscriptionNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsInfrastructureNotificationsSubscriptionNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_OrganizationsInfrastructure_Notifications_SubscriptionNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_SubscriptionNotificationConsumer", context.CancellationToken);
     }
 }
@@ -147,15 +117,9 @@ public sealed class DeliverDomainEventToApiHost1SubscriptionsInfrastructurePersi
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1SubscriptionsInfrastructurePersistenceNotificationsOrganizationNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_SubscriptionsInfrastructure_Persistence_Notifications_OrganizationNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1SubscriptionsInfrastructurePersistenceNotificationsOrganizationNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_SubscriptionsInfrastructure_Persistence_Notifications_OrganizationNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_SubscriptionsInfrastructure_Persistence_Notifications_OrganizationNotificationConsumer", context.CancellationToken);
     }
 }
@@ -173,15 +137,9 @@ public sealed class DeliverDomainEventToApiHost1UserProfilesInfrastructureNotifi
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesInfrastructureNotificationsEndUserNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_EndUserNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesInfrastructureNotificationsEndUserNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_UserProfilesInfrastructure_Notifications_EndUserNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_EndUserNotificationConsumer", context.CancellationToken);
     }
 }
@@ -199,15 +157,9 @@ public sealed class DeliverDomainEventToApiHost1UserProfilesInfrastructureNotifi
     }
 
     [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesInfrastructureNotificationsImageNotificationConsumer))]
-    public Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer")] Application.Persistence.Shared.ReadModels.DomainEventingMessage message, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        return _worker.RelayMessageOrThrowAsync("ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer", message, context.CancellationToken);
-    }
-    
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesInfrastructureNotificationsImageNotificationConsumer))]
     public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
-        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name);
+        var handler = new AzureFunctionMessageDeliveryHandler(actions, _runtime, context.FunctionDefinition.Name, context.RetryContext.RetryCount);
         await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer", context.CancellationToken);
     }
 }
@@ -231,7 +183,7 @@ public sealed class DeliverDomainEventToApiHost1EndUsersInfrastructureNotificati
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_OrganizationNotificationConsumer", CancellationToken.None);
     }
 }
@@ -251,7 +203,7 @@ public sealed class DeliverDomainEventToApiHost1EndUsersInfrastructureNotificati
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_EndUsersInfrastructure_Notifications_SubscriptionNotificationConsumer", CancellationToken.None);
     }
 }
@@ -271,7 +223,7 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_EndUserNotificationConsumer", CancellationToken.None);
     }
 }
@@ -291,7 +243,7 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_ImageNotificationConsumer", CancellationToken.None);
     }
 }
@@ -311,7 +263,7 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsInfrastructureNotif
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_OrganizationsInfrastructure_Notifications_SubscriptionNotificationConsumer", CancellationToken.None);
     }
 }
@@ -331,7 +283,7 @@ public sealed class DeliverDomainEventToApiHost1SubscriptionsInfrastructurePersi
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_SubscriptionsInfrastructure_Persistence_Notifications_OrganizationNotificationConsumer", CancellationToken.None);
     }
 }
@@ -351,7 +303,7 @@ public sealed class DeliverDomainEventToApiHost1UserProfilesInfrastructureNotifi
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_EndUserNotificationConsumer", CancellationToken.None);
     }
 }
@@ -371,7 +323,7 @@ public sealed class DeliverDomainEventToApiHost1UserProfilesInfrastructureNotifi
     [Amazon.Lambda.Annotations.LambdaFunction]
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName);
+        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
         return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "ApiHost1_UserProfilesInfrastructure_Notifications_ImageNotificationConsumer", CancellationToken.None);
     }
 }

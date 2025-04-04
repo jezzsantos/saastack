@@ -29,6 +29,8 @@ public class FunctionExtensionsSpec
         _handler = new Mock<IMessageDeliveryHandler>();
         _handler.Setup(hdl => hdl.FunctionName)
             .Returns("afunctionname");
+        _handler.Setup(hdl => hdl.RetryCount)
+            .Returns(5);
     }
 
     [Fact]

@@ -15,7 +15,7 @@ public static class LambdaExtensions
         where TMessage : IQueuedMessage
     {
         const int deliveryCount = 0; //TODO: how to get these from Lambda runtime?
-        const int retryCount = 5;
+        var retryCount = handler.RetryCount;
         try
         {
             await receivedMessage.RelayRecordsAsync(worker, subscriberHostName, subscriptionName, cancellationToken);
@@ -24,8 +24,8 @@ public static class LambdaExtensions
         }
         catch (Exception)
         {
-            await handler.AbandonMessageAsync(receivedMessage, cancellationToken);
             await handler.CheckCircuitAsync(handler.FunctionName, deliveryCount, retryCount, cancellationToken);
+            await handler.AbandonMessageAsync(receivedMessage, cancellationToken);
             throw;
         }
     }
