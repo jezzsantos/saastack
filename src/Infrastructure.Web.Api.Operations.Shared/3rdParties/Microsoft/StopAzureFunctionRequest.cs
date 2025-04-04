@@ -7,21 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Microsoft;
 
 /// <summary>
-///     Stops an Azure Function
+///     Disables an Azure Function
 /// </summary>
 [Interfaces.Route(
-    "/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroupName}/providers/Microsoft.Web/sites/{FunctionName}/stop",
-    OperationMethod.Post)]
+    "/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroupName}/providers/Microsoft.Web/sites/{FunctionAppName}/functions/{FunctionName}/state",
+    OperationMethod.PutPatch)]
 [UsedImplicitly]
-public class StopAzureFunctionRequest : TenantedRequest<StopAzureFunctionRequest, StopAzureFunctionResponse>
+public class StopAzureFunctionRequest : UnTenantedRequest<StopAzureFunctionRequest, StopAzureFunctionResponse>
 {
     [FromQuery]
+    [JsonIgnore]
     [JsonPropertyName("api-version")]
-    public string? ApiVersion { get; set; } = "2024-04-01";
+    public string? ApiVersion { get; set; } = "2022-09-01";
 
-    [Required] public string? FunctionName { get; set; }
+    [JsonIgnore] [Required] public string? FunctionAppName { get; set; }
 
-    [Required] public string? ResourceGroupName { get; set; }
+    [JsonIgnore] [Required] public string? FunctionName { get; set; }
 
-    [Required] public string? SubscriptionId { get; set; }
+    [Required] public string Properties { get; set; } = "disabled";
+
+    [JsonIgnore] [Required] public string? ResourceGroupName { get; set; }
+
+    [JsonIgnore] [Required] public string? SubscriptionId { get; set; }
 }

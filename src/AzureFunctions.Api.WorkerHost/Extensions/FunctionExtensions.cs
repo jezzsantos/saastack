@@ -6,6 +6,7 @@ namespace AzureFunctions.Api.WorkerHost.Extensions;
 
 public static class FunctionExtensions
 {
+    internal const string ServiceBusReceivedMessageDeliveryCountPropertyName = "x-opt-abort-retry-count";
     /// <summary>
     ///     Handles the delivery of the message
     /// </summary>
@@ -17,7 +18,8 @@ public static class FunctionExtensions
     {
         var deliveryCount = receivedMessage.DeliveryCount;
         var retryCount =
-            receivedMessage.ApplicationProperties.TryGetValue("x-opt-abort-retry-count", out var retryCountValue)
+            receivedMessage.ApplicationProperties.TryGetValue(ServiceBusReceivedMessageDeliveryCountPropertyName,
+                out var retryCountValue)
                 ? (int)retryCountValue
                 : 0;
         try

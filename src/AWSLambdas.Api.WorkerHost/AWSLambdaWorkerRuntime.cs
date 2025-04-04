@@ -7,9 +7,9 @@ namespace AWSLambdas.Api.WorkerHost;
 /// </summary>
 public class AWSLambdaWorkerRuntime : IWorkersRuntime
 {
-    public async Task CircuitBreakWorkerAsync(string workerName, CancellationToken cancellationToken)
+    public Task CircuitBreakWorkerAsync(string workerName, CancellationToken cancellationToken)
     {
         //TODO: how to disable the Lambda?
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }

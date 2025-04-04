@@ -106,7 +106,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         Result<ServiceBusReceivedMessage?, Error> received;
         try
         {
-            received = await RetrieveNextMessageInternalAsync(topicName, subscriptionName, receiver!,
+            received = await RetrieveNextMessageInternalAsync(topicName, subscriptionName, receiver,
                 cancellationToken);
             if (received.IsFailure)
             {
