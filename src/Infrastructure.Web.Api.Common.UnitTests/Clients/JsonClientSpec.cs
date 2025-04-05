@@ -424,6 +424,31 @@ public class JsonClientSpec
         }
 
         [Fact]
+        public async Task
+            WhenGetTypedResponseAsyncAndContentTypeIsJsonAndNonStandardError5ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent("\"aquotederror\""),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be(Resources.JsonClient_TryParseNonStandardErrors_NonStandard);
+            result.Error.Detail.Should().Be("aquotederror");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
         public async Task WhenGetTypedResponseAsyncAndContentTypeIsTextForSuccess_ThenReturnsEmptyResponse()
         {
             var response = new HttpResponseMessage

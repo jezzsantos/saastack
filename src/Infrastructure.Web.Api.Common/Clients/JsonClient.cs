@@ -570,6 +570,15 @@ public class JsonClient : IHttpJsonClient, IDisposable
         out ResponseProblem problem)
     {
         problem = new ResponseProblem();
+        // Azure API errors, and any that just return a quoted string
+        if (responseText.HasValue()
+            && responseText.StartsWith("\"") && responseText.EndsWith("\""))
+        {
+            problem = statusCode.ToResponseProblem(Resources.JsonClient_TryParseNonStandardErrors_NonStandard,
+                responseText.TrimStart('"').TrimEnd('"'));
+            return true;
+        }
+
         try
         {
             var details = responseText.FromJson<NonStandardProblemDetails>();
@@ -659,11 +668,11 @@ public class JsonClient : IHttpJsonClient, IDisposable
 [UsedImplicitly]
 internal class NonStandardProblemDetails
 {
-    [JsonPropertyName("message")] public string? Message { get; set; }
-    
     [JsonPropertyName("details")] public string? Details { get; set; }
 
     [JsonPropertyName("error")] public NonStandardProblemError? Error { get; set; }
+
+    [JsonPropertyName("message")] public string? Message { get; set; }
 
     [JsonPropertyName("status")] public int? Status { get; set; }
 }
