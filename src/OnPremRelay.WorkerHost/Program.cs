@@ -30,7 +30,6 @@ public abstract class Program
             {
                 config.AddJsonFile("appsettings.OnPremises.json", false, true);
             })
-            .ConfigureServices((hostContext, services) => { })
             .ConfigureServices((hostContext, services) =>
             {
                 // Register RabbitMQ settings from configuration
@@ -102,6 +101,11 @@ public abstract class Program
 
                 // Register the MultiRelayWorker as a hosted service
                 services.AddHostedService<MultiRelayWorker>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
             })
             .Build();
 
