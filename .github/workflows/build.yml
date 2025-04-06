@@ -23,7 +23,7 @@ defaults:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v3
       - name: Install .NET
@@ -56,7 +56,7 @@ jobs:
           npm run build
   test:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v3
       - name: Install .NET
