@@ -16,6 +16,7 @@ using OnPremRelay.WorkerHost.Configuration;
 using OnPremRelay.WorkerHost.Messaging.Delivery;
 using OnPremRelay.WorkerHost.Messaging.Interfaces;
 using OnPremRelay.WorkerHost.Messaging.Services;
+using OnPremRelay.WorkerHost.Workers;
 
 namespace OnPremRelay.WorkerHost;
 
@@ -98,9 +99,9 @@ public abstract class Program
                         sp.GetRequiredService<IMessageBusMonitoringApiRelayWorker<DomainEventingMessage>>(),
                         WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1,
                         WorkerConstants.MessageBuses.Topics.DomainEvents));
-                
-                // // Register the MultiRelayWorker as a hosted service
-                // services.AddHostedService<MultiRelayWorker>();
+
+                // Register the MultiRelayWorker as a hosted service
+                services.AddHostedService<MultiRelayWorker>();
             })
             .Build();
 
