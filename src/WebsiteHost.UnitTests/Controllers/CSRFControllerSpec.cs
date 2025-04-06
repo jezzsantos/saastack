@@ -61,6 +61,9 @@ public class CSRFControllerSpec
 #if HOSTEDONAWS
         model.IsHostedOn.Should().Be("AWS");
 #endif
+#if HOSTEDONPREMISES
+        model.IsHostedOn.Should().Be("ONPREMISES");
+#endif
         model.IsTestingOnly.Should().BeTrue();
         model.JsBundleName.Should().Be("abundle");
         _csrfService.Verify(x => x.CreateTokens(Optional<string>.None));
