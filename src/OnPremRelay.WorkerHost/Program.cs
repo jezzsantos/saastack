@@ -1,3 +1,5 @@
+using OnPremRelay.WorkerHost.Configuration;
+
 namespace OnPremRelay.WorkerHost;
 
 public abstract class Program
@@ -11,6 +13,12 @@ public abstract class Program
                 config.AddJsonFile("appsettings.OnPremises.json", false, true);
             })
             .ConfigureServices((hostContext, services) => { })
+            .ConfigureServices((hostContext, services) =>
+            {
+                // Register RabbitMQ settings from configuration
+                services.Configure<RabbitMqSettings>(hostContext.Configuration.GetSection("RabbitMQ"));
+
+            })
             .Build();
 
         await host.RunAsync();
