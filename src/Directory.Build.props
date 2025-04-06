@@ -76,7 +76,8 @@
         <Platforms>AnyCPU</Platforms>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-        <HostingPlatform>HOSTEDONAZURE</HostingPlatform> <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
+        <!-- Hosting platform (`HOSTEDONPREMISES` or `HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
+        <HostingPlatform>HOSTEDONPREMISES</HostingPlatform>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
