@@ -122,7 +122,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         catch (Exception ex)
         {
             _recorder.TraceError(null,
-                ex, "Failed to receive message from topic: {Topic} for subscription: {Subscription}",
+                ex, "AzureServiceBus failed to receive message from topic: {Topic} for subscription: {Subscription}",
                 topicName, subscriptionName);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -144,7 +144,8 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await receiver.AbandonMessageAsync(topicMessage, null, cancellationToken);
 
             _recorder.TraceError(null,
-                ex, "Failed to handle last message: {MessageId} from topic: {Topic} for subscription: {Subscription}",
+                ex,
+                "AzureServiceBus failed to handle last message: {MessageId} from topic: {Topic} for subscription: {Subscription}",
                 topicMessage.MessageId, topicName, subscriptionName);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -160,26 +161,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AnyStore_MissingTopicName);
         message.ThrowIfNotValuedParameter((string)nameof(message), Resources.AnyStore_MissingSentMessage);
 
-        try
-        {
-            var sent = await SendMessageInternalAsync(topicName, message, cancellationToken);
-            if (sent.IsFailure)
-            {
-                return sent.Error;
-            }
-        }
-        catch (ArgumentException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _recorder.TraceError(null,
-                ex, "Failed to send message: {Message} to the topic: {Topic}", message, topicName);
-            return ex.ToError(ErrorCode.Unexpected);
-        }
-
-        return Result.Ok;
+        return await SendMessageInternalAsync(topicName, message, cancellationToken);
     }
 
     public async Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
@@ -224,12 +206,19 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
 
             await sender.SendMessageAsync(msg, cancellationToken);
 
+            _recorder.TraceInformation(null, "AzureServiceBus sent message: {Message} to the topic: {Topic}", message,
+                topicName);
+
             return Result.Ok;
         };
 
         try
         {
             return await command();
+        }
+        catch (ArgumentException)
+        {
+            throw;
         }
         catch (ServiceBusException ex)
         {
@@ -243,9 +232,17 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
                 await CreateTopicAsync(topicName, cancellationToken);
                 return await command();
             }
-        }
 
-        return Result.Ok;
+            _recorder.TraceError(null, ex, "AzureServiceBus failed to send message: {Message} to the topic: {Topic}",
+                message, topicName);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+        catch (Exception ex)
+        {
+            _recorder.TraceError(null, ex, "AzureServiceBus failed to send message: {Message} to the topic: {Topic}",
+                message, topicName);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
     }
 
     private async Task DeleteTopicAsync(string topicName, CancellationToken cancellationToken)
@@ -316,6 +313,8 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
                 EnablePartitioning = false,
                 SupportOrdering = true // We want order preserved
             }, cancellationToken);
+
+            _recorder.TraceInformation(null, "AzureServiceBus created topic: {Topic}", sanitizedTopicName);
         }
     }
 
@@ -333,11 +332,15 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         {
             var options = new CreateSubscriptionOptions(sanitizedTopicName, sanitizedSubscriptionName)
             {
+                DeadLetteringOnMessageExpiration = true, //we want expired session messages to go to DLQ
                 MaxDeliveryCount = 2000, //Ensures it never gets to DLQ
                 RequiresSession = true // Ensures FIFO delivery
             };
             await _adminClient.CreateSubscriptionAsync(
                 options, cancellationToken);
+
+            _recorder.TraceInformation(null, "AzureServiceBus created subscription: {Subscription} for {Topic}",
+                sanitizedSubscriptionName, sanitizedTopicName);
         }
     }
 
