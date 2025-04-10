@@ -1,13 +1,4 @@
-﻿#if !TESTINGONLY
-using Infrastructure.Persistence.Common.ApplicationServices;
-#if HOSTEDONAZURE
-using Infrastructure.External.Persistence.Azure.ApplicationServices;
-#elif HOSTEDONAWS
-using Infrastructure.External.Persistence.AWS.ApplicationServices;
-#endif
-#else
-using Infrastructure.Persistence.Interfaces;
-#endif
+﻿
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -18,6 +9,17 @@ using Common.Recording;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Infrastructure.Persistence.Shared.ApplicationServices;
+#if !TESTINGONLY
+#if HOSTEDONAZURE
+using Infrastructure.External.Persistence.Azure.ApplicationServices;
+#elif HOSTEDONAWS
+using Infrastructure.External.Persistence.AWS.ApplicationServices;
+#elif HOSTEDONPREMISES
+using Infrastructure.External.Persistence.OnPremises.ApplicationServices;
+#endif
+#else
+using Infrastructure.Persistence.Interfaces;
+#endif
 
 namespace Infrastructure.Common.Recording;
 
@@ -38,6 +40,8 @@ public class QueuedUsageReporter : IUsageReporter
             AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, AzureStorageAccountStoreOptions.Credentials(settings))
 #elif HOSTEDONAWS
             AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
+#elif HOSTEDONPREMISES
+            RabbitMqQueueStore.Create(NoOpRecorder.Instance, RabbitMqStoreOptions.FromCredentials(settings))
 #endif
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()

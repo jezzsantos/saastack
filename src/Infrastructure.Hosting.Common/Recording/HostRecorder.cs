@@ -285,6 +285,10 @@ public sealed class HostRecorder : IRecorder, IDisposable
                 new ApplicationInsightsCrashReporter(container),
 #elif HOSTEDONAWS
                 new AWSCloudWatchCrashReporter(logger),
+#elif HOSTEDONPREMISES
+                new NoOpCrashReporter(),
+#else
+                new NoOpCrashReporter(),
 #endif
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
@@ -313,6 +317,10 @@ public sealed class HostRecorder : IRecorder, IDisposable
                 new ApplicationInsightsMetricReporter(container),
 #elif HOSTEDONAWS
                 new AWSCloudWatchMetricReporter(container),
+#elif HOSTEDONPREMISES
+                new NoOpMetricReporter(),
+#else
+                new NoOpMetricReporter(),
 #endif
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };

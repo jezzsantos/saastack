@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.External.Persistence.OnPremises\Infrastructure.External.Persistence.OnPremises.csproj" />
         <ProjectReference Include="..\Infrastructure.External.Persistence.TestingOnly\Infrastructure.External.Persistence.TestingOnly.csproj" />
         <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.External.Persistence.AWS\Infrastructure.External.Persistence.AWS.csproj" />
@@ -39,6 +40,10 @@
     <ItemGroup>
         <None Remove="Azure\TestDatabaseSchema.sql" />
         <Content Include="Azure\TestDatabaseSchema.sql">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <None Remove="OnPremises\TestDatabaseSchema.sql" />
+        <Content Include="OnPremises\TestDatabaseSchema.sql">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
