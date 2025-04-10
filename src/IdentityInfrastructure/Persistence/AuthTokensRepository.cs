@@ -15,10 +15,10 @@ namespace IdentityInfrastructure.Persistence;
 public class AuthTokensRepository : IAuthTokensRepository
 {
     private readonly ISnapshottingQueryStore<AuthToken> _tokenQueries;
-    private readonly IEventSourcingDddCommandStore<AuthTokensRoot> _tokens;
+    private readonly ISnapshottingDddCommandStore<AuthTokensRoot> _tokens;
 
     public AuthTokensRepository(IRecorder recorder, IDomainFactory domainFactory,
-        IEventSourcingDddCommandStore<AuthTokensRoot> tokensStore, IDataStore store)
+        ISnapshottingDddCommandStore<AuthTokensRoot> tokensStore, IDataStore store)
     {
         _tokenQueries = new SnapshottingQueryStore<AuthToken>(recorder, domainFactory, store);
         _tokens = tokensStore;
@@ -52,7 +52,7 @@ public class AuthTokensRepository : IAuthTokensRepository
     public async Task<Result<AuthTokensRoot, Error>> SaveAsync(AuthTokensRoot tokens,
         CancellationToken cancellationToken)
     {
-        var saved = await _tokens.SaveAsync(tokens, cancellationToken);
+        var saved = await _tokens.UpsertAsync(tokens, false, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
@@ -76,12 +76,12 @@ public class AuthTokensRepository : IAuthTokensRepository
             return Optional<AuthTokensRoot>.None;
         }
 
-        var tokens = await _tokens.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        var tokens = await _tokens.GetAsync(matching.Id.Value.ToId(), true, false, cancellationToken);
         if (tokens.IsFailure)
         {
             return tokens.Error;
         }
 
-        return tokens.Value.ToOptional();
+        return tokens.Value;
     }
 }

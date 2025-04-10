@@ -138,40 +138,55 @@ This change is also almost impossible to predict and design ahead of time, so we
 
 > "State" and "data" mean slightly different things in this context.
 
-Event Sourcing depends on producing and consuming a stream of domain-specific "domain events" where the "event stream" consists of one or more events preserved in the specific order in which they occurred.
+Event Sourcing depends on producing and consuming a stream of domain-specific "domain events" where the "event stream" consists of one or more events preserved in the specific order in which they occurred, for a specific "root aggregate".
 
 Whereas "snapshotting" state does not strictly depend on domain events at all, it depends on maintaining a collection of properties/fields/attributes of an object.
 
-Nonetheless, in this architecture, we wish to generate "domain events" in our Domain Layer irrespective of whether we utilize event sourcing or not, which means that this comes down to a decision only about how we persist state changes as a "stream of events" or as a snapshot of the "latest changes". Both schemes are very feasible.
+In this way, persistence of state, and communicating state change, are distantly two separate concerns.
 
-> Event Sourcing will be new to many developers who are used to data modeling techniques that only store the "snapshot" of data. And with all things new, it comes with some reservations about its use.
 
-Despite the advantages and the different challenges of using event sourcing ([see here for more details](https://martinfowler.com/eaaDev/EventSourcing.html)), this "event-timeline" capability has some significant advantages that are hard to accomplish with the "snapshot" strategy, particularly for SaaS-based products.
 
-The primary advantage is that you can create time-based reports on key aggregates in your domain for deeper data analysis any time later. Then secondarily, you can change your read models (database tables) at any time (or even support many of them at the same time), and rebuild them from scratch at any time based on the source events. In many cases, this creates new data in the tables from past events.
+In this architecture, regardless of how we persist the state of things, we wish to generate (and publish) "domain events" from our Domain Layer to communicate changes to other parts of the system, without tightly coupling them. Irrespective of whether we utilize event sourcing or not. We need "domain events" to do that communication. Which means that it comes down only to a decision only about how we persist state changes as a "stream of events" or as a snapshot of the "latest changes". Both schemes are very feasible to achieve what we need.
 
-This ability to re-write history is a big advantage.
+#### Why Event Sourcing?
 
-For example, let's say that 2 years into your Car Sharing product, you now want to understand your end user's behaviors a little better because you are contemplating a new capability in the product.
+> Note: Event Sourcing may be new to many developers who are only used to data modeling techniques that only store the "snapshot" of data. And with all things new, it comes with some reservations and concerns to overcome about its use.
 
-So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it until now.
+Despite the advantages and the different challenges of using event sourcing ([see here for more details](https://martinfowler.com/eaaDev/EventSourcing.html)), this "event-timeline" capability has some significant advantages that are hard to accomplish with the "snapshot" strategy, particularly in SaaS-based products for certain contexts.
+
+The primary advantage is that you can create different representations of the same data over time, and all changes are audited in time. This is particularly useful in systems of record, highly analytical systems, or systems that require extensive dashboard reporting capabilities.
+
+For example time-based reports (i.e. histograms) of key aggregates in your domain for deeper data analysis any time in the future. Answering questions like: What has changed over time? How many times has it changed over time? etc, etc.
+
+Secondly, and under rated in terms of helping software change over time, is how you can change your actual read models (database tables) at any time (or even support many of them at the same time), and rebuild them from scratch at any time based off of the source events. In many cases, this creates new data in the tables from past events. But the advantage is that you don't have to change the software that uses these tables to run the application. This means, having separate read models from the write models, and little dependency between them. 
+
+Thirdly, well defined workflows and complicated state machines benefit greatly from being event-sourced, and are a natural fit, especially where the various transitions have high variance. That is, where the completions states are many and the paths to get to one or more of them is many. Again, knowing how the various pathways were actually traversed is valuable intelligence to have in the data you saved.
+
+This ability to represent history (retrospectively) is a big advantage as the software changes over time.
+
+For example, let's say that 2 years into your Car Sharing product, you now want to understand your end user's behaviors a little better because you are contemplating a new capability in the product. So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it to. Until now, that is.
 
 So you have to engineer a solution to provide this historical data from this day forward and start capturing it in the data. The problem is that now, you need a large enough dataset for any statistical significance or meaning, and you don't have it. So you can't provide an answer to the question for another few months or years down the track while you collect that data. With an event-sourced system, it is likely that you can have that answer right away, it is in the data already.
 
-This is why we recommend using event sourcing as your default persistence strategy by storing your domain events in an event stream in an Event Store for all new core subdomains.
+
+
+This is why we recommend considering and using event sourcing as your preferred default persistence strategy, by storing your domain events in an event stream in an Event Store for all new core subdomains.
 
 #### When to Snapshot?
 
-There are some very legitimate reasons not to use event-sourcing aggregates.
-Particularly, when you have data that changes very frequently, which would result in 1000's, 100,000's or millions of change events in a short period of time. This might be a key indicator that you are probably not modelling much behavior at all.
+There are some very legitimate reasons not to use event-sourcing aggregates, and instead revert back to using snapshotting aggregates.
 
-One example of this are aggregates that might process "telemetry" data.
+> First make sure that you don't have a specific need for any of the 3 major advantages above. 
 
-For example, a change in temperature over time.
+Specifically, when you have data that changes very frequently, which would result in 1000's, 100,000's or millions of change events in a short period of time, or within the lifetime of an aggregate (regardless of how long that is). For example, the life of a user on your platform.
+
+In cases like these, it might be a key indicator that you might not modelling much useful or interesting behavior at all, and other strategies might be considered that are sufficient to handle so many changes. 
+
+One example of this are aggregates that might process "telemetry" data. For example, a change in temperature over time from a single senor.
 
 In these cases, you need to think very carefully about saving the raw historical values (as they arrive) in a snapshot storage (like a data lake), and then processing that raw data at intervals, and only save the interesting changes over time in an event-sourced aggregate.
 
-Every use case different, but try to keep the number of events to hundreds or thousands, not much beyond that unless you have special use cases, that might require special strategies for managing large event streams of data.
+Every use case, every aggregate and every subdomain is different, but try to keep the number of events to a maximum of hundreds or a couple thousand (over the lifecycle of the aggregate). Beyond that, you have special use cases, that might require special strategies for managing large event streams of data. For example [Event Snapshots]().
 
 #### More Information
 
@@ -539,13 +554,11 @@ Every root aggregate can have a hierarchy of child/descendent entities and value
 
 > Think of entities as the branches of a tree. Think of value objects as the leaves of a tree.
 
-Entities can be named (in the code) with the suffix:
-`Entity` to distinguish them from other domain types (like value objects) that are used throughout the other Layers of the codebase, such as those with the same name in the read models and resources for the same subdomain.
+Entities can be named (in the code) with the suffix `Entity` to distinguish them from other domain types (like value objects) that are used throughout the other Layers of the codebase, such as those with the same name in the read models and resources for the same subdomain.
 
 The current naming convention, is that they have no suffix.
 
-An entity class should derive from
-`EntityBase,` and the designer should decide whether the state of the ancestor aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database table).
+An entity class should derive from `EntityBase,` and the designer should decide whether the state of the ancestor aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database table).
 
 > If your aggregate root is event sourced, all your entities will also be event-sourced as well. If your aggregate root is snapshotted, all your entities will also be snapshotted.
 
@@ -563,8 +576,7 @@ public sealed class Unavailability : EntityBase
 
 Entities are not created directly. They are always created by their parent/ancestor root aggregate in response to some domain event. The aggregate will handle the entity creation domain event, it will instantiate an instance of the entity, and it will relay the domain event to the entity that will then set its own internal state.
 
-For example, this is how the `CarRoot` creates an `UnavailabilityEntity` in response to raising a
-`UnavailabilitySlotAdded` domain event that was raised by the aggregate root, in some use case method.
+For example, this is how the `CarRoot` creates an `UnavailabilityEntity` in response to raising an `UnavailabilitySlotAdded` domain event that was raised by the aggregate root, in some use case method.
 
 ```c#
     // Note: this is called automatically after the domain event is raised 
@@ -640,8 +652,7 @@ then, in the `UnavailabilityEntity` class, the entity will also handle the same 
     }
 ```
 
-> This specific event
-`UnavailabilitySlotAdded` is known as the creation event that calls the constructor of the entity and instantiates the instance of the entity. Any other events simply set the internal state of the entity.
+> This specific event `UnavailabilitySlotAdded` is known as the creation event that calls the constructor of the entity and instantiates the instance of the entity. Any other events simply set the internal state of the entity.
 
 When a new entity is created, it must be constructed with a class factory method that includes the `RootEventHandler rootEventHandler`. This handler is later used by the entity to raise events to its parent/ancestor root aggregate when they originate from the entity.
 
@@ -653,8 +664,7 @@ Any additional parameters that are needed at creation time must be validated to 
 
 > Remember: An aggregate (as a whole, which includes all of its child/descendant entities and value objects) and they must all be in a valid state at all times.
 
-> Note: The entity will create its own `Id` value (using the
-`IIdentifierFactory`), and it will initialize its initial in-memory state with its "creation" event.
+> Note: The entity will create its own `Id` value (using the `IIdentifierFactory`), and it will initialize its initial in-memory state with its "creation" event.
 
 For example, a typical entity class factory creation method might look like this:
 
@@ -680,8 +690,9 @@ All entities will need to implement the `public static EntityFactory<TEntity> Re
 
 There are two supported persistence mechanisms:
 
-**SnapShotting
-**: Entities that are going to be persisted by "dehydrating" their current/latest in-memory state (e.g., to be stored in a database) will need to implement these characteristics:
+##### SnapShotting
+
+Entities that are going to be persisted by "dehydrating" their current/latest in-memory state (e.g., to be stored in a database) will need to implement these characteristics:
 
 1. They will declare a `[EntityName("TableName")]` on their class declaration. This will be used to identify the storage container (i.e., the table name in a relational SQL database or the document/collection name in a NoSQL database) by the persistence layer.
 2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `public static EntityFactory<TEntity> Rehydrate()` method.
@@ -728,8 +739,8 @@ public sealed class Trip : EntityBase
 }
 ```
 
-**Event-Sourcing
-**: Entities that are going to be persisted by saving and loading their parent/ancestors aggregate event stream (e.g., to and from an event store) will need to implement these characteristics:
+##### Event-Sourcing
+Entities that are going to be persisted by saving and loading their parent/ancestors aggregate event stream (e.g., to and from an event store) will need to implement these characteristics:
 
 1. They will implement a private constructor that is called by their own `Create()` factory method, which is called by the  `AggregateRootBase.RaiseEventToChildEntity()` method.
 
@@ -754,18 +765,10 @@ The method on the entity then (typically) raises a new domain event and relays t
 
 > Note: It is possible that the root aggregate raises this change event, but to encapsulate logic, it is more often the entity itself that raises the domain event to change its own state.
 
-When an entity raises an event (using the `RaiseChangeEvent()` method) it first calls
-`OnStateChanged()` on the entity, followed by
-`EnsureInvariants()` on the entity, followed by passing the event to the root aggregate to handle in the root's
-`OnStateChanged()` method, and then the `EnsureVariants()` method on the root.
+When an entity raises an event (using the `RaiseChangeEvent()` method) it first calls `OnStateChanged()` on the entity, followed by `EnsureInvariants()` on the entity, followed by passing the event to the root aggregate to handle in the root's `OnStateChanged()` method, and then the `EnsureVariants()` method on the root.
 
-> Note: In the
-`OnStateChanged()` method of the root aggregate, it is likely that the handler for this specific event will delegate the call back to the entity instance, to the entity's
-`OnStateChanged()` method again - setting the entities internal state again (as it already did before passing the event to the root aggregate). This might seem inefficient, and it is. In most cases, this won't have a negative impact. But in some case, it may. The point to understand is this. If the root aggregate
-`OnStateChange()` method did not delegate the event to the entity, then the entity would never be initialized when the aggregate root is initialized. So this delegation must happen, from root to child entity. The problem comes when the entity is the party that raises the event. Then we enter this duplicated cycle. You can avoid the duplicated initialization cycle by considering the value of the
-`isReconstituting` parameter of the aggregate root's
-`OnStateChanged()` method. In other words, if the entity is the raising the event, the aggregate root would not pass the event back to the entity is the
-`isReconstituting == false`.
+> Note: In the `OnStateChanged()` method of the root aggregate, it is likely that the handler for this specific event will delegate the call back to the entity instance, to the entity's
+`OnStateChanged()` method again - setting the entities internal state again (as it already did before passing the event to the root aggregate). This might seem inefficient, and it is. In most cases, this won't have a negative impact. But in some case, it may. The point to understand is this. If the root aggregate `OnStateChange()` method did not delegate the event to the entity, then the entity would never be initialized when the aggregate root is initialized. So this delegation must happen, from root to child entity. The problem comes when the entity is the party that raises the event. Then we enter this duplicated cycle. You can avoid the duplicated initialization cycle by considering the value of the `isReconstituting` parameter of the aggregate root's `OnStateChanged()` method. In other words, if the entity is the raising the event, the aggregate root would not pass the event back to the entity is the `isReconstituting == false`.
 
 The aggregate will handle this event in its `OnStateChanged()` method and relay the call back to the appropriate entity.
 

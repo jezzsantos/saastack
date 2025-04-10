@@ -1,15 +1,19 @@
 using Common;
 using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using JetBrains.Annotations;
+using QueryAny;
 
 namespace IdentityDomain;
 
+[EntityName("AuthToken")]
 public sealed class AuthTokensRoot : AggregateRootBase
 {
     public static Result<AuthTokensRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
@@ -24,10 +28,16 @@ public sealed class AuthTokensRoot : AggregateRootBase
     {
     }
 
-    private AuthTokensRoot(IRecorder recorder, IIdentifierFactory idFactory,
-        ISingleValueObject<string> identifier) : base(
-        recorder, idFactory, identifier)
+    private AuthTokensRoot(ISingleValueObject<string> identifier, IDependencyContainer container,
+        HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
+        AccessToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(AccessToken));
+        AccessTokenExpiresOn =
+            rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(AccessTokenExpiresOn));
+        RefreshToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(RefreshToken));
+        RefreshTokenExpiresOn =
+            rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(RefreshTokenExpiresOn));
+        UserId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(UserId));
     }
 
     public Optional<string> AccessToken { get; private set; }
@@ -45,11 +55,21 @@ public sealed class AuthTokensRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
+    public override HydrationProperties Dehydrate()
+    {
+        var properties = base.Dehydrate();
+        properties.Add(nameof(AccessToken), AccessToken);
+        properties.Add(nameof(AccessTokenExpiresOn), AccessTokenExpiresOn);
+        properties.Add(nameof(RefreshToken), RefreshToken);
+        properties.Add(nameof(RefreshTokenExpiresOn), RefreshTokenExpiresOn);
+        properties.Add(nameof(UserId), UserId);
+        return properties;
+    }
+
     [UsedImplicitly]
     public static AggregateRootFactory<AuthTokensRoot> Rehydrate()
     {
-        return (identifier, container, _) => new AuthTokensRoot(container.GetRequiredService<IRecorder>(),
-            container.GetRequiredService<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AuthTokensRoot(identifier, container, properties);
     }
 
     public override Result<Error> EnsureInvariants()
