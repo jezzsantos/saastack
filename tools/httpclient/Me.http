@@ -7,6 +7,10 @@ GET {{apihost1}}/profiles/me
 Accept: application/json
 Authorization: Bearer {{access_token}}
 
+> {%
+    client.global.set("default_organization_id", response.body.profile.defaultOrganizationId);
+%}
+
 ### What Orgs do I have?
 
 GET {{apihost1}}/memberships/me
