@@ -201,7 +201,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
             await using var sender = await ConnectToTopicAsync(topicName, cancellationToken);
             var msg = new ServiceBusMessage(message)
             {
-                SessionId = DefaultSessionId
+                SessionId = DefaultSessionId // we want to guarantee FIFO and InOrder delivery
             };
 
             await sender.SendMessageAsync(msg, cancellationToken);
@@ -332,8 +332,8 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         {
             var options = new CreateSubscriptionOptions(sanitizedTopicName, sanitizedSubscriptionName)
             {
-                DeadLetteringOnMessageExpiration = true, //we want expired session messages to go to DLQ
-                MaxDeliveryCount = 2000, //Ensures it never gets to DLQ
+                DeadLetteringOnMessageExpiration = true, // We want expired session messages to go to DLQ
+                MaxDeliveryCount = 200_000, // Ensures it never gets to DLQ
                 RequiresSession = true // Ensures FIFO delivery
             };
             await _adminClient.CreateSubscriptionAsync(
