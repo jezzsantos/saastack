@@ -101,12 +101,9 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IAuthTokensRepository>(c =>
                     new AuthTokensRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcingDddCommandStore<AuthTokensRoot>>(),
+                        c.GetRequiredService<ISnapshottingDddCommandStore<AuthTokensRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterEventing<AuthTokensRoot, AuthTokensProjection>(
-                    c => new AuthTokensProjection(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<AuthTokensRoot>();
                 services.AddPerHttpRequest<IAPIKeysRepository>(c =>
                     new APIKeysRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),

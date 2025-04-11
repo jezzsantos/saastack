@@ -1378,14 +1378,14 @@ public sealed class $name$Root : AggregateRootBase
     }
 
     // TODO: DELETE this constructor if EventSourcing, LEAVE if Snapshotting
-    private $name$Root(Identifier identifier, IDependencyContainer container, RehydratingProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private $name$Root(ISingleValueObject&lt;string&gt; identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
         $propertyname$ = rehydratingProperties.GetValueOrDefault&lt;Name&gt;(nameof($propertyname$));
         OrganizationId = rehydratingProperties.GetValueOrDefault&lt;Identifier&gt;(nameof(OrganizationId))!;
     }
 
     // TODO: DELETE this method if EventSourcing, LEAVE if Snapshotting
-    public override Dictionary&lt;string, object?&gt; Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         properties.Add(nameof($propertyname$), $propertyname$);

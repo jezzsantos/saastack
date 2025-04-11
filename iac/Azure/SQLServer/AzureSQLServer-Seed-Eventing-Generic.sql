@@ -39,13 +39,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[AuthToken]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[AuthToken]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[EmailDelivery]')
             AND type in (N'U'))
     DROP TABLE [dbo].[EmailDelivery]
@@ -189,30 +182,6 @@ CREATE INDEX UserId
     ON [dbo].[Audit]
         (
          [AgainstId]
-            );
-
-CREATE TABLE [dbo].[AuthToken]
-(
-    [Id]                    [nvarchar](100)  NOT NULL,
-    [LastPersistedAtUtc]    [datetime]       NULL,
-    [IsDeleted]             [bit]            NULL,
-    [AccessToken]           [nvarchar](4000) NULL,
-    [AccessTokenExpiresOn]  [datetime]       NULL,
-    [RefreshToken]          [nvarchar](4000) NULL,
-    [RefreshTokenExpiresOn] [datetime]       NULL,
-    [UserId]                [nvarchar](100)  NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[AuthToken]
-        (
-         [Id]
-            );
-CREATE INDEX UserId
-    ON [dbo].[AuthToken]
-        (
-         [UserId]
             );
 
 CREATE TABLE [dbo].[EmailDelivery]

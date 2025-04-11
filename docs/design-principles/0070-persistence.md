@@ -48,7 +48,7 @@ These interfaces/abstractions are tailored to specific workloads and classes of 
 
 For example, the `IDataStore` port could be implemented by an adapter to an RMDBS like Microsoft SQL Server, or AWS RDS+Postgres, or implemented by NOSQL databases like Azure Table Storage, Azure Cosmos, or AWS DynamoDB, MongoDB, or others.
 
-> In SaaStack, we have at least 2 adapters: a `LocalMachineFileStore` and to `InProcessInMemStore` that implement all the above ports in one adapter!
+> In SaaStack, we have at least 2 adapters: a `LocalMachineFileStore` and to `InProcessInMemStore` that implement all the above ports in one adapter! Both are to ONLY be used in testing, and NOT in production workloads.
 
 One interesting and key design challenge for `IDataStore` is how to query sets of "records" from the specific technology when they all support different capabilities.
 
@@ -170,6 +170,10 @@ Both persistence schemes can persist the state of an aggregate (and all its desc
 > This means that if/when you change your mind down the track, and you switch from one scheme to the other, you only need to change the implementation of your domain-specific `IApplicationRepository,` and you need to add/remove the `Dehydration()` method and constructor to/from your aggregate classes.
 
 The code flows from the Application's perspective are the same, but the implementation of the domain-specific `IApplicationRepository` and the aggregate are slightly different.
+
+
+
+See [Event Sourced versus Snapshotting](0050-domain-driven-design.md#Event-Sourced-versus-Snapshotting) for a discussion about the differences and why it matters.
 
 #### Snapshotting Persistence
 
