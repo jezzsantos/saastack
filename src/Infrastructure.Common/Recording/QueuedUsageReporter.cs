@@ -1,15 +1,5 @@
-﻿
-using Application.Interfaces;
-using Application.Persistence.Shared;
-using Application.Persistence.Shared.ReadModels;
-using Common;
-using Common.Configuration;
-using Common.Extensions;
-using Common.Recording;
-using Domain.Interfaces;
-using Domain.Interfaces.Services;
-using Infrastructure.Persistence.Shared.ApplicationServices;
-#if !TESTINGONLY
+﻿#if !TESTINGONLY
+using Infrastructure.Persistence.Common.ApplicationServices;
 #if HOSTEDONAZURE
 using Infrastructure.External.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
@@ -20,6 +10,16 @@ using Infrastructure.External.Persistence.OnPremises.ApplicationServices;
 #else
 using Infrastructure.Persistence.Interfaces;
 #endif
+using Application.Interfaces;
+using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
+using Common;
+using Common.Configuration;
+using Common.Extensions;
+using Common.Recording;
+using Domain.Interfaces;
+using Domain.Interfaces.Services;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 
 namespace Infrastructure.Common.Recording;
 
