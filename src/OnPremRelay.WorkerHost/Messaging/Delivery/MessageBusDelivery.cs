@@ -13,20 +13,22 @@ public class MessageBusDelivery<TMessage>
     where TMessage : IQueuedMessage
 {
     private readonly IMessageBusMonitoringApiRelayWorker<TMessage> _worker;
-    private readonly string _subscriberHostName;
-    private readonly string _subscriptionName;
+
+    /// <summary>
+    ///     Gets the name of the queue from which messages are delivered.
+    /// </summary>
+    public string SubscriberHostName { get; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MessageBusDelivery{TMessage}" /> class.
     /// </summary>
     /// <param name="worker">The message bus relay worker.</param>
     /// <param name="subscriber">The subscriber name.</param>
-    public MessageBusDelivery(IMessageBusMonitoringApiRelayWorker<TMessage> worker, string subscriberHostName,
-        string subscriptionName)
+    public MessageBusDelivery(IMessageBusMonitoringApiRelayWorker<TMessage> worker,
+        string subscriberHostName)
     {
         _worker = worker ?? throw new ArgumentNullException(nameof(worker));
-        _subscriberHostName = subscriberHostName ?? throw new ArgumentNullException(nameof(subscriberHostName));
-        _subscriptionName = subscriptionName ?? throw new ArgumentNullException(nameof(subscriptionName));
+        SubscriberHostName = subscriberHostName ?? throw new ArgumentNullException(nameof(subscriberHostName));
     }
 
     /// <summary>
@@ -38,5 +40,9 @@ public class MessageBusDelivery<TMessage>
     public Task ProcessMessageAsync(TMessage message, CancellationToken cancellationToken)
     {
         return _worker.RelayMessageOrThrowAsync(_subscriberHostName, _subscriptionName, message, cancellationToken);
+    public Task ProcessMessageAsync(TMessage message, string subscriptionName,
+        CancellationToken cancellationToken)
+    {
+        return _worker.RelayMessageOrThrowAsync(SubscriberHostName, subscriptionName, message, cancellationToken);
     }
 }
