@@ -8,7 +8,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     ChallengePasswordMfaAuthenticatorForCallerRequestValidator : AbstractValidator<
-    ChallengePasswordMfaAuthenticatorForCallerRequest>
+    ChallengeCredentialMfaAuthenticatorForCallerRequest>
 {
     public ChallengePasswordMfaAuthenticatorForCallerRequestValidator(IIdentifierFactory identifierFactory)
     {

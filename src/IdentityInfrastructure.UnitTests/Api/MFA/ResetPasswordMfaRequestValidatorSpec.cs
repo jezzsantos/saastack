@@ -9,14 +9,14 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class ResetPasswordMfaRequestValidatorSpec
 {
-    private readonly ResetPasswordMfaRequest _dto;
+    private readonly ResetCredentialMfaRequest _dto;
     private readonly ResetPasswordMfaRequestValidator _validator;
 
     public ResetPasswordMfaRequestValidatorSpec()
     {
         _validator =
             new ResetPasswordMfaRequestValidator(new FixedIdentifierFactory("anid"));
-        _dto = new ResetPasswordMfaRequest
+        _dto = new ResetCredentialMfaRequest
         {
             UserId = "anid"
         };

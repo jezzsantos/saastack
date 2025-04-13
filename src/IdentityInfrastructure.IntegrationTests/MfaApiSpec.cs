@@ -49,7 +49,7 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var result = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest
+            var result = await Api.GetAsync(new ListCredentialMfaAuthenticatorsForCallerRequest
             {
                 MfaToken = mfaToken
             });
@@ -63,15 +63,15 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+                AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
                 PhoneNumber = null
             });
 
             result.Content.Value.Authenticator.Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+                .Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().BeNull();
             result.Content.Value.Authenticator.BarCodeUri.Should().StartWith("otpauth://totp/");
@@ -80,10 +80,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
         }
 
         [Fact]
@@ -92,14 +92,14 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                 PhoneNumber = "+6498876986"
             });
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -110,10 +110,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -122,14 +122,14 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail,
                 PhoneNumber = null
             });
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -140,10 +140,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
         }
 
         [Fact]
@@ -152,19 +152,19 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken, "+6498876981");
+            await Associate(CredentialMfaAuthenticatorType.OobSms, mfaToken, "+6498876981");
 
             _userNotificationsService.LastMfaOobSmsRecipient.Should().Be("+6498876981");
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
 
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                 PhoneNumber = "+6498876982"
             });
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -175,10 +175,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -187,15 +187,15 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
 
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                 PhoneNumber = "+6498876986"
             });
 
@@ -208,13 +208,13 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
 
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+                AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
                 ConfirmationCode = confirmationCode
             });
 
@@ -233,12 +233,12 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken);
+                await Associate(CredentialMfaAuthenticatorType.OobSms, mfaToken);
 
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                 OobCode = oobCode,
                 ConfirmationCode = confirmationCode
             });
@@ -258,12 +258,12 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken);
+                await Associate(CredentialMfaAuthenticatorType.OobEmail, mfaToken);
 
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail,
                 OobCode = oobCode,
                 ConfirmationCode = confirmationCode
             });
@@ -282,20 +282,20 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var authenticator =
-                await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+                await GetAuthenticator(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
 
-            var result = await Api.PutAsync(new ChallengePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ChallengeCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+            result.Content.Value.Challenge.Type.Should().Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Challenge.OobCode.Should().BeNull();
             _userNotificationsService.LastMfaOobSmsRecipient.Should().BeNull();
             _userNotificationsService.LastMfaOobEmailRecipient.Should().BeNull();
@@ -308,18 +308,18 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken);
-            await Confirm(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken, oobCode, confirmationCode);
+                await Associate(CredentialMfaAuthenticatorType.OobSms, mfaToken);
+            await Confirm(CredentialMfaAuthenticatorType.OobSms, mfaToken, oobCode, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.OobSms, mfaToken);
 
-            var result = await Api.PutAsync(new ChallengePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ChallengeCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Challenge.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Challenge.OobCode.Should().NotBeNullOrEmpty();
             _userNotificationsService.LastMfaOobSmsRecipient.Should().Be("+6498876986");
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
@@ -332,18 +332,18 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken);
-            await Confirm(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken, oobCode, confirmationCode);
+                await Associate(CredentialMfaAuthenticatorType.OobEmail, mfaToken);
+            await Confirm(CredentialMfaAuthenticatorType.OobEmail, mfaToken, oobCode, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.OobEmail, mfaToken);
 
-            var result = await Api.PutAsync(new ChallengePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ChallengeCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Challenge.Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Challenge.OobCode.Should().NotBeNullOrEmpty();
             _userNotificationsService.LastMfaOobEmailRecipient.Should().Be(login.Profile!.EmailAddress);
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
@@ -355,19 +355,19 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var authenticator =
-                await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+                await GetAuthenticator(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
             await Challenge(mfaToken, authenticator);
             confirmationCode = _mfaService.GetOtpCodeNow(MfaService.TimeStep.Next); //One time step ahead
 
-            var result = await Api.PutAsync(new VerifyPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new VerifyCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+                AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
                 OobCode = null,
                 ConfirmationCode = confirmationCode
             });
@@ -387,16 +387,16 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken);
-            await Confirm(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken, oobCode, confirmationCode);
+                await Associate(CredentialMfaAuthenticatorType.OobSms, mfaToken);
+            await Confirm(CredentialMfaAuthenticatorType.OobSms, mfaToken, oobCode, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.OobSms, mfaToken);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.OobSms, mfaToken);
             (oobCode, confirmationCode) = await Challenge(mfaToken, authenticator);
 
-            var result = await Api.PutAsync(new VerifyPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new VerifyCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                 OobCode = oobCode,
                 ConfirmationCode = confirmationCode
             });
@@ -416,16 +416,16 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken);
-            await Confirm(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken, oobCode, confirmationCode);
+                await Associate(CredentialMfaAuthenticatorType.OobEmail, mfaToken);
+            await Confirm(CredentialMfaAuthenticatorType.OobEmail, mfaToken, oobCode, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.OobEmail, mfaToken);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.OobEmail, mfaToken);
             (oobCode, confirmationCode) = await Challenge(mfaToken, authenticator);
 
-            var result = await Api.PutAsync(new VerifyPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new VerifyCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail,
+                AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail,
                 OobCode = oobCode,
                 ConfirmationCode = confirmationCode
             });
@@ -445,17 +445,17 @@ public class MfaApiSpec
             await EnableMfa(login);
             var mfaToken = await AttemptAuthenticationToGetMfaToken(login);
             var (_, _, recoveryCodes) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
+                await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, mfaToken, null, confirmationCode);
             mfaToken = await AttemptAuthenticationToGetMfaToken(login);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.RecoveryCodes, mfaToken);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.RecoveryCodes, mfaToken);
             await Challenge(mfaToken, authenticator);
 
-            var result = await Api.PutAsync(new VerifyPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new VerifyCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
-                AuthenticatorType = PasswordCredentialMfaAuthenticatorType.RecoveryCodes,
+                AuthenticatorType = CredentialMfaAuthenticatorType.RecoveryCodes,
                 OobCode = null,
                 ConfirmationCode = recoveryCodes![0]
             });
@@ -469,9 +469,9 @@ public class MfaApiSpec
         }
 
         private async Task<(string OobCode, string ConfirmationCode)> Challenge(string mfaToken,
-            PasswordCredentialMfaAuthenticator? authenticator)
+            CredentialMfaAuthenticator? authenticator)
         {
-            var challenged = await Api.PutAsync(new ChallengePasswordMfaAuthenticatorForCallerRequest
+            var challenged = await Api.PutAsync(new ChallengeCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorId = authenticator!.Id
@@ -483,10 +483,10 @@ public class MfaApiSpec
             return (oobCode, confirmationCode);
         }
 
-        private async Task<PasswordCredentialMfaAuthenticator?> GetAuthenticator(
-            PasswordCredentialMfaAuthenticatorType type, string mfaToken)
+        private async Task<CredentialMfaAuthenticator?> GetAuthenticator(
+            CredentialMfaAuthenticatorType type, string mfaToken)
         {
-            var authenticators = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest
+            var authenticators = await Api.GetAsync(new ListCredentialMfaAuthenticatorsForCallerRequest
             {
                 MfaToken = mfaToken
             });
@@ -495,9 +495,9 @@ public class MfaApiSpec
                 .FirstOrDefault(auth => auth.Type == type);
         }
 
-        private async Task<List<PasswordCredentialMfaAuthenticator>> GetAuthenticators(string mfaToken)
+        private async Task<List<CredentialMfaAuthenticator>> GetAuthenticators(string mfaToken)
         {
-            var authenticators = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest
+            var authenticators = await Api.GetAsync(new ListCredentialMfaAuthenticatorsForCallerRequest
             {
                 MfaToken = mfaToken
             });
@@ -505,10 +505,10 @@ public class MfaApiSpec
             return authenticators.Content.Value.Authenticators;
         }
 
-        private async Task Confirm(PasswordCredentialMfaAuthenticatorType type, string mfaToken, string? oobCode = null,
+        private async Task Confirm(CredentialMfaAuthenticatorType type, string mfaToken, string? oobCode = null,
             string? confirmationCode = null)
         {
-            await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorType = type,
@@ -518,13 +518,13 @@ public class MfaApiSpec
         }
 
         private async Task<(string OobCode, string ConfirmationCode, List<string>? recoveryCodes)> Associate(
-            PasswordCredentialMfaAuthenticatorType type, string mfaToken, string phoneNumber = "+6498876986")
+            CredentialMfaAuthenticatorType type, string mfaToken, string phoneNumber = "+6498876986")
         {
-            var associated = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var associated = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
             {
                 MfaToken = mfaToken,
                 AuthenticatorType = type,
-                PhoneNumber = type == PasswordCredentialMfaAuthenticatorType.OobSms
+                PhoneNumber = type == CredentialMfaAuthenticatorType.OobSms
                     ? phoneNumber
                     : null
             });
@@ -538,19 +538,19 @@ public class MfaApiSpec
 
         private async Task<string> AttemptAuthenticationToGetMfaToken(LoginDetails login)
         {
-            var failedAuth = await Api.PostAsync(new AuthenticatePasswordRequest
+            var failedAuth = await Api.PostAsync(new AuthenticateCredentialRequest
             {
                 Username = login.Profile!.EmailAddress,
                 Password = PasswordForPerson
             });
 
-            return failedAuth.Content.Error.Extensions![PasswordCredentialsApplication.MfaTokenName]
+            return failedAuth.Content.Error.Extensions![PersonCredentialsApplication.MfaTokenName]
                 .As<JsonElement>().GetString()!;
         }
 
         private async Task EnableMfa(LoginDetails login)
         {
-            await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+            await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
             {
                 IsEnabled = true
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -586,7 +586,7 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
 
-            var result = await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+            var result = await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
             {
                 IsEnabled = true
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -601,7 +601,7 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
 
-            var result = await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+            var result = await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
             {
                 IsEnabled = false
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -615,11 +615,11 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
 
-            var result = await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+            var result = await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
             {
                 IsEnabled = false
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -636,7 +636,7 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            var result = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest(),
+            var result = await Api.GetAsync(new ListCredentialMfaAuthenticatorsForCallerRequest(),
                 req => req.SetJWTBearerToken(login.AccessToken));
 
             result.Content.Value.Authenticators.Count.Should().Be(0);
@@ -647,15 +647,15 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
                     PhoneNumber = null
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
             result.Content.Value.Authenticator.Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+                .Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().BeNull();
             result.Content.Value.Authenticator.BarCodeUri.Should().StartWith("otpauth://totp/");
@@ -664,10 +664,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
         }
 
         [Fact]
@@ -675,14 +675,14 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                     PhoneNumber = "+6498876986"
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -693,10 +693,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -704,14 +704,14 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail,
                     PhoneNumber = null
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -722,10 +722,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
         }
 
         [Fact]
@@ -733,19 +733,19 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, login, "+6498876981");
+            await Associate(CredentialMfaAuthenticatorType.OobSms, login, "+6498876981");
 
             _userNotificationsService.LastMfaOobSmsRecipient.Should().Be("+6498876981");
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
 
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                     PhoneNumber = "+6498876982"
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -756,10 +756,10 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(2);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeFalse();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -767,18 +767,18 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
 
-            var result = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                     PhoneNumber = "+6498876986"
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().BeNull();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -789,13 +789,13 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(3);
             authenticators[0].Id.Should().NotBeEmpty();
             authenticators[0].IsActive.Should().BeTrue();
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             authenticators[1].Id.Should().NotBeEmpty();
             authenticators[1].IsActive.Should().BeTrue();
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
             authenticators[2].Id.Should().NotBeEmpty();
             authenticators[2].IsActive.Should().BeFalse();
-            authenticators[2].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[2].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -804,12 +804,12 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
 
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
-            var result = await Api.DeleteAsync(new DisassociatePasswordMfaAuthenticatorForCallerRequest
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            var result = await Api.DeleteAsync(new DisassociateCredentialMfaAuthenticatorForCallerRequest
             {
                 Id = authenticator!.Id
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -825,15 +825,15 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var otpConfirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login, null, otpConfirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, login, null, otpConfirmationCode);
             var (oobCode, ooBConfirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, login);
-            await Confirm(PasswordCredentialMfaAuthenticatorType.OobSms, login, oobCode, ooBConfirmationCode);
-            var authenticator = await GetAuthenticator(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+                await Associate(CredentialMfaAuthenticatorType.OobSms, login);
+            await Confirm(CredentialMfaAuthenticatorType.OobSms, login, oobCode, ooBConfirmationCode);
+            var authenticator = await GetAuthenticator(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
 
-            var result = await Api.DeleteAsync(new DisassociatePasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.DeleteAsync(new DisassociateCredentialMfaAuthenticatorForCallerRequest
             {
                 Id = authenticator!.Id
             }, req => req.SetJWTBearerToken(login.AccessToken));
@@ -842,8 +842,8 @@ public class MfaApiSpec
 
             var authenticators = await GetAuthenticators(login);
             authenticators.Count.Should().Be(2);
-            authenticators[0].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
-            authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            authenticators[0].Type.Should().Be(CredentialMfaAuthenticatorType.RecoveryCodes);
+            authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
         }
 
         [Fact]
@@ -851,12 +851,12 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var confirmationCode = _mfaService.GetOtpCodeNow();
 
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
                     ConfirmationCode = confirmationCode
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
@@ -864,10 +864,10 @@ public class MfaApiSpec
             result.Content.Value.Tokens.Should().BeNull();
             result.Content.Value.Authenticators!.Count.Should().Be(2);
             result.Content.Value.Authenticators[0].Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+                .Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             result.Content.Value.Authenticators[0].IsActive.Should().BeTrue();
             result.Content.Value.Authenticators[1].Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+                .Be(CredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Authenticators[1].IsActive.Should().BeTrue();
         }
 
@@ -876,11 +876,11 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            var (oobCode, confirmationCode, _) = await Associate(PasswordCredentialMfaAuthenticatorType.OobSms, login);
+            var (oobCode, confirmationCode, _) = await Associate(CredentialMfaAuthenticatorType.OobSms, login);
 
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobSms,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobSms,
                     OobCode = oobCode,
                     ConfirmationCode = confirmationCode
                 },
@@ -889,9 +889,9 @@ public class MfaApiSpec
             result.Content.Value.Tokens.Should().BeNull();
             result.Content.Value.Authenticators!.Count.Should().Be(2);
             result.Content.Value.Authenticators[0].Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+                .Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             result.Content.Value.Authenticators[0].IsActive.Should().BeTrue();
-            result.Content.Value.Authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticators[1].IsActive.Should().BeTrue();
         }
 
@@ -901,11 +901,11 @@ public class MfaApiSpec
             var login = await LoginUserAsync();
             await EnableMfa(login);
             var (oobCode, confirmationCode, _) =
-                await Associate(PasswordCredentialMfaAuthenticatorType.OobEmail, login);
+                await Associate(CredentialMfaAuthenticatorType.OobEmail, login);
 
-            var result = await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            var result = await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
                 {
-                    AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail,
+                    AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail,
                     OobCode = oobCode,
                     ConfirmationCode = confirmationCode
                 },
@@ -914,9 +914,9 @@ public class MfaApiSpec
             result.Content.Value.Tokens.Should().BeNull();
             result.Content.Value.Authenticators!.Count.Should().Be(2);
             result.Content.Value.Authenticators[0].Type.Should()
-                .Be(PasswordCredentialMfaAuthenticatorType.RecoveryCodes);
+                .Be(CredentialMfaAuthenticatorType.RecoveryCodes);
             result.Content.Value.Authenticators[0].IsActive.Should().BeTrue();
-            result.Content.Value.Authenticators[1].Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Authenticators[1].Type.Should().Be(CredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Authenticators[1].IsActive.Should().BeTrue();
         }
 
@@ -925,12 +925,12 @@ public class MfaApiSpec
         {
             var login = await LoginUserAsync();
             await EnableMfa(login);
-            await Associate(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login);
+            await Associate(CredentialMfaAuthenticatorType.TotpAuthenticator, login);
             var confirmationCode = _mfaService.GetOtpCodeNow();
-            await Confirm(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
+            await Confirm(CredentialMfaAuthenticatorType.TotpAuthenticator, login, null, confirmationCode);
 
             var @operator = await LoginUserAsync(LoginUser.Operator);
-            var result = await Api.PutAsync(new ResetPasswordMfaRequest
+            var result = await Api.PutAsync(new ResetCredentialMfaRequest
             {
                 UserId = login.User.Id
             }, req => req.SetJWTBearerToken(@operator.AccessToken));
@@ -943,8 +943,8 @@ public class MfaApiSpec
             authenticators.Count.Should().Be(0);
         }
 
-        private async Task<PasswordCredentialMfaAuthenticator?> GetAuthenticator(
-            PasswordCredentialMfaAuthenticatorType type, LoginDetails login)
+        private async Task<CredentialMfaAuthenticator?> GetAuthenticator(
+            CredentialMfaAuthenticatorType type, LoginDetails login)
         {
             var authenticators = await GetAuthenticators(login);
 
@@ -953,12 +953,12 @@ public class MfaApiSpec
         }
 
         private async Task<(string OobCode, string ConfirmationCode, List<string>? recoveryCodes)> Associate(
-            PasswordCredentialMfaAuthenticatorType type, LoginDetails login, string phoneNumber = "+6498876986")
+            CredentialMfaAuthenticatorType type, LoginDetails login, string phoneNumber = "+6498876986")
         {
-            var associated = await Api.PostAsync(new AssociatePasswordMfaAuthenticatorForCallerRequest
+            var associated = await Api.PostAsync(new AssociateCredentialMfaAuthenticatorForCallerRequest
                 {
                     AuthenticatorType = type,
-                    PhoneNumber = type == PasswordCredentialMfaAuthenticatorType.OobSms
+                    PhoneNumber = type == CredentialMfaAuthenticatorType.OobSms
                         ? phoneNumber
                         : null
                 },
@@ -971,10 +971,10 @@ public class MfaApiSpec
             return (oobCode, confirmationCode, recoveryCodes);
         }
 
-        private async Task Confirm(PasswordCredentialMfaAuthenticatorType type, LoginDetails login,
+        private async Task Confirm(CredentialMfaAuthenticatorType type, LoginDetails login,
             string? oobCode = null, string? confirmationCode = null)
         {
-            await Api.PutAsync(new ConfirmPasswordMfaAuthenticatorForCallerRequest
+            await Api.PutAsync(new ConfirmCredentialMfaAuthenticatorForCallerRequest
                 {
                     AuthenticatorType = type,
                     OobCode = oobCode,
@@ -983,9 +983,9 @@ public class MfaApiSpec
                 req => req.SetJWTBearerToken(login.AccessToken));
         }
 
-        private async Task<List<PasswordCredentialMfaAuthenticator>> GetAuthenticators(LoginDetails login)
+        private async Task<List<CredentialMfaAuthenticator>> GetAuthenticators(LoginDetails login)
         {
-            var authenticators = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest(),
+            var authenticators = await Api.GetAsync(new ListCredentialMfaAuthenticatorsForCallerRequest(),
                 req => req.SetJWTBearerToken(login.AccessToken));
 
             return authenticators.Content.Value.Authenticators;
@@ -993,7 +993,7 @@ public class MfaApiSpec
 
         private async Task EnableMfa(LoginDetails login)
         {
-            await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+            await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
             {
                 IsEnabled = true
             }, req => req.SetJWTBearerToken(login.AccessToken));

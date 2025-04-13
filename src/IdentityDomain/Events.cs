@@ -2,7 +2,7 @@ using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Events.Shared.Identities.AuthTokens;
-using Domain.Events.Shared.Identities.PasswordCredentials;
+using Domain.Events.Shared.Identities.PersonCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
 using Domain.Shared.Identities;
@@ -61,7 +61,7 @@ public static class Events
         }
     }
 
-    public static class PasswordCredentials
+    public static class PersonCredentials
     {
         public static AccountLocked AccountLocked(Identifier id)
         {
@@ -73,10 +73,10 @@ public static class Events
             return new AccountUnlocked(id);
         }
 
-        public static Domain.Events.Shared.Identities.PasswordCredentials.Created Created(Identifier id,
+        public static Domain.Events.Shared.Identities.PersonCredentials.Created Created(Identifier id,
             Identifier userId, MfaOptions mfaOptions)
         {
-            return new Domain.Events.Shared.Identities.PasswordCredentials.Created(id)
+            return new Domain.Events.Shared.Identities.PersonCredentials.Created(id)
             {
                 UserId = userId,
                 IsMfaEnabled = mfaOptions.IsEnabled,

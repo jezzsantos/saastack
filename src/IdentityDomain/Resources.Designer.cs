@@ -348,177 +348,6 @@ namespace IdentityDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This authenticator has already been associated.
-        /// </summary>
-        internal static string PasswordCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This authenticator cannot be associated.
-        /// </summary>
-        internal static string PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An authenticator has already been associated, you must challenge it.
-        /// </summary>
-        internal static string PasswordCredentialRoot_AssociateMfaAuthenticator_MustChallenge {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_AssociateMfaAuthenticator_MustChallenge", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The authenticator has not yet been associated.
-        /// </summary>
-        internal static string PasswordCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You cannot delete the recovery codes for MFA.
-        /// </summary>
-        internal static string PasswordCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to New password cannot be the same as old password.
-        /// </summary>
-        internal static string PasswordCredentialRoot_DuplicatePassword {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_DuplicatePassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The email is already in use by another user.
-        /// </summary>
-        internal static string PasswordCredentialRoot_EmailNotUnique {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_EmailNotUnique", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The password is not valid.
-        /// </summary>
-        internal static string PasswordCredentialRoot_InvalidPassword {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_InvalidPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to MFA is not enabled for this user.
-        /// </summary>
-        internal static string PasswordCredentialRoot_MfaNotEnabled {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_MfaNotEnabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This authenticator does not exist.
-        /// </summary>
-        internal static string PasswordCredentialRoot_NoAuthenticator {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_NoAuthenticator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No password has yet been set for this user.
-        /// </summary>
-        internal static string PasswordCredentialRoot_NoPassword {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_NoPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This user is not a member of the operations team.
-        /// </summary>
-        internal static string PasswordCredentialRoot_NotOperator {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_NotOperator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You must be an owner of this user account to change MFA settings.
-        /// </summary>
-        internal static string PasswordCredentialRoot_NotOwner {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_NotOwner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot initiate password reset before the user is registered.
-        /// </summary>
-        internal static string PasswordCredentialRoot_PasswordInitiatedWithoutRegistration {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_PasswordInitiatedWithoutRegistration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The password reset confirmation has expired.
-        /// </summary>
-        internal static string PasswordCredentialRoot_PasswordResetTokenExpired {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_PasswordResetTokenExpired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user&apos;s registration confirmation cannot be confirmed.
-        /// </summary>
-        internal static string PasswordCredentialRoot_RegistrationNotVerifying {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_RegistrationNotVerifying", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user&apos;s registration has not been verified yet.
-        /// </summary>
-        internal static string PasswordCredentialRoot_RegistrationUnverified {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_RegistrationUnverified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user&apos;s registration is already verified.
-        /// </summary>
-        internal static string PasswordCredentialRoot_RegistrationVerified {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_RegistrationVerified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user&apos;s registration confirmation window has expired.
-        /// </summary>
-        internal static string PasswordCredentialRoot_RegistrationVerifyingExpired {
-            get {
-                return ResourceManager.GetString("PasswordCredentialRoot_RegistrationVerifyingExpired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The password is not valid.
         /// </summary>
         internal static string PasswordKeep_InvalidPassword {
@@ -569,6 +398,177 @@ namespace IdentityDomain {
         internal static string PasswordKeep_TokensNotMatch {
             get {
                 return ResourceManager.GetString("PasswordKeep_TokensNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This authenticator has already been associated.
+        /// </summary>
+        internal static string PersonCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This authenticator cannot be associated.
+        /// </summary>
+        internal static string PersonCredentialRoot_AssociateMfaAuthenticator_InvalidType {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_AssociateMfaAuthenticator_InvalidType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An authenticator has already been associated, you must challenge it.
+        /// </summary>
+        internal static string PersonCredentialRoot_AssociateMfaAuthenticator_MustChallenge {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_AssociateMfaAuthenticator_MustChallenge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The authenticator has not yet been associated.
+        /// </summary>
+        internal static string PersonCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You cannot delete the recovery codes for MFA.
+        /// </summary>
+        internal static string PersonCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New password cannot be the same as old password.
+        /// </summary>
+        internal static string PersonCredentialRoot_DuplicatePassword {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_DuplicatePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email is already in use by another user.
+        /// </summary>
+        internal static string PersonCredentialRoot_EmailNotUnique {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_EmailNotUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password is not valid.
+        /// </summary>
+        internal static string PersonCredentialRoot_InvalidPassword {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MFA is not enabled for this user.
+        /// </summary>
+        internal static string PersonCredentialRoot_MfaNotEnabled {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_MfaNotEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This authenticator does not exist.
+        /// </summary>
+        internal static string PersonCredentialRoot_NoMfaAuthenticator {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_NoMfaAuthenticator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No password has yet been set for this user.
+        /// </summary>
+        internal static string PersonCredentialRoot_NoPassword {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_NoPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This user is not a member of the operations team.
+        /// </summary>
+        internal static string PersonCredentialRoot_NotOperator {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_NotOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must be an owner of this user account to change MFA settings.
+        /// </summary>
+        internal static string PersonCredentialRoot_NotOwner {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot initiate password reset before the user is registered.
+        /// </summary>
+        internal static string PersonCredentialRoot_PasswordInitiatedWithoutRegistration {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_PasswordInitiatedWithoutRegistration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password reset confirmation has expired.
+        /// </summary>
+        internal static string PersonCredentialRoot_PasswordResetTokenExpired {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_PasswordResetTokenExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user&apos;s registration confirmation cannot be confirmed.
+        /// </summary>
+        internal static string PersonCredentialRoot_RegistrationNotVerifying {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_RegistrationNotVerifying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user&apos;s registration has not been verified yet.
+        /// </summary>
+        internal static string PersonCredentialRoot_RegistrationUnverified {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_RegistrationUnverified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user&apos;s registration is already verified.
+        /// </summary>
+        internal static string PersonCredentialRoot_RegistrationVerified {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_RegistrationVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user&apos;s registration confirmation window has expired.
+        /// </summary>
+        internal static string PersonCredentialRoot_RegistrationVerifyingExpired {
+            get {
+                return ResourceManager.GetString("PersonCredentialRoot_RegistrationVerifyingExpired", resourceCulture);
             }
         }
         

@@ -8,7 +8,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     DisassociatePasswordMfaAuthenticatorForCallerRequestValidator : AbstractValidator<
-    DisassociatePasswordMfaAuthenticatorForCallerRequest>
+    DisassociateCredentialMfaAuthenticatorForCallerRequest>
 {
     public DisassociatePasswordMfaAuthenticatorForCallerRequestValidator(IIdentifierFactory identifierFactory)
     {

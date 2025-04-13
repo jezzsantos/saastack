@@ -3,7 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
-using Domain.Events.Shared.Identities.PasswordCredentials;
+using Domain.Events.Shared.Identities.PersonCredentials;
 using Domain.Interfaces.Entities;
 using Domain.Services.Shared;
 using Domain.Shared;
@@ -227,7 +227,7 @@ public sealed class MfaAuthenticator : EntityBase
                 throw new ArgumentOutOfRangeException(nameof(Type), Type, null);
         }
 
-        return RaiseChangeEvent(Events.PasswordCredentials.MfaAuthenticatorAssociated(Id, this, oobCode,
+        return RaiseChangeEvent(Events.PersonCredentials.MfaAuthenticatorAssociated(Id, this, oobCode,
             barCodeUri, secret, oobChannel));
     }
 
@@ -278,7 +278,7 @@ public sealed class MfaAuthenticator : EntityBase
         }
 
         return RaiseChangeEvent(
-            Events.PasswordCredentials.MfaAuthenticatorChallenged(Id, this, oobCode, barCodeUri, secret, oobChannel));
+            Events.PersonCredentials.MfaAuthenticatorChallenged(Id, this, oobCode, barCodeUri, secret, oobChannel));
     }
 
     public Result<Error> ConfirmAssociation(Optional<string> confirmationOobCode, Optional<string> confirmationCode)
@@ -341,7 +341,7 @@ public sealed class MfaAuthenticator : EntityBase
             }
         }
 
-        return RaiseChangeEvent(Events.PasswordCredentials.MfaAuthenticatorConfirmed(RootId,
+        return RaiseChangeEvent(Events.PersonCredentials.MfaAuthenticatorConfirmed(RootId,
             this, confirmationOobCode, confirmationCode, verifiedState));
     }
 
@@ -441,7 +441,7 @@ public sealed class MfaAuthenticator : EntityBase
             }
         }
 
-        return RaiseChangeEvent(Events.PasswordCredentials.MfaAuthenticatorVerified(RootId,
+        return RaiseChangeEvent(Events.PersonCredentials.MfaAuthenticatorVerified(RootId,
             this, confirmationOobCode, confirmationCode, verifiedState));
     }
 

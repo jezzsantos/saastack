@@ -7,16 +7,16 @@ namespace IdentityInfrastructure.DomainServices;
 
 public sealed class EmailAddressService : IEmailAddressService
 {
-    private readonly IPasswordCredentialsRepository _repository;
+    private readonly IPersonCredentialRepository _repository;
 
-    public EmailAddressService(IPasswordCredentialsRepository repository)
+    public EmailAddressService(IPersonCredentialRepository repository)
     {
         _repository = repository;
     }
 
     public async Task<bool> EnsureUniqueAsync(EmailAddress emailAddress, Identifier userId)
     {
-        var retrieved = await _repository.FindCredentialsByUsernameAsync(emailAddress.Address, CancellationToken.None);
+        var retrieved = await _repository.FindCredentialByUsernameAsync(emailAddress.Address, CancellationToken.None);
         if (retrieved.IsFailure)
         {
             return false;

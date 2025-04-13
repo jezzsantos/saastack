@@ -80,54 +80,54 @@ namespace IdentityApplication {
         /// <summary>
         ///   Looks up a localized string similar to The user account is locked out.
         /// </summary>
-        internal static string PasswordCredentialsApplication_AccountLocked {
+        internal static string PersonCredentialsApplication_AccountLocked {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_AccountLocked", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_AccountLocked", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The user account is suspended.
         /// </summary>
-        internal static string PasswordCredentialsApplication_AccountSuspended {
+        internal static string PersonCredentialsApplication_AccountSuspended {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_AccountSuspended", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_AccountSuspended", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication requires another factor.
         /// </summary>
-        internal static string PasswordCredentialsApplication_MfaRequired {
+        internal static string PersonCredentialsApplication_MfaRequired {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_MfaRequired", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_MfaRequired", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The user account ID is not a person.
         /// </summary>
-        internal static string PasswordCredentialsApplication_NotPerson {
+        internal static string PersonCredentialsApplication_NotPerson {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_NotPerson", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_NotPerson", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The user account has already been verified.
         /// </summary>
-        internal static string PasswordCredentialsApplication_RegistrationAlreadyVerified {
+        internal static string PersonCredentialsApplication_RegistrationAlreadyVerified {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_RegistrationAlreadyVerified", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_RegistrationAlreadyVerified", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The user account has not been verified.
         /// </summary>
-        internal static string PasswordCredentialsApplication_RegistrationNotVerified {
+        internal static string PersonCredentialsApplication_RegistrationNotVerified {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_RegistrationNotVerified", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_RegistrationNotVerified", resourceCulture);
             }
         }
         

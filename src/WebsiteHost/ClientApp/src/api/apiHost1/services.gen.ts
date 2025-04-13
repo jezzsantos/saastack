@@ -17,12 +17,12 @@ import type {
   AssignRolesToOrganizationPutData,
   AssignRolesToOrganizationPutError,
   AssignRolesToOrganizationPutResponse,
-  AssociatePasswordMfaAuthenticatorForCallerData,
-  AssociatePasswordMfaAuthenticatorForCallerError,
-  AssociatePasswordMfaAuthenticatorForCallerResponse2,
-  AuthenticatePasswordData,
-  AuthenticatePasswordError,
-  AuthenticatePasswordResponse,
+  AssociateCredentialMfaAuthenticatorForCallerData,
+  AssociateCredentialMfaAuthenticatorForCallerError,
+  AssociateCredentialMfaAuthenticatorForCallerResponse2,
+  AuthenticateCredentialData,
+  AuthenticateCredentialError,
+  AuthenticateCredentialResponse,
   AuthenticateSingleSignOnData,
   AuthenticateSingleSignOnError,
   AuthenticateSingleSignOnResponse,
@@ -38,12 +38,18 @@ import type {
   CancelSubscriptionData,
   CancelSubscriptionError,
   CancelSubscriptionResponse,
-  ChallengePasswordMfaAuthenticatorForCallerPatchData,
-  ChallengePasswordMfaAuthenticatorForCallerPatchError,
-  ChallengePasswordMfaAuthenticatorForCallerPatchResponse,
-  ChallengePasswordMfaAuthenticatorForCallerPutData,
-  ChallengePasswordMfaAuthenticatorForCallerPutError,
-  ChallengePasswordMfaAuthenticatorForCallerPutResponse,
+  ChallengeCredentialMfaAuthenticatorForCallerPatchData,
+  ChallengeCredentialMfaAuthenticatorForCallerPatchError,
+  ChallengeCredentialMfaAuthenticatorForCallerPatchResponse,
+  ChallengeCredentialMfaAuthenticatorForCallerPutData,
+  ChallengeCredentialMfaAuthenticatorForCallerPutError,
+  ChallengeCredentialMfaAuthenticatorForCallerPutResponse,
+  ChangeCredentialMfaForCallerPatchData,
+  ChangeCredentialMfaForCallerPatchError,
+  ChangeCredentialMfaForCallerPatchResponse,
+  ChangeCredentialMfaForCallerPutData,
+  ChangeCredentialMfaForCallerPutError,
+  ChangeCredentialMfaForCallerPutResponse,
   ChangeDefaultOrganizationPatchData,
   ChangeDefaultOrganizationPatchError,
   ChangeDefaultOrganizationPatchResponse,
@@ -62,12 +68,6 @@ import type {
   ChangeOrganizationPutData,
   ChangeOrganizationPutError,
   ChangeOrganizationPutResponse,
-  ChangePasswordMfaForCallerPatchData,
-  ChangePasswordMfaForCallerPatchError,
-  ChangePasswordMfaForCallerPatchResponse,
-  ChangePasswordMfaForCallerPutData,
-  ChangePasswordMfaForCallerPutError,
-  ChangePasswordMfaForCallerPutResponse,
   ChangeProfileAvatarPatchData,
   ChangeProfileAvatarPatchError,
   ChangeProfileAvatarPatchResponse,
@@ -95,24 +95,24 @@ import type {
   ChargebeeNotifyWebhookEventData,
   ChargebeeNotifyWebhookEventError,
   ChargebeeNotifyWebhookEventResponse,
-  CompletePasswordResetData,
-  CompletePasswordResetError,
-  CompletePasswordResetResponse,
+  CompleteCredentialResetData,
+  CompleteCredentialResetError,
+  CompleteCredentialResetResponse,
+  ConfirmCredentialMfaAuthenticatorForCallerPatchData,
+  ConfirmCredentialMfaAuthenticatorForCallerPatchError,
+  ConfirmCredentialMfaAuthenticatorForCallerPatchResponse,
+  ConfirmCredentialMfaAuthenticatorForCallerPutData,
+  ConfirmCredentialMfaAuthenticatorForCallerPutError,
+  ConfirmCredentialMfaAuthenticatorForCallerPutResponse,
   ConfirmEmailDeliveredData,
   ConfirmEmailDeliveredError,
   ConfirmEmailDeliveredResponse,
   ConfirmEmailDeliveryFailedData,
   ConfirmEmailDeliveryFailedError,
   ConfirmEmailDeliveryFailedResponse,
-  ConfirmPasswordMfaAuthenticatorForCallerPatchData,
-  ConfirmPasswordMfaAuthenticatorForCallerPatchError,
-  ConfirmPasswordMfaAuthenticatorForCallerPatchResponse,
-  ConfirmPasswordMfaAuthenticatorForCallerPutData,
-  ConfirmPasswordMfaAuthenticatorForCallerPutError,
-  ConfirmPasswordMfaAuthenticatorForCallerPutResponse,
-  ConfirmRegistrationPersonPasswordData,
-  ConfirmRegistrationPersonPasswordError,
-  ConfirmRegistrationPersonPasswordResponse2,
+  ConfirmRegistrationPersonCredentialData,
+  ConfirmRegistrationPersonCredentialError,
+  ConfirmRegistrationPersonCredentialResponse2,
   ConfirmSmsDeliveredData,
   ConfirmSmsDeliveredError,
   ConfirmSmsDeliveredResponse,
@@ -122,9 +122,9 @@ import type {
   ContentNegotiationsTestingOnlyData,
   ContentNegotiationsTestingOnlyError,
   ContentNegotiationsTestingOnlyResponse,
-  CreateApiKeyForCallerData,
-  CreateApiKeyForCallerError,
-  CreateApiKeyForCallerResponse,
+  CreateApiKeyData,
+  CreateApiKeyError,
+  CreateApiKeyResponse,
   CreateOrganizationData,
   CreateOrganizationError,
   CreateOrganizationResponse,
@@ -155,21 +155,21 @@ import type {
   DestroyAllRepositoriesData,
   DestroyAllRepositoriesError,
   DestroyAllRepositoriesResponse,
-  DisassociatePasswordMfaAuthenticatorForCallerData,
-  DisassociatePasswordMfaAuthenticatorForCallerError,
-  DisassociatePasswordMfaAuthenticatorForCallerResponse,
+  DisassociateCredentialMfaAuthenticatorForCallerData,
+  DisassociateCredentialMfaAuthenticatorForCallerError,
+  DisassociateCredentialMfaAuthenticatorForCallerResponse,
   DownloadImageData,
   DownloadImageError,
   DownloadImageResponse,
   DrainAllAuditsData,
   DrainAllAuditsError,
   DrainAllAuditsResponse,
-  DrainAllDomainEventsData,
-  DrainAllDomainEventsError,
-  DrainAllDomainEventsResponse,
   DrainAllEmailsData,
   DrainAllEmailsError,
   DrainAllEmailsResponse,
+  DrainAllEventNotificationsData,
+  DrainAllEventNotificationsError,
+  DrainAllEventNotificationsResponse,
   DrainAllProvisioningsData,
   DrainAllProvisioningsError,
   DrainAllProvisioningsResponse,
@@ -228,9 +228,6 @@ import type {
   GetSubscriptionData,
   GetSubscriptionError,
   GetSubscriptionResponse2,
-  GetUserData,
-  GetUserError,
-  GetUserResponse2,
   GetWithSimpleArrayTestingOnlyData,
   GetWithSimpleArrayTestingOnlyError,
   GetWithSimpleArrayTestingOnlyResponse,
@@ -245,15 +242,15 @@ import type {
   InviteMemberToOrganizationData,
   InviteMemberToOrganizationError,
   InviteMemberToOrganizationResponse2,
+  ListCredentialMfaAuthenticatorsForCallerData,
+  ListCredentialMfaAuthenticatorsForCallerError,
+  ListCredentialMfaAuthenticatorsForCallerResponse2,
   ListMembersForOrganizationData,
   ListMembersForOrganizationError,
   ListMembersForOrganizationResponse2,
   ListMembershipsForCallerData,
   ListMembershipsForCallerError,
   ListMembershipsForCallerResponse2,
-  ListPasswordMfaAuthenticatorsForCallerData,
-  ListPasswordMfaAuthenticatorsForCallerError,
-  ListPasswordMfaAuthenticatorsForCallerResponse2,
   ListPricingPlansError,
   ListPricingPlansResponse2,
   MailgunNotifyWebhookEventData,
@@ -322,9 +319,9 @@ import type {
   RegisterMachineData,
   RegisterMachineError,
   RegisterMachineResponse2,
-  RegisterPersonPasswordData,
-  RegisterPersonPasswordError,
-  RegisterPersonPasswordResponse2,
+  RegisterPersonCredentialData,
+  RegisterPersonCredentialError,
+  RegisterPersonCredentialResponse2,
   RequestCorrelationsTestingOnlyError,
   RequestCorrelationsTestingOnlyResponse,
   ResendGuestInvitationData,
@@ -333,12 +330,15 @@ import type {
   ResendPasswordResetData,
   ResendPasswordResetError,
   ResendPasswordResetResponse,
-  ResetPasswordMfaPatchData,
-  ResetPasswordMfaPatchError,
-  ResetPasswordMfaPatchResponse,
-  ResetPasswordMfaPutData,
-  ResetPasswordMfaPutError,
-  ResetPasswordMfaPutResponse,
+  ResetCredentialMfaPatchData,
+  ResetCredentialMfaPatchError,
+  ResetCredentialMfaPatchResponse,
+  ResetCredentialMfaPutData,
+  ResetCredentialMfaPutError,
+  ResetCredentialMfaPutResponse,
+  RevokeApiKeyData,
+  RevokeApiKeyError,
+  RevokeApiKeyResponse,
   RevokeRefreshTokenData,
   RevokeRefreshTokenError,
   RevokeRefreshTokenResponse,
@@ -366,18 +366,21 @@ import type {
   SearchAllCarUnavailabilitiesData,
   SearchAllCarUnavailabilitiesError,
   SearchAllCarUnavailabilitiesResponse2,
-  SearchAllDomainEventsData,
-  SearchAllDomainEventsError,
-  SearchAllDomainEventsResponse2,
   SearchAllEmailDeliveriesData,
   SearchAllEmailDeliveriesError,
   SearchAllEmailDeliveriesResponse2,
+  SearchAllEventNotificationsData,
+  SearchAllEventNotificationsError,
+  SearchAllEventNotificationsResponse2,
   SearchAllSmsDeliveriesData,
   SearchAllSmsDeliveriesError,
   SearchAllSmsDeliveriesResponse2,
   SearchSubscriptionHistoryData,
   SearchSubscriptionHistoryError,
   SearchSubscriptionHistoryResponse2,
+  SearchTestingOnlyData,
+  SearchTestingOnlyError,
+  SearchTestingOnlyResponse2,
   SendEmailData,
   SendEmailError,
   SendEmailResponse,
@@ -452,15 +455,15 @@ import type {
   ValidationsValidatedPostTestingOnlyData,
   ValidationsValidatedPostTestingOnlyError,
   ValidationsValidatedPostTestingOnlyResponse,
+  VerifyCredentialMfaAuthenticatorForCallerPatchData,
+  VerifyCredentialMfaAuthenticatorForCallerPatchError,
+  VerifyCredentialMfaAuthenticatorForCallerPatchResponse,
+  VerifyCredentialMfaAuthenticatorForCallerPutData,
+  VerifyCredentialMfaAuthenticatorForCallerPutError,
+  VerifyCredentialMfaAuthenticatorForCallerPutResponse,
   VerifyGuestInvitationData,
   VerifyGuestInvitationError,
   VerifyGuestInvitationResponse2,
-  VerifyPasswordMfaAuthenticatorForCallerPatchData,
-  VerifyPasswordMfaAuthenticatorForCallerPatchError,
-  VerifyPasswordMfaAuthenticatorForCallerPatchResponse,
-  VerifyPasswordMfaAuthenticatorForCallerPutData,
-  VerifyPasswordMfaAuthenticatorForCallerPutError,
-  VerifyPasswordMfaAuthenticatorForCallerPutResponse,
   VerifyPasswordResetData,
   VerifyPasswordResetError,
   VerifyPasswordResetResponse
@@ -469,15 +472,13 @@ import type {
 export const client = createClient(createConfig());
 
 /**
- * Create a new API key for the authenticated user
- * (request type: CreateAPIKeyForCallerRequest)
+ * Creates a new API key for the authenticated user, and expires all exisitng API keys
+ * (request type: CreateAPIKeyRequest)
  */
-export const createApiKeyForCaller = <ThrowOnError extends boolean = false>(
-  options?: Options<CreateApiKeyForCallerData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<CreateApiKeyForCallerResponse, CreateApiKeyForCallerError, ThrowOnError>({
+export const createApiKey = <ThrowOnError extends boolean = false>(options?: Options<CreateApiKeyData, ThrowOnError>) =>
+  (options?.client ?? client).post<CreateApiKeyResponse, CreateApiKeyError, ThrowOnError>({
     ...options,
-    url: "/apikeys/me"
+    url: "/apikeys"
   });
 
 /**
@@ -489,11 +490,11 @@ export const searchAllApiKeysForCaller = <ThrowOnError extends boolean = false>(
 ) =>
   (options?.client ?? client).get<SearchAllApiKeysForCallerResponse, SearchAllApiKeysForCallerError, ThrowOnError>({
     ...options,
-    url: "/apikeys/me"
+    url: "/apikeys"
   });
 
 /**
- * Deletes the API key
+ * Deletes the API key of the authenticated user
  * (request type: DeleteAPIKeyRequest)
  */
 export const deleteApiKey = <ThrowOnError extends boolean = false>(options: Options<DeleteApiKeyData, ThrowOnError>) =>
@@ -501,6 +502,16 @@ export const deleteApiKey = <ThrowOnError extends boolean = false>(options: Opti
     ...options,
     url: "/apikeys/{Id}"
   });
+
+/**
+ * Revokes the API key
+ * (request type: RevokeAPIKeyRequest)
+ */
+export const revokeApiKey = <ThrowOnError extends boolean = false>(options: Options<RevokeApiKeyData, ThrowOnError>) =>
+    (options?.client ?? client).delete<RevokeApiKeyResponse, RevokeApiKeyError, ThrowOnError>({
+      ...options,
+      url: "/apikeys/{Id}/revoke"
+    });
 
 /**
  * Delivers an audit message
@@ -751,29 +762,133 @@ export const takeOfflineCarPatch = <ThrowOnError extends boolean = false>(
  * (request type: ChargebeeNotifyWebhookEventRequest)
  */
 export const chargebeeNotifyWebhookEvent = <ThrowOnError extends boolean = false>(
-    options?: Options<ChargebeeNotifyWebhookEventData, ThrowOnError>
+  options?: Options<ChargebeeNotifyWebhookEventData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<ChargebeeNotifyWebhookEventResponse, ChargebeeNotifyWebhookEventError, ThrowOnError>(
-        {
-            ...options,
-            url: "/webhooks/chargebee"
-        }
-    );
+  (options?.client ?? client).post<ChargebeeNotifyWebhookEventResponse, ChargebeeNotifyWebhookEventError, ThrowOnError>(
+    {
+      ...options,
+      url: "/webhooks/chargebee"
+    }
+  );
 
 /**
- * Drains all the pending domain_event messages
- * (request type: DrainAllDomainEventsRequest)
+ * Authenticates a user with a username and password
+ * (request type: AuthenticateCredentialRequest)
  */
-export const drainAllDomainEvents = <ThrowOnError extends boolean = false>(
-  options?: Options<DrainAllDomainEventsData, ThrowOnError>
+export const authenticateCredential = <ThrowOnError extends boolean = false>(
+    options?: Options<AuthenticateCredentialData, ThrowOnError>
 ) =>
-  (options?.client ?? client).post<DrainAllDomainEventsResponse, DrainAllDomainEventsError, ThrowOnError>({
+    (options?.client ?? client).post<AuthenticateCredentialResponse, AuthenticateCredentialError, ThrowOnError>({
+      ...options,
+      url: "/credentials/auth"
+    });
+
+/**
+ * Completes a password reset attempt
+ * (request type: CompleteCredentialResetRequest)
+ */
+export const completeCredentialReset = <ThrowOnError extends boolean = false>(
+    options: Options<CompleteCredentialResetData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<CompleteCredentialResetResponse, CompleteCredentialResetError, ThrowOnError>({
+      ...options,
+      url: "/credentials/{Token}/reset/complete"
+    });
+
+/**
+ * Confirms the invitation to register a new person (verifying their email address)
+ * (request type: ConfirmRegistrationPersonCredentialRequest)
+ */
+export const confirmRegistrationPersonCredential = <ThrowOnError extends boolean = false>(
+  options?: Options<ConfirmRegistrationPersonCredentialData, ThrowOnError>
+) =>
+  (options?.client ?? client).post<
+    ConfirmRegistrationPersonCredentialResponse2,
+    ConfirmRegistrationPersonCredentialError,
+    ThrowOnError
+  >({
     ...options,
-    url: "/domain_events/drain"
+    url: "/credentials/confirm-registration"
   });
 
 /**
- * Notifies when a domain_event has been raised
+ * Fetches the confirmation token for a registration of a person
+ * (request type: GetRegistrationPersonConfirmationRequest)
+ */
+export const getRegistrationPersonConfirmation = <ThrowOnError extends boolean = false>(
+  options: Options<GetRegistrationPersonConfirmationData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    GetRegistrationPersonConfirmationResponse2,
+    GetRegistrationPersonConfirmationError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/credentials/confirm-registration"
+  });
+
+/**
+ * Registers a new person on the platform
+ * (request type: RegisterPersonCredentialRequest)
+ */
+export const registerPersonCredential = <ThrowOnError extends boolean = false>(
+    options?: Options<RegisterPersonCredentialData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<RegisterPersonCredentialResponse2, RegisterPersonCredentialError, ThrowOnError>({
+      ...options,
+      url: "/credentials/register"
+    });
+
+/**
+ * Begins a password reset attempt
+ * (request type: InitiatePasswordResetRequest)
+ */
+export const initiatePasswordReset = <ThrowOnError extends boolean = false>(
+    options?: Options<InitiatePasswordResetData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<InitiatePasswordResetResponse, InitiatePasswordResetError, ThrowOnError>({
+      ...options,
+      url: "/credentials/reset"
+  });
+
+/**
+ * Resends a password reset attempt (via email)
+ * (request type: ResendPasswordResetRequest)
+ */
+export const resendPasswordReset = <ThrowOnError extends boolean = false>(
+    options: Options<ResendPasswordResetData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<ResendPasswordResetResponse, ResendPasswordResetError, ThrowOnError>({
+      ...options,
+      url: "/credentials/{Token}/reset/resend"
+    });
+
+/**
+ * Verifies that the password reset attempt is still valid
+ * (request type: VerifyPasswordResetRequest)
+ */
+export const verifyPasswordReset = <ThrowOnError extends boolean = false>(
+    options: Options<VerifyPasswordResetData, ThrowOnError>
+) =>
+    (options?.client ?? client).get<VerifyPasswordResetResponse, VerifyPasswordResetError, ThrowOnError>({
+      ...options,
+      url: "/credentials/{Token}/reset/verify"
+    });
+
+/**
+ * Drains all the pending event notifications
+ * (request type: DrainAllEventNotificationsRequest)
+ */
+export const drainAllEventNotifications = <ThrowOnError extends boolean = false>(
+    options?: Options<DrainAllEventNotificationsData, ThrowOnError>
+) =>
+    (options?.client ?? client).post<DrainAllEventNotificationsResponse, DrainAllEventNotificationsError, ThrowOnError>({
+      ...options,
+      url: "/event_notifications/drain"
+    });
+
+/**
+ * Notifies when a domain_event has been raised to a subscriber
  * (request type: NotifyDomainEventRequest)
  */
 export const notifyDomainEvent = <ThrowOnError extends boolean = false>(
@@ -781,20 +896,22 @@ export const notifyDomainEvent = <ThrowOnError extends boolean = false>(
 ) =>
   (options?.client ?? client).post<NotifyDomainEventResponse, NotifyDomainEventError, ThrowOnError>({
     ...options,
-    url: "/domain_events/notify"
+    url: "/event_notifications"
   });
 
 /**
- * Lists all delivered domain_events
- * (request type: SearchAllDomainEventsRequest)
+ * Lists all event notifications
+ * (request type: SearchAllEventNotificationsRequest)
  */
-export const searchAllDomainEvents = <ThrowOnError extends boolean = false>(
-  options?: Options<SearchAllDomainEventsData, ThrowOnError>
+export const searchAllEventNotifications = <ThrowOnError extends boolean = false>(
+  options?: Options<SearchAllEventNotificationsData, ThrowOnError>
 ) =>
-  (options?.client ?? client).get<SearchAllDomainEventsResponse2, SearchAllDomainEventsError, ThrowOnError>({
-    ...options,
-    url: "/domain_events"
-  });
+  (options?.client ?? client).get<SearchAllEventNotificationsResponse2, SearchAllEventNotificationsError, ThrowOnError>(
+    {
+      ...options,
+      url: "/event_notifications"
+    }
+  );
 
 /**
  * Confirms the delivery of a sent email message
@@ -886,16 +1003,6 @@ export const unassignPlatformRolesPatch = <ThrowOnError extends boolean = false>
   (options?.client ?? client).patch<UnassignPlatformRolesPatchResponse, UnassignPlatformRolesPatchError, ThrowOnError>({
     ...options,
     url: "/users/{Id}/roles"
-  });
-
-/**
- * Fetches the specified user
- * (request type: GetUserRequest)
- */
-export const getUser = <ThrowOnError extends boolean = false>(options: Options<GetUserData, ThrowOnError>) =>
-  (options?.client ?? client).get<GetUserResponse2, GetUserError, ThrowOnError>({
-    ...options,
-    url: "/users/{Id}"
   });
 
 /**
@@ -1117,202 +1224,202 @@ export const listMembershipsForCaller = <ThrowOnError extends boolean = false>(
 
 /**
  * Associates another MFA authentication factor to the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.
- * (request type: AssociatePasswordMfaAuthenticatorForCallerRequest)
+ * (request type: AssociateCredentialMfaAuthenticatorForCallerRequest)
  */
-export const associatePasswordMfaAuthenticatorForCaller = <ThrowOnError extends boolean = false>(
-  options?: Options<AssociatePasswordMfaAuthenticatorForCallerData, ThrowOnError>
+export const associateCredentialMfaAuthenticatorForCaller = <ThrowOnError extends boolean = false>(
+  options?: Options<AssociateCredentialMfaAuthenticatorForCallerData, ThrowOnError>
 ) =>
   (options?.client ?? client).post<
-    AssociatePasswordMfaAuthenticatorForCallerResponse2,
-    AssociatePasswordMfaAuthenticatorForCallerError,
+    AssociateCredentialMfaAuthenticatorForCallerResponse2,
+    AssociateCredentialMfaAuthenticatorForCallerError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators"
+    url: "/credentials/mfa/authenticators"
   });
 
 /**
  * Fetches the MFA authenticators for the user
- * (request type: ListPasswordMfaAuthenticatorsForCallerRequest)
+ * (request type: ListCredentialMfaAuthenticatorsForCallerRequest)
  */
-export const listPasswordMfaAuthenticatorsForCaller = <ThrowOnError extends boolean = false>(
-  options?: Options<ListPasswordMfaAuthenticatorsForCallerData, ThrowOnError>
+export const listCredentialMfaAuthenticatorsForCaller = <ThrowOnError extends boolean = false>(
+  options?: Options<ListCredentialMfaAuthenticatorsForCallerData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<
-    ListPasswordMfaAuthenticatorsForCallerResponse2,
-    ListPasswordMfaAuthenticatorsForCallerError,
+    ListCredentialMfaAuthenticatorsForCallerResponse2,
+    ListCredentialMfaAuthenticatorsForCallerError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators"
+    url: "/credentials/mfa/authenticators"
   });
 
 /**
  * Challenges an MFA authenticator for the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.
- * (request type: ChallengePasswordMfaAuthenticatorForCallerRequest)
+ * (request type: ChallengeCredentialMfaAuthenticatorForCallerRequest)
  */
-export const challengePasswordMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
-  options: Options<ChallengePasswordMfaAuthenticatorForCallerPutData, ThrowOnError>
+export const challengeCredentialMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
+  options: Options<ChallengeCredentialMfaAuthenticatorForCallerPutData, ThrowOnError>
 ) =>
   (options?.client ?? client).put<
-    ChallengePasswordMfaAuthenticatorForCallerPutResponse,
-    ChallengePasswordMfaAuthenticatorForCallerPutError,
+    ChallengeCredentialMfaAuthenticatorForCallerPutResponse,
+    ChallengeCredentialMfaAuthenticatorForCallerPutError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorId}/challenge"
+    url: "/credentials/mfa/authenticators/{AuthenticatorId}/challenge"
   });
 
 /**
  * Challenges an MFA authenticator for the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.
- * (request type: ChallengePasswordMfaAuthenticatorForCallerRequest)
+ * (request type: ChallengeCredentialMfaAuthenticatorForCallerRequest)
  */
-export const challengePasswordMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
-  options: Options<ChallengePasswordMfaAuthenticatorForCallerPatchData, ThrowOnError>
+export const challengeCredentialMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
+  options: Options<ChallengeCredentialMfaAuthenticatorForCallerPatchData, ThrowOnError>
 ) =>
   (options?.client ?? client).patch<
-    ChallengePasswordMfaAuthenticatorForCallerPatchResponse,
-    ChallengePasswordMfaAuthenticatorForCallerPatchError,
+    ChallengeCredentialMfaAuthenticatorForCallerPatchResponse,
+    ChallengeCredentialMfaAuthenticatorForCallerPatchError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorId}/challenge"
+    url: "/credentials/mfa/authenticators/{AuthenticatorId}/challenge"
   });
 
 /**
  * Changes whether the user is MFA enabled or not
- * (request type: ChangePasswordMfaForCallerRequest)
+ * (request type: ChangeCredentialMfaForCallerRequest)
  */
-export const changePasswordMfaForCallerPut = <ThrowOnError extends boolean = false>(
-  options?: Options<ChangePasswordMfaForCallerPutData, ThrowOnError>
+export const changeCredentialMfaForCallerPut = <ThrowOnError extends boolean = false>(
+  options?: Options<ChangeCredentialMfaForCallerPutData, ThrowOnError>
 ) =>
   (options?.client ?? client).put<
-    ChangePasswordMfaForCallerPutResponse,
-    ChangePasswordMfaForCallerPutError,
+    ChangeCredentialMfaForCallerPutResponse,
+    ChangeCredentialMfaForCallerPutError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa"
+    url: "/credentials/mfa"
   });
 
 /**
  * Changes whether the user is MFA enabled or not
- * (request type: ChangePasswordMfaForCallerRequest)
+ * (request type: ChangeCredentialMfaForCallerRequest)
  */
-export const changePasswordMfaForCallerPatch = <ThrowOnError extends boolean = false>(
-  options?: Options<ChangePasswordMfaForCallerPatchData, ThrowOnError>
+export const changeCredentialMfaForCallerPatch = <ThrowOnError extends boolean = false>(
+  options?: Options<ChangeCredentialMfaForCallerPatchData, ThrowOnError>
 ) =>
   (options?.client ?? client).patch<
-    ChangePasswordMfaForCallerPatchResponse,
-    ChangePasswordMfaForCallerPatchError,
+    ChangeCredentialMfaForCallerPatchResponse,
+    ChangeCredentialMfaForCallerPatchError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa"
+    url: "/credentials/mfa"
   });
 
 /**
  * Confirms the association of an MFA authenticator for the user, and authenticates the user.
- * (request type: ConfirmPasswordMfaAuthenticatorForCallerRequest)
+ * (request type: ConfirmCredentialMfaAuthenticatorForCallerRequest)
  */
-export const confirmPasswordMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
-  options: Options<ConfirmPasswordMfaAuthenticatorForCallerPutData, ThrowOnError>
+export const confirmCredentialMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmCredentialMfaAuthenticatorForCallerPutData, ThrowOnError>
 ) =>
   (options?.client ?? client).put<
-    ConfirmPasswordMfaAuthenticatorForCallerPutResponse,
-    ConfirmPasswordMfaAuthenticatorForCallerPutError,
+    ConfirmCredentialMfaAuthenticatorForCallerPutResponse,
+    ConfirmCredentialMfaAuthenticatorForCallerPutError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorType}/confirm"
+    url: "/credentials/mfa/authenticators/{AuthenticatorType}/confirm"
   });
 
 /**
  * Confirms the association of an MFA authenticator for the user, and authenticates the user.
- * (request type: ConfirmPasswordMfaAuthenticatorForCallerRequest)
+ * (request type: ConfirmCredentialMfaAuthenticatorForCallerRequest)
  */
-export const confirmPasswordMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
-  options: Options<ConfirmPasswordMfaAuthenticatorForCallerPatchData, ThrowOnError>
+export const confirmCredentialMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmCredentialMfaAuthenticatorForCallerPatchData, ThrowOnError>
 ) =>
   (options?.client ?? client).patch<
-    ConfirmPasswordMfaAuthenticatorForCallerPatchResponse,
-    ConfirmPasswordMfaAuthenticatorForCallerPatchError,
+    ConfirmCredentialMfaAuthenticatorForCallerPatchResponse,
+    ConfirmCredentialMfaAuthenticatorForCallerPatchError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorType}/confirm"
+    url: "/credentials/mfa/authenticators/{AuthenticatorType}/confirm"
   });
 
 /**
  * Disassociates an associated MFA authenticator from the user
- * (request type: DisassociatePasswordMfaAuthenticatorForCallerRequest)
+ * (request type: DisassociateCredentialMfaAuthenticatorForCallerRequest)
  */
-export const disassociatePasswordMfaAuthenticatorForCaller = <ThrowOnError extends boolean = false>(
-  options: Options<DisassociatePasswordMfaAuthenticatorForCallerData, ThrowOnError>
+export const disassociateCredentialMfaAuthenticatorForCaller = <ThrowOnError extends boolean = false>(
+  options: Options<DisassociateCredentialMfaAuthenticatorForCallerData, ThrowOnError>
 ) =>
   (options?.client ?? client).delete<
-    DisassociatePasswordMfaAuthenticatorForCallerResponse,
-    DisassociatePasswordMfaAuthenticatorForCallerError,
+    DisassociateCredentialMfaAuthenticatorForCallerResponse,
+    DisassociateCredentialMfaAuthenticatorForCallerError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{Id}"
+    url: "/credentials/mfa/authenticators/{Id}"
   });
 
 /**
  * Resets the user MFA status back to the default for all users
- * (request type: ResetPasswordMfaRequest)
+ * (request type: ResetCredentialMfaRequest)
  */
-export const resetPasswordMfaPut = <ThrowOnError extends boolean = false>(
-  options?: Options<ResetPasswordMfaPutData, ThrowOnError>
+export const resetCredentialMfaPut = <ThrowOnError extends boolean = false>(
+  options?: Options<ResetCredentialMfaPutData, ThrowOnError>
 ) =>
-  (options?.client ?? client).put<ResetPasswordMfaPutResponse, ResetPasswordMfaPutError, ThrowOnError>({
+  (options?.client ?? client).put<ResetCredentialMfaPutResponse, ResetCredentialMfaPutError, ThrowOnError>({
     ...options,
-    url: "/passwords/mfa/reset"
+    url: "/credentials/mfa/reset"
   });
 
 /**
  * Resets the user MFA status back to the default for all users
- * (request type: ResetPasswordMfaRequest)
+ * (request type: ResetCredentialMfaRequest)
  */
-export const resetPasswordMfaPatch = <ThrowOnError extends boolean = false>(
-  options?: Options<ResetPasswordMfaPatchData, ThrowOnError>
+export const resetCredentialMfaPatch = <ThrowOnError extends boolean = false>(
+  options?: Options<ResetCredentialMfaPatchData, ThrowOnError>
 ) =>
-  (options?.client ?? client).patch<ResetPasswordMfaPatchResponse, ResetPasswordMfaPatchError, ThrowOnError>({
+  (options?.client ?? client).patch<ResetCredentialMfaPatchResponse, ResetCredentialMfaPatchError, ThrowOnError>({
     ...options,
-    url: "/passwords/mfa/reset"
+    url: "/credentials/mfa/reset"
   });
 
 /**
  * Verifies an MFA authenticator for the user, and authenticates the user.
- * (request type: VerifyPasswordMfaAuthenticatorForCallerRequest)
+ * (request type: VerifyCredentialMfaAuthenticatorForCallerRequest)
  */
-export const verifyPasswordMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
-  options: Options<VerifyPasswordMfaAuthenticatorForCallerPutData, ThrowOnError>
+export const verifyCredentialMfaAuthenticatorForCallerPut = <ThrowOnError extends boolean = false>(
+  options: Options<VerifyCredentialMfaAuthenticatorForCallerPutData, ThrowOnError>
 ) =>
   (options?.client ?? client).put<
-    VerifyPasswordMfaAuthenticatorForCallerPutResponse,
-    VerifyPasswordMfaAuthenticatorForCallerPutError,
+    VerifyCredentialMfaAuthenticatorForCallerPutResponse,
+    VerifyCredentialMfaAuthenticatorForCallerPutError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorType}/verify"
+    url: "/credentials/mfa/authenticators/{AuthenticatorType}/verify"
   });
 
 /**
  * Verifies an MFA authenticator for the user, and authenticates the user.
- * (request type: VerifyPasswordMfaAuthenticatorForCallerRequest)
+ * (request type: VerifyCredentialMfaAuthenticatorForCallerRequest)
  */
-export const verifyPasswordMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
-  options: Options<VerifyPasswordMfaAuthenticatorForCallerPatchData, ThrowOnError>
+export const verifyCredentialMfaAuthenticatorForCallerPatch = <ThrowOnError extends boolean = false>(
+  options: Options<VerifyCredentialMfaAuthenticatorForCallerPatchData, ThrowOnError>
 ) =>
   (options?.client ?? client).patch<
-    VerifyPasswordMfaAuthenticatorForCallerPatchResponse,
-    VerifyPasswordMfaAuthenticatorForCallerPatchError,
+    VerifyCredentialMfaAuthenticatorForCallerPatchResponse,
+    VerifyCredentialMfaAuthenticatorForCallerPatchError,
     ThrowOnError
   >({
     ...options,
-    url: "/passwords/mfa/authenticators/{AuthenticatorType}/verify"
+    url: "/credentials/mfa/authenticators/{AuthenticatorType}/verify"
   });
 
 /**
@@ -1537,110 +1644,6 @@ export const unInviteMemberFromOrganization = <ThrowOnError extends boolean = fa
   >({
     ...options,
     url: "/organizations/{Id}/members/{UserId}"
-  });
-
-/**
- * Authenticates a user with a username and password
- * (request type: AuthenticatePasswordRequest)
- */
-export const authenticatePassword = <ThrowOnError extends boolean = false>(
-  options?: Options<AuthenticatePasswordData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<AuthenticatePasswordResponse, AuthenticatePasswordError, ThrowOnError>({
-    ...options,
-    url: "/passwords/auth"
-  });
-
-/**
- * Completes a password reset attempt
- * (request type: CompletePasswordResetRequest)
- */
-export const completePasswordReset = <ThrowOnError extends boolean = false>(
-  options: Options<CompletePasswordResetData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<CompletePasswordResetResponse, CompletePasswordResetError, ThrowOnError>({
-    ...options,
-    url: "/passwords/{Token}/reset/complete"
-  });
-
-/**
- * Confirms the invitation to register a new person (verifying their email address)
- * (request type: ConfirmRegistrationPersonPasswordRequest)
- */
-export const confirmRegistrationPersonPassword = <ThrowOnError extends boolean = false>(
-  options?: Options<ConfirmRegistrationPersonPasswordData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<
-    ConfirmRegistrationPersonPasswordResponse2,
-    ConfirmRegistrationPersonPasswordError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/passwords/confirm-registration"
-  });
-
-/**
- * Fetches the confirmation token for a registration of a person
- * (request type: GetRegistrationPersonConfirmationRequest)
- */
-export const getRegistrationPersonConfirmation = <ThrowOnError extends boolean = false>(
-  options: Options<GetRegistrationPersonConfirmationData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    GetRegistrationPersonConfirmationResponse2,
-    GetRegistrationPersonConfirmationError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/passwords/confirm-registration"
-  });
-
-/**
- * Registers a new person on the platform
- * (request type: RegisterPersonPasswordRequest)
- */
-export const registerPersonPassword = <ThrowOnError extends boolean = false>(
-  options?: Options<RegisterPersonPasswordData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<RegisterPersonPasswordResponse2, RegisterPersonPasswordError, ThrowOnError>({
-    ...options,
-    url: "/passwords/register"
-  });
-
-/**
- * Begins a password reset attempt
- * (request type: InitiatePasswordResetRequest)
- */
-export const initiatePasswordReset = <ThrowOnError extends boolean = false>(
-  options?: Options<InitiatePasswordResetData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<InitiatePasswordResetResponse, InitiatePasswordResetError, ThrowOnError>({
-    ...options,
-    url: "/passwords/reset"
-  });
-
-/**
- * Resends a password reset attempt (via email)
- * (request type: ResendPasswordResetRequest)
- */
-export const resendPasswordReset = <ThrowOnError extends boolean = false>(
-  options: Options<ResendPasswordResetData, ThrowOnError>
-) =>
-  (options?.client ?? client).post<ResendPasswordResetResponse, ResendPasswordResetError, ThrowOnError>({
-    ...options,
-    url: "/passwords/{Token}/reset/resend"
-  });
-
-/**
- * Verifies that the password reset attempt is still valid
- * (request type: VerifyPasswordResetRequest)
- */
-export const verifyPasswordReset = <ThrowOnError extends boolean = false>(
-  options: Options<VerifyPasswordResetData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<VerifyPasswordResetResponse, VerifyPasswordResetError, ThrowOnError>({
-    ...options,
-    url: "/passwords/{Token}/reset/verify"
   });
 
 /**
@@ -2032,16 +2035,16 @@ export const postWithEmptyBodyTestingOnly = <ThrowOnError extends boolean = fals
  * (request type: PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest)
  */
 export const postWithEmptyBodyAndRequiredPropertiesTestingOnly = <ThrowOnError extends boolean = false>(
-    options?: Options<PostWithEmptyBodyAndRequiredPropertiesTestingOnlyData, ThrowOnError>
+  options?: Options<PostWithEmptyBodyAndRequiredPropertiesTestingOnlyData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<
-        PostWithEmptyBodyAndRequiredPropertiesTestingOnlyResponse,
-        PostWithEmptyBodyAndRequiredPropertiesTestingOnlyError,
-        ThrowOnError
-    >({
-        ...options,
-        url: "/testingonly/general/body/empty/required"
-    });
+  (options?.client ?? client).post<
+    PostWithEmptyBodyAndRequiredPropertiesTestingOnlyResponse,
+    PostWithEmptyBodyAndRequiredPropertiesTestingOnlyError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/testingonly/general/body/empty/required"
+  });
 
 /**
  * Tests the use of an empty post body with route parameters Notice the use of Infrastructure.Web.Api.Interfaces.WebRequest`2 instead of Infrastructure.Web.Api.Interfaces.IWebRequest`1
@@ -2072,10 +2075,24 @@ export const postWithEnumTestingOnly = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Tests Search APIs
+ * (request type: SearchTestingOnlyRequest)
+ */
+export const searchTestingOnly = <ThrowOnError extends boolean = false>(
+  options?: Options<SearchTestingOnlyData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<SearchTestingOnlyResponse2, SearchTestingOnlyError, ThrowOnError>({
+    ...options,
+    url: "/testingonly/search"
+  });
+
+/**
  * Tests access with anonymous access
  * (request type: GetInsecureTestingOnlyRequest)
  */
-export const getInsecureTestingOnly = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) =>
+export const getInsecureTestingOnly = <ThrowOnError extends boolean = false>(
+  options?: Options<unknown, ThrowOnError>
+) =>
   (options?.client ?? client).get<GetInsecureTestingOnlyResponse, GetInsecureTestingOnlyError, ThrowOnError>({
     ...options,
     url: "/testingonly/security/none"

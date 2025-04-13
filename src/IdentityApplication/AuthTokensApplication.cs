@@ -145,7 +145,7 @@ public class AuthTokensApplication : IAuthTokensApplication
             UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
             new Dictionary<string, object>
             {
-                { UsageConstants.Properties.AuthProvider, PasswordCredentialsApplication.ProviderName },
+                { UsageConstants.Properties.AuthProvider, PersonCredentialsApplication.ProviderName },
                 { UsageConstants.Properties.UserIdOverride, user.Id }
             });
 

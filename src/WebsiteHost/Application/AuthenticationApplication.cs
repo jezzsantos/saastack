@@ -28,7 +28,7 @@ public class AuthenticationApplication : IAuthenticationApplication
         switch (provider)
         {
             case AuthenticationConstants.Providers.Credentials:
-                request = _serviceClient.PostAsync(caller, new AuthenticatePasswordRequest
+                request = _serviceClient.PostAsync(caller, new AuthenticateCredentialRequest
                 {
                     Username = username!,
                     Password = password!

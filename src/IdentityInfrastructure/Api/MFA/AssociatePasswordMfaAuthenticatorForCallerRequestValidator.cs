@@ -9,7 +9,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     AssociatePasswordMfaAuthenticatorForCallerRequestValidator : AbstractValidator<
-    AssociatePasswordMfaAuthenticatorForCallerRequest>
+    AssociateCredentialMfaAuthenticatorForCallerRequest>
 {
     public AssociatePasswordMfaAuthenticatorForCallerRequestValidator()
     {
@@ -22,8 +22,8 @@ public class
         RuleFor(req => req.AuthenticatorType)
             .IsInEnum()
             .NotNull()
-            .Must(type => type != PasswordCredentialMfaAuthenticatorType.None
-                          && type != PasswordCredentialMfaAuthenticatorType.RecoveryCodes)
+            .Must(type => type != CredentialMfaAuthenticatorType.None
+                          && type != CredentialMfaAuthenticatorType.RecoveryCodes)
             .WithMessage(Resources.PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType);
         When(req => req.PhoneNumber.HasValue(), () =>
         {

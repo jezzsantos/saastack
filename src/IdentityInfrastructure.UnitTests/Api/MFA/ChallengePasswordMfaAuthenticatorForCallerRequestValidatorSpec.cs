@@ -12,13 +12,13 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class ChallengePasswordMfaAuthenticatorForCallerRequestValidatorSpec
 {
-    private readonly ChallengePasswordMfaAuthenticatorForCallerRequest _dto;
+    private readonly ChallengeCredentialMfaAuthenticatorForCallerRequest _dto;
     private readonly ChallengePasswordMfaAuthenticatorForCallerRequestValidator _validator;
 
     public ChallengePasswordMfaAuthenticatorForCallerRequestValidatorSpec()
     {
         _validator = new ChallengePasswordMfaAuthenticatorForCallerRequestValidator(new FixedIdentifierFactory("anid"));
-        _dto = new ChallengePasswordMfaAuthenticatorForCallerRequest
+        _dto = new ChallengeCredentialMfaAuthenticatorForCallerRequest
         {
             MfaToken = new TokensService().CreateMfaAuthenticationToken(),
             AuthenticatorId = "anid"

@@ -25,9 +25,9 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[APIKey]')
+          WHERE object_id = OBJECT_ID(N'[dbo].[APIKeyAuth]')
             AND type in (N'U'))
-    DROP TABLE [dbo].[APIKey]
+    DROP TABLE [dbo].[APIKeyAuth]
 GO
 
 IF EXISTS(SELECT *
@@ -35,6 +35,13 @@ IF EXISTS(SELECT *
           WHERE object_id = OBJECT_ID(N'[dbo].[Audit]')
             AND type in (N'U'))
     DROP TABLE [dbo].[Audit]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[CredentialAuth]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[CredentialAuth]
 GO
 
 IF EXISTS(SELECT *
@@ -88,13 +95,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[PasswordCredential]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[PasswordCredential]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[SmsDelivery]')
             AND type in (N'U'))
     DROP TABLE [dbo].[SmsDelivery]
@@ -130,7 +130,7 @@ GO
 
 --
 
-CREATE TABLE [dbo].[APIKey]
+CREATE TABLE [dbo].[APIKeyAuth]
 (
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
@@ -144,17 +144,17 @@ CREATE TABLE [dbo].[APIKey]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[APIKey]
+    ON [dbo].[APIKeyAuth]
         (
          [Id]
             );
 CREATE INDEX KeyToken
-    ON [dbo].[APIKey]
+    ON [dbo].[APIKeyAuth]
         (
          [KeyToken]
             );
 CREATE INDEX UserId
-    ON [dbo].[APIKey]
+    ON [dbo].[APIKeyAuth]
         (
          [UserId]
             );
@@ -182,6 +182,51 @@ CREATE INDEX UserId
     ON [dbo].[Audit]
         (
          [AgainstId]
+            );
+
+CREATE TABLE [dbo].[CredentialAuth]
+(
+    [Id]                            [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]            [datetime]      NULL,
+    [IsDeleted]                     [bit]           NULL,
+    [AccountLocked]                 [bit]           NULL,
+    [IsMfaEnabled]                  [bit]           NULL,
+    [MfaAuthenticationExpiresAt]    [datetime]      NULL,
+    [MfaAuthenticationToken]        [nvarchar](100) NULL,
+    [MfaCanBeDisabled]              [bit]           NULL,
+    [PasswordResetToken]            [nvarchar](450) NULL,
+    [RegistrationVerificationToken] [nvarchar](max) NULL,
+    [RegistrationVerified]          [bit]           NULL,
+    [UserEmailAddress]              [nvarchar](max) NULL,
+    [UserId]                        [nvarchar](100) NULL,
+    [UserName]                      [nvarchar](450) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[CredentialAuth]
+        (
+         [Id]
+            );
+CREATE INDEX PasswordResetToken
+    ON [dbo].[CredentialAuth]
+        (
+         [PasswordResetToken]
+            );
+CREATE INDEX UserId
+    ON [dbo].[CredentialAuth]
+        (
+         [UserId]
+            );
+CREATE INDEX UserName
+    ON [dbo].[CredentialAuth]
+        (
+         [UserName]
+            );
+CREATE INDEX MfaAuthenticationToken
+    ON [dbo].[CredentialAuth]
+        (
+         [MfaAuthenticationToken]
             );
 
 CREATE TABLE [dbo].[EmailDelivery]
@@ -334,7 +379,7 @@ CREATE TABLE [dbo].[MfaAuthenticator]
     [State]                 [nvarchar](max) NULL,
     [OobChannelValue]       [nvarchar](max) NULL,
     [OobCode]               [nvarchar](max) NULL,
-    [PasswordCredentialId]  [nvarchar](100) NULL,
+    [CredentialId]          [nvarchar](100) NULL,
     [Secret]                [nvarchar](max) NULL,
     [Type]                  [nvarchar](max) NULL,
     [UserId]                [nvarchar](100) NULL,
@@ -371,51 +416,6 @@ CREATE INDEX AvatarImageId
     ON [dbo].[Organization]
         (
          [AvatarImageId]
-            );
-
-CREATE TABLE [dbo].[PasswordCredential]
-(
-    [Id]                            [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc]            [datetime]      NULL,
-    [IsDeleted]                     [bit]           NULL,
-    [AccountLocked]                 [bit]           NULL,
-    [IsMfaEnabled]                  [bit]           NULL,
-    [MfaAuthenticationExpiresAt]    [datetime]      NULL,
-    [MfaAuthenticationToken]        [nvarchar](100) NULL,
-    [MfaCanBeDisabled]              [bit]           NULL,
-    [PasswordResetToken]            [nvarchar](450) NULL,
-    [RegistrationVerificationToken] [nvarchar](max) NULL,
-    [RegistrationVerified]          [bit]           NULL,
-    [UserEmailAddress]              [nvarchar](max) NULL,
-    [UserId]                        [nvarchar](100) NULL,
-    [UserName]                      [nvarchar](450) NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[PasswordCredential]
-        (
-         [Id]
-            );
-CREATE INDEX PasswordResetToken
-    ON [dbo].[PasswordCredential]
-        (
-         [PasswordResetToken]
-            );
-CREATE INDEX UserId
-    ON [dbo].[PasswordCredential]
-        (
-         [UserId]
-            );
-CREATE INDEX UserName
-    ON [dbo].[PasswordCredential]
-        (
-         [UserName]
-            );
-CREATE INDEX MfaAuthenticationToken
-    ON [dbo].[PasswordCredential]
-        (
-         [MfaAuthenticationToken]
             );
 
 CREATE TABLE [dbo].[SmsDelivery]

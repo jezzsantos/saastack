@@ -13,6 +13,12 @@ using QueryAny;
 
 namespace IdentityDomain;
 
+/// <summary>
+///     Note: We've decided to make this aggregate snapshotting becuase over the lifetime of a user account (let's say 15
+///     years), it is possible to have renewed this token every 15mins in that time frame, which would generate
+///     thousands and thousands of events, which would make loading this aggregate into memory progressively slower over
+///     time. We are not actually too interested in the history of the token value, just the current state of it.
+/// </summary>
 [EntityName("AuthToken")]
 public sealed class AuthTokensRoot : AggregateRootBase
 {

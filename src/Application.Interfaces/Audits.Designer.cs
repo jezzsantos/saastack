@@ -215,72 +215,72 @@ namespace Application.Interfaces {
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Failed.AccountLocked.
         /// </summary>
-        public static string PasswordCredentialsApplication_Authenticate_AccountLocked {
+        public static string PersonCredentialsApplication_Authenticate_AccountLocked {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_AccountLocked", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_Authenticate_AccountLocked", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Failed.AccountSuspended.
         /// </summary>
-        public static string PasswordCredentialsApplication_Authenticate_AccountSuspended {
+        public static string PersonCredentialsApplication_Authenticate_AccountSuspended {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_AccountSuspended", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_Authenticate_AccountSuspended", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Failed.BeforeVerified.
         /// </summary>
-        public static string PasswordCredentialsApplication_Authenticate_BeforeVerified {
+        public static string PersonCredentialsApplication_Authenticate_BeforeVerified {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_BeforeVerified", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_Authenticate_BeforeVerified", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Failed.InvalidCredentials.
         /// </summary>
-        public static string PasswordCredentialsApplication_Authenticate_InvalidCredentials {
+        public static string PersonCredentialsApplication_Authenticate_InvalidCredentials {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_InvalidCredentials", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_Authenticate_InvalidCredentials", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Passed.
         /// </summary>
-        public static string PasswordCredentialsApplication_Authenticate_Succeeded {
+        public static string PersonCredentialsApplication_Authenticate_Succeeded {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_Succeeded", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_Authenticate_Succeeded", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Mfa.Failed.InvalidMfa.
         /// </summary>
-        public static string PasswordCredentialsApplication_MfaAuthenticate_Failed {
+        public static string PersonCredentialsApplication_MfaAuthenticate_Failed {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_MfaAuthenticate_Failed", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_MfaAuthenticate_Failed", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Mfa.Passed.
         /// </summary>
-        public static string PasswordCredentialsApplication_MfaAuthenticate_Succeeded {
+        public static string PersonCredentialsApplication_MfaAuthenticate_Succeeded {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_MfaAuthenticate_Succeeded", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_MfaAuthenticate_Succeeded", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Authentication.Password.Mfa.Reset.
         /// </summary>
-        public static string PasswordCredentialsApplication_MfaReset {
+        public static string PersonCredentialsApplication_MfaReset {
             get {
-                return ResourceManager.GetString("PasswordCredentialsApplication_MfaReset", resourceCulture);
+                return ResourceManager.GetString("PersonCredentialsApplication_MfaReset", resourceCulture);
             }
         }
         

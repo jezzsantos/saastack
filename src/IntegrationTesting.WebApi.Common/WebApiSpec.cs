@@ -293,7 +293,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         var person = await RegisterUserAsync(emailAddress, firstName);
 
-        var user = person.Credential.User;
+        var user = person.Person.User;
         return await ReAuthenticateUserAsync(user, emailAddress);
     }
 
@@ -323,7 +323,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         string emailAddress, string password = PasswordForPerson)
     {
         await PropagateDomainEventsAsync();
-        var login = await Api.PostAsync(new AuthenticatePasswordRequest
+        var login = await Api.PostAsync(new AuthenticateCredentialRequest
         {
             Username = emailAddress,
             Password = password
@@ -339,10 +339,10 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return new LoginDetails(accessToken, refreshToken, user, profile, defaultOrganizationId);
     }
 
-    protected async Task<RegisterPersonPasswordResponse> RegisterUserAsync(string emailAddress,
+    protected async Task<RegisterPersonCredentialResponse> RegisterUserAsync(string emailAddress,
         string firstName = "afirstname", string lastName = "alastname")
     {
-        var person = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var person = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             EmailAddress = emailAddress,
             FirstName = firstName,
@@ -352,7 +352,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         });
 
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
-        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
+        await Api.PostAsync(new ConfirmRegistrationPersonCredentialRequest
         {
             Token = token!
         });

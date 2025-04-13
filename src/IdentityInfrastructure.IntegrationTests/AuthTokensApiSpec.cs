@@ -22,7 +22,7 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRefreshToken_ThenReturnsNewTokens()
     {
-        await Api.PostAsync(new RegisterPersonPasswordRequest
+        await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             EmailAddress = "auser@company.com",
             FirstName = "afirstname",
@@ -33,13 +33,13 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
 
         await PropagateDomainEventsAsync();
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
-        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
+        await Api.PostAsync(new ConfirmRegistrationPersonCredentialRequest
         {
             Token = token!
         });
 
         await PropagateDomainEventsAsync();
-        var oldTokens = await Api.PostAsync(new AuthenticatePasswordRequest
+        var oldTokens = await Api.PostAsync(new AuthenticateCredentialRequest
         {
             Username = "auser@company.com",
             Password = "1Password!"

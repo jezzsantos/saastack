@@ -422,7 +422,7 @@ For example,
 /// <response code="401">The user's username or password is invalid</response>
 /// <response code="405">The user has not yet verified their registration</response>
 /// <response code="423">The user's account is suspended or locked, and cannot be authenticated or used</response>
-[Route("/passwords/auth", OperationMethod.Post)]
+[Route("/credentials/auth", OperationMethod.Post)]
 public class AuthenticatePasswordRequest : UnTenantedRequest<AuthenticatePasswordRequest, AuthenticateResponse>
 {
     [Required] public string? Password { get; set; }
@@ -1134,11 +1134,11 @@ This codebase has a lot of examples of such APIs.
 
 We recommend the use of these TESTINGONLY APIs, given the comprehensive [integration testing strategies](../design-principles/0190-testing-strategies.md) we are using.
 
-For a good example, look at how this API is defined: `PasswordCredentialsApi.GetConfirmationToken`.
+For a good example, look at how this API is defined: `PersonCredentialsApi.GetConfirmationToken`.
 
 Look at how the service operation is defined, and how the `GetRegistrationPersonConfirmationRequest` is defined.
 
-Navigate down the code path down from the API service operation, and down through the Application ( `PasswordCredentialsApplication.GetPersonRegistrationConfirmationAsync()`) to the Domain layer.
+Navigate down the code path down from the API service operation, and down through the Application ( `PersonCredentialsApplication.GetPersonRegistrationConfirmationAsync()`) to the Domain layer.
 
 You will see the disciplined use of the `#if TESTINGONLY` compiler directive, to ensure that none of this code reaches a production server - ever. After all, if this specific API were ever exposed to the public, it would seriously compromise entirely all security measures that have been build in!
 

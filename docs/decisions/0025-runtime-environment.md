@@ -15,17 +15,17 @@ Examples of the "units of compute" cloud infrastructure are:
 
 * IoT Devices, etc
 
-These kinds of cloud infrastructure are nowadays east to integrate together using vendor SDKs, to compose functioning and reliable systems.
+These kinds of infrastructure are nowadays easy to integrate together using vendor SDKs, to compose functioning and reliable systems.
 
-However, to interop with other systems (3rd party systems) today, the predominant protocol is REST APIs over HTTPS.
+However, to interop with other systems (3rd party systems) today, the predominant protocol is synchronously with REST APIs over HTTPS.
 
 This means that building REST APIs that are accessible over HTTP is a forgone conclusion to interop with 3rd party remote systems. But it also means that building REST APIs for internal composition of this distributed system is also very viable, especially in the early stages of the product.
 
 For example,
 
-Instead of dividing up your business rules (and subdomains) into spare components and deploying them to different cloud infrastructure to run independently, you should find ways to configure cloud infrastructure so that this software executes behind (just another) API call.
+Instead of dividing up your business rules (and subdomains) into spare components and deploying them to different hosts to run independently, you should find ways to configure the infrastructure so that this software executes behind (just another) API call.
 
-That way we can define very robust architectural patterns for developing APIs (whether they are public on private) and maintain all our evolving rules in one place for as long as possible.
+That way we can define very robust architectural patterns for developing APIs (whether they are public on private) and maintain all our evolving rules in one place for as long as possible. We also get the benefits of scale-out load balancing.
 
 > Later in the business, once the core of the product is stabilizing, when scaling up the organization and dividing up the product into separate independent teams, you can start to optimize and split up the API's and move code into different infrastructure to optimize throughput and performance.
 

@@ -34,7 +34,7 @@ public class IdentityApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+        await Api.PutAsync(new ChangeCredentialMfaForCallerRequest
         {
             IsEnabled = true
         }, req => req.SetJWTBearerToken(login.AccessToken));

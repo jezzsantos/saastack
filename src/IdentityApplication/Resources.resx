@@ -24,26 +24,26 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="PasswordCredentialsApplication_AccountLocked" xml:space="preserve">
+    <data name="PersonCredentialsApplication_AccountLocked" xml:space="preserve">
       <value>The user account is locked out</value>
     </data>
-    <data name="PasswordCredentialsApplication_AccountSuspended" xml:space="preserve">
+    <data name="PersonCredentialsApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
-    <data name="PasswordCredentialsApplication_RegistrationNotVerified" xml:space="preserve">
+    <data name="PersonCredentialsApplication_RegistrationNotVerified" xml:space="preserve">
         <value>The user account has not been verified</value>
     </data>
-    <data name="PasswordCredentialsApplication_RegistrationAlreadyVerified" xml:space="preserve">
+    <data name="PersonCredentialsApplication_RegistrationAlreadyVerified" xml:space="preserve">
         <value>The user account has already been verified</value>
     </data>
-    <data name="PasswordCredentialsApplication_NotPerson" xml:space="preserve">
+    <data name="PersonCredentialsApplication_NotPerson" xml:space="preserve">
         <value>The user account ID is not a person</value>
+    </data>
+    <data name="PersonCredentialsApplication_MfaRequired" xml:space="preserve">
+      <value>Authentication requires another factor</value>
     </data>
     <data name="SingleSignOnApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
-    </data>
-    <data name="SSOProvidersService_UnknownProvider" xml:space="preserve">
-      <value>The '{0}' is not registered</value>
     </data>
     <data name="APIKeysApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
@@ -51,8 +51,8 @@
     <data name="AuthTokensApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
-    <data name="PasswordCredentialsApplication_MfaRequired" xml:space="preserve">
-      <value>Authentication requires another factor</value>
+    <data name="SSOProvidersService_UnknownProvider" xml:space="preserve">
+      <value>The '{0}' is not registered</value>
     </data>
     <data name="SSOProvidersService_Authentication_MissingUid" xml:space="preserve">
       <value>SSO Authentication provider has not provided a valid UID for this user</value>

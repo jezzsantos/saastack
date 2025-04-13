@@ -14,21 +14,21 @@ public class IdentityApplicationSpec
 {
     private readonly IdentityApplication _application;
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<IPasswordCredentialsService> _passwordCredentialsService;
+    private readonly Mock<IPersonCredentialsService> _personCredentialsService;
 
     public IdentityApplicationSpec()
     {
         _caller = new Mock<ICallerContext>();
         _caller.Setup(c => c.CallerId)
             .Returns("acallerid");
-        _passwordCredentialsService = new Mock<IPasswordCredentialsService>();
-        _application = new IdentityApplication(_passwordCredentialsService.Object);
+        _personCredentialsService = new Mock<IPersonCredentialsService>();
+        _application = new IdentityApplication(_personCredentialsService.Object);
     }
 
     [Fact]
     public async Task WhenGetIdentityAsyncAndCredentialNotExist_ThenReturnsIdentity()
     {
-        _passwordCredentialsService.Setup(pcs =>
+        _personCredentialsService.Setup(pcs =>
                 pcs.GetCredentialsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.EntityNotFound());
 
@@ -43,9 +43,9 @@ public class IdentityApplicationSpec
     [Fact]
     public async Task WhenGetIdentityAsyncAndCredentialExists_ThenReturnsIdentity()
     {
-        _passwordCredentialsService.Setup(pcs =>
+        _personCredentialsService.Setup(pcs =>
                 pcs.GetCredentialsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PasswordCredential
+            .ReturnsAsync(new PersonCredential
             {
                 Id = "auserid",
                 User = new EndUser

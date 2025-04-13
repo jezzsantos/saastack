@@ -17,13 +17,13 @@ namespace IdentityInfrastructure.Persistence;
 
 public class APIKeysRepository : IAPIKeysRepository
 {
-    private readonly SnapshottingQueryStore<APIKey> _apiKeyQueries;
+    private readonly SnapshottingQueryStore<APIKeyAuth> _apiKeyQueries;
     private readonly IEventSourcingDddCommandStore<APIKeyRoot> _apiKeys;
 
     public APIKeysRepository(IRecorder recorder, IDomainFactory domainFactory,
         IEventSourcingDddCommandStore<APIKeyRoot> apiKeyStore, IDataStore store)
     {
-        _apiKeyQueries = new SnapshottingQueryStore<APIKey>(recorder, domainFactory, store);
+        _apiKeyQueries = new SnapshottingQueryStore<APIKeyAuth>(recorder, domainFactory, store);
         _apiKeys = apiKeyStore;
     }
 
@@ -39,7 +39,7 @@ public class APIKeysRepository : IAPIKeysRepository
     public async Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,
         CancellationToken cancellationToken)
     {
-        var query = Query.From<APIKey>()
+        var query = Query.From<APIKeyAuth>()
             .Where<string>(key => key.KeyToken, ConditionOperator.EqualTo, keyToken);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
@@ -66,20 +66,20 @@ public class APIKeysRepository : IAPIKeysRepository
         return apiKey;
     }
 
-    public async Task<Result<QueryResults<APIKey>, Error>> SearchAllForUserAsync(Identifier userId,
+    public async Task<Result<QueryResults<APIKeyAuth>, Error>> SearchAllForUserAsync(Identifier userId,
         SearchOptions options, CancellationToken cancellationToken)
     {
-        var query = Query.From<APIKey>()
+        var query = Query.From<APIKeyAuth>()
             .Where<string>(key => key.UserId, ConditionOperator.EqualTo, userId)
             .WithSearchOptions(options);
 
         return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
     }
 
-    public async Task<Result<QueryResults<APIKey>, Error>> SearchAllUnexpiredForUserAsync(Identifier userId,
+    public async Task<Result<QueryResults<APIKeyAuth>, Error>> SearchAllUnexpiredForUserAsync(Identifier userId,
         CancellationToken cancellationToken)
     {
-        var query = Query.From<APIKey>()
+        var query = Query.From<APIKeyAuth>()
             .Where<string>(key => key.UserId, ConditionOperator.EqualTo, userId)
             .AndWhere(subquery => subquery
                 .Where<DateTime?>(key => key.ExpiresOn, ConditionOperator.EqualTo, null)
@@ -88,7 +88,7 @@ public class APIKeysRepository : IAPIKeysRepository
         return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
     }
 
-    private async Task<Result<Optional<APIKeyRoot>, Error>> FindFirstByQueryAsync(QueryClause<APIKey> query,
+    private async Task<Result<Optional<APIKeyRoot>, Error>> FindFirstByQueryAsync(QueryClause<APIKeyAuth> query,
         CancellationToken cancellationToken)
     {
         var queried = await _apiKeyQueries.QueryAsync(query, false, cancellationToken);

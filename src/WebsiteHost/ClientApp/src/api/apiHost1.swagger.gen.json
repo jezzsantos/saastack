@@ -6,19 +6,19 @@
     "version": "v1"
   },
   "paths": {
-    "/apikeys/me": {
+    "/apikeys": {
       "post": {
         "tags": [
           "APIKeysApi"
         ],
-        "summary": "Create a new API key for the authenticated user",
-        "description": "(request type: CreateAPIKeyForCallerRequest)",
-        "operationId": "CreateAPIKeyForCaller",
+        "summary": "Creates a new API key for the authenticated user, and expires all exisitng API keys",
+        "description": "(request type: CreateAPIKeyRequest)",
+        "operationId": "CreateAPIKey",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAPIKeyForCallerRequest"
+                "$ref": "#/components/schemas/CreateAPIKeyRequest"
               }
             }
           }
@@ -266,9 +266,103 @@
         "tags": [
           "APIKeysApi"
         ],
-        "summary": "Deletes the API key",
+        "summary": "Deletes the API key of the authenticated user",
         "description": "(request type: DeleteAPIKeyRequest)",
         "operationId": "DeleteAPIKey",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "APIKey": [ ]
+          }
+        ]
+      }
+    },
+    "/apikeys/{Id}/revoke": {
+      "delete": {
+        "tags": [
+          "APIKeysApi"
+        ],
+        "summary": "Revokes the API key",
+        "description": "(request type: RevokeAPIKeyRequest)",
+        "operationId": "RevokeAPIKey",
         "parameters": [
           {
             "name": "Id",
@@ -2987,19 +3081,811 @@
         }
       }
     },
-    "/domain_events/drain": {
+    "/credentials/auth": {
       "post": {
         "tags": [
-          "DomainEventsApi"
+          "CredentialsApi"
         ],
-        "summary": "Drains all the pending domain_event messages",
-        "description": "(request type: DrainAllDomainEventsRequest)",
-        "operationId": "DrainAllDomainEvents",
+        "summary": "Authenticates a user with a username and password",
+        "description": "(request type: AuthenticateCredentialRequest)",
+        "operationId": "AuthenticateCredential",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DrainAllDomainEventsRequest"
+                "$ref": "#/components/schemas/AuthenticateCredentialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticateResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The user's username or password is invalid"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "When the user has authenticated, but has MFA enabled. The details of the error contains a value of \"mfa_required\"."
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "The user has not yet verified their registration"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/{Token}/reset/complete": {
+      "post": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Completes a password reset attempt",
+        "description": "(request type: CompleteCredentialResetRequest)",
+        "operationId": "CompleteCredentialReset",
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteCredentialResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/confirm-registration": {
+      "post": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Confirms the invitation to register a new person (verifying their email address)",
+        "description": "(request type: ConfirmRegistrationPersonCredentialRequest)",
+        "operationId": "ConfirmRegistrationPersonCredential",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmRegistrationPersonCredentialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmRegistrationPersonCredentialResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmRegistrationPersonCredentialResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Fetches the confirmation token for a registration of a person",
+        "description": "(request type: GetRegistrationPersonConfirmationRequest)",
+        "operationId": "GetRegistrationPersonConfirmation",
+        "parameters": [
+          {
+            "name": "UserId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRegistrationPersonConfirmationResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRegistrationPersonConfirmationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/register": {
+      "post": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Registers a new person on the platform",
+        "description": "(request type: RegisterPersonCredentialRequest)",
+        "operationId": "RegisterPersonCredential",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPersonCredentialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterPersonCredentialResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterPersonCredentialResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/reset": {
+      "post": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Begins a password reset attempt",
+        "description": "(request type: InitiatePasswordResetRequest)",
+        "operationId": "InitiatePasswordReset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiatePasswordResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/{Token}/reset/resend": {
+      "post": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Resends a password reset attempt (via email)",
+        "description": "(request type: ResendPasswordResetRequest)",
+        "operationId": "ResendPasswordReset",
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendPasswordResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/{Token}/reset/verify": {
+      "get": {
+        "tags": [
+          "CredentialsApi"
+        ],
+        "summary": "Verifies that the password reset attempt is still valid",
+        "description": "(request type: VerifyPasswordResetRequest)",
+        "operationId": "VerifyPasswordReset",
+        "parameters": [
+          {
+            "name": "Token",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event_notifications/drain": {
+      "post": {
+        "tags": [
+          "DomainEventsApi"
+        ],
+        "summary": "Drains all the pending event notifications",
+        "description": "(request type: DrainAllEventNotificationsRequest)",
+        "operationId": "DrainAllEventNotifications",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrainAllEventNotificationsRequest"
               }
             }
           }
@@ -3088,12 +3974,12 @@
         ]
       }
     },
-    "/domain_events/notify": {
+    "/event_notifications": {
       "post": {
         "tags": [
           "DomainEventsApi"
         ],
-        "summary": "Notifies when a domain_event has been raised",
+        "summary": "Notifies when a domain_event has been raised to a subscriber",
         "description": "(request type: NotifyDomainEventRequest)",
         "operationId": "NotifyDomainEvent",
         "requestBody": {
@@ -3187,16 +4073,14 @@
             "HMAC": [ ]
           }
         ]
-      }
-    },
-    "/domain_events": {
+      },
       "get": {
         "tags": [
           "DomainEventsApi"
         ],
-        "summary": "Lists all delivered domain_events",
-        "description": "(request type: SearchAllDomainEventsRequest)",
-        "operationId": "SearchAllDomainEvents",
+        "summary": "Lists all event notifications",
+        "description": "(request type: SearchAllEventNotificationsRequest)",
+        "operationId": "SearchAllEventNotifications",
         "parameters": [
           {
             "name": "Embed",
@@ -3252,12 +4136,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchAllDomainEventsResponse"
+                  "$ref": "#/components/schemas/SearchAllEventNotificationsResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchAllDomainEventsResponse"
+                  "$ref": "#/components/schemas/SearchAllEventNotificationsResponse"
                 }
               }
             }
@@ -4234,104 +5118,6 @@
             "APIKey": [ ]
           }
         ]
-      }
-    },
-    "/users/{Id}": {
-      "get": {
-        "tags": [
-          "EndUsersApi"
-        ],
-        "summary": "Fetches the specified user",
-        "description": "(request type: GetUserRequest)",
-        "operationId": "GetUser",
-        "parameters": [
-          {
-            "name": "Id",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetUserResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetUserResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/flags/{UserId}/{Name}": {
@@ -6332,19 +7118,19 @@
         ]
       }
     },
-    "/passwords/mfa/authenticators": {
+    "/credentials/mfa/authenticators": {
       "post": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Associates another MFA authentication factor to the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.",
-        "description": "(request type: AssociatePasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "AssociatePasswordMfaAuthenticatorForCaller",
+        "description": "(request type: AssociateCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "AssociateCredentialMfaAuthenticatorForCaller",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AssociatePasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/AssociateCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -6355,12 +7141,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssociatePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/AssociateCredentialMfaAuthenticatorForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssociatePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/AssociateCredentialMfaAuthenticatorForCallerResponse"
                 }
               }
             }
@@ -6432,8 +7218,8 @@
           "MfaApi"
         ],
         "summary": "Fetches the MFA authenticators for the user",
-        "description": "(request type: ListPasswordMfaAuthenticatorsForCallerRequest)",
-        "operationId": "ListPasswordMfaAuthenticatorsForCaller",
+        "description": "(request type: ListCredentialMfaAuthenticatorsForCallerRequest)",
+        "operationId": "ListCredentialMfaAuthenticatorsForCaller",
         "parameters": [
           {
             "name": "MfaToken",
@@ -6450,12 +7236,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListPasswordMfaAuthenticatorsForCallerResponse"
+                  "$ref": "#/components/schemas/ListCredentialMfaAuthenticatorsForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListPasswordMfaAuthenticatorsForCallerResponse"
+                  "$ref": "#/components/schemas/ListCredentialMfaAuthenticatorsForCallerResponse"
                 }
               }
             }
@@ -6523,14 +7309,14 @@
         }
       }
     },
-    "/passwords/mfa/authenticators/{AuthenticatorId}/challenge": {
+    "/credentials/mfa/authenticators/{AuthenticatorId}/challenge": {
       "put": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Challenges an MFA authenticator for the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.",
-        "description": "(request type: ChallengePasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "ChallengePasswordMfaAuthenticatorForCaller (Put)",
+        "description": "(request type: ChallengeCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "ChallengeCredentialMfaAuthenticatorForCaller (Put)",
         "parameters": [
           {
             "name": "AuthenticatorId",
@@ -6546,7 +7332,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -6557,12 +7343,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerResponse"
                 }
               }
             }
@@ -6634,8 +7420,8 @@
           "MfaApi"
         ],
         "summary": "Challenges an MFA authenticator for the user. Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.",
-        "description": "(request type: ChallengePasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "ChallengePasswordMfaAuthenticatorForCaller (Patch)",
+        "description": "(request type: ChallengeCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "ChallengeCredentialMfaAuthenticatorForCaller (Patch)",
         "parameters": [
           {
             "name": "AuthenticatorId",
@@ -6651,7 +7437,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -6662,12 +7448,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChallengePasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ChallengeCredentialMfaAuthenticatorForCallerResponse"
                 }
               }
             }
@@ -6735,19 +7521,19 @@
         }
       }
     },
-    "/passwords/mfa": {
+    "/credentials/mfa": {
       "put": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Changes whether the user is MFA enabled or not",
-        "description": "(request type: ChangePasswordMfaForCallerRequest)",
-        "operationId": "ChangePasswordMfaForCaller (Put)",
+        "description": "(request type: ChangeCredentialMfaForCallerRequest)",
+        "operationId": "ChangeCredentialMfaForCaller (Put)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordMfaForCallerRequest"
+                "$ref": "#/components/schemas/ChangeCredentialMfaForCallerRequest"
               }
             }
           }
@@ -6758,12 +7544,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               }
             }
@@ -6843,13 +7629,13 @@
           "MfaApi"
         ],
         "summary": "Changes whether the user is MFA enabled or not",
-        "description": "(request type: ChangePasswordMfaForCallerRequest)",
-        "operationId": "ChangePasswordMfaForCaller (Patch)",
+        "description": "(request type: ChangeCredentialMfaForCallerRequest)",
+        "operationId": "ChangeCredentialMfaForCaller (Patch)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordMfaForCallerRequest"
+                "$ref": "#/components/schemas/ChangeCredentialMfaForCallerRequest"
               }
             }
           }
@@ -6860,12 +7646,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               }
             }
@@ -6941,14 +7727,14 @@
         ]
       }
     },
-    "/passwords/mfa/authenticators/{AuthenticatorType}/confirm": {
+    "/credentials/mfa/authenticators/{AuthenticatorType}/confirm": {
       "put": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Confirms the association of an MFA authenticator for the user, and authenticates the user.",
-        "description": "(request type: ConfirmPasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "ConfirmPasswordMfaAuthenticatorForCaller (Put)",
+        "description": "(request type: ConfirmCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "ConfirmCredentialMfaAuthenticatorForCaller (Put)",
         "parameters": [
           {
             "name": "AuthenticatorType",
@@ -6964,7 +7750,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -6975,12 +7761,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerResponse"
                 }
               }
             }
@@ -7052,8 +7838,8 @@
           "MfaApi"
         ],
         "summary": "Confirms the association of an MFA authenticator for the user, and authenticates the user.",
-        "description": "(request type: ConfirmPasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "ConfirmPasswordMfaAuthenticatorForCaller (Patch)",
+        "description": "(request type: ConfirmCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "ConfirmCredentialMfaAuthenticatorForCaller (Patch)",
         "parameters": [
           {
             "name": "AuthenticatorType",
@@ -7069,7 +7855,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -7080,12 +7866,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfirmPasswordMfaAuthenticatorForCallerResponse"
+                  "$ref": "#/components/schemas/ConfirmCredentialMfaAuthenticatorForCallerResponse"
                 }
               }
             }
@@ -7153,14 +7939,14 @@
         }
       }
     },
-    "/passwords/mfa/authenticators/{Id}": {
+    "/credentials/mfa/authenticators/{Id}": {
       "delete": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Disassociates an associated MFA authenticator from the user",
-        "description": "(request type: DisassociatePasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "DisassociatePasswordMfaAuthenticatorForCaller",
+        "description": "(request type: DisassociateCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "DisassociateCredentialMfaAuthenticatorForCaller",
         "parameters": [
           {
             "name": "Id",
@@ -7247,19 +8033,19 @@
         ]
       }
     },
-    "/passwords/mfa/reset": {
+    "/credentials/mfa/reset": {
       "put": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Resets the user MFA status back to the default for all users",
-        "description": "(request type: ResetPasswordMfaRequest)",
-        "operationId": "ResetPasswordMfa (Put)",
+        "description": "(request type: ResetCredentialMfaRequest)",
+        "operationId": "ResetCredentialMfa (Put)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordMfaRequest"
+                "$ref": "#/components/schemas/ResetCredentialMfaRequest"
               }
             }
           }
@@ -7270,12 +8056,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               }
             }
@@ -7355,13 +8141,13 @@
           "MfaApi"
         ],
         "summary": "Resets the user MFA status back to the default for all users",
-        "description": "(request type: ResetPasswordMfaRequest)",
-        "operationId": "ResetPasswordMfa (Patch)",
+        "description": "(request type: ResetCredentialMfaRequest)",
+        "operationId": "ResetCredentialMfa (Patch)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordMfaRequest"
+                "$ref": "#/components/schemas/ResetCredentialMfaRequest"
               }
             }
           }
@@ -7372,12 +8158,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChangePasswordMfaResponse"
+                  "$ref": "#/components/schemas/ChangeCredentialMfaResponse"
                 }
               }
             }
@@ -7453,14 +8239,14 @@
         ]
       }
     },
-    "/passwords/mfa/authenticators/{AuthenticatorType}/verify": {
+    "/credentials/mfa/authenticators/{AuthenticatorType}/verify": {
       "put": {
         "tags": [
           "MfaApi"
         ],
         "summary": "Verifies an MFA authenticator for the user, and authenticates the user.",
-        "description": "(request type: VerifyPasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "VerifyPasswordMfaAuthenticatorForCaller (Put)",
+        "description": "(request type: VerifyCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "VerifyCredentialMfaAuthenticatorForCaller (Put)",
         "parameters": [
           {
             "name": "AuthenticatorType",
@@ -7476,7 +8262,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyPasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/VerifyCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -7564,8 +8350,8 @@
           "MfaApi"
         ],
         "summary": "Verifies an MFA authenticator for the user, and authenticates the user.",
-        "description": "(request type: VerifyPasswordMfaAuthenticatorForCallerRequest)",
-        "operationId": "VerifyPasswordMfaAuthenticatorForCaller (Patch)",
+        "description": "(request type: VerifyCredentialMfaAuthenticatorForCallerRequest)",
+        "operationId": "VerifyCredentialMfaAuthenticatorForCaller (Patch)",
         "parameters": [
           {
             "name": "AuthenticatorType",
@@ -7581,7 +8367,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyPasswordMfaAuthenticatorForCallerRequest"
+                "$ref": "#/components/schemas/VerifyCredentialMfaAuthenticatorForCallerRequest"
               }
             }
           }
@@ -9490,798 +10276,6 @@
             "APIKey": [ ]
           }
         ]
-      }
-    },
-    "/passwords/auth": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Authenticates a user with a username and password",
-        "description": "(request type: AuthenticatePasswordRequest)",
-        "operationId": "AuthenticatePassword",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthenticatePasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthenticateResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthenticateResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The user's username or password is invalid"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "When the user has authenticated, but has MFA enabled. The details of the error contains a value of \"mfa_required\"."
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "The user has not yet verified their registration"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/{Token}/reset/complete": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Completes a password reset attempt",
-        "description": "(request type: CompletePasswordResetRequest)",
-        "operationId": "CompletePasswordReset",
-        "parameters": [
-          {
-            "name": "Token",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompletePasswordResetRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/confirm-registration": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Confirms the invitation to register a new person (verifying their email address)",
-        "description": "(request type: ConfirmRegistrationPersonPasswordRequest)",
-        "operationId": "ConfirmRegistrationPersonPassword",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfirmRegistrationPersonPasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfirmRegistrationPersonPasswordResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfirmRegistrationPersonPasswordResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Fetches the confirmation token for a registration of a person",
-        "description": "(request type: GetRegistrationPersonConfirmationRequest)",
-        "operationId": "GetRegistrationPersonConfirmation",
-        "parameters": [
-          {
-            "name": "UserId",
-            "in": "query",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetRegistrationPersonConfirmationResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetRegistrationPersonConfirmationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/register": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Registers a new person on the platform",
-        "description": "(request type: RegisterPersonPasswordRequest)",
-        "operationId": "RegisterPersonPassword",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterPersonPasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterPersonPasswordResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterPersonPasswordResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/reset": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Begins a password reset attempt",
-        "description": "(request type: InitiatePasswordResetRequest)",
-        "operationId": "InitiatePasswordReset",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitiatePasswordResetRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/{Token}/reset/resend": {
-      "post": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Resends a password reset attempt (via email)",
-        "description": "(request type: ResendPasswordResetRequest)",
-        "operationId": "ResendPasswordReset",
-        "parameters": [
-          {
-            "name": "Token",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResendPasswordResetRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/passwords/{Token}/reset/verify": {
-      "get": {
-        "tags": [
-          "PasswordCredentialsApi"
-        ],
-        "summary": "Verifies that the password reset attempt is still valid",
-        "description": "(request type: VerifyPasswordResetRequest)",
-        "operationId": "VerifyPasswordReset",
-        "parameters": [
-          {
-            "name": "Token",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmptyResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Validation": {
-                    "summary": "Validation Error",
-                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
-                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
-                  },
-                  "RuleViolation": {
-                    "summary": "Rule Violation",
-                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
-          },
-          "402": {
-            "description": "Payment Required: The client must have payment information to get the requested response"
-          },
-          "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
-          },
-          "404": {
-            "description": "Not Found: The server cannot find the requested resource"
-          },
-          "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
-          },
-          "409": {
-            "description": "Conflict: The request conflicts with the current state of the resource"
-          },
-          "423": {
-            "description": "Locked: The current resource is locked and cannot be accessed"
-          },
-          "500": {
-            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Unexpected": {
-                    "summary": "Unexpected Error",
-                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
-                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/pricing/plans": {
@@ -13819,6 +13813,142 @@
         }
       }
     },
+    "/testingonly/search": {
+      "get": {
+        "tags": [
+          "TestingWebApi"
+        ],
+        "summary": "Tests Search APIs",
+        "description": "(request type: SearchTestingOnlyRequest)",
+        "operationId": "SearchTestingOnly",
+        "parameters": [
+          {
+            "name": "Embed",
+            "in": "query",
+            "description": "List of child resources to embed in the resource",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Filter",
+            "in": "query",
+            "description": "List of fields to include and exclude in the search result",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "The maximum number of search results to return",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "description": "The zero-based index of the first search result",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Sort",
+            "in": "query",
+            "description": "List of fields to sort the results on",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchTestingOnlyResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchTestingOnlyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Validation": {
+                    "summary": "Validation Error",
+                    "description": "The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.",
+                    "value": "{\r\n  \"type\": \"https://datatracker.ietf.org/doc/html/rfc9110#section-15.5\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"The error for FieldA\",\r\n  \"instance\": \"https://api.server.com/resource/123\",\r\n  \"errors\": [\r\n    {\r\n      \"reason\": \"The error for FieldA\",\r\n      \"rule\": \"The Code for FieldA\"\r\n    },\r\n    {\r\n      \"reason\": \"The error for FieldB\",\r\n      \"rule\": \"The Code for FieldB\"\r\n    }\r\n  ]\r\n}"
+                  },
+                  "RuleViolation": {
+                    "summary": "Rule Violation",
+                    "description": "A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"A description of the violation\"\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+          },
+          "402": {
+            "description": "Payment Required: The client must have payment information to get the requested response"
+          },
+          "403": {
+            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+          },
+          "404": {
+            "description": "Not Found: The server cannot find the requested resource"
+          },
+          "405": {
+            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+          },
+          "409": {
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Unexpected": {
+                    "summary": "Unexpected Error",
+                    "description": "An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.",
+                    "value": "{\r\n  \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.6.1\",\r\n  \"title\": \"An error occurred while processing your request.\",\r\n  \"status\": 500,\r\n  \"detail\": \"A description of the error\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/testingonly/security/none": {
       "get": {
         "tags": [
@@ -17102,14 +17232,14 @@
         },
         "additionalProperties": false
       },
-      "AssociatePasswordMfaAuthenticatorForCallerRequest": {
+      "AssociateCredentialMfaAuthenticatorForCallerRequest": {
         "required": [
           "authenticatorType"
         ],
         "type": "object",
         "properties": {
           "authenticatorType": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorType"
           },
           "mfaToken": {
             "type": "string",
@@ -17122,14 +17252,14 @@
         },
         "additionalProperties": false
       },
-      "AssociatePasswordMfaAuthenticatorForCallerResponse": {
+      "AssociateCredentialMfaAuthenticatorForCallerResponse": {
         "required": [
           "authenticator"
         ],
         "type": "object",
         "properties": {
           "authenticator": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorAssociation"
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorAssociation"
           }
         },
         "additionalProperties": false
@@ -17176,7 +17306,7 @@
         },
         "additionalProperties": false
       },
-      "AuthenticatePasswordRequest": {
+      "AuthenticateCredentialRequest": {
         "required": [
           "password",
           "username"
@@ -17399,7 +17529,7 @@
         },
         "additionalProperties": false
       },
-      "ChallengePasswordMfaAuthenticatorForCallerRequest": {
+      "ChallengeCredentialMfaAuthenticatorForCallerRequest": {
         "required": [
           "authenticatorId",
           "mfaToken"
@@ -17413,14 +17543,38 @@
         },
         "additionalProperties": false
       },
-      "ChallengePasswordMfaAuthenticatorForCallerResponse": {
+      "ChallengeCredentialMfaAuthenticatorForCallerResponse": {
         "required": [
           "challenge"
         ],
         "type": "object",
         "properties": {
           "challenge": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorChallenge"
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorChallenge"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChangeCredentialMfaForCallerRequest": {
+        "required": [
+          "isEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "isEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChangeCredentialMfaResponse": {
+        "required": [
+          "credential"
+        ],
+        "type": "object",
+        "properties": {
+          "credential": {
+            "$ref": "#/components/schemas/PersonCredential"
           }
         },
         "additionalProperties": false
@@ -17447,30 +17601,6 @@
           "name": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ChangePasswordMfaForCallerRequest": {
-        "required": [
-          "isEnabled"
-        ],
-        "type": "object",
-        "properties": {
-          "isEnabled": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ChangePasswordMfaResponse": {
-        "required": [
-          "credential"
-        ],
-        "type": "object",
-        "properties": {
-          "credential": {
-            "$ref": "#/components/schemas/PasswordCredential"
           }
         },
         "additionalProperties": false
@@ -17720,7 +17850,7 @@
         },
         "additionalProperties": false
       },
-      "CompletePasswordResetRequest": {
+      "CompleteCredentialResetRequest": {
         "required": [
           "password",
           "token"
@@ -17730,6 +17860,46 @@
           "password": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfirmCredentialMfaAuthenticatorForCallerRequest": {
+        "required": [
+          "authenticatorType",
+          "confirmationCode"
+        ],
+        "type": "object",
+        "properties": {
+          "confirmationCode": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "mfaToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "oobCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfirmCredentialMfaAuthenticatorForCallerResponse": {
+        "required": [
+          "tokens"
+        ],
+        "type": "object",
+        "properties": {
+          "authenticators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CredentialMfaAuthenticator"
+            }
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/AuthenticateTokens"
           }
         },
         "additionalProperties": false
@@ -17774,47 +17944,7 @@
         },
         "additionalProperties": false
       },
-      "ConfirmPasswordMfaAuthenticatorForCallerRequest": {
-        "required": [
-          "authenticatorType",
-          "confirmationCode"
-        ],
-        "type": "object",
-        "properties": {
-          "confirmationCode": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "mfaToken": {
-            "type": "string",
-            "nullable": true
-          },
-          "oobCode": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ConfirmPasswordMfaAuthenticatorForCallerResponse": {
-        "required": [
-          "tokens"
-        ],
-        "type": "object",
-        "properties": {
-          "authenticators": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticator"
-            }
-          },
-          "tokens": {
-            "$ref": "#/components/schemas/AuthenticateTokens"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ConfirmRegistrationPersonPasswordRequest": {
+      "ConfirmRegistrationPersonCredentialRequest": {
         "required": [
           "token"
         ],
@@ -17827,7 +17957,7 @@
         },
         "additionalProperties": false
       },
-      "ConfirmRegistrationPersonPasswordResponse": {
+      "ConfirmRegistrationPersonCredentialResponse": {
         "type": "object",
         "additionalProperties": false
       },
@@ -17871,7 +18001,7 @@
         },
         "additionalProperties": false
       },
-      "CreateAPIKeyForCallerRequest": {
+      "CreateAPIKeyRequest": {
         "type": "object",
         "properties": {
           "expiresOnUtc": {
@@ -17906,6 +18036,86 @@
           }
         },
         "additionalProperties": false
+      },
+      "CredentialMfaAuthenticator": {
+        "required": [
+          "id",
+          "isActive",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorType"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CredentialMfaAuthenticatorAssociation": {
+        "required": [
+          "barCodeUri",
+          "oobCode",
+          "secret",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "barCodeUri": {
+            "type": "string"
+          },
+          "oobCode": {
+            "type": "string"
+          },
+          "recoveryCodes": {
+            "type": "array",
+            "items": {
+              "required": [
+                "chars",
+                "length"
+              ],
+              "type": "string"
+            }
+          },
+          "secret": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CredentialMfaAuthenticatorChallenge": {
+        "required": [
+          "oobCode",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "oobCode": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CredentialMfaAuthenticatorType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CredentialMfaAuthenticatorType": {
+        "enum": [
+          "None",
+          "RecoveryCodes",
+          "OobSms",
+          "OobEmail",
+          "TotpAuthenticator"
+        ],
+        "type": "string"
       },
       "CustomDto": {
         "required": [
@@ -18193,52 +18403,15 @@
         "type": "object",
         "additionalProperties": false
       },
-      "DomainEvent": {
-        "required": [
-          "data",
-          "eventType",
-          "id",
-          "metadataFullyQualifiedName",
-          "rootAggregateType",
-          "streamName",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "string"
-          },
-          "eventType": {
-            "type": "string"
-          },
-          "metadataFullyQualifiedName": {
-            "type": "string"
-          },
-          "rootAggregateType": {
-            "type": "string"
-          },
-          "streamName": {
-            "type": "string"
-          },
-          "version": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "DrainAllAuditsRequest": {
         "type": "object",
         "additionalProperties": false
       },
-      "DrainAllDomainEventsRequest": {
+      "DrainAllEmailsRequest": {
         "type": "object",
         "additionalProperties": false
       },
-      "DrainAllEmailsRequest": {
+      "DrainAllEventNotificationsRequest": {
         "type": "object",
         "additionalProperties": false
       },
@@ -18325,55 +18498,43 @@
         ],
         "type": "string"
       },
-      "EndUserWithMemberships": {
+      "EventNotification": {
         "required": [
-          "access",
-          "classification",
-          "features",
+          "data",
+          "eventType",
           "id",
-          "memberships",
-          "roles",
-          "status"
+          "metadataFullyQualifiedName",
+          "rootAggregateType",
+          "streamName",
+          "subscriberRef",
+          "version"
         ],
         "type": "object",
         "properties": {
-          "access": {
-            "$ref": "#/components/schemas/EndUserAccess"
+          "data": {
+            "type": "string"
           },
-          "classification": {
-            "$ref": "#/components/schemas/EndUserClassification"
+          "eventType": {
+            "type": "string"
           },
-          "features": {
-            "type": "array",
-            "items": {
-              "required": [
-                "chars",
-                "length"
-              ],
-              "type": "string"
-            }
+          "metadataFullyQualifiedName": {
+            "type": "string"
           },
-          "roles": {
-            "type": "array",
-            "items": {
-              "required": [
-                "chars",
-                "length"
-              ],
-              "type": "string"
-            }
+          "rootAggregateType": {
+            "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/EndUserStatus"
+          "streamName": {
+            "type": "string"
+          },
+          "subscriberRef": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           },
           "id": {
             "type": "string"
-          },
-          "memberships": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Membership"
-            }
           }
         },
         "additionalProperties": false
@@ -18427,8 +18588,7 @@
                 "length"
               ],
               "type": "string"
-            },
-            "readOnly": true
+            }
           }
         },
         "additionalProperties": false
@@ -18649,18 +18809,6 @@
         "properties": {
           "subscription": {
             "$ref": "#/components/schemas/SubscriptionWithPlan"
-          }
-        },
-        "additionalProperties": false
-      },
-      "GetUserResponse": {
-        "required": [
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "$ref": "#/components/schemas/EndUserWithMemberships"
           }
         },
         "additionalProperties": false
@@ -18970,6 +19118,21 @@
         },
         "additionalProperties": false
       },
+      "ListCredentialMfaAuthenticatorsForCallerResponse": {
+        "required": [
+          "authenticators"
+        ],
+        "type": "object",
+        "properties": {
+          "authenticators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CredentialMfaAuthenticator"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ListMembersForOrganizationResponse": {
         "required": [
           "members",
@@ -19003,21 +19166,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Membership"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "ListPasswordMfaAuthenticatorsForCallerResponse": {
-        "required": [
-          "authenticators"
-        ],
-        "type": "object",
-        "properties": {
-          "authenticators": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticator"
             }
           }
         },
@@ -19307,11 +19455,16 @@
       },
       "NotifyDomainEventRequest": {
         "required": [
-          "message"
+          "message",
+          "subscriptionName"
         ],
         "type": "object",
         "properties": {
           "message": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "subscriptionName": {
             "minLength": 1,
             "type": "string"
           }
@@ -19535,106 +19688,6 @@
         ],
         "type": "string"
       },
-      "PasswordCredential": {
-        "required": [
-          "id",
-          "isMfaEnabled",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "isMfaEnabled": {
-            "type": "boolean"
-          },
-          "user": {
-            "$ref": "#/components/schemas/EndUser"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PasswordCredentialMfaAuthenticator": {
-        "required": [
-          "id",
-          "isActive",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean"
-          },
-          "type": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-          },
-          "id": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PasswordCredentialMfaAuthenticatorAssociation": {
-        "required": [
-          "barCodeUri",
-          "oobCode",
-          "secret",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "barCodeUri": {
-            "type": "string"
-          },
-          "oobCode": {
-            "type": "string"
-          },
-          "recoveryCodes": {
-            "type": "array",
-            "items": {
-              "required": [
-                "chars",
-                "length"
-              ],
-              "type": "string"
-            }
-          },
-          "secret": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PasswordCredentialMfaAuthenticatorChallenge": {
-        "required": [
-          "oobCode",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "oobCode": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PasswordCredentialMfaAuthenticatorType": {
-        "enum": [
-          "None",
-          "RecoveryCodes",
-          "OobSms",
-          "OobEmail",
-          "TotpAuthenticator"
-        ],
-        "type": "string"
-      },
       "PaymentMethodStatus": {
         "enum": [
           "Invalid",
@@ -19659,6 +19712,26 @@
           "Year"
         ],
         "type": "string"
+      },
+      "PersonCredential": {
+        "required": [
+          "id",
+          "isMfaEnabled",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "isMfaEnabled": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/EndUser"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "PersonName": {
         "required": [
@@ -20065,7 +20138,7 @@
         },
         "additionalProperties": false
       },
-      "RegisterPersonPasswordRequest": {
+      "RegisterPersonCredentialRequest": {
         "required": [
           "emailAddress",
           "firstName",
@@ -20108,14 +20181,14 @@
         },
         "additionalProperties": false
       },
-      "RegisterPersonPasswordResponse": {
+      "RegisterPersonCredentialResponse": {
         "required": [
-          "credential"
+          "person"
         ],
         "type": "object",
         "properties": {
-          "credential": {
-            "$ref": "#/components/schemas/PasswordCredential"
+          "person": {
+            "$ref": "#/components/schemas/PersonCredential"
           }
         },
         "additionalProperties": false
@@ -20134,7 +20207,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "ResetPasswordMfaRequest": {
+      "ResetCredentialMfaRequest": {
         "type": "object",
         "properties": {
           "userId": {
@@ -20261,25 +20334,6 @@
         },
         "additionalProperties": false
       },
-      "SearchAllDomainEventsResponse": {
-        "required": [
-          "events",
-          "metadata"
-        ],
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "$ref": "#/components/schemas/SearchResultMetadata"
-          },
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DomainEvent"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "SearchAllEmailDeliveriesResponse": {
         "required": [
           "emails",
@@ -20294,6 +20348,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DeliveredEmail"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchAllEventNotificationsResponse": {
+        "required": [
+          "metadata",
+          "notifications"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/SearchResultMetadata"
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventNotification"
             }
           }
         },
@@ -20363,6 +20436,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Invoice"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchTestingOnlyResponse": {
+        "required": [
+          "items",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/SearchResultMetadata"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestResource"
             }
           }
         },
@@ -20743,6 +20835,21 @@
         ],
         "type": "string"
       },
+      "TestResource": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "aProperty": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "TokenType": {
         "enum": [
           "OtherToken",
@@ -21054,19 +21161,7 @@
         },
         "additionalProperties": false
       },
-      "VerifyGuestInvitationResponse": {
-        "required": [
-          "invitation"
-        ],
-        "type": "object",
-        "properties": {
-          "invitation": {
-            "$ref": "#/components/schemas/Invitation"
-          }
-        },
-        "additionalProperties": false
-      },
-      "VerifyPasswordMfaAuthenticatorForCallerRequest": {
+      "VerifyCredentialMfaAuthenticatorForCallerRequest": {
         "required": [
           "authenticatorType",
           "confirmationCode",
@@ -21085,6 +21180,18 @@
           "oobCode": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyGuestInvitationResponse": {
+        "required": [
+          "invitation"
+        ],
+        "type": "object",
+        "properties": {
+          "invitation": {
+            "$ref": "#/components/schemas/Invitation"
           }
         },
         "additionalProperties": false

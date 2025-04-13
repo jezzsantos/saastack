@@ -9,7 +9,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     ConfirmPasswordMfaAuthenticatorForCallerRequestValidator : AbstractValidator<
-    ConfirmPasswordMfaAuthenticatorForCallerRequest>
+    ConfirmCredentialMfaAuthenticatorForCallerRequest>
 {
     public ConfirmPasswordMfaAuthenticatorForCallerRequestValidator()
     {
@@ -22,12 +22,12 @@ public class
         RuleFor(req => req.AuthenticatorType)
             .IsInEnum()
             .NotNull()
-            .Must(type => type != PasswordCredentialMfaAuthenticatorType.None
-                          && type != PasswordCredentialMfaAuthenticatorType.RecoveryCodes)
+            .Must(type => type != CredentialMfaAuthenticatorType.None
+                          && type != CredentialMfaAuthenticatorType.RecoveryCodes)
             .WithMessage(Resources.PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType);
         When(
-            req => req.AuthenticatorType is PasswordCredentialMfaAuthenticatorType.OobSms
-                or PasswordCredentialMfaAuthenticatorType.OobEmail, () =>
+            req => req.AuthenticatorType is CredentialMfaAuthenticatorType.OobSms
+                or CredentialMfaAuthenticatorType.OobEmail, () =>
             {
                 RuleFor(req => req.OobCode)
                     .NotEmpty()

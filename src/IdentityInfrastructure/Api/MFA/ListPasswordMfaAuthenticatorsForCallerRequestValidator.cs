@@ -8,7 +8,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     ListPasswordMfaAuthenticatorsForCallerRequestValidator : AbstractValidator<
-    ListPasswordMfaAuthenticatorsForCallerRequest>
+    ListCredentialMfaAuthenticatorsForCallerRequest>
 {
     public ListPasswordMfaAuthenticatorsForCallerRequestValidator()
     {

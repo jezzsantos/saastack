@@ -12,17 +12,17 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec
 {
-    private readonly ConfirmPasswordMfaAuthenticatorForCallerRequest _dto;
+    private readonly ConfirmCredentialMfaAuthenticatorForCallerRequest _dto;
     private readonly ConfirmPasswordMfaAuthenticatorForCallerRequestValidator _validator;
 
     public ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec()
     {
         _validator =
             new ConfirmPasswordMfaAuthenticatorForCallerRequestValidator();
-        _dto = new ConfirmPasswordMfaAuthenticatorForCallerRequest
+        _dto = new ConfirmCredentialMfaAuthenticatorForCallerRequest
         {
             MfaToken = new TokensService().CreateMfaAuthenticationToken(),
-            AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator,
+            AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator,
             ConfirmationCode = "123456"
         };
     }
@@ -46,7 +46,7 @@ public class ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenOobCodeIsNullAndOobAuthenticator_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail;
         _dto.OobCode = null;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
@@ -57,7 +57,7 @@ public class ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenOobCodeIsInvalidAndOobAuthenticator_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.OobEmail;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.OobEmail;
         _dto.OobCode = "aninvalidoobcode";
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
@@ -79,7 +79,7 @@ public class ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenAuthenticatorTypeIsNone_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.None;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.None;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
@@ -90,7 +90,7 @@ public class ConfirmPasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenAuthenticatorTypeIsRecoveryCodes_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.RecoveryCodes;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.RecoveryCodes;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()

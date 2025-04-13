@@ -86,7 +86,7 @@ Since there is a Reverse Proxy handling inbound calls, and since we do not want 
 
 The BEFFE offers a dedicated API for authentication ( `POST /api/auth`) that intermediates the authentication process. Regardless of what data is used to authenticate the user (i.e., password credentials or SSO tokens, etc.), the call is made directly with the BEFFE and then relayed to the various authentication endpoints in the backend.
 
-If the attempt to authenticate is successful, the authentication response from the Backend API (e.g., from `POST /passwords/auth` or `POST /sso/auth`) will always include an `access_token` and a `refresh_token`.
+If the attempt to authenticate is successful, the authentication response from the Backend API (e.g., from `POST /credentials/auth` or `POST /sso/auth`) will always include an `access_token` and a `refresh_token`.
 
 These "auth tokens" are then added to [HTTPOnly, secure] cookies that are then returned to the browser to be used between the browser and BEFFE for subsequent requests/responses.
 

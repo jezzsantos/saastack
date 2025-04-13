@@ -9,14 +9,14 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class DisassociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec
 {
-    private readonly DisassociatePasswordMfaAuthenticatorForCallerRequest _dto;
+    private readonly DisassociateCredentialMfaAuthenticatorForCallerRequest _dto;
     private readonly DisassociatePasswordMfaAuthenticatorForCallerRequestValidator _validator;
 
     public DisassociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec()
     {
         _validator =
             new DisassociatePasswordMfaAuthenticatorForCallerRequestValidator(new FixedIdentifierFactory("anid"));
-        _dto = new DisassociatePasswordMfaAuthenticatorForCallerRequest
+        _dto = new DisassociateCredentialMfaAuthenticatorForCallerRequest
         {
             Id = "anid"
         };

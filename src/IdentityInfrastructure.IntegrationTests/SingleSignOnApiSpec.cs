@@ -99,7 +99,7 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
         WhenAuthenticateWithSameEmailAndEndUserAlreadyRegisteredWithPassword_ThenReturnsSameUserNewTokens()
     {
         const string emailAddress = "auser@company.com";
-        var registered = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var registered = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             EmailAddress = emailAddress,
             FirstName = "afirstname",
@@ -108,11 +108,11 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        var userId = registered.Content.Value.Credential.User.Id;
+        var userId = registered.Content.Value.Person.User.Id;
 
         await PropagateDomainEventsAsync();
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
-        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
+        await Api.PostAsync(new ConfirmRegistrationPersonCredentialRequest
         {
             Token = token!
         });

@@ -29,7 +29,7 @@ We will prevent those JWT tokens ever being seen by any JavaScript running in a 
 
 ### Password Credential Authentication
 
-Out of the box, we will offer Password-Credential authentication via the `IPasswordCredentialsApplication`
+Out of the box, we will offer Password-Credential authentication via the `IPersonCredentialsApplication`
 
 This will enable quick adoption of the SaaS product, and a foundation to extend out into SSO and 3rd party identity solutions later.
 
@@ -73,7 +73,7 @@ There is now good support for 2FA, using the following built-in second factors:
 
 MFA can be enforced, by default, for all new users of the product, or it can be allowed/disallowed to be turned on/off by individual users.
 
-> See the `MfaOptions` in the  `PasswordCredentialRoot` for these default settings.
+> See the `MfaOptions` in the  `PersonCredentialRoot` for these default settings.
 
 When MFA is enabled, users will fail to complete authenticate with just their username + password. instead, they will receive a `HTTP 403 - Forbidden` error containing the message `mfa_required`.
 
@@ -84,7 +84,7 @@ Whether the user has already set up a second factor or not, they will receive th
 The response will look like this:
 
 ```    
-POST /passwords/auth
+POST /credentials/auth
 
 HTTP 403
 {
@@ -101,7 +101,7 @@ At this point, the client (i.e., web app) will need to request for the available
 It will issue this request, and receive a list of "authenticators" to challenge:
 
 ``` 
-GET /passwords/mfa/authenticators
+GET /credentials/mfa/authenticators
 
 HTTP 200 
 {
@@ -155,7 +155,7 @@ Associating a second factor (during the authentication process), is only necessa
 
 ![MFA Associate](../images/Authentication-MFA-Associate.png)
 
-At this point (during the authentication process), the client will need to first request `GET /passwords/mfa/authenticators` to determine what authenticators are already associated.
+At this point (during the authentication process), the client will need to first request `GET /credentials/mfa/authenticators` to determine what authenticators are already associated.
 
 If the client determines that there are any associated authenticators already (`IsActive == true`) the client will not be able to associate others, and the client must move to challenging one of the existing authenticators. See [Challenging](#Challenging-a-Second-Factor).
 
@@ -170,7 +170,7 @@ This method uses an Authenticator App (e.g., Microsoft, Google, etc.), typically
 The client will need to make this request:
 
 ```
-POST /passwords/mfa/authenticators
+POST /credentials/mfa/authenticators
 {
   "MfaToken": "{{mfa_token}}",
   "Type": "TotpAuthenticator"
@@ -202,7 +202,7 @@ The client can also offer to display the `secret`, if the user needs to input it
 Once configured in their Authenticator App, the user will see a revolving 6-digit code (every 30secs), they will need to copy and paste that code back into the user interface and the client will issue this request:
 
 ``` 
-PUT /passwords/mfa/authenticators/TotpAuthenticator/confirm
+PUT /credentials/mfa/authenticators/TotpAuthenticator/confirm
 {
   "MfaToken": "{{mfa_token}}",
   "ConfirmationCode": "123456"
@@ -236,7 +236,7 @@ If the user chooses to use their mobile phone device, then they are choosing the
 `SMS OOB` option, the client will need to make this request:
 
 ```
-POST /passwords/mfa/authenticators
+POST /credentials/mfa/authenticators
 {
   "MfaToken": "{{mfa_token}}",
   "Type": "OobSms",
@@ -263,7 +263,7 @@ HTTP 200
 Shortly, the user will receive an SMS message that will contain a secret code in the body of the text message, which they will need to copy and paste back into the user interface, and the client will issue this request:
 
 ``` 
-PUT /passwords/mfa/authenticators/OobSms/confirm
+PUT /credentials/mfa/authenticators/OobSms/confirm
 {
   "MfaToken": "{{mfa_token}}",
   "OobCode": "{{oob_code}}",
@@ -298,7 +298,7 @@ If the user chooses to use their email, then they are choosing the
 `Email OOB` option, the client will need to make this request:
 
 ```
-POST /passwords/mfa/authenticators
+POST /credentials/mfa/authenticators
 {
   "MfaToken": "{{mfa_token}}",
   "Type": "OobEmail",
@@ -323,7 +323,7 @@ HTTP 200
 Shortly, the user will receive an email message that will contain a secret code in the body of the message, which they will need to copy and paste back into the user interface, and the client will issue this request:
 
 ```
-PUT /passwords/mfa/authenticators/OobEmail/confirm
+PUT /credentials/mfa/authenticators/OobEmail/confirm
 {
   "MfaToken": "{{mfa_token}}",
   "OobCode": "{{oob_code}}",
@@ -346,13 +346,13 @@ Challenging a second factor, during authentication, is necessary when the user h
 
 ![MFA Challenge](../images/Authentication-MFA-Challenge.png)
 
-That, is when the call to `GET /passwords/mfa/authenticators` yields one or more authenticators where
+That, is when the call to `GET /credentials/mfa/authenticators` yields one or more authenticators where
 `IsActive == true` (other than `type == recoveryCodes`).
 
 In all cases, a request is issued to challenge the authenticator, like this, given the data in the response to:
 
 ```
-GET /passwords/mfa/authenticators
+GET /credentials/mfa/authenticators
 
 HTTP 200 
 {
@@ -384,7 +384,7 @@ HTTP 200
 The client makes the challenge for each authenticator like this:
 
 ```
-PUT /passwords/mfa/authenticators/{{AuthenticatorId}/challenge
+PUT /credentials/mfa/authenticators/{{AuthenticatorId}/challenge
 {
 	"MfaToken": "{{mfa_token}}",
 }
@@ -413,7 +413,7 @@ To verify a TOTP authenticator, the client needs to collect from the user the 6-
 Then send this request:
 
 ```
-PUT /passwords/mfa/authenticators/totpAuthenticator/verify
+PUT /credentials/mfa/authenticators/totpAuthenticator/verify
 {
 	"MfaToken": "{{mfa_token}}",
 	"ConfirmationCode": "123456"
@@ -448,7 +448,7 @@ To verify a OOB SMS authenticator, the client needs to collect from the user the
 Then send this request:
 
 ```
-PUT /passwords/mfa/authenticators/OobSms/verify
+PUT /credentials/mfa/authenticators/OobSms/verify
 {
 	"MfaToken": "{{mfa_token}}",
 	"OobCode": "{{oob_code}}",
@@ -484,7 +484,7 @@ To verify a OOB Email authenticator, the client needs to collect from the user t
 Then send this request:
 
 ```
-PUT /passwords/mfa/authenticators/OobEmail/verify
+PUT /credentials/mfa/authenticators/OobEmail/verify
 {
 	"MfaToken": "{{mfa_token}}",
 	"OobCode": "{{oob_code}}",
@@ -520,7 +520,7 @@ To verify the Recovery Code authenticator, the client needs to collect from the 
 Then send this request:
 
 ```
-PUT /passwords/mfa/authenticators/RecoveryCodes/verify
+PUT /credentials/mfa/authenticators/RecoveryCodes/verify
 {
 	"MfaToken": "{{mfa_token}}",
 	"ConfirmationCode": "12345678"

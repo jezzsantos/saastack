@@ -20,7 +20,7 @@ Users of the product are managed in the `EndUser` subdomain.
 
 * Once registered, the email address they registered with becomes their username. Even though they may change that email address (in the future), no two users on the platform can use the same email address.
 
-Users self-register in the `Identity` subdomain via either `PasswordCredentials`, `SSOUsers`, or other methods, each responsible for its own onboarding flow (e.g., passwords require email confirmations and a managed registration flow, whereas SSO can just automate it).
+Users self-register in the `Identity` subdomain via either `PersonCredentials`, `SSOUsers`, or other methods, each responsible for its own onboarding flow (e.g., passwords require email confirmations and a managed registration flow, whereas SSO can just automate it).
 
 * New users can be invited by another party and can respond to that invitation (e.g., a "warm" guest invitation) or register without an invitation (e.g., a "cold" direct registration).
 

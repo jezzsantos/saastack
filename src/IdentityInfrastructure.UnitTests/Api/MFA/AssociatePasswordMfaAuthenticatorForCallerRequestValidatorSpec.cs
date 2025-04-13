@@ -12,16 +12,16 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class AssociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec
 {
-    private readonly AssociatePasswordMfaAuthenticatorForCallerRequest _dto;
+    private readonly AssociateCredentialMfaAuthenticatorForCallerRequest _dto;
     private readonly AssociatePasswordMfaAuthenticatorForCallerRequestValidator _validator;
 
     public AssociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec()
     {
         _validator = new AssociatePasswordMfaAuthenticatorForCallerRequestValidator();
-        _dto = new AssociatePasswordMfaAuthenticatorForCallerRequest
+        _dto = new AssociateCredentialMfaAuthenticatorForCallerRequest
         {
             MfaToken = new TokensService().CreateMfaAuthenticationToken(),
-            AuthenticatorType = PasswordCredentialMfaAuthenticatorType.TotpAuthenticator
+            AuthenticatorType = CredentialMfaAuthenticatorType.TotpAuthenticator
         };
     }
 
@@ -54,7 +54,7 @@ public class AssociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenAuthenticatorTypeIsNone_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.None;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.None;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
@@ -65,7 +65,7 @@ public class AssociatePasswordMfaAuthenticatorForCallerRequestValidatorSpec
     [Fact]
     public void WhenAuthenticatorTypeIsRecoveryCodes_ThenThrows()
     {
-        _dto.AuthenticatorType = PasswordCredentialMfaAuthenticatorType.RecoveryCodes;
+        _dto.AuthenticatorType = CredentialMfaAuthenticatorType.RecoveryCodes;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()

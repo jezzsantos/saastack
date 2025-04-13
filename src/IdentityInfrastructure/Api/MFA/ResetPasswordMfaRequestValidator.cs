@@ -6,7 +6,7 @@ using Infrastructure.Web.Api.Operations.Shared.Identities;
 
 namespace IdentityInfrastructure.Api.MFA;
 
-public class ResetPasswordMfaRequestValidator : AbstractValidator<ResetPasswordMfaRequest>
+public class ResetPasswordMfaRequestValidator : AbstractValidator<ResetCredentialMfaRequest>
 {
     public ResetPasswordMfaRequestValidator(IIdentifierFactory identifierFactory)
     {

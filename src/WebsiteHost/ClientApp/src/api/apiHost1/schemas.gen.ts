@@ -60,12 +60,12 @@ export const AssignRolesToOrganizationRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const AssociatePasswordMfaAuthenticatorForCallerRequestSchema = {
+export const AssociateCredentialMfaAuthenticatorForCallerRequestSchema = {
   required: ["authenticatorType"],
   type: "object",
   properties: {
     authenticatorType: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorType"
     },
     mfaToken: {
       type: "string",
@@ -79,12 +79,12 @@ export const AssociatePasswordMfaAuthenticatorForCallerRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const AssociatePasswordMfaAuthenticatorForCallerResponseSchema = {
+export const AssociateCredentialMfaAuthenticatorForCallerResponseSchema = {
   required: ["authenticator"],
   type: "object",
   properties: {
     authenticator: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorAssociation"
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorAssociation"
     }
   },
   additionalProperties: false
@@ -124,7 +124,7 @@ export const AuditSchema = {
   additionalProperties: false
 } as const;
 
-export const AuthenticatePasswordRequestSchema = {
+export const AuthenticateCredentialRequestSchema = {
   required: ["password", "username"],
   type: "object",
   properties: {
@@ -322,7 +322,7 @@ export const CarOwnerSchema = {
   additionalProperties: false
 } as const;
 
-export const ChallengePasswordMfaAuthenticatorForCallerRequestSchema = {
+export const ChallengeCredentialMfaAuthenticatorForCallerRequestSchema = {
   required: ["authenticatorId", "mfaToken"],
   type: "object",
   properties: {
@@ -334,12 +334,34 @@ export const ChallengePasswordMfaAuthenticatorForCallerRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const ChallengePasswordMfaAuthenticatorForCallerResponseSchema = {
+export const ChallengeCredentialMfaAuthenticatorForCallerResponseSchema = {
   required: ["challenge"],
   type: "object",
   properties: {
     challenge: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorChallenge"
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorChallenge"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChangeCredentialMfaForCallerRequestSchema = {
+  required: ["isEnabled"],
+  type: "object",
+  properties: {
+    isEnabled: {
+      type: "boolean"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ChangeCredentialMfaResponseSchema = {
+  required: ["credential"],
+  type: "object",
+  properties: {
+    credential: {
+      $ref: "#/components/schemas/PersonCredential"
     }
   },
   additionalProperties: false
@@ -364,28 +386,6 @@ export const ChangeOrganizationRequestSchema = {
     name: {
       type: "string",
       nullable: true
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const ChangePasswordMfaForCallerRequestSchema = {
-  required: ["isEnabled"],
-  type: "object",
-  properties: {
-    isEnabled: {
-      type: "boolean"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const ChangePasswordMfaResponseSchema = {
-  required: ["credential"],
-  type: "object",
-  properties: {
-    credential: {
-      $ref: "#/components/schemas/PasswordCredential"
     }
   },
   additionalProperties: false
@@ -619,13 +619,50 @@ export const ChargebeePaymentMethodSchema = {
   additionalProperties: false
 } as const;
 
-export const CompletePasswordResetRequestSchema = {
+export const CompleteCredentialResetRequestSchema = {
   required: ["password", "token"],
   type: "object",
   properties: {
     password: {
       minLength: 1,
       type: "string"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ConfirmCredentialMfaAuthenticatorForCallerRequestSchema = {
+  required: ["authenticatorType", "confirmationCode"],
+  type: "object",
+  properties: {
+    confirmationCode: {
+      minLength: 1,
+      type: "string"
+    },
+    mfaToken: {
+      type: "string",
+      nullable: true
+    },
+    oobCode: {
+      type: "string",
+      nullable: true
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const ConfirmCredentialMfaAuthenticatorForCallerResponseSchema = {
+  required: ["tokens"],
+  type: "object",
+  properties: {
+    authenticators: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/CredentialMfaAuthenticator"
+      }
+    },
+    tokens: {
+      $ref: "#/components/schemas/AuthenticateTokens"
     }
   },
   additionalProperties: false
@@ -669,44 +706,7 @@ export const ConfirmEmailDeliveryFailedRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const ConfirmPasswordMfaAuthenticatorForCallerRequestSchema = {
-  required: ["authenticatorType", "confirmationCode"],
-  type: "object",
-  properties: {
-    confirmationCode: {
-      minLength: 1,
-      type: "string"
-    },
-    mfaToken: {
-      type: "string",
-      nullable: true
-    },
-    oobCode: {
-      type: "string",
-      nullable: true
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const ConfirmPasswordMfaAuthenticatorForCallerResponseSchema = {
-  required: ["tokens"],
-  type: "object",
-  properties: {
-    authenticators: {
-      type: "array",
-      items: {
-        $ref: "#/components/schemas/PasswordCredentialMfaAuthenticator"
-      }
-    },
-    tokens: {
-      $ref: "#/components/schemas/AuthenticateTokens"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const ConfirmRegistrationPersonPasswordRequestSchema = {
+export const ConfirmRegistrationPersonCredentialRequestSchema = {
   required: ["token"],
   type: "object",
   properties: {
@@ -718,7 +718,7 @@ export const ConfirmRegistrationPersonPasswordRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const ConfirmRegistrationPersonPasswordResponseSchema = {
+export const ConfirmRegistrationPersonCredentialResponseSchema = {
   type: "object",
   additionalProperties: false
 } as const;
@@ -761,7 +761,7 @@ export const ConfirmSmsDeliveryFailedRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const CreateAPIKeyForCallerRequestSchema = {
+export const CreateAPIKeyRequestSchema = {
   type: "object",
   properties: {
     expiresOnUtc: {
@@ -794,6 +794,69 @@ export const CreateOrganizationRequestSchema = {
     }
   },
   additionalProperties: false
+} as const;
+
+export const CredentialMfaAuthenticatorSchema = {
+  required: ["id", "isActive", "type"],
+  type: "object",
+  properties: {
+    isActive: {
+      type: "boolean"
+    },
+    type: {
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorType"
+    },
+    id: {
+      type: "string"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const CredentialMfaAuthenticatorAssociationSchema = {
+  required: ["barCodeUri", "oobCode", "secret", "type"],
+  type: "object",
+  properties: {
+    barCodeUri: {
+      type: "string"
+    },
+    oobCode: {
+      type: "string"
+    },
+    recoveryCodes: {
+      type: "array",
+      items: {
+        required: ["chars", "length"],
+        type: "string"
+      }
+    },
+    secret: {
+      type: "string"
+    },
+    type: {
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorType"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const CredentialMfaAuthenticatorChallengeSchema = {
+  required: ["oobCode", "type"],
+  type: "object",
+  properties: {
+    oobCode: {
+      type: "string"
+    },
+    type: {
+      $ref: "#/components/schemas/CredentialMfaAuthenticatorType"
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const CredentialMfaAuthenticatorTypeSchema = {
+  enum: ["None", "RecoveryCodes", "OobSms", "OobEmail", "TotpAuthenticator"],
+  type: "string"
 } as const;
 
 export const CustomDtoSchema = {
@@ -1060,47 +1123,17 @@ export const DestroyAllRepositoriesRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const DomainEventSchema = {
-  required: ["data", "eventType", "id", "metadataFullyQualifiedName", "rootAggregateType", "streamName", "version"],
-  type: "object",
-  properties: {
-    data: {
-      type: "string"
-    },
-    eventType: {
-      type: "string"
-    },
-    metadataFullyQualifiedName: {
-      type: "string"
-    },
-    rootAggregateType: {
-      type: "string"
-    },
-    streamName: {
-      type: "string"
-    },
-    version: {
-      type: "integer",
-      format: "int32"
-    },
-    id: {
-      type: "string"
-    }
-  },
-  additionalProperties: false
-} as const;
-
 export const DrainAllAuditsRequestSchema = {
   type: "object",
   additionalProperties: false
 } as const;
 
-export const DrainAllDomainEventsRequestSchema = {
+export const DrainAllEmailsRequestSchema = {
   type: "object",
   additionalProperties: false
 } as const;
 
-export const DrainAllEmailsRequestSchema = {
+export const DrainAllEventNotificationsRequestSchema = {
   type: "object",
   additionalProperties: false
 } as const;
@@ -1174,41 +1207,43 @@ export const EndUserStatusSchema = {
   type: "string"
 } as const;
 
-export const EndUserWithMembershipsSchema = {
-  required: ["access", "classification", "features", "id", "memberships", "roles", "status"],
+export const EventNotificationSchema = {
+  required: [
+    "data",
+    "eventType",
+    "id",
+    "metadataFullyQualifiedName",
+    "rootAggregateType",
+    "streamName",
+    "subscriberRef",
+    "version"
+  ],
   type: "object",
   properties: {
-    access: {
-      $ref: "#/components/schemas/EndUserAccess"
+    data: {
+      type: "string"
     },
-    classification: {
-      $ref: "#/components/schemas/EndUserClassification"
+    eventType: {
+      type: "string"
     },
-    features: {
-      type: "array",
-      items: {
-        required: ["chars", "length"],
-        type: "string"
-      }
+    metadataFullyQualifiedName: {
+      type: "string"
     },
-    roles: {
-      type: "array",
-      items: {
-        required: ["chars", "length"],
-        type: "string"
-      }
+    rootAggregateType: {
+      type: "string"
     },
-    status: {
-      $ref: "#/components/schemas/EndUserStatus"
+    streamName: {
+      type: "string"
+    },
+    subscriberRef: {
+      type: "string"
+    },
+    version: {
+      type: "integer",
+      format: "int32"
     },
     id: {
       type: "string"
-    },
-    memberships: {
-      type: "array",
-      items: {
-        $ref: "#/components/schemas/Membership"
-      }
     }
   },
   additionalProperties: false
@@ -1254,8 +1289,7 @@ export const FilteringSchema = {
       items: {
         required: ["chars", "length"],
         type: "string"
-      },
-      readOnly: true
+      }
     }
   },
   additionalProperties: false
@@ -1459,17 +1493,6 @@ export const GetSubscriptionResponseSchema = {
   properties: {
     subscription: {
       $ref: "#/components/schemas/SubscriptionWithPlan"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const GetUserResponseSchema = {
-  required: ["user"],
-  type: "object",
-  properties: {
-    user: {
-      $ref: "#/components/schemas/EndUserWithMemberships"
     }
   },
   additionalProperties: false
@@ -1748,6 +1771,20 @@ export const InvoiceSummarySchema = {
   additionalProperties: false
 } as const;
 
+export const ListCredentialMfaAuthenticatorsForCallerResponseSchema = {
+  required: ["authenticators"],
+  type: "object",
+  properties: {
+    authenticators: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/CredentialMfaAuthenticator"
+      }
+    }
+  },
+  additionalProperties: false
+} as const;
+
 export const ListMembersForOrganizationResponseSchema = {
   required: ["members", "metadata"],
   type: "object",
@@ -1776,20 +1813,6 @@ export const ListMembershipsForCallerResponseSchema = {
       type: "array",
       items: {
         $ref: "#/components/schemas/Membership"
-      }
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const ListPasswordMfaAuthenticatorsForCallerResponseSchema = {
-  required: ["authenticators"],
-  type: "object",
-  properties: {
-    authenticators: {
-      type: "array",
-      items: {
-        $ref: "#/components/schemas/PasswordCredentialMfaAuthenticator"
       }
     }
   },
@@ -2041,10 +2064,14 @@ export const MigrateSubscriptionResponseSchema = {
 } as const;
 
 export const NotifyDomainEventRequestSchema = {
-  required: ["message"],
+  required: ["message", "subscriptionName"],
   type: "object",
   properties: {
     message: {
+      minLength: 1,
+      type: "string"
+    },
+    subscriptionName: {
       minLength: 1,
       type: "string"
     }
@@ -2234,7 +2261,22 @@ export const OrganizationOwnershipSchema = {
   type: "string"
 } as const;
 
-export const PasswordCredentialSchema = {
+export const PaymentMethodStatusSchema = {
+  enum: ["Invalid", "Valid"],
+  type: "string"
+} as const;
+
+export const PaymentMethodTypeSchema = {
+  enum: ["None", "Card", "Other"],
+  type: "string"
+} as const;
+
+export const PeriodFrequencyUnitSchema = {
+  enum: ["Eternity", "Day", "Week", "Month", "Year"],
+  type: "string"
+} as const;
+
+export const PersonCredentialSchema = {
   required: ["id", "isMfaEnabled", "user"],
   type: "object",
   properties: {
@@ -2249,84 +2291,6 @@ export const PasswordCredentialSchema = {
     }
   },
   additionalProperties: false
-} as const;
-
-export const PasswordCredentialMfaAuthenticatorSchema = {
-  required: ["id", "isActive", "type"],
-  type: "object",
-  properties: {
-    isActive: {
-      type: "boolean"
-    },
-    type: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-    },
-    id: {
-      type: "string"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const PasswordCredentialMfaAuthenticatorAssociationSchema = {
-  required: ["barCodeUri", "oobCode", "secret", "type"],
-  type: "object",
-  properties: {
-    barCodeUri: {
-      type: "string"
-    },
-    oobCode: {
-      type: "string"
-    },
-    recoveryCodes: {
-      type: "array",
-      items: {
-        required: ["chars", "length"],
-        type: "string"
-      }
-    },
-    secret: {
-      type: "string"
-    },
-    type: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const PasswordCredentialMfaAuthenticatorChallengeSchema = {
-  required: ["oobCode", "type"],
-  type: "object",
-  properties: {
-    oobCode: {
-      type: "string"
-    },
-    type: {
-      $ref: "#/components/schemas/PasswordCredentialMfaAuthenticatorType"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const PasswordCredentialMfaAuthenticatorTypeSchema = {
-  enum: ["None", "RecoveryCodes", "OobSms", "OobEmail", "TotpAuthenticator"],
-  type: "string"
-} as const;
-
-export const PaymentMethodStatusSchema = {
-  enum: ["Invalid", "Valid"],
-  type: "string"
-} as const;
-
-export const PaymentMethodTypeSchema = {
-  enum: ["None", "Card", "Other"],
-  type: "string"
-} as const;
-
-export const PeriodFrequencyUnitSchema = {
-  enum: ["Eternity", "Day", "Week", "Month", "Year"],
-  type: "string"
 } as const;
 
 export const PersonNameSchema = {
@@ -2698,7 +2662,7 @@ export const RegisterMachineResponseSchema = {
   additionalProperties: false
 } as const;
 
-export const RegisterPersonPasswordRequestSchema = {
+export const RegisterPersonCredentialRequestSchema = {
   required: ["emailAddress", "firstName", "lastName", "password"],
   type: "object",
   properties: {
@@ -2737,12 +2701,12 @@ export const RegisterPersonPasswordRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const RegisterPersonPasswordResponseSchema = {
-  required: ["credential"],
+export const RegisterPersonCredentialResponseSchema = {
+  required: ["person"],
   type: "object",
   properties: {
-    credential: {
-      $ref: "#/components/schemas/PasswordCredential"
+    person: {
+      $ref: "#/components/schemas/PersonCredential"
     }
   },
   additionalProperties: false
@@ -2760,7 +2724,7 @@ export const ResendPasswordResetRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const ResetPasswordMfaRequestSchema = {
+export const ResetCredentialMfaRequestSchema = {
   type: "object",
   properties: {
     userId: {
@@ -2878,23 +2842,6 @@ export const SearchAllCarsResponseSchema = {
   additionalProperties: false
 } as const;
 
-export const SearchAllDomainEventsResponseSchema = {
-  required: ["events", "metadata"],
-  type: "object",
-  properties: {
-    metadata: {
-      $ref: "#/components/schemas/SearchResultMetadata"
-    },
-    events: {
-      type: "array",
-      items: {
-        $ref: "#/components/schemas/DomainEvent"
-      }
-    }
-  },
-  additionalProperties: false
-} as const;
-
 export const SearchAllEmailDeliveriesResponseSchema = {
   required: ["emails", "metadata"],
   type: "object",
@@ -2906,6 +2853,23 @@ export const SearchAllEmailDeliveriesResponseSchema = {
       type: "array",
       items: {
         $ref: "#/components/schemas/DeliveredEmail"
+      }
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const SearchAllEventNotificationsResponseSchema = {
+  required: ["metadata", "notifications"],
+  type: "object",
+  properties: {
+    metadata: {
+      $ref: "#/components/schemas/SearchResultMetadata"
+    },
+    notifications: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/EventNotification"
       }
     }
   },
@@ -2966,6 +2930,23 @@ export const SearchSubscriptionHistoryResponseSchema = {
       type: "array",
       items: {
         $ref: "#/components/schemas/Invoice"
+      }
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const SearchTestingOnlyResponseSchema = {
+  required: ["items", "metadata"],
+  type: "object",
+  properties: {
+    metadata: {
+      $ref: "#/components/schemas/SearchResultMetadata"
+    },
+    items: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/TestResource"
       }
     }
   },
@@ -3298,6 +3279,20 @@ export const TestEnumSchema = {
   type: "string"
 } as const;
 
+export const TestResourceSchema = {
+  required: ["id"],
+  type: "object",
+  properties: {
+    aProperty: {
+      type: "string"
+    },
+    id: {
+      type: "string"
+    }
+  },
+  additionalProperties: false
+} as const;
+
 export const TokenTypeSchema = {
   enum: ["OtherToken", "AccessToken", "RefreshToken"],
   type: "string"
@@ -3574,18 +3569,7 @@ export const ValidationsValidatedPostTestingOnlyRequestSchema = {
   additionalProperties: false
 } as const;
 
-export const VerifyGuestInvitationResponseSchema = {
-  required: ["invitation"],
-  type: "object",
-  properties: {
-    invitation: {
-      $ref: "#/components/schemas/Invitation"
-    }
-  },
-  additionalProperties: false
-} as const;
-
-export const VerifyPasswordMfaAuthenticatorForCallerRequestSchema = {
+export const VerifyCredentialMfaAuthenticatorForCallerRequestSchema = {
   required: ["authenticatorType", "confirmationCode", "mfaToken"],
   type: "object",
   properties: {
@@ -3600,6 +3584,17 @@ export const VerifyPasswordMfaAuthenticatorForCallerRequestSchema = {
     oobCode: {
       type: "string",
       nullable: true
+    }
+  },
+  additionalProperties: false
+} as const;
+
+export const VerifyGuestInvitationResponseSchema = {
+  required: ["invitation"],
+  type: "object",
+  properties: {
+    invitation: {
+      $ref: "#/components/schemas/Invitation"
     }
   },
   additionalProperties: false

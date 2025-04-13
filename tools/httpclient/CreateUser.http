@@ -1,7 +1,7 @@
 
 ### Register a user
 
-POST {{apihost1}}/passwords/register
+POST {{apihost1}}/credentials/register
 Accept: application/json
 Content-Type: application/json
 
@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ### Get Registration Token (the one sent in an email)
 
-GET {{apihost1}}/passwords/confirm-registration?UserId={{user_id}}
+GET {{apihost1}}/credentials/confirm-registration?UserId={{user_id}}
 Accept: application/json
 
 > {%
@@ -28,7 +28,7 @@ Accept: application/json
 
 ### Confirm registration
 
-POST {{apihost1}}/passwords/confirm-registration
+POST {{apihost1}}/credentials/confirm-registration
 Accept: application/json
 Content-Type: application/json
 
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ### Authenticate
 
-POST {{apihost1}}/passwords/auth
+POST {{apihost1}}/credentials/auth
 Accept: application/json
 Content-Type: application/json
 

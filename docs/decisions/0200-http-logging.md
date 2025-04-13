@@ -23,7 +23,7 @@ On the security front, data in the requests and in responses of HTTP calls can c
 For example, consider logging the request body of the following request:
 
 ```http
-POST {{apihost1}}/passwords/register
+POST {{apihost1}}/credentials/register
 Accept: application/json
 Content-Type: application/json
 

@@ -45,7 +45,7 @@ public class AuthenticationApplicationSpec
     {
         var accessTokenExpiresOn = DateTime.UtcNow;
         var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
-        _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticatePasswordRequest>(),
+        _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticateCredentialRequest>(),
                 null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuthenticateResponse
             {
@@ -75,7 +75,7 @@ public class AuthenticationApplicationSpec
         result.Value.AccessToken.ExpiresOn.Should().Be(accessTokenExpiresOn);
         result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
         result.Value.RefreshToken.ExpiresOn.Should().Be(refreshTokenExpiresOn);
-        _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticatePasswordRequest>(req =>
+        _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticateCredentialRequest>(req =>
             req.Username == "ausername"
             && req.Password == "apassword"
         ), null, It.IsAny<CancellationToken>()));

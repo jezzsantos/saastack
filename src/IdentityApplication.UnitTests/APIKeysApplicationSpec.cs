@@ -12,12 +12,12 @@ using Domain.Services.Shared;
 using Domain.Shared.Identities;
 using FluentAssertions;
 using IdentityApplication.Persistence;
+using IdentityApplication.Persistence.ReadModels;
 using IdentityDomain;
 using IdentityDomain.DomainServices;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
-using APIKey = IdentityApplication.Persistence.ReadModels.APIKey;
 
 namespace IdentityApplication.UnitTests;
 
@@ -249,7 +249,7 @@ public class APIKeysApplicationSpec
         _caller.Setup(cc => cc.CallerId).Returns("acallerid");
         _repository.Setup(rep =>
                 rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new QueryResults<APIKey>([]));
+            .ReturnsAsync(new QueryResults<APIKeyAuth>([]));
 
         var result =
             await _application.CreateAPIKeyForCallerAsync(_caller.Object, null, CancellationToken.None);
@@ -275,22 +275,22 @@ public class APIKeysApplicationSpec
         var expiresOn = DateTime.UtcNow.AddHours(1);
         _repository.Setup(rep =>
                 rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new QueryResults<APIKey>([
-                new APIKey
+            .ReturnsAsync(new QueryResults<APIKeyAuth>([
+                new APIKeyAuth
                 {
                     Id = "anid",
                     ExpiresOn = DateTime.UtcNow.AddHours(1),
                     UserId = "auserid"
                 },
 
-                new APIKey
+                new APIKeyAuth
                 {
                     Id = "anapikeyid1",
                     ExpiresOn = DateTime.UtcNow.AddHours(1),
                     UserId = "auserid"
                 },
 
-                new APIKey
+                new APIKeyAuth
                 {
                     Id = "anapikeyid2",
                     ExpiresOn = DateTime.UtcNow.SubtractHours(1),
@@ -339,7 +339,7 @@ public class APIKeysApplicationSpec
         var expiresOn = DateTime.UtcNow.AddHours(1);
         _repository.Setup(rep =>
                 rep.SearchAllUnexpiredForUserAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new QueryResults<APIKey>([]));
+            .ReturnsAsync(new QueryResults<APIKeyAuth>([]));
 
         var result =
             await _application.CreateAPIKeyForUserAsync(_caller.Object, "auserid", "adescription", expiresOn,
@@ -366,8 +366,8 @@ public class APIKeysApplicationSpec
         var expiresOn = DateTime.UtcNow.AddHours(1);
         _repository.Setup(rep => rep.SearchAllForUserAsync(It.IsAny<Identifier>(), It.IsAny<SearchOptions>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new QueryResults<APIKey>([
-                new APIKey
+            .ReturnsAsync(new QueryResults<APIKeyAuth>([
+                new APIKeyAuth
                 {
                     Id = "anid",
                     KeyToken = "akeytoken",

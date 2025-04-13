@@ -193,7 +193,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
     {
         var acceptedEmailAddress = CreateRandomEmailAddress();
 
-        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var result = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             InvitationToken = new TokensService().CreateGuestInvitationToken(),
             EmailAddress = acceptedEmailAddress,
@@ -203,13 +203,13 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
-        result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
-        result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
-        result.Content.Value.Credential.User.Features.Should()
+        result.Content.Value.Person.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Access.Should().Be(EndUserAccess.Enabled);
+        result.Content.Value.Person.User.Status.Should().Be(EndUserStatus.Registered);
+        result.Content.Value.Person.User.Classification.Should().Be(EndUserClassification.Person);
+        result.Content.Value.Person.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Person.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
     }
 
@@ -225,7 +225,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(login.AccessToken));
         var token = _userNotificationService.LastGuestInvitationToken!;
 
-        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var result = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             InvitationToken = token,
             EmailAddress = invitedEmailAddress,
@@ -235,13 +235,13 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
-        result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
-        result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
-        result.Content.Value.Credential.User.Features.Should()
+        result.Content.Value.Person.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Access.Should().Be(EndUserAccess.Enabled);
+        result.Content.Value.Person.User.Status.Should().Be(EndUserStatus.Registered);
+        result.Content.Value.Person.User.Classification.Should().Be(EndUserClassification.Person);
+        result.Content.Value.Person.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Person.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
     }
 
@@ -258,7 +258,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         var token = _userNotificationService.LastGuestInvitationToken!;
 
         var registeredEmailAddress = CreateRandomEmailAddress();
-        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var result = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             InvitationToken = token,
             EmailAddress = registeredEmailAddress,
@@ -268,13 +268,13 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
-        result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
-        result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
-        result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
-        result.Content.Value.Credential.User.Features.Should()
+        result.Content.Value.Person.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Id.Should().NotBeEmpty();
+        result.Content.Value.Person.User.Access.Should().Be(EndUserAccess.Enabled);
+        result.Content.Value.Person.User.Status.Should().Be(EndUserStatus.Registered);
+        result.Content.Value.Person.User.Classification.Should().Be(EndUserClassification.Person);
+        result.Content.Value.Person.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Person.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
     }
 
@@ -291,7 +291,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         var token = _userNotificationService.LastGuestInvitationToken!;
 
         var existingEmailAddress = login.Profile!.EmailAddress!;
-        var result = await Api.PostAsync(new RegisterPersonPasswordRequest
+        var result = await Api.PostAsync(new RegisterPersonCredentialRequest
         {
             InvitationToken = token,
             EmailAddress = existingEmailAddress,

@@ -10,6 +10,7 @@ using Domain.Common.ValueObjects;
 using Domain.Services.Shared;
 using Domain.Shared;
 using IdentityApplication.Persistence;
+using IdentityApplication.Persistence.ReadModels;
 using IdentityDomain;
 using IdentityDomain.DomainServices;
 
@@ -287,7 +288,7 @@ internal static class APIKeyConversionExtensions
         };
     }
 
-    public static APIKey ToApiKey(this Persistence.ReadModels.APIKey apiKey)
+    public static APIKey ToApiKey(this APIKeyAuth apiKey)
     {
         return new APIKey
         {

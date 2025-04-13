@@ -8,7 +8,7 @@ namespace IdentityInfrastructure.Api.MFA;
 
 public class
     VerifyPasswordMfaAuthenticatorForCallerRequestValidator : AbstractValidator<
-    VerifyPasswordMfaAuthenticatorForCallerRequest>
+    VerifyCredentialMfaAuthenticatorForCallerRequest>
 {
     public VerifyPasswordMfaAuthenticatorForCallerRequestValidator()
     {
@@ -18,11 +18,11 @@ public class
         RuleFor(req => req.AuthenticatorType)
             .IsInEnum()
             .NotNull()
-            .Must(type => type != PasswordCredentialMfaAuthenticatorType.None)
+            .Must(type => type != CredentialMfaAuthenticatorType.None)
             .WithMessage(Resources.PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType);
         When(
-            req => req.AuthenticatorType is PasswordCredentialMfaAuthenticatorType.OobSms
-                or PasswordCredentialMfaAuthenticatorType.OobEmail, () =>
+            req => req.AuthenticatorType is CredentialMfaAuthenticatorType.OobSms
+                or CredentialMfaAuthenticatorType.OobEmail, () =>
             {
                 RuleFor(req => req.OobCode)
                     .NotEmpty()
@@ -32,13 +32,13 @@ public class
         RuleFor(req => req.ConfirmationCode)
             .NotEmpty()
             .Matches(Validations.Credentials.Password.RecoveryConfirmationCode)
-            .When(req => req.AuthenticatorType == PasswordCredentialMfaAuthenticatorType.RecoveryCodes)
+            .When(req => req.AuthenticatorType == CredentialMfaAuthenticatorType.RecoveryCodes)
             .WithMessage(Resources
                 .ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidRecoveryConfirmationCode);
         RuleFor(req => req.ConfirmationCode)
             .NotEmpty()
             .Matches(Validations.Credentials.Password.ConfirmationCode)
-            .When(req => req.AuthenticatorType != PasswordCredentialMfaAuthenticatorType.RecoveryCodes)
+            .When(req => req.AuthenticatorType != CredentialMfaAuthenticatorType.RecoveryCodes)
             .WithMessage(Resources.ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidConfirmationCode);
     }
 }

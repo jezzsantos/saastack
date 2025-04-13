@@ -93,7 +93,7 @@ public static class WebsiteTestingExtensions
         JsonSerializerOptions jsonOptions, CSRFMiddleware.ICSRFService csrfService,
         string emailAddress, string password)
     {
-        var registrationRequest = new RegisterPersonPasswordRequest
+        var registrationRequest = new RegisterPersonCredentialRequest
         {
             EmailAddress = emailAddress,
             FirstName = "afirstname",
@@ -105,8 +105,8 @@ public static class WebsiteTestingExtensions
         var person = await websiteClient.PostAsync(registrationUrl, JsonContent.Create(registrationRequest),
             (msg, cookies) => msg.WithCSRF(cookies, csrfService));
 
-        var userId = (await person.Content.ReadFromJsonAsync<RegisterPersonPasswordResponse>(jsonOptions))!
-            .Credential.User.Id;
+        var userId = (await person.Content.ReadFromJsonAsync<RegisterPersonCredentialResponse>(jsonOptions))!
+            .Person.User.Id;
 
 #if TESTINGONLY
         await websiteClient.PropagateDomainEventsAsync(csrfService);
@@ -120,7 +120,7 @@ public static class WebsiteTestingExtensions
         var token =
             (await confirmationToken.Content.ReadFromJsonAsync<GetRegistrationPersonConfirmationResponse>(jsonOptions))!
             .Token;
-        var confirmationRequest = new ConfirmRegistrationPersonPasswordRequest
+        var confirmationRequest = new ConfirmRegistrationPersonCredentialRequest
         {
             Token = token
         };

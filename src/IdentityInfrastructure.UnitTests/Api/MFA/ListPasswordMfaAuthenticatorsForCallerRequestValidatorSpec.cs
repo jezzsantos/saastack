@@ -11,13 +11,13 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class ListPasswordMfaAuthenticatorsForCallerRequestValidatorSpec
 {
-    private readonly ListPasswordMfaAuthenticatorsForCallerRequest _dto;
+    private readonly ListCredentialMfaAuthenticatorsForCallerRequest _dto;
     private readonly ListPasswordMfaAuthenticatorsForCallerRequestValidator _validator;
 
     public ListPasswordMfaAuthenticatorsForCallerRequestValidatorSpec()
     {
         _validator = new ListPasswordMfaAuthenticatorsForCallerRequestValidator();
-        _dto = new ListPasswordMfaAuthenticatorsForCallerRequest
+        _dto = new ListCredentialMfaAuthenticatorsForCallerRequest
         {
             MfaToken = new TokensService().CreateMfaAuthenticationToken()
         };

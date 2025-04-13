@@ -17,7 +17,7 @@ public class MfaAuthenticator : ReadModelEntity
 
     public Optional<string> OobCode { get; set; }
 
-    public Optional<string> PasswordCredentialId { get; set; }
+    public Optional<string> CredentialId { get; set; }
 
     public Optional<string> Secret { get; set; }
 

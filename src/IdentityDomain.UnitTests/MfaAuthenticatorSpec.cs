@@ -225,7 +225,7 @@ public class MfaAuthenticatorSpec
     public void WhenConfirmAssociationForNoneAuthenticator_ThenReturnsError()
     {
         CreateAuthenticator(MfaAuthenticatorType.None);
-        _authenticator.RaiseChangeEvent(Events.PasswordCredentials.MfaAuthenticatorAssociated("anid".ToId(),
+        _authenticator.RaiseChangeEvent(Events.PersonCredentials.MfaAuthenticatorAssociated("anid".ToId(),
             _authenticator, "anoobcode", Optional<string>.None, Optional<string>.None,
             Optional<string>.None));
 
@@ -798,7 +798,7 @@ public class MfaAuthenticatorSpec
 
     private void CreateAuthenticator(MfaAuthenticatorType type)
     {
-        _authenticator.RaiseChangeEvent(Events.PasswordCredentials.MfaAuthenticatorAdded("anid".ToId(),
+        _authenticator.RaiseChangeEvent(Events.PersonCredentials.MfaAuthenticatorAdded("anid".ToId(),
             "auserid".ToId(), type, true));
     }
 }

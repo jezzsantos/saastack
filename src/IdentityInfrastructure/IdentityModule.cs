@@ -3,7 +3,6 @@ using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
-using Domain.Common.Identity;
 using Domain.Interfaces;
 using Domain.Services.Shared;
 using IdentityApplication;
@@ -11,7 +10,7 @@ using IdentityApplication.ApplicationServices;
 using IdentityApplication.Persistence;
 using IdentityDomain;
 using IdentityDomain.DomainServices;
-using IdentityInfrastructure.Api.PasswordCredentials;
+using IdentityInfrastructure.Api.PersonCredentials;
 using IdentityInfrastructure.ApplicationServices;
 using IdentityInfrastructure.DomainServices;
 using IdentityInfrastructure.Persistence;
@@ -34,18 +33,18 @@ public class IdentityModule : ISubdomainModule
         get { return (app, _) => app.RegisterRoutes(); }
     }
 
-    public Assembly DomainAssembly => typeof(PasswordCredentialRoot).Assembly;
+    public Assembly DomainAssembly => typeof(PersonCredentialRoot).Assembly;
 
     public Dictionary<Type, string> EntityPrefixes => new()
     {
-        { typeof(PasswordCredentialRoot), "pwdcred" },
+        { typeof(PersonCredentialRoot), "pwdcred" },
         { typeof(MfaAuthenticator), "mfaauth" },
         { typeof(AuthTokensRoot), "authtok" },
         { typeof(APIKeyRoot), "apikey" },
         { typeof(SSOUserRoot), "ssocred" }
     };
 
-    public Assembly InfrastructureAssembly => typeof(PasswordCredentialsApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(CredentialsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
@@ -72,30 +71,16 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IIdentityApplication, IdentityApplication.IdentityApplication>();
                 services.AddPerHttpRequest<IAPIKeysApplication, APIKeysApplication>();
                 services.AddPerHttpRequest<IAuthTokensApplication, AuthTokensApplication>();
-                services.AddPerHttpRequest<IPasswordCredentialsApplication>(c =>
-                    new PasswordCredentialsApplication(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IIdentifierFactory>(),
-                        c.GetRequiredService<IEndUsersService>(),
-                        c.GetRequiredService<IUserProfilesService>(),
-                        c.GetRequiredService<IUserNotificationsService>(),
-                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                        c.GetRequiredService<IEmailAddressService>(),
-                        c.GetRequiredService<ITokensService>(),
-                        c.GetRequiredService<IEncryptionService>(),
-                        c.GetRequiredService<IPasswordHasherService>(),
-                        c.GetRequiredService<IMfaService>(),
-                        c.GetRequiredService<IAuthTokensService>(),
-                        c.GetRequiredService<IWebsiteUiService>(),
-                        c.GetRequiredService<IPasswordCredentialsRepository>()));
+                services.AddPerHttpRequest<IPersonCredentialsApplication, PersonCredentialsApplication>();
                 services.AddPerHttpRequest<IMachineCredentialsApplication, MachineCredentialsApplication>();
                 services.AddPerHttpRequest<ISingleSignOnApplication, SingleSignOnApplication>();
-                services.AddPerHttpRequest<IPasswordCredentialsRepository>(c =>
-                    new PasswordCredentialsRepository(c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IPersonCredentialRepository>(c =>
+                    new PersonCredentialRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcingDddCommandStore<PasswordCredentialRoot>>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<PersonCredentialRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterEventing<PasswordCredentialRoot, PasswordCredentialProjection>(
-                    c => new PasswordCredentialProjection(c.GetRequiredService<IRecorder>(),
+                services.RegisterEventing<PersonCredentialRoot, PersonCredentialProjection>(
+                    c => new PersonCredentialProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.AddPerHttpRequest<IAuthTokensRepository>(c =>
@@ -127,7 +112,7 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
-                services.AddPerHttpRequest<IPasswordCredentialsService, PasswordCredentialsService>();
+                services.AddPerHttpRequest<IPersonCredentialsService, PersonCredentialsService>();
 
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations

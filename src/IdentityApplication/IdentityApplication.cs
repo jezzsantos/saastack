@@ -7,11 +7,11 @@ namespace IdentityApplication;
 
 public class IdentityApplication : IIdentityApplication
 {
-    private readonly IPasswordCredentialsService _passwordCredentialsService;
+    private readonly IPersonCredentialsService _personCredentialsService;
 
-    public IdentityApplication(IPasswordCredentialsService passwordCredentialsService)
+    public IdentityApplication(IPersonCredentialsService personCredentialsService)
     {
-        _passwordCredentialsService = passwordCredentialsService;
+        _personCredentialsService = personCredentialsService;
     }
 
     public async Task<Result<Identity, Error>> GetIdentityAsync(ICallerContext caller,
@@ -20,7 +20,7 @@ public class IdentityApplication : IIdentityApplication
         var isMfaEnabled = false;
         var hasCredentials = false;
         var receivedCredentials =
-            await _passwordCredentialsService.GetCredentialsPrivateAsync(caller, cancellationToken);
+            await _personCredentialsService.GetCredentialsPrivateAsync(caller, cancellationToken);
         if (receivedCredentials.IsFailure)
         {
             if (receivedCredentials.Error.IsNot(ErrorCode.EntityNotFound))

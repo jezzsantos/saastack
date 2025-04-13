@@ -8,13 +8,13 @@ namespace IdentityInfrastructure.UnitTests.Api.MFA;
 [Trait("Category", "Unit")]
 public class ChangePasswordMfaForCallerRequestValidatorSpec
 {
-    private readonly ChangePasswordMfaForCallerRequest _dto;
+    private readonly ChangeCredentialMfaForCallerRequest _dto;
     private readonly ChangePasswordMfaForCallerRequestValidator _validator;
 
     public ChangePasswordMfaForCallerRequestValidatorSpec()
     {
         _validator = new ChangePasswordMfaForCallerRequestValidator();
-        _dto = new ChangePasswordMfaForCallerRequest
+        _dto = new ChangeCredentialMfaForCallerRequest
         {
             IsEnabled = true
         };

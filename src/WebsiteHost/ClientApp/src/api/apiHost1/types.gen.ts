@@ -17,14 +17,14 @@ export type AssignRolesToOrganizationRequest = {
   userId: string;
 };
 
-export type AssociatePasswordMfaAuthenticatorForCallerRequest = {
-  authenticatorType: PasswordCredentialMfaAuthenticatorType;
+export type AssociateCredentialMfaAuthenticatorForCallerRequest = {
+  authenticatorType: CredentialMfaAuthenticatorType;
   mfaToken?: string | null;
   phoneNumber?: string | null;
 };
 
-export type AssociatePasswordMfaAuthenticatorForCallerResponse = {
-  authenticator: PasswordCredentialMfaAuthenticatorAssociation;
+export type AssociateCredentialMfaAuthenticatorForCallerResponse = {
+  authenticator: CredentialMfaAuthenticatorAssociation;
 };
 
 export type Audit = {
@@ -37,7 +37,7 @@ export type Audit = {
   id: string;
 };
 
-export type AuthenticatePasswordRequest = {
+export type AuthenticateCredentialRequest = {
   password: string;
   username: string;
 };
@@ -102,12 +102,20 @@ export type CarOwner = {
   id: string;
 };
 
-export type ChallengePasswordMfaAuthenticatorForCallerRequest = {
+export type ChallengeCredentialMfaAuthenticatorForCallerRequest = {
   mfaToken: string;
 };
 
-export type ChallengePasswordMfaAuthenticatorForCallerResponse = {
-  challenge: PasswordCredentialMfaAuthenticatorChallenge;
+export type ChallengeCredentialMfaAuthenticatorForCallerResponse = {
+  challenge: CredentialMfaAuthenticatorChallenge;
+};
+
+export type ChangeCredentialMfaForCallerRequest = {
+  isEnabled: boolean;
+};
+
+export type ChangeCredentialMfaResponse = {
+  credential: PersonCredential;
 };
 
 export type ChangeDefaultOrganizationRequest = {
@@ -116,14 +124,6 @@ export type ChangeDefaultOrganizationRequest = {
 
 export type ChangeOrganizationRequest = {
   name?: string | null;
-};
-
-export type ChangePasswordMfaForCallerRequest = {
-  isEnabled: boolean;
-};
-
-export type ChangePasswordMfaResponse = {
-  credential: PasswordCredential;
 };
 
 export type ChangeProfileAvatarResponse = {
@@ -197,8 +197,19 @@ export type ChargebeePaymentMethod = {
   type: string;
 };
 
-export type CompletePasswordResetRequest = {
+export type CompleteCredentialResetRequest = {
   password: string;
+};
+
+export type ConfirmCredentialMfaAuthenticatorForCallerRequest = {
+  confirmationCode: string;
+  mfaToken?: string | null;
+  oobCode?: string | null;
+};
+
+export type ConfirmCredentialMfaAuthenticatorForCallerResponse = {
+  authenticators?: Array<CredentialMfaAuthenticator>;
+  tokens: AuthenticateTokens;
 };
 
 export type ConfirmEmailDeliveredRequest = {
@@ -212,22 +223,11 @@ export type ConfirmEmailDeliveryFailedRequest = {
   receiptId: string;
 };
 
-export type ConfirmPasswordMfaAuthenticatorForCallerRequest = {
-  confirmationCode: string;
-  mfaToken?: string | null;
-  oobCode?: string | null;
-};
-
-export type ConfirmPasswordMfaAuthenticatorForCallerResponse = {
-  authenticators?: Array<PasswordCredentialMfaAuthenticator>;
-  tokens: AuthenticateTokens;
-};
-
-export type ConfirmRegistrationPersonPasswordRequest = {
+export type ConfirmRegistrationPersonCredentialRequest = {
   token: string;
 };
 
-export type ConfirmRegistrationPersonPasswordResponse = {
+export type ConfirmRegistrationPersonCredentialResponse = {
   [key: string]: unknown;
 };
 
@@ -242,7 +242,7 @@ export type ConfirmSmsDeliveryFailedRequest = {
   receiptId: string;
 };
 
-export type CreateAPIKeyForCallerRequest = {
+export type CreateAPIKeyRequest = {
   expiresOnUtc?: string | null;
 };
 
@@ -253,6 +253,27 @@ export type CreateAPIKeyResponse = {
 export type CreateOrganizationRequest = {
   name: string;
 };
+
+export type CredentialMfaAuthenticator = {
+  isActive: boolean;
+  type: CredentialMfaAuthenticatorType;
+  id: string;
+};
+
+export type CredentialMfaAuthenticatorAssociation = {
+  barCodeUri: string;
+  oobCode: string;
+  recoveryCodes?: Array<string>;
+  secret: string;
+  type: CredentialMfaAuthenticatorType;
+};
+
+export type CredentialMfaAuthenticatorChallenge = {
+  oobCode: string;
+  type: CredentialMfaAuthenticatorType;
+};
+
+export type CredentialMfaAuthenticatorType = "None" | "RecoveryCodes" | "OobSms" | "OobEmail" | "TotpAuthenticator";
 
 export type CustomDto = {
   double?: number;
@@ -320,25 +341,15 @@ export type DestroyAllRepositoriesRequest = {
   [key: string]: unknown;
 };
 
-export type DomainEvent = {
-  data: string;
-  eventType: string;
-  metadataFullyQualifiedName: string;
-  rootAggregateType: string;
-  streamName: string;
-  version: number;
-  id: string;
-};
-
 export type DrainAllAuditsRequest = {
   [key: string]: unknown;
 };
 
-export type DrainAllDomainEventsRequest = {
+export type DrainAllEmailsRequest = {
   [key: string]: unknown;
 };
 
-export type DrainAllEmailsRequest = {
+export type DrainAllEventNotificationsRequest = {
   [key: string]: unknown;
 };
 
@@ -373,14 +384,15 @@ export type EndUserClassification = "Person" | "Machine";
 
 export type EndUserStatus = "Unregistered" | "Registered";
 
-export type EndUserWithMemberships = {
-  access: EndUserAccess;
-  classification: EndUserClassification;
-  features: Array<string>;
-  roles: Array<string>;
-  status: EndUserStatus;
+export type EventNotification = {
+  data: string;
+  eventType: string;
+  metadataFullyQualifiedName: string;
+  rootAggregateType: string;
+  streamName: string;
+  subscriberRef: string;
+  version: number;
   id: string;
-  memberships: Array<Membership>;
 };
 
 export type ExportSubscriptionsToMigrateResponse = {
@@ -394,7 +406,7 @@ export type FeatureFlag = {
 };
 
 export type Filtering = {
-  readonly fields: Array<string>;
+  fields: Array<string>;
 };
 
 export type FormatsTestingOnlyRequest = {
@@ -466,10 +478,6 @@ export type GetSubscriptionResponse = {
   subscription: SubscriptionWithPlan;
 };
 
-export type GetUserResponse = {
-  user: EndUserWithMemberships;
-};
-
 export type HealthCheckResponse = {
   name: string;
   status: string;
@@ -477,7 +485,7 @@ export type HealthCheckResponse = {
 
 export type Identity = {
   hasCredentials: boolean;
-    isMfaEnabled: boolean;
+  isMfaEnabled: boolean;
   id: string;
 };
 
@@ -559,6 +567,10 @@ export type InvoiceSummary = {
   nextUtc?: string;
 };
 
+export type ListCredentialMfaAuthenticatorsForCallerResponse = {
+  authenticators: Array<CredentialMfaAuthenticator>;
+};
+
 export type ListMembersForOrganizationResponse = {
   metadata: SearchResultMetadata;
   members: Array<OrganizationMember>;
@@ -567,10 +579,6 @@ export type ListMembersForOrganizationResponse = {
 export type ListMembershipsForCallerResponse = {
   metadata: SearchResultMetadata;
   memberships: Array<Membership>;
-};
-
-export type ListPasswordMfaAuthenticatorsForCallerResponse = {
-  authenticators: Array<PasswordCredentialMfaAuthenticator>;
 };
 
 export type ListPricingPlansResponse = {
@@ -658,6 +666,7 @@ export type MigrateSubscriptionResponse = {
 
 export type NotifyDomainEventRequest = {
   message: string;
+  subscriptionName: string;
 };
 
 export type NotifyProvisioningRequest = {
@@ -729,43 +738,17 @@ export type OrganizationMember = {
 
 export type OrganizationOwnership = "Shared" | "Personal";
 
-export type PasswordCredential = {
-  isMfaEnabled: boolean;
-  user: EndUser;
-  id: string;
-};
-
-export type PasswordCredentialMfaAuthenticator = {
-  isActive: boolean;
-  type: PasswordCredentialMfaAuthenticatorType;
-  id: string;
-};
-
-export type PasswordCredentialMfaAuthenticatorAssociation = {
-  barCodeUri: string;
-  oobCode: string;
-  recoveryCodes?: Array<string>;
-  secret: string;
-  type: PasswordCredentialMfaAuthenticatorType;
-};
-
-export type PasswordCredentialMfaAuthenticatorChallenge = {
-  oobCode: string;
-  type: PasswordCredentialMfaAuthenticatorType;
-};
-
-export type PasswordCredentialMfaAuthenticatorType =
-  | "None"
-  | "RecoveryCodes"
-  | "OobSms"
-  | "OobEmail"
-  | "TotpAuthenticator";
-
 export type PaymentMethodStatus = "Invalid" | "Valid";
 
 export type PaymentMethodType = "None" | "Card" | "Other";
 
 export type PeriodFrequencyUnit = "Eternity" | "Day" | "Week" | "Month" | "Year";
+
+export type PersonCredential = {
+  isMfaEnabled: boolean;
+  user: EndUser;
+  id: string;
+};
 
 export type PersonName = {
   firstName: string;
@@ -894,7 +877,7 @@ export type RegisterMachineResponse = {
   machine: MachineCredential;
 };
 
-export type RegisterPersonPasswordRequest = {
+export type RegisterPersonCredentialRequest = {
   countryCode?: string | null;
   emailAddress: string;
   firstName: string;
@@ -905,8 +888,8 @@ export type RegisterPersonPasswordRequest = {
   timezone?: string | null;
 };
 
-export type RegisterPersonPasswordResponse = {
-  credential: PasswordCredential;
+export type RegisterPersonCredentialResponse = {
+  person: PersonCredential;
 };
 
 export type ResendGuestInvitationRequest = {
@@ -917,7 +900,7 @@ export type ResendPasswordResetRequest = {
   [key: string]: unknown;
 };
 
-export type ResetPasswordMfaRequest = {
+export type ResetCredentialMfaRequest = {
   userId?: string | null;
 };
 
@@ -955,14 +938,14 @@ export type SearchAllCarsResponse = {
   cars: Array<Car>;
 };
 
-export type SearchAllDomainEventsResponse = {
-  metadata: SearchResultMetadata;
-  events: Array<DomainEvent>;
-};
-
 export type SearchAllEmailDeliveriesResponse = {
   metadata: SearchResultMetadata;
   emails: Array<DeliveredEmail>;
+};
+
+export type SearchAllEventNotificationsResponse = {
+  metadata: SearchResultMetadata;
+  notifications: Array<EventNotification>;
 };
 
 export type SearchAllSmsDeliveriesResponse = {
@@ -981,6 +964,11 @@ export type SearchResultMetadata = {
 export type SearchSubscriptionHistoryResponse = {
   metadata: SearchResultMetadata;
   invoices: Array<Invoice>;
+};
+
+export type SearchTestingOnlyResponse = {
+  metadata: SearchResultMetadata;
+  items: Array<TestResource>;
 };
 
 export type SendEmailRequest = {
@@ -1100,6 +1088,11 @@ export type TakeOfflineCarRequest = {
 
 export type TestEnum = "Value1" | "Value2" | "Value3";
 
+export type TestResource = {
+  aProperty?: string;
+  id: string;
+};
+
 export type TokenType = "OtherToken" | "AccessToken" | "RefreshToken";
 
 export type TransferSubscriptionRequest = {
@@ -1194,23 +1187,23 @@ export type ValidationsValidatedPostTestingOnlyRequest = {
   requiredField: string;
 };
 
-export type VerifyGuestInvitationResponse = {
-  invitation: Invitation;
-};
-
-export type VerifyPasswordMfaAuthenticatorForCallerRequest = {
+export type VerifyCredentialMfaAuthenticatorForCallerRequest = {
   confirmationCode: string;
   mfaToken: string;
   oobCode?: string | null;
 };
 
-export type CreateApiKeyForCallerData = {
-  body?: CreateAPIKeyForCallerRequest;
+export type VerifyGuestInvitationResponse = {
+  invitation: Invitation;
 };
 
-export type CreateApiKeyForCallerResponse = CreateAPIKeyResponse;
+export type CreateApiKeyData = {
+  body?: CreateAPIKeyRequest;
+};
 
-export type CreateApiKeyForCallerError = ProblemDetails | unknown;
+export type CreateApiKeyResponse = CreateAPIKeyResponse;
+
+export type CreateApiKeyError = ProblemDetails | unknown;
 
 export type SearchAllApiKeysForCallerData = {
   query?: {
@@ -1254,6 +1247,16 @@ export type DeleteApiKeyData = {
 export type DeleteApiKeyResponse = void;
 
 export type DeleteApiKeyError = ProblemDetails | unknown;
+
+export type RevokeApiKeyData = {
+  path: {
+    Id: string;
+  };
+};
+
+export type RevokeApiKeyResponse = void;
+
+export type RevokeApiKeyError = ProblemDetails | unknown;
 
 export type DeliverAuditData = {
   body?: DeliverAuditRequest;
@@ -1626,13 +1629,87 @@ export type ChargebeeNotifyWebhookEventResponse = EmptyResponse;
 
 export type ChargebeeNotifyWebhookEventError = ProblemDetails | unknown;
 
-export type DrainAllDomainEventsData = {
-  body?: DrainAllDomainEventsRequest;
+export type AuthenticateCredentialData = {
+  body?: AuthenticateCredentialRequest;
 };
 
-export type DrainAllDomainEventsResponse = EmptyResponse;
+export type AuthenticateCredentialResponse = AuthenticateResponse;
 
-export type DrainAllDomainEventsError = ProblemDetails | unknown;
+export type AuthenticateCredentialError = ProblemDetails | unknown;
+
+export type CompleteCredentialResetData = {
+  body?: CompleteCredentialResetRequest;
+  path: {
+    Token: string;
+  };
+};
+
+export type CompleteCredentialResetResponse = EmptyResponse;
+
+export type CompleteCredentialResetError = ProblemDetails | unknown;
+
+export type ConfirmRegistrationPersonCredentialData = {
+  body?: ConfirmRegistrationPersonCredentialRequest;
+};
+
+export type ConfirmRegistrationPersonCredentialResponse2 = ConfirmRegistrationPersonCredentialResponse;
+
+export type ConfirmRegistrationPersonCredentialError = ProblemDetails | unknown;
+
+export type GetRegistrationPersonConfirmationData = {
+  query: {
+    UserId: string;
+  };
+};
+
+export type GetRegistrationPersonConfirmationResponse2 = GetRegistrationPersonConfirmationResponse;
+
+export type GetRegistrationPersonConfirmationError = ProblemDetails | unknown;
+
+export type RegisterPersonCredentialData = {
+  body?: RegisterPersonCredentialRequest;
+};
+
+export type RegisterPersonCredentialResponse2 = RegisterPersonCredentialResponse;
+
+export type RegisterPersonCredentialError = ProblemDetails | unknown;
+
+export type InitiatePasswordResetData = {
+  body?: InitiatePasswordResetRequest;
+};
+
+export type InitiatePasswordResetResponse = EmptyResponse;
+
+export type InitiatePasswordResetError = ProblemDetails | unknown;
+
+export type ResendPasswordResetData = {
+  body?: ResendPasswordResetRequest;
+  path: {
+    Token: string;
+  };
+};
+
+export type ResendPasswordResetResponse = EmptyResponse;
+
+export type ResendPasswordResetError = ProblemDetails | unknown;
+
+export type VerifyPasswordResetData = {
+  path: {
+    Token: string;
+  };
+};
+
+export type VerifyPasswordResetResponse = EmptyResponse;
+
+export type VerifyPasswordResetError = ProblemDetails | unknown;
+
+export type DrainAllEventNotificationsData = {
+  body?: DrainAllEventNotificationsRequest;
+};
+
+export type DrainAllEventNotificationsResponse = EmptyResponse;
+
+export type DrainAllEventNotificationsError = ProblemDetails | unknown;
 
 export type NotifyDomainEventData = {
   body?: NotifyDomainEventRequest;
@@ -1642,7 +1719,7 @@ export type NotifyDomainEventResponse = DeliverMessageResponse;
 
 export type NotifyDomainEventError = ProblemDetails | unknown;
 
-export type SearchAllDomainEventsData = {
+export type SearchAllEventNotificationsData = {
   query?: {
     /**
      * List of child resources to embed in the resource
@@ -1667,9 +1744,9 @@ export type SearchAllDomainEventsData = {
   };
 };
 
-export type SearchAllDomainEventsResponse2 = SearchAllDomainEventsResponse;
+export type SearchAllEventNotificationsResponse2 = SearchAllEventNotificationsResponse;
 
-export type SearchAllDomainEventsError = ProblemDetails | unknown;
+export type SearchAllEventNotificationsError = ProblemDetails | unknown;
 
 export type ConfirmEmailDeliveredData = {
   body?: ConfirmEmailDeliveredRequest;
@@ -1767,16 +1844,6 @@ export type UnassignPlatformRolesPatchData = {
 export type UnassignPlatformRolesPatchResponse = UpdateUserResponse;
 
 export type UnassignPlatformRolesPatchError = ProblemDetails | unknown;
-
-export type GetUserData = {
-  path: {
-    Id: string;
-  };
-};
-
-export type GetUserResponse2 = GetUserResponse;
-
-export type GetUserError = ProblemDetails | unknown;
 
 export type GetFeatureFlagData = {
   path: {
@@ -1967,132 +2034,135 @@ export type ListMembershipsForCallerResponse2 = ListMembershipsForCallerResponse
 
 export type ListMembershipsForCallerError = ProblemDetails | unknown;
 
-export type AssociatePasswordMfaAuthenticatorForCallerData = {
-  body?: AssociatePasswordMfaAuthenticatorForCallerRequest;
+export type AssociateCredentialMfaAuthenticatorForCallerData = {
+  body?: AssociateCredentialMfaAuthenticatorForCallerRequest;
 };
 
-export type AssociatePasswordMfaAuthenticatorForCallerResponse2 = AssociatePasswordMfaAuthenticatorForCallerResponse;
+export type AssociateCredentialMfaAuthenticatorForCallerResponse2 =
+  AssociateCredentialMfaAuthenticatorForCallerResponse;
 
-export type AssociatePasswordMfaAuthenticatorForCallerError = ProblemDetails | unknown;
+export type AssociateCredentialMfaAuthenticatorForCallerError = ProblemDetails | unknown;
 
-export type ListPasswordMfaAuthenticatorsForCallerData = {
+export type ListCredentialMfaAuthenticatorsForCallerData = {
   query?: {
     MfaToken?: string;
   };
 };
 
-export type ListPasswordMfaAuthenticatorsForCallerResponse2 = ListPasswordMfaAuthenticatorsForCallerResponse;
+export type ListCredentialMfaAuthenticatorsForCallerResponse2 = ListCredentialMfaAuthenticatorsForCallerResponse;
 
-export type ListPasswordMfaAuthenticatorsForCallerError = ProblemDetails | unknown;
+export type ListCredentialMfaAuthenticatorsForCallerError = ProblemDetails | unknown;
 
-export type ChallengePasswordMfaAuthenticatorForCallerPutData = {
-  body?: ChallengePasswordMfaAuthenticatorForCallerRequest;
+export type ChallengeCredentialMfaAuthenticatorForCallerPutData = {
+  body?: ChallengeCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorId: string;
   };
 };
 
-export type ChallengePasswordMfaAuthenticatorForCallerPutResponse = ChallengePasswordMfaAuthenticatorForCallerResponse;
+export type ChallengeCredentialMfaAuthenticatorForCallerPutResponse =
+  ChallengeCredentialMfaAuthenticatorForCallerResponse;
 
-export type ChallengePasswordMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
+export type ChallengeCredentialMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
 
-export type ChallengePasswordMfaAuthenticatorForCallerPatchData = {
-  body?: ChallengePasswordMfaAuthenticatorForCallerRequest;
+export type ChallengeCredentialMfaAuthenticatorForCallerPatchData = {
+  body?: ChallengeCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorId: string;
   };
 };
 
-export type ChallengePasswordMfaAuthenticatorForCallerPatchResponse =
-  ChallengePasswordMfaAuthenticatorForCallerResponse;
+export type ChallengeCredentialMfaAuthenticatorForCallerPatchResponse =
+  ChallengeCredentialMfaAuthenticatorForCallerResponse;
 
-export type ChallengePasswordMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
+export type ChallengeCredentialMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
 
-export type ChangePasswordMfaForCallerPutData = {
-  body?: ChangePasswordMfaForCallerRequest;
+export type ChangeCredentialMfaForCallerPutData = {
+  body?: ChangeCredentialMfaForCallerRequest;
 };
 
-export type ChangePasswordMfaForCallerPutResponse = ChangePasswordMfaResponse;
+export type ChangeCredentialMfaForCallerPutResponse = ChangeCredentialMfaResponse;
 
-export type ChangePasswordMfaForCallerPutError = ProblemDetails | unknown;
+export type ChangeCredentialMfaForCallerPutError = ProblemDetails | unknown;
 
-export type ChangePasswordMfaForCallerPatchData = {
-  body?: ChangePasswordMfaForCallerRequest;
+export type ChangeCredentialMfaForCallerPatchData = {
+  body?: ChangeCredentialMfaForCallerRequest;
 };
 
-export type ChangePasswordMfaForCallerPatchResponse = ChangePasswordMfaResponse;
+export type ChangeCredentialMfaForCallerPatchResponse = ChangeCredentialMfaResponse;
 
-export type ChangePasswordMfaForCallerPatchError = ProblemDetails | unknown;
+export type ChangeCredentialMfaForCallerPatchError = ProblemDetails | unknown;
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPutData = {
-  body?: ConfirmPasswordMfaAuthenticatorForCallerRequest;
+export type ConfirmCredentialMfaAuthenticatorForCallerPutData = {
+  body?: ConfirmCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorType: string;
   };
 };
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPutResponse = ConfirmPasswordMfaAuthenticatorForCallerResponse;
+export type ConfirmCredentialMfaAuthenticatorForCallerPutResponse = ConfirmCredentialMfaAuthenticatorForCallerResponse;
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
+export type ConfirmCredentialMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPatchData = {
-  body?: ConfirmPasswordMfaAuthenticatorForCallerRequest;
+export type ConfirmCredentialMfaAuthenticatorForCallerPatchData = {
+  body?: ConfirmCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorType: string;
   };
 };
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPatchResponse = ConfirmPasswordMfaAuthenticatorForCallerResponse;
+export type ConfirmCredentialMfaAuthenticatorForCallerPatchResponse =
+  ConfirmCredentialMfaAuthenticatorForCallerResponse;
 
-export type ConfirmPasswordMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
+export type ConfirmCredentialMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
 
-export type DisassociatePasswordMfaAuthenticatorForCallerData = {
+export type DisassociateCredentialMfaAuthenticatorForCallerData = {
   path: {
     Id: string;
   };
 };
 
-export type DisassociatePasswordMfaAuthenticatorForCallerResponse = void;
+export type DisassociateCredentialMfaAuthenticatorForCallerResponse = void;
 
-export type DisassociatePasswordMfaAuthenticatorForCallerError = ProblemDetails | unknown;
+export type DisassociateCredentialMfaAuthenticatorForCallerError = ProblemDetails | unknown;
 
-export type ResetPasswordMfaPutData = {
-  body?: ResetPasswordMfaRequest;
+export type ResetCredentialMfaPutData = {
+  body?: ResetCredentialMfaRequest;
 };
 
-export type ResetPasswordMfaPutResponse = ChangePasswordMfaResponse;
+export type ResetCredentialMfaPutResponse = ChangeCredentialMfaResponse;
 
-export type ResetPasswordMfaPutError = ProblemDetails | unknown;
+export type ResetCredentialMfaPutError = ProblemDetails | unknown;
 
-export type ResetPasswordMfaPatchData = {
-  body?: ResetPasswordMfaRequest;
+export type ResetCredentialMfaPatchData = {
+  body?: ResetCredentialMfaRequest;
 };
 
-export type ResetPasswordMfaPatchResponse = ChangePasswordMfaResponse;
+export type ResetCredentialMfaPatchResponse = ChangeCredentialMfaResponse;
 
-export type ResetPasswordMfaPatchError = ProblemDetails | unknown;
+export type ResetCredentialMfaPatchError = ProblemDetails | unknown;
 
-export type VerifyPasswordMfaAuthenticatorForCallerPutData = {
-  body?: VerifyPasswordMfaAuthenticatorForCallerRequest;
+export type VerifyCredentialMfaAuthenticatorForCallerPutData = {
+  body?: VerifyCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorType: string;
   };
 };
 
-export type VerifyPasswordMfaAuthenticatorForCallerPutResponse = AuthenticateResponse;
+export type VerifyCredentialMfaAuthenticatorForCallerPutResponse = AuthenticateResponse;
 
-export type VerifyPasswordMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
+export type VerifyCredentialMfaAuthenticatorForCallerPutError = ProblemDetails | unknown;
 
-export type VerifyPasswordMfaAuthenticatorForCallerPatchData = {
-  body?: VerifyPasswordMfaAuthenticatorForCallerRequest;
+export type VerifyCredentialMfaAuthenticatorForCallerPatchData = {
+  body?: VerifyCredentialMfaAuthenticatorForCallerRequest;
   path: {
     AuthenticatorType: string;
   };
 };
 
-export type VerifyPasswordMfaAuthenticatorForCallerPatchResponse = AuthenticateResponse;
+export type VerifyCredentialMfaAuthenticatorForCallerPatchResponse = AuthenticateResponse;
 
-export type VerifyPasswordMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
+export type VerifyCredentialMfaAuthenticatorForCallerPatchError = ProblemDetails | unknown;
 
 export type AssignRolesToOrganizationPutData = {
   body?: AssignRolesToOrganizationRequest;
@@ -2287,80 +2357,6 @@ export type UnInviteMemberFromOrganizationData = {
 export type UnInviteMemberFromOrganizationResponse2 = UnInviteMemberFromOrganizationResponse;
 
 export type UnInviteMemberFromOrganizationError = ProblemDetails | unknown;
-
-export type AuthenticatePasswordData = {
-  body?: AuthenticatePasswordRequest;
-};
-
-export type AuthenticatePasswordResponse = AuthenticateResponse;
-
-export type AuthenticatePasswordError = ProblemDetails | unknown;
-
-export type CompletePasswordResetData = {
-  body?: CompletePasswordResetRequest;
-  path: {
-    Token: string;
-  };
-};
-
-export type CompletePasswordResetResponse = EmptyResponse;
-
-export type CompletePasswordResetError = ProblemDetails | unknown;
-
-export type ConfirmRegistrationPersonPasswordData = {
-  body?: ConfirmRegistrationPersonPasswordRequest;
-};
-
-export type ConfirmRegistrationPersonPasswordResponse2 = ConfirmRegistrationPersonPasswordResponse;
-
-export type ConfirmRegistrationPersonPasswordError = ProblemDetails | unknown;
-
-export type GetRegistrationPersonConfirmationData = {
-  query: {
-    UserId: string;
-  };
-};
-
-export type GetRegistrationPersonConfirmationResponse2 = GetRegistrationPersonConfirmationResponse;
-
-export type GetRegistrationPersonConfirmationError = ProblemDetails | unknown;
-
-export type RegisterPersonPasswordData = {
-  body?: RegisterPersonPasswordRequest;
-};
-
-export type RegisterPersonPasswordResponse2 = RegisterPersonPasswordResponse;
-
-export type RegisterPersonPasswordError = ProblemDetails | unknown;
-
-export type InitiatePasswordResetData = {
-  body?: InitiatePasswordResetRequest;
-};
-
-export type InitiatePasswordResetResponse = EmptyResponse;
-
-export type InitiatePasswordResetError = ProblemDetails | unknown;
-
-export type ResendPasswordResetData = {
-  body?: ResendPasswordResetRequest;
-  path: {
-    Token: string;
-  };
-};
-
-export type ResendPasswordResetResponse = EmptyResponse;
-
-export type ResendPasswordResetError = ProblemDetails | unknown;
-
-export type VerifyPasswordResetData = {
-  path: {
-    Token: string;
-  };
-};
-
-export type VerifyPasswordResetResponse = EmptyResponse;
-
-export type VerifyPasswordResetError = ProblemDetails | unknown;
 
 export type ListPricingPlansResponse2 = ListPricingPlansResponse;
 
@@ -2677,6 +2673,35 @@ export type PostWithEnumTestingOnlyData = {
 export type PostWithEnumTestingOnlyResponse = StringMessageTestingOnlyResponse;
 
 export type PostWithEnumTestingOnlyError = ProblemDetails | unknown;
+
+export type SearchTestingOnlyData = {
+  query?: {
+    /**
+     * List of child resources to embed in the resource
+     */
+    Embed?: string;
+    /**
+     * List of fields to include and exclude in the search result
+     */
+    Filter?: string;
+    /**
+     * The maximum number of search results to return
+     */
+    Limit?: number;
+    /**
+     * The zero-based index of the first search result
+     */
+    Offset?: number;
+    /**
+     * List of fields to sort the results on
+     */
+    Sort?: string;
+  };
+};
+
+export type SearchTestingOnlyResponse2 = SearchTestingOnlyResponse;
+
+export type SearchTestingOnlyError = ProblemDetails | unknown;
 
 export type GetInsecureTestingOnlyResponse = EmptyResponse;
 
