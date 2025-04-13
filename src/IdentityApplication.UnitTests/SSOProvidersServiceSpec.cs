@@ -4,7 +4,6 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
-using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces.Entities;
 using Domain.Services.Shared;
 using Domain.Shared;
@@ -16,6 +15,7 @@ using JetBrains.Annotations;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
+using AuthToken = Application.Resources.Shared.AuthToken;
 using PersonName = Domain.Shared.PersonName;
 
 namespace IdentityApplication.UnitTests;
@@ -215,7 +215,7 @@ public class SSOProvidersServiceSpec
                 Timezones.Default, CountryCodes.Default);
             var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object, "aprovidername", "auserid".ToId())
                 .Value;
-            ssoUser.AddDetails(SSOAuthTokens.Create(new List<SSOToken>()).Value, "aprovideruid",
+            ssoUser.ChangeDetails("aprovideruid",
                 EmailAddress.Create("auser@company.com").Value,
                 PersonName.Create("afirstname", "alastname").Value, Timezone.Default,
                 Address.Create(CountryCodes.Default).Value);
@@ -289,6 +289,9 @@ public class SSOProvidersServiceSpec
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Optional<SSOUserRoot>.None);
+            _repository.Setup(rep => rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(),
+                    It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Optional<ProviderAuthTokensRoot>.None);
 
             var result =
                 await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
@@ -306,6 +309,13 @@ public class SSOProvidersServiceSpec
                 && user.Name.Value.LastName == Optional<Name>.None
                 && user.Timezone.Value == Timezones.Default
                 && user.Address.Value.CountryCode == CountryCodes.Default
+            ), It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.FindProviderTokensByUserIdAndProviderAsync(TestSSOAuthenticationProvider.Name,
+                "auserid".ToId(), It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.SaveAsync(It.Is<ProviderAuthTokensRoot>(toks =>
+                toks.ProviderName == TestSSOAuthenticationProvider.Name
+                && toks.UserId == "auserid"
+                && toks.Tokens.Value.ToList().Count == 0
             ), It.IsAny<CancellationToken>()));
         }
 
@@ -346,6 +356,11 @@ public class SSOProvidersServiceSpec
                 Resources.SSOProvidersService_UnknownProvider.Format("aprovidername"));
             _repository.Verify(
                 rep => rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+            _repository.Verify(
+                rep => rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+            _repository.Verify(rep => rep.SaveAsync(It.IsAny<ProviderAuthTokensRoot>(), It.IsAny<CancellationToken>()),
                 Times.Never);
         }
 
@@ -390,10 +405,15 @@ public class SSOProvidersServiceSpec
             result.Should().BeError(ErrorCode.EntityNotFound);
             _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
                 It.IsAny<CancellationToken>()));
+            _repository.Verify(
+                rep => rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+            _repository.Verify(rep => rep.SaveAsync(It.IsAny<ProviderAuthTokensRoot>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Fact]
-        public async Task WhenSaveTokensOnBehalfOfUserAsync_ThenSavesTokens()
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncWithNoTokens_ThenSavesNewTokens()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -429,29 +449,108 @@ public class SSOProvidersServiceSpec
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
+            _repository.Setup(rep =>
+                    rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Optional<ProviderAuthTokensRoot>.None);
 
             var result =
                 await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
                     "auserid".ToId(),
                     tokens, CancellationToken.None);
 
-            var expectedTokens = SSOAuthTokens.Create([
-                SSOAuthToken.Create(SSOAuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.OtherToken, "anencryptedvalue", datum).Value
+            var expectedTokens = AuthTokens.Create([
+                IdentityDomain.AuthToken.Create(AuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.OtherToken, "anencryptedvalue", datum).Value
             ]).Value;
             result.Should().BeSuccess();
             _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
                 It.IsAny<CancellationToken>()));
-            _repository.Verify(rep => rep.SaveAsync(It.Is<SSOUserRoot>(user =>
-                user.UserId == "auserid"
-                && user.ProviderName == "aprovidername"
-                && user.Tokens == expectedTokens
+            _repository.Verify(rep =>
+                rep.FindProviderTokensByUserIdAndProviderAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                    It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.SaveAsync(It.Is<ProviderAuthTokensRoot>(toks =>
+                toks.ProviderName == TestSSOAuthenticationProvider.Name
+                && toks.UserId == "auserid"
+                && toks.Tokens == expectedTokens
             ), It.IsAny<CancellationToken>()));
         }
 
         [Fact]
-        public async Task WhenSaveTokensOnBehalfOfUserAsyncWhenCallerIsNotOwner_ThenSucceeds()
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncWithExistingTokens_ThenUpdatesTokens()
+        {
+            _caller.Setup(cc => cc.CallerId)
+                .Returns("auserid");
+            var datum = DateTime.UtcNow;
+            var tokens = new ProviderAuthenticationTokens
+            {
+                Provider = "aprovidername",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = datum,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = datum,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                },
+                OtherTokens =
+                [
+                    new AuthenticationToken
+                    {
+                        ExpiresOn = datum,
+                        Type = TokenType.OtherToken,
+                        Value = "anothertoken"
+                    }
+                ]
+            };
+            var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object,
+                "aprovidername", "auserid".ToId()).Value;
+            _repository.Setup(rep =>
+                    rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ssoUser.ToOptional());
+            var providerTokens = ProviderAuthTokensRoot.Create(_recorder.Object, _idFactory.Object,
+                TestSSOAuthenticationProvider.Name, "auserid".ToId()).Value;
+            providerTokens.ChangeTokens("auserid".ToId(), AuthTokens.Create([
+                IdentityDomain.AuthToken.Create(AuthTokenType.AccessToken, "anothervalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.RefreshToken, "anothervalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.OtherToken, "anothervalue", datum).Value
+            ]).Value);
+            _repository.Setup(rep =>
+                    rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerTokens.ToOptional());
+
+            var result =
+                await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
+                    "auserid".ToId(), tokens, CancellationToken.None);
+
+            var expectedTokens = AuthTokens.Create([
+                IdentityDomain.AuthToken.Create(AuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.OtherToken, "anencryptedvalue", datum).Value
+            ]).Value;
+            result.Should().BeSuccess();
+            _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                It.IsAny<CancellationToken>()));
+            _repository.Verify(rep =>
+                rep.FindProviderTokensByUserIdAndProviderAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                    It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.SaveAsync(It.Is<ProviderAuthTokensRoot>(toks =>
+                toks.ProviderName == TestSSOAuthenticationProvider.Name
+                && toks.Id == "anid"
+                && toks.UserId == "auserid"
+                && toks.Tokens == expectedTokens
+            ), It.IsAny<CancellationToken>()));
+        }
+
+        [Fact]
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncWhenCallerIsNotOwner_ThenSavesTokens()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -487,23 +586,29 @@ public class SSOProvidersServiceSpec
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
+            _repository.Setup(rep =>
+                    rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Optional<ProviderAuthTokensRoot>.None);
 
             var result =
                 await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
                     "anotheruserid".ToId(), tokens, CancellationToken.None);
 
-            var expectedTokens = SSOAuthTokens.Create([
-                SSOAuthToken.Create(SSOAuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.OtherToken, "anencryptedvalue", datum).Value
+            var expectedTokens = AuthTokens.Create([
+                IdentityDomain.AuthToken.Create(AuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.OtherToken, "anencryptedvalue", datum).Value
             ]).Value;
             result.Should().BeSuccess();
-            _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "anotheruserid".ToId(),
-                It.IsAny<CancellationToken>()));
-            _repository.Verify(rep => rep.SaveAsync(It.Is<SSOUserRoot>(user =>
-                user.UserId == "anotheruserid"
-                && user.ProviderName == "aprovidername"
-                && user.Tokens == expectedTokens
+            _repository.Verify(rep =>
+                rep.FindProviderTokensByUserIdAndProviderAsync(TestSSOAuthenticationProvider.Name,
+                    "anotheruserid".ToId(),
+                    It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.SaveAsync(It.Is<ProviderAuthTokensRoot>(toks =>
+                toks.ProviderName == TestSSOAuthenticationProvider.Name
+                && toks.UserId == "anotheruserid"
+                && toks.Tokens == expectedTokens
             ), It.IsAny<CancellationToken>()));
         }
 
@@ -559,6 +664,9 @@ public class SSOProvidersServiceSpec
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
+            _repository.Setup(rep => rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(),
+                    It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Optional<ProviderAuthTokensRoot>.None);
 
             var result =
                 await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
@@ -567,6 +675,8 @@ public class SSOProvidersServiceSpec
             result.Value.Count.Should().Be(0);
             _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "auserid".ToId(),
                 It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.FindProviderTokensByUserIdAndProviderAsync(TestSSOAuthenticationProvider.Name,
+                "auserid".ToId(), It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -577,15 +687,22 @@ public class SSOProvidersServiceSpec
             var datum = DateTime.UtcNow;
             var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object,
                 "aprovidername", "auserid".ToId()).Value;
-            ssoUser.ChangeTokens("auserid".ToId(), SSOAuthTokens.Create([
-                SSOAuthToken.Create(SSOAuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
-                SSOAuthToken.Create(SSOAuthTokenType.OtherToken, "anencryptedvalue", datum).Value
-            ]).Value);
             _repository.Setup(rep =>
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
+            var expectedTokens = AuthTokens.Create([
+                IdentityDomain.AuthToken.Create(AuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
+                IdentityDomain.AuthToken.Create(AuthTokenType.OtherToken, "anencryptedvalue", datum).Value
+            ]).Value;
+            var providerTokens = ProviderAuthTokensRoot.Create(_recorder.Object, _idFactory.Object,
+                TestSSOAuthenticationProvider.Name, "auserid".ToId()).Value;
+            providerTokens.ChangeTokens("auserid".ToId(), expectedTokens);
+            _repository.Setup(rep =>
+                    rep.FindProviderTokensByUserIdAndProviderAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerTokens.ToOptional());
 
             var result =
                 await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);

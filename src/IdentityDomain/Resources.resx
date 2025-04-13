@@ -165,11 +165,14 @@
     <data name="PersonCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound" xml:space="preserve">
         <value>The authenticator has not yet been associated</value>
     </data>
-    <data name="MfaAuthenticator_ConfirmAssociation_NotAssociated" xml:space="preserve">
-        <value>The authenticator cannot be confirmed</value>
-    </data>
     <data name="PersonCredentialRoot_NoMfaAuthenticator" xml:space="preserve">
         <value>This authenticator does not exist</value>
+    </data>
+    <data name="PersonCredentialRoot_NotOperator" xml:space="preserve">
+        <value>This user is not a member of the operations team</value>
+    </data>
+    <data name="MfaAuthenticator_ConfirmAssociation_NotAssociated" xml:space="preserve">
+        <value>The authenticator cannot be confirmed</value>
     </data>
     <data name="MfaAuthenticator_Associate_OobSms_NoPhoneNumber" xml:space="preserve">
         <value>A phone number is required to associate OOB with SMS</value>
@@ -198,7 +201,8 @@
     <data name="MfaAuthenticator_Verify_InvalidType" xml:space="preserve">
         <value>You cannot verify this type of authenticator</value>
     </data>
-    <data name="PersonCredentialRoot_NotOperator" xml:space="preserve">
-        <value>This user is not a member of the operations team</value>
+    <data name="ProviderAuthTokensRoot_NotOwner" xml:space="preserve">
+        <value>Only the user can update their own tokens</value>
     </data>
+
 </root>

@@ -4,11 +4,11 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using IdentityApplication.Persistence;
-using IdentityApplication.Persistence.ReadModels;
 using IdentityDomain;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
+using AuthToken = IdentityApplication.Persistence.ReadModels.AuthToken;
 
 namespace IdentityInfrastructure.Persistence;
 

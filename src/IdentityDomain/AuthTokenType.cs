@@ -1,6 +1,6 @@
 namespace IdentityDomain;
 
-public enum SSOAuthTokenType
+public enum AuthTokenType
 {
     OtherToken = 0,
     AccessToken = 1,

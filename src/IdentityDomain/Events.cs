@@ -7,7 +7,7 @@ using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
 using Domain.Shared.Identities;
 using Created = Domain.Events.Shared.Identities.AuthTokens.Created;
-using TokensChanged = Domain.Events.Shared.Identities.SSOUsers.TokensChanged;
+using TokensChanged = Domain.Events.Shared.Identities.AuthTokens.TokensChanged;
 
 namespace IdentityDomain;
 
@@ -23,12 +23,12 @@ public static class Events
             };
         }
 
-        public static Domain.Events.Shared.Identities.AuthTokens.TokensChanged TokensChanged(Identifier id,
+        public static TokensChanged TokensChanged(Identifier id,
             Identifier userId, string accessToken,
             DateTime accessTokenExpiresOn,
             string refreshToken, DateTime refreshTokenExpiresOn)
         {
-            return new Domain.Events.Shared.Identities.AuthTokens.TokensChanged(id)
+            return new TokensChanged(id)
             {
                 UserId = userId,
                 AccessToken = accessToken,
@@ -57,6 +57,35 @@ public static class Events
             return new TokensRevoked(id)
             {
                 UserId = userId
+            };
+        }
+    }
+
+    public static class ProviderAuthTokens
+    {
+        public static Domain.Events.Shared.Identities.ProviderAuthTokens.Created Created(Identifier id,
+            Identifier userId, string providerName)
+        {
+            return new Domain.Events.Shared.Identities.ProviderAuthTokens.Created(id)
+            {
+                UserId = userId,
+                ProviderName = providerName
+            };
+        }
+
+        public static Domain.Events.Shared.Identities.ProviderAuthTokens.TokensChanged TokensChanged(Identifier id,
+            IdentityDomain.AuthTokens tokens)
+        {
+            return new Domain.Events.Shared.Identities.ProviderAuthTokens.TokensChanged(id)
+            {
+                Tokens = tokens
+                    .ToList()
+                    .Select(tok => new Domain.Events.Shared.Identities.ProviderAuthTokens.AuthToken
+                    {
+                        Type = tok.Type.ToString(),
+                        EncryptedValue = tok.EncryptedValue,
+                        ExpiresOn = tok.ExpiresOn
+                    }).ToList()
             };
         }
     }
@@ -331,32 +360,17 @@ public static class Events
             };
         }
 
-        public static DetailsAdded DetailsAdded(Identifier id, string uId, EmailAddress emailAddress,
+        public static DetailsChanged DetailsChanged(Identifier id, string providerUniqueId, EmailAddress emailAddress,
             PersonName name, Timezone timezone, Address address)
         {
-            return new DetailsAdded(id)
+            return new DetailsChanged(id)
             {
-                ProviderUId = uId,
+                ProviderUId = providerUniqueId,
                 EmailAddress = emailAddress,
                 FirstName = name.FirstName,
                 LastName = name.LastName.ValueOrDefault?.Text,
                 Timezone = timezone.Code.ToString(),
                 CountryCode = address.CountryCode.ToString()
-            };
-        }
-
-        public static TokensChanged TokensChanged(Identifier id, SSOAuthTokens tokens)
-        {
-            return new TokensChanged(id)
-            {
-                Tokens = tokens
-                    .ToList()
-                    .Select(tok => new SSOToken
-                    {
-                        Type = tok.Type.ToString(),
-                        EncryptedValue = tok.EncryptedValue,
-                        ExpiresOn = tok.ExpiresOn
-                    }).ToList()
             };
         }
     }

@@ -49,6 +49,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[ProviderAuthTokens]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[ProviderAuthTokens]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[WebhookNotificationAudits]')
             AND type in (N'U'))
     DROP TABLE [dbo].[WebhookNotificationAudits]
@@ -126,6 +133,23 @@ CREATE INDEX StreamName
     ON [dbo].[ProjectionCheckpoints]
         (
          [StreamName]
+            );
+
+CREATE TABLE [dbo].[ProviderAuthTokens]
+(
+    [Id]                 [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc] [datetime]      NULL,
+    [IsDeleted]          [bit]           NULL,
+    [ProviderName]       [nvarchar](max) NULL,
+    [Tokens]             [nvarchar](max) NULL,
+    [UserId]             [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[ProviderAuthTokens]
+        (
+         [Id]
             );
 
 CREATE TABLE [dbo].[WebhookNotificationAudits]

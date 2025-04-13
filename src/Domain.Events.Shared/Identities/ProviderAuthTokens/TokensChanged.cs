@@ -2,7 +2,7 @@ using Domain.Common;
 using Domain.Common.ValueObjects;
 using JetBrains.Annotations;
 
-namespace Domain.Events.Shared.Identities.SSOUsers;
+namespace Domain.Events.Shared.Identities.ProviderAuthTokens;
 
 public sealed class TokensChanged : DomainEvent
 {
@@ -15,10 +15,10 @@ public sealed class TokensChanged : DomainEvent
     {
     }
 
-    public required List<SSOToken> Tokens { get; set; }
+    public required List<AuthToken> Tokens { get; set; }
 }
 
-public class SSOToken
+public class AuthToken
 {
     public required string EncryptedValue { get; set; }
 

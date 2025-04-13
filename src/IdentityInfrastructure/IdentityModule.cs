@@ -37,11 +37,12 @@ public class IdentityModule : ISubdomainModule
 
     public Dictionary<Type, string> EntityPrefixes => new()
     {
-        { typeof(PersonCredentialRoot), "pwdcred" },
+        { typeof(PersonCredentialRoot), "cred" },
         { typeof(MfaAuthenticator), "mfaauth" },
         { typeof(AuthTokensRoot), "authtok" },
         { typeof(APIKeyRoot), "apikey" },
-        { typeof(SSOUserRoot), "ssocred" }
+        { typeof(SSOUserRoot), "ssouser" },
+        { typeof(ProviderAuthTokensRoot), "pvdrauthtok" }
     };
 
     public Assembly InfrastructureAssembly => typeof(CredentialsApi).Assembly;
@@ -105,6 +106,10 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterEventing<SSOUserRoot, SSOUserProjection>(
                     c => new SSOUserProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<ProviderAuthTokensRoot, ProviderAuthTokensProjection>(
+                    c => new ProviderAuthTokensProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
 

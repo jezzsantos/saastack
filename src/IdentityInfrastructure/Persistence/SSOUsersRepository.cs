@@ -14,6 +14,8 @@ namespace IdentityInfrastructure.Persistence;
 
 public class SSOUsersRepository : ISSOUsersRepository
 {
+    private readonly ISnapshottingDddCommandStore<ProviderAuthTokensRoot> _providerTokens;
+    private readonly ISnapshottingQueryStore<ProviderAuthTokens> _providerTokensQueries;
     private readonly ISnapshottingQueryStore<SSOUser> _userQueries;
     private readonly IEventSourcingDddCommandStore<SSOUserRoot> _users;
 
@@ -22,6 +24,8 @@ public class SSOUsersRepository : ISSOUsersRepository
     {
         _userQueries = new SnapshottingQueryStore<SSOUser>(recorder, domainFactory, store);
         _users = usersStore;
+        _providerTokensQueries = new SnapshottingQueryStore<ProviderAuthTokens>(recorder, domainFactory, store);
+        _providerTokens = new SnapshottingDddCommandStore<ProviderAuthTokensRoot>(recorder, domainFactory, store);
     }
 
 #if TESTINGONLY
@@ -29,7 +33,9 @@ public class SSOUsersRepository : ISSOUsersRepository
     {
         return await Tasks.WhenAllAsync(
             _userQueries.DestroyAllAsync(cancellationToken),
-            _users.DestroyAllAsync(cancellationToken));
+            _users.DestroyAllAsync(cancellationToken),
+            _providerTokensQueries.DestroyAllAsync(cancellationToken),
+            _providerTokens.DestroyAllAsync(cancellationToken));
     }
 #endif
 
@@ -51,6 +57,16 @@ public class SSOUsersRepository : ISSOUsersRepository
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
+    public async Task<Result<Optional<ProviderAuthTokensRoot>, Error>> FindProviderTokensByUserIdAndProviderAsync(
+        string providerName,
+        Identifier userId, CancellationToken cancellationToken)
+    {
+        var query = Query.From<ProviderAuthTokens>()
+            .Where<string>(toks => toks.UserId, ConditionOperator.EqualTo, userId)
+            .AndWhere<string>(toks => toks.ProviderName, ConditionOperator.EqualTo, providerName);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<SSOUserRoot, Error>> SaveAsync(SSOUserRoot user, CancellationToken cancellationToken)
     {
         var saved = await _users.SaveAsync(user, cancellationToken);
@@ -62,9 +78,14 @@ public class SSOUsersRepository : ISSOUsersRepository
         return user;
     }
 
-    private async Task<Result<Optional<SSOUserRoot>, Error>> FindFirstByQueryAsync(
-        QueryClause<SSOUser> query,
+    public async Task<Result<ProviderAuthTokensRoot, Error>> SaveAsync(ProviderAuthTokensRoot authTokens,
         CancellationToken cancellationToken)
+    {
+        return await _providerTokens.UpsertAsync(authTokens, false, cancellationToken);
+    }
+
+    private async Task<Result<Optional<SSOUserRoot>, Error>> FindFirstByQueryAsync(
+        QueryClause<SSOUser> query, CancellationToken cancellationToken)
     {
         var queried = await _userQueries.QueryAsync(query, false, cancellationToken);
         if (queried.IsFailure)
@@ -85,5 +106,29 @@ public class SSOUsersRepository : ISSOUsersRepository
         }
 
         return users.Value.ToOptional();
+    }
+
+    private async Task<Result<Optional<ProviderAuthTokensRoot>, Error>> FindFirstByQueryAsync(
+        QueryClause<ProviderAuthTokens> query, CancellationToken cancellationToken)
+    {
+        var queried = await _providerTokensQueries.QueryAsync(query, false, cancellationToken);
+        if (queried.IsFailure)
+        {
+            return queried.Error;
+        }
+
+        var matching = queried.Value.Results.FirstOrDefault();
+        if (matching.NotExists())
+        {
+            return Optional<ProviderAuthTokensRoot>.None;
+        }
+
+        var providerTokens = await _providerTokens.GetAsync(matching.Id.Value.ToId(), true, false, cancellationToken);
+        if (providerTokens.IsFailure)
+        {
+            return providerTokens.Error;
+        }
+
+        return providerTokens.Value;
     }
 }

@@ -503,9 +503,8 @@ CREATE TABLE [dbo].[SSOUser]
     [FirstName]          [nvarchar](max) NULL,
     [LastName]           [nvarchar](max) NULL,
     [ProviderName]       [nvarchar](max) NULL,
-    [ProviderUId]        [nvarchar](100) NULL,
+    [ProviderUId]        [nvarchar](450) NULL,
     [Timezone]           [nvarchar](max) NULL,
-    [Tokens]             [nvarchar](max) NULL,
     [UserId]             [nvarchar](100) NULL,
 ) ON [PRIMARY]
 GO

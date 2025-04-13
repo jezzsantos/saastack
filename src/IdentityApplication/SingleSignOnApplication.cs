@@ -28,8 +28,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
     public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller,
         string? invitationToken, string providerName, string authCode, string? username,
-        bool? termsAndConditionsAccepted,
-        CancellationToken cancellationToken)
+        bool? termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         var authenticated =
             await _ssoProvidersService.AuthenticateUserAsync(caller, providerName, authCode, username,

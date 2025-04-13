@@ -1,5 +1,4 @@
 using Common;
-using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.SSOUsers;
@@ -16,7 +15,6 @@ namespace IdentityDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class SSOUserRootSpec
 {
-    private readonly Mock<IEncryptionService> _encryptionService;
     private readonly SSOUserRoot _user;
 
     public SSOUserRootSpec()
@@ -25,10 +23,10 @@ public class SSOUserRootSpec
         var idFactory = new Mock<IIdentifierFactory>();
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
-        _encryptionService = new Mock<IEncryptionService>();
-        _encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
+        var encryptionService = new Mock<IEncryptionService>();
+        encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
             .Returns((string value) => value);
-        _encryptionService.Setup(es => es.Decrypt(It.IsAny<string>()))
+        encryptionService.Setup(es => es.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
         _user = SSOUserRoot.Create(recorder.Object, idFactory.Object, "aprovidername",
             "auserid".ToId()).Value;
@@ -42,15 +40,24 @@ public class SSOUserRootSpec
     }
 
     [Fact]
-    public void WhenAddedDetails_ThenAdds()
+    public void WhenChangeDetailsAndSameDetails_ThenDoesNothing()
     {
-        var expiresOn = DateTime.UtcNow;
-        var token = SSOAuthToken
-            .Create(SSOAuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
-            .Value;
-        var tokens = SSOAuthTokens.Create([token]).Value;
+        _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
+            PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
 
-        var result = _user.AddDetails(tokens, "aprovideruid", EmailAddress.Create("auser@company.com").Value,
+        var result = _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
+            PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
+
+        result.Should().BeSuccess();
+        _user.Events.Count.Should().Be(2);
+        _user.Events[0].Should().BeOfType<Created>();
+        _user.Events[1].Should().BeOfType<DetailsChanged>();
+    }
+
+    [Fact]
+    public void WhenChangeDetails_ThenAdds()
+    {
+        var result = _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
             PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
 
         result.Should().BeSuccess();
@@ -61,38 +68,8 @@ public class SSOUserRootSpec
         _user.Name.Value.LastName.Should().BeNone();
         _user.Timezone.Value.Code.Should().Be(Timezones.Default);
         _user.Address.Value.CountryCode.Should().Be(CountryCodes.Default);
-        _user.Tokens.Value.ToList()[0].Should().Be(token);
-        _user.Events.Last().Should().BeOfType<TokensChanged>();
-    }
-
-    [Fact]
-    public void WhenChangedTokensByAnotherUser_ThenReturnsError()
-    {
-        var expiresOn = DateTime.UtcNow;
-        var token = SSOAuthToken
-            .Create(SSOAuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
-            .Value;
-        var tokens = SSOAuthTokens.Create([token]).Value;
-
-        var result = _user.ChangeTokens("anotheruserid".ToId(), tokens);
-
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.SSOUserRoot_NotOwner);
-    }
-
-    [Fact]
-    public void WhenChangedTokens_ThenChanges()
-    {
-        var expiresOn = DateTime.UtcNow;
-        var token = SSOAuthToken
-            .Create(SSOAuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
-            .Value;
-        var tokens = SSOAuthTokens.Create([token]).Value;
-
-        var result = _user.ChangeTokens("auserid".ToId(), tokens);
-
-        result.Should().BeSuccess();
-        _user.UserId.Should().Be("auserid".ToId());
-        _user.Tokens.Value.ToList()[0].Should().Be(token);
-        _user.Events.Last().Should().BeOfType<TokensChanged>();
+        _user.Events.Count.Should().Be(2);
+        _user.Events[0].Should().BeOfType<Created>();
+        _user.Events[1].Should().BeOfType<DetailsChanged>();
     }
 }

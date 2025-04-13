@@ -33,7 +33,7 @@ public class SSOUserProjection : IReadModelProjection
                     },
                     cancellationToken);
 
-            case DetailsAdded e:
+            case DetailsChanged e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.ProviderUId = e.ProviderUId;
@@ -43,10 +43,6 @@ public class SSOUserProjection : IReadModelProjection
                     dto.Timezone = e.Timezone;
                     dto.CountryCode = e.CountryCode;
                 }, cancellationToken);
-
-            case TokensChanged e:
-                return await _users.HandleUpdateAsync(e.RootId,
-                    dto => { dto.Tokens = SSOAuthTokens.Create(e.Tokens).Value; }, cancellationToken);
 
             default:
                 return false;

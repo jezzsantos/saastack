@@ -11,6 +11,12 @@ using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
+/// <summary>
+///     Note: This aggregate is used to store the SSO auth details for a specific SSO provider.
+///     It might be updated every time the external provider authenticates the user.
+///     It is also updated, whenever the info about the user changes in the external provider,
+///     which should not be that often.
+/// </summary>
 public sealed class SSOUserRoot : AggregateRootBase
 {
     public static Result<SSOUserRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
@@ -42,8 +48,6 @@ public sealed class SSOUserRoot : AggregateRootBase
     public Optional<string> ProviderUId { get; private set; }
 
     public Optional<Timezone> Timezone { get; private set; }
-
-    public Optional<SSOAuthTokens> Tokens { get; private set; }
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
@@ -77,51 +81,38 @@ public sealed class SSOUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case TokensChanged changed:
+            case DetailsChanged changed:
             {
-                var tokens = SSOAuthTokens.Create(changed.Tokens);
-                if (tokens.IsFailure)
-                {
-                    return tokens.Error;
-                }
-
-                Tokens = tokens.Value;
-                Recorder.TraceDebug(null, "User {Id} has changed their tokens", Id);
-                return Result.Ok;
-            }
-
-            case DetailsAdded added:
-            {
-                ProviderUId = added.ProviderUId;
-                var emailAddress = Domain.Shared.EmailAddress.Create(added.EmailAddress);
+                ProviderUId = changed.ProviderUId;
+                var emailAddress = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
                 if (emailAddress.IsFailure)
                 {
                     return emailAddress.Error;
                 }
 
                 EmailAddress = emailAddress.Value;
-                var name = PersonName.Create(added.FirstName, added.LastName);
+                var name = PersonName.Create(changed.FirstName, changed.LastName);
                 if (name.IsFailure)
                 {
                     return name.Error;
                 }
 
                 Name = name.Value;
-                var timezone = Domain.Shared.Timezone.Create(added.Timezone);
+                var timezone = Domain.Shared.Timezone.Create(changed.Timezone);
                 if (timezone.IsFailure)
                 {
                     return timezone.Error;
                 }
 
                 Timezone = timezone.Value;
-                var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(added.CountryCode));
+                var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(changed.CountryCode));
                 if (address.IsFailure)
                 {
                     return address.Error;
                 }
 
                 Address = address.Value;
-                Recorder.TraceDebug(null, "User {Id} has added their details", Id);
+                Recorder.TraceDebug(null, "User {Id} have changed their details", Id);
                 return Result.Ok;
             }
 
@@ -130,28 +121,30 @@ public sealed class SSOUserRoot : AggregateRootBase
         }
     }
 
-    public Result<Error> AddDetails(SSOAuthTokens tokens, string uId, EmailAddress emailAddress,
+    public Result<Error> ChangeDetails(string providerUniqueId, EmailAddress emailAddress,
         PersonName name, Timezone timezone, Address address)
     {
-        var detailsUpdated = RaiseChangeEvent(
-            IdentityDomain.Events.SSOUsers.DetailsAdded(Id, uId, emailAddress, name, timezone,
-                address));
-        if (detailsUpdated.IsFailure)
+        if (DetailsHaveChanged())
         {
-            return detailsUpdated.Error;
+            var detailsUpdated = RaiseChangeEvent(
+                IdentityDomain.Events.SSOUsers.DetailsChanged(Id, providerUniqueId, emailAddress, name, timezone,
+                    address));
+            if (detailsUpdated.IsFailure)
+            {
+                return detailsUpdated.Error;
+            }
         }
 
-        return RaiseChangeEvent(IdentityDomain.Events.SSOUsers.TokensChanged(Id, tokens));
-    }
+        return Result.Ok;
 
-    public Result<Error> ChangeTokens(Identifier modifierId, SSOAuthTokens tokens)
-    {
-        if (!IsOwner(modifierId))
+        bool DetailsHaveChanged()
         {
-            return Error.RoleViolation(Resources.SSOUserRoot_NotOwner);
+            return providerUniqueId != ProviderUId
+                   || emailAddress != EmailAddress
+                   || name != Name
+                   || timezone != Timezone
+                   || address != Address;
         }
-
-        return RaiseChangeEvent(IdentityDomain.Events.SSOUsers.TokensChanged(Id, tokens));
     }
 
     public Result<Error> ViewUser(Identifier viewerId)

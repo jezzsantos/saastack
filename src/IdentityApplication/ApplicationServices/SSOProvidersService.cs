@@ -9,7 +9,9 @@ using Domain.Services.Shared;
 using Domain.Shared;
 using IdentityApplication.Persistence;
 using IdentityDomain;
+using AuthToken = Application.Resources.Shared.AuthToken;
 using PersonName = Domain.Shared.PersonName;
+using SSOUser = Application.Resources.Shared.SSOUser;
 
 namespace IdentityApplication.ApplicationServices;
 
@@ -25,8 +27,7 @@ public class SSOProvidersService : ISSOProvidersService
     private readonly ISSOUsersRepository _repository;
 
     public SSOProvidersService(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IEncryptionService encryptionService,
-        IEnumerable<ISSOAuthenticationProvider> authenticationProviders,
+        IEncryptionService encryptionService, IEnumerable<ISSOAuthenticationProvider> authenticationProviders,
         ISSOUsersRepository repository)
     {
         _recorder = recorder;
@@ -37,8 +38,7 @@ public class SSOProvidersService : ISSOProvidersService
     }
 
     public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateUserAsync(ICallerContext caller, string providerName,
-        string authCode, string? username,
-        CancellationToken cancellationToken)
+        string authCode, string? username, CancellationToken cancellationToken)
     {
         var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
@@ -80,8 +80,7 @@ public class SSOProvidersService : ISSOProvidersService
     }
 
     public async Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByUserIdAsync(
-        ICallerContext caller,
-        string userId, string providerName, CancellationToken cancellationToken)
+        ICallerContext caller, string userId, string providerName, CancellationToken cancellationToken)
     {
         var provider =
             _authenticationProviders.FirstOrDefault(provider => provider.ProviderName.EqualsIgnoreCase(providerName));
@@ -148,18 +147,17 @@ public class SSOProvidersService : ISSOProvidersService
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        return await GetTokensInternalAsync(caller.ToCallerId(), cancellationToken);
+        return await GetProviderTokensInternalAsync(caller.ToCallerId(), cancellationToken);
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(
         ICallerContext caller, string userId, CancellationToken cancellationToken)
     {
-        return await GetTokensInternalAsync(userId.ToId(), cancellationToken);
+        return await GetProviderTokensInternalAsync(userId.ToId(), cancellationToken);
     }
 
     public async Task<Result<Error>> SaveInfoOnBehalfOfUserAsync(ICallerContext caller, string providerName,
-        string userId,
-        SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken)
+        string userId, SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken)
     {
         var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
@@ -220,24 +218,12 @@ public class SSOProvidersService : ISSOProvidersService
             return address.Error;
         }
 
-        var toks = authUserInfo.Tokens.ToAuthTokens(_encryptionService);
-        if (toks.IsFailure)
+        var providerUniqueId = authUserInfo.UId;
+        var changed = user.ChangeDetails(providerUniqueId, emailAddress.Value, name.Value, timezone.Value,
+            address.Value);
+        if (changed.IsFailure)
         {
-            return toks.Error;
-        }
-
-        var tokens = SSOAuthTokens.Create(toks.Value);
-        if (tokens.IsFailure)
-        {
-            return tokens.Error;
-        }
-
-        var uId = authUserInfo.UId;
-
-        var updated = user.AddDetails(tokens.Value, uId, emailAddress.Value, name.Value, timezone.Value, address.Value);
-        if (updated.IsFailure)
-        {
-            return updated.Error;
+            return changed.Error;
         }
 
         var saved = await _repository.SaveAsync(user, cancellationToken);
@@ -250,12 +236,12 @@ public class SSOProvidersService : ISSOProvidersService
         _recorder.TraceInformation(caller.ToCall(), "SSO User {UserId} updated with user information",
             user.UserId);
 
-        return Result.Ok;
+        return await SaveProviderTokensAsync(caller, user.ProviderName.Value, userId.ToId(),
+            authUserInfo.Tokens, cancellationToken);
     }
 
     public async Task<Result<Error>> SaveTokensOnBehalfOfUserAsync(ICallerContext caller, string providerName,
-        string userId,
-        ProviderAuthenticationTokens tokens, CancellationToken cancellationToken)
+        string userId, ProviderAuthenticationTokens tokens, CancellationToken cancellationToken)
     {
         var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
@@ -281,34 +267,64 @@ public class SSOProvidersService : ISSOProvidersService
             return Error.EntityNotFound();
         }
 
-        var user = retrievedUser.Value.Value;
-        var toks = tokens.ToAuthTokens(_encryptionService);
+        var authTokens = tokens.ToAuthTokens();
+        if (authTokens.IsFailure)
+        {
+            return authTokens.Error;
+        }
+
+        return await SaveProviderTokensAsync(caller, provider.ProviderName, userId.ToId(),
+            authTokens.Value, cancellationToken);
+    }
+
+    private async Task<Result<Error>> SaveProviderTokensAsync(ICallerContext caller, string providerName,
+        Identifier userId, IReadOnlyList<AuthToken> authTokens, CancellationToken cancellationToken)
+    {
+        var retrievedProviderTokens =
+            await _repository.FindProviderTokensByUserIdAndProviderAsync(providerName, userId,
+                cancellationToken);
+        if (retrievedProviderTokens.IsFailure)
+        {
+            return retrievedProviderTokens.Error;
+        }
+
+        ProviderAuthTokensRoot providerAuthTokens;
+        if (!retrievedProviderTokens.Value.HasValue)
+        {
+            var created =
+                ProviderAuthTokensRoot.Create(_recorder, _identifierFactory, providerName, userId);
+            if (created.IsFailure)
+            {
+                return created.Error;
+            }
+
+            providerAuthTokens = created.Value;
+        }
+        else
+        {
+            providerAuthTokens = retrievedProviderTokens.Value.Value;
+        }
+
+        var toks = authTokens.ToAuthTokens(_encryptionService);
         if (toks.IsFailure)
         {
             return toks.Error;
         }
 
-        var ssoTokens = SSOAuthTokens.Create(toks.Value);
-        if (ssoTokens.IsFailure)
-        {
-            return ssoTokens.Error;
-        }
-
-        var changed = user.ChangeTokens(userId.ToId(), ssoTokens.Value);
+        var changed = providerAuthTokens.ChangeTokens(userId, toks.Value);
         if (changed.IsFailure)
         {
             return changed.Error;
         }
 
-        var saved = await _repository.SaveAsync(user, cancellationToken);
-        if (saved.IsFailure)
+        var savedTokens = await _repository.SaveAsync(providerAuthTokens, cancellationToken);
+        if (savedTokens.IsFailure)
         {
-            return saved.Error;
+            return savedTokens.Error;
         }
 
-        user = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "SSO User {UserId} changed tokens",
-            user.UserId);
+        _recorder.TraceInformation(caller.ToCall(), "SSO User {UserId} updated tokens for provider {Provider}",
+            userId, providerName);
 
         return Result.Ok;
     }
@@ -320,7 +336,7 @@ public class SSOProvidersService : ISSOProvidersService
         return provider.ToOptional();
     }
 
-    private async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensInternalAsync(
+    private async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetProviderTokensInternalAsync(
         Identifier userId, CancellationToken cancellationToken)
     {
         var allTokens = new List<ProviderAuthenticationTokens>();
@@ -344,13 +360,20 @@ public class SSOProvidersService : ISSOProvidersService
                 return viewed.Error;
             }
 
-            if (!user.Tokens.HasValue)
+            var providerTokens =
+                await _repository.FindProviderTokensByUserIdAndProviderAsync(provider.ProviderName, user.UserId,
+                    cancellationToken);
+            if (providerTokens.IsFailure)
             {
                 continue;
             }
 
-            var tokens = user.Tokens.Value;
-            allTokens.Add(tokens.ToProviderAuthenticationTokens(provider.ProviderName, _encryptionService));
+            if (!providerTokens.Value.HasValue)
+            {
+                continue;
+            }
+
+            allTokens.Add(providerTokens.Value.Value.ToProviderAuthenticationTokens(_encryptionService));
         }
 
         return allTokens;
@@ -359,15 +382,15 @@ public class SSOProvidersService : ISSOProvidersService
 
 internal static class SSOProvidersServiceConversionExtensions
 {
-    public static Result<List<SSOAuthToken>, Error> ToAuthTokens(this IReadOnlyList<AuthToken> tokens,
+    public static Result<AuthTokens, Error> ToAuthTokens(this IReadOnlyList<AuthToken> authTokens,
         IEncryptionService encryptionService)
     {
-        var list = new List<SSOAuthToken>();
-        foreach (var token in tokens)
+        var list = new List<IdentityDomain.AuthToken>();
+        foreach (var token in authTokens)
         {
-            var tok = SSOAuthToken.Create(token.Type.ToEnumOrDefault(SSOAuthTokenType.AccessToken), token.Value,
-                token.ExpiresOn,
-                encryptionService);
+            var tok = IdentityDomain.AuthToken.Create(token.Type.ToEnumOrDefault(AuthTokenType.AccessToken),
+                token.Value,
+                token.ExpiresOn, encryptionService);
             if (tok.IsFailure)
             {
                 return tok.Error;
@@ -376,72 +399,49 @@ internal static class SSOProvidersServiceConversionExtensions
             list.Add(tok.Value);
         }
 
-        return list;
+        return AuthTokens.Create(list);
     }
 
-    public static Result<List<SSOAuthToken>, Error> ToAuthTokens(this ProviderAuthenticationTokens tokens,
-        IEncryptionService encryptionService)
+    public static Result<IReadOnlyList<AuthToken>, Error> ToAuthTokens(this ProviderAuthenticationTokens providerTokens)
     {
-        var list = new List<SSOAuthToken>();
-        if (tokens.AccessToken.Exists())
+        var list = new List<AuthToken>();
+        if (providerTokens.AccessToken.Exists())
         {
-            var tok = SSOAuthToken.Create(SSOAuthTokenType.AccessToken, tokens.AccessToken.Value,
-                tokens.AccessToken.ExpiresOn, encryptionService);
-            if (tok.IsFailure)
-            {
-                return tok.Error;
-            }
-
-            list.Add(tok.Value);
+            list.Add(providerTokens.AccessToken.ToAuthToken());
         }
 
-        if (tokens.RefreshToken.Exists())
+        if (providerTokens.RefreshToken.Exists())
         {
-            var tok = SSOAuthToken.Create(SSOAuthTokenType.RefreshToken, tokens.RefreshToken.Value,
-                tokens.RefreshToken.ExpiresOn, encryptionService);
-            if (tok.IsFailure)
-            {
-                return tok.Error;
-            }
-
-            list.Add(tok.Value);
+            list.Add(providerTokens.RefreshToken.ToAuthToken());
         }
 
-        if (tokens.OtherTokens.HasAny())
+        if (providerTokens.OtherTokens.HasAny())
         {
-            foreach (var token in tokens.OtherTokens)
+            foreach (var token in providerTokens.OtherTokens)
             {
-                var tok = SSOAuthToken.Create(SSOAuthTokenType.OtherToken, token.Value,
-                    token.ExpiresOn, encryptionService);
-                if (tok.IsFailure)
-                {
-                    return tok.Error;
-                }
-
-                list.Add(tok.Value);
+                list.Add(token.ToAuthToken());
             }
         }
 
         return list;
     }
 
-    public static ProviderAuthenticationTokens ToProviderAuthenticationTokens(this SSOAuthTokens tokens,
-        string providerName, IEncryptionService encryptionService)
+    public static ProviderAuthenticationTokens ToProviderAuthenticationTokens(
+        this ProviderAuthTokensRoot providerTokens, IEncryptionService encryptionService)
     {
-        var accessToken = tokens
+        var authTokens = providerTokens.Tokens.Value.ToList();
+        var accessToken = authTokens
+            .Single(tok => tok.Type == AuthTokenType.AccessToken);
+        var refreshToken = authTokens
             .ToList()
-            .Single(tok => tok.Type == SSOAuthTokenType.AccessToken);
-        var refreshToken = tokens
-            .ToList()
-            .FirstOrDefault(tok => tok.Type == SSOAuthTokenType.RefreshToken);
-        var otherTokens = tokens
-            .ToList()
-            .Where(tok => tok.Type == SSOAuthTokenType.OtherToken)
+            .FirstOrDefault(tok => tok.Type == AuthTokenType.RefreshToken);
+        var otherTokens = authTokens
+            .Where(tok => tok.Type == AuthTokenType.OtherToken)
             .ToList();
 
-        var providerTokens = new ProviderAuthenticationTokens
+        var authenticationTokens = new ProviderAuthenticationTokens
         {
-            Provider = providerName,
+            Provider = providerTokens.ProviderName,
             AccessToken = new AuthenticationToken
             {
                 ExpiresOn = accessToken.ExpiresOn,
@@ -466,7 +466,7 @@ internal static class SSOProvidersServiceConversionExtensions
                 : []
         };
 
-        return providerTokens;
+        return authenticationTokens;
     }
 
     public static SSOUser ToUser(this SSOUserRoot user)
@@ -476,5 +476,10 @@ internal static class SSOProvidersServiceConversionExtensions
             Id = user.UserId,
             ProviderUId = user.ProviderUId
         };
+    }
+
+    private static AuthToken ToAuthToken(this AuthenticationToken token)
+    {
+        return new AuthToken(token.Type, token.Value, token.ExpiresOn);
     }
 }

@@ -575,6 +575,15 @@ namespace IdentityDomain {
         /// <summary>
         ///   Looks up a localized string similar to Only the user can update their own tokens.
         /// </summary>
+        internal static string ProviderAuthTokensRoot_NotOwner {
+            get {
+                return ResourceManager.GetString("ProviderAuthTokensRoot_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only the user can update their own tokens.
+        /// </summary>
         internal static string SSOUserRoot_NotOwner {
             get {
                 return ResourceManager.GetString("SSOUserRoot_NotOwner", resourceCulture);

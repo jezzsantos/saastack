@@ -975,9 +975,6 @@ public sealed class PersonCredentialRoot : AggregateRootBase
                 .PersonCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound);
         }
 
-        //TODO: can we only raise the event in the case where the last attempt was failed.
-        //If the last attempt was fine, then don't raise the event
-
         return authenticator.Value.Verify(oobCode, confirmationCode);
     }
 
@@ -995,9 +992,6 @@ public sealed class PersonCredentialRoot : AggregateRootBase
             return verify.Error;
         }
 
-        //TODO: can we only raise the event in the case where the last attempt was failed.
-        //If the last attempt was fine, then don't raise the event 
-        
         var isVerified = verify.Value;
         var raised =
             RaiseChangeEvent(

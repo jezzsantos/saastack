@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace IdentityDomain;
 
-public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
+public sealed class AuthToken : ValueObjectBase<AuthToken>
 {
-    public static Result<SSOAuthToken, Error> Create(SSOAuthTokenType type, string value, DateTime? expiresOn,
+    public static Result<AuthToken, Error> Create(AuthTokenType type, string value, DateTime? expiresOn,
         IEncryptionService encryptionService)
     {
         if (value.IsNotValuedParameter(nameof(value), out var error1))
@@ -22,17 +22,17 @@ public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
         return Create(type, encrypted, expiresOn);
     }
 
-    public static Result<SSOAuthToken, Error> Create(SSOAuthTokenType type, string encryptedValue, DateTime? expiresOn)
+    public static Result<AuthToken, Error> Create(AuthTokenType type, string encryptedValue, DateTime? expiresOn)
     {
         if (encryptedValue.IsNotValuedParameter(nameof(encryptedValue), out var error1))
         {
             return error1;
         }
 
-        return new SSOAuthToken(type, encryptedValue, expiresOn);
+        return new AuthToken(type, encryptedValue, expiresOn);
     }
 
-    private SSOAuthToken(SSOAuthTokenType type, string encryptedValue, DateTime? expiresOn)
+    private AuthToken(AuthTokenType type, string encryptedValue, DateTime? expiresOn)
     {
         Type = type;
         EncryptedValue = encryptedValue;
@@ -43,15 +43,15 @@ public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
 
     public DateTime? ExpiresOn { get; }
 
-    public SSOAuthTokenType Type { get; }
+    public AuthTokenType Type { get; }
 
     [UsedImplicitly]
-    public static ValueObjectFactory<SSOAuthToken> Rehydrate()
+    public static ValueObjectFactory<AuthToken> Rehydrate()
     {
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new SSOAuthToken(parts[0].ToEnumOrDefault(SSOAuthTokenType.AccessToken), parts[1]!,
+            return new AuthToken(parts[0].ToEnumOrDefault(AuthTokenType.AccessToken), parts[1]!,
                 parts[2]?.FromIso8601());
         };
     }

@@ -52,7 +52,7 @@ To upgrade your aggregate root, you need to perform the following changes to it:
    	private MyAggregateRoot(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
        {
            propertyname = rehydratingProperties.GetValueOrDefault<Name>(nameof(propertyname));
-           OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId))!;
+           OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId));
        }
    ```
 

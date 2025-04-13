@@ -4,14 +4,14 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.SSOUsers;
 
-public sealed class DetailsAdded : DomainEvent
+public sealed class DetailsChanged : DomainEvent
 {
-    public DetailsAdded(Identifier id) : base(id)
+    public DetailsChanged(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public DetailsAdded()
+    public DetailsChanged()
     {
     }
 

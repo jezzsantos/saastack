@@ -8,7 +8,7 @@ using Xunit;
 namespace IdentityDomain.UnitTests;
 
 [Trait("Category", "Unit")]
-public class SSOAuthTokenSpec
+public class AuthTokenSpec
 {
     [Fact]
     public void WhenCreateAndValueIsEmpty_ThenReturnsError()
@@ -17,7 +17,7 @@ public class SSOAuthTokenSpec
         encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
             .Returns((string _) => "anencryptedvalue");
 
-        var result = SSOAuthToken.Create(SSOAuthTokenType.AccessToken, string.Empty, null, encryptionService.Object);
+        var result = AuthToken.Create(AuthTokenType.AccessToken, string.Empty, null, encryptionService.Object);
 
         result.Should().BeError(ErrorCode.Validation);
     }
@@ -29,10 +29,10 @@ public class SSOAuthTokenSpec
         encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
             .Returns((string _) => "anencryptedvalue");
         var expiresOn = DateTime.UtcNow;
-        var result = SSOAuthToken.Create(SSOAuthTokenType.AccessToken, "atoken", expiresOn, encryptionService.Object);
+        var result = AuthToken.Create(AuthTokenType.AccessToken, "atoken", expiresOn, encryptionService.Object);
 
         result.Should().BeSuccess();
-        result.Value.Type.Should().Be(SSOAuthTokenType.AccessToken);
+        result.Value.Type.Should().Be(AuthTokenType.AccessToken);
         result.Value.EncryptedValue.Should().Be("anencryptedvalue");
         result.Value.ExpiresOn.Should().Be(expiresOn);
     }
