@@ -388,7 +388,7 @@
               "value": "dotnet"
             }
           ],
-          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]"
         },
         "httpsOnly": true,
         "publicNetworkAccess": "Enabled"

@@ -44,6 +44,8 @@ CREATE TABLE [dbo].[Booking]
     [Id]                 [nvarchar](100) NOT NULL,
     [LastPersistedAtUtc] [datetime]      NULL,
     [IsDeleted]          [bit]           NULL,
+    [CreatedAtUtc]       [datetime]      NULL,
+    [LastModifiedAtUtc]  [datetime]      NULL,
     [BorrowerId]         [nvarchar](100) NULL,
     [CarId]              [nvarchar](100) NULL,
     [End]                [datetime]      NULL,

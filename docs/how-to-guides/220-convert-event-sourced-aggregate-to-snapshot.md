@@ -136,8 +136,15 @@ We need to switch from using `IEventSourcingDddCommandStore<TAggregateRoot>` to 
 
 ### Other deployment issues
 
-Finally, you may have had to change the definition of your tables/containers in your `IDataStore`.
+Finally, you may have had to change the definition of your tables/containers in your `IDataStore`, for example, if you use a relational database, like Microsoft SQLServer or Postgres.
 
 If this is the case, and you have schema for that `IDataStore` then update the files for that data store.
 
-For example, if you are using a SQL server technology, you may need to move the definition of the old read model from one file (e.g., from: `AzureSQLServer-Seed-Eventing-Generic.sql`) to another file (e.g., to: `AzureSQLServer-Seed-Snapshotting-Generic.sql`). 
+Aggregates that change from event-sourcing to snapshotting require 2 new columns of data, as part of their definition:
+
+```sql
+  [CreatedAtUtc]          [datetime]       NULL,
+  [LastModifiedAtUtc]     [datetime]       NULL,
+```
+
+> Lastly, if you are using Microsoft SQL Server, you will need to move the definition of the old read model from one file (e.g., from: `AzureSQLServer-Seed-Eventing-Generic.sql`) to another file (e.g., to: `AzureSQLServer-Seed-Snapshotting-Generic.sql`). 

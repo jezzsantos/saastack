@@ -217,20 +217,22 @@ By default, the following 3rd party technology adapters are injected into the de
 
 These services require the following secrets and variables in your GitHub deployment environment:
 
-* var: `APPLICATIONSERVICES_FLAGSMITH_BASEURL` (Could be: `https://edge.api.flagsmith.com/api/v1/`)
-* sec: `APPLICATIONSERVICES_FLAGSMITH_ENVIRONMENTKEY` (Sign in to your FlagSmith account, select your project, and find the environment key in the SDK Keys)
-* var: `APPLICATIONSERVICES_GRAVATAR_BASEURL` (Should be: `https://www.gravatar.com`)
-* var: `APPLICATIONSERVICES_MAILGUN_BASEURL` (Should be: `https://api.mailgun.net/v3/`)
-* var: `APPLICATIONSERVICES_MAILGUN_DOMAINNAME` (Sign in to your Mailgun account, select Send -> Sending -> Domains, and copy your domain)
-* sec: `APPLICATIONSERVICES_MAILGUN_APIKEY` (Sign in to your Mailgun account, select Your Account -> API Security -> and create a new Mailgun API Key)
-* sec: `APPLICATIONSERVICES_MAILGUN_WEBHOOKSIGNINGKEY` (Sign in to your Mailgun account, select Send -> Sending -> Webhooks -> HTTP Webhook signing key)
-* var: `APPLICATIONSERVICES_TWILIO_BASEURL` (Should be: `https://api.twilio.com`)
-* sec: `APPLICATIONSERVICES_TWILIO_ACCOUNTSID` (Sign in to your Twilio account, Admin -> Account Management -> Manage account -> General settings, copy your Account SID)
-* sec: `APPLICATIONSERVICES_TWILIO_AUTHTOKEN` (Sign in to your Twilio account, Admin -> Account Management -> Keys & Credentials -> ApPI Keys & Tokens, copy your AuthToken)
-* var: `APPLICATIONSERVICES_TWILIO_SENDERPHONENUMBER` (Sign in to your Twilio account, Account Dashboard -> Develop -> Phone numbers -> Manage -> Active numbers, and copy one of the phone numbers)
-* var: `APPLICATIONSERVICES_TWILIO_WEBHOOKCALLBACKURL` (Should be: `<HOSTS_ANCILLARYAPI_BASEURL>/webhooks/twilio`)
-* var: `APPLICATIONSERVICES_USERPILOT_BASEURL` (Should be: `https://analytex-eu.userpilot.io/v1`)
-* sec: `APPLICATIONSERVICES_USERPILOT_APIKEY` (Sign in to your UserPilot account, Configure -> Environment, and copy the API Key)
+| Name                                          | Secret or Variable | Value                                                        |
+| --------------------------------------------- | :----------------: | ------------------------------------------------------------ |
+| APPLICATIONSERVICES_FLAGSMITH_BASEURL         |      Variable      | Could be: `https://edge.api.flagsmith.com/api/v1/`           |
+| APPLICATIONSERVICES_FLAGSMITH_ENVIRONMENTKEY  |       Secret       | Sign in to your FlagSmith account, select your project, and find the environment key in the SDK Keys |
+| APPLICATIONSERVICES_GRAVATAR_BASEURL          |      Variable      | Should be: `https://www.gravatar.com`                        |
+| APPLICATIONSERVICES_MAILGUN_BASEURL           |      Variable      | Should be: `https://api.mailgun.net/v3/`                     |
+| APPLICATIONSERVICES_MAILGUN_DOMAINNAME        |      Variable      | Sign in to your Mailgun account, select Send -> Sending -> Domains, and copy your domain |
+| APPLICATIONSERVICES_MAILGUN_APIKEY            |       Secret       | Sign in to your Mailgun account, select Your Account -> API Security -> and create a new Mailgun API Key |
+| APPLICATIONSERVICES_MAILGUN_WEBHOOKSIGNINGKEY |       Secret       | Sign in to your Mailgun account, select Send -> Sending -> Webhooks -> HTTP Webhook signing key |
+| APPLICATIONSERVICES_TWILIO_BASEURL            |      Variable      | Should be: `https://api.twilio.com`                          |
+| APPLICATIONSERVICES_TWILIO_ACCOUNTSID         |       Secret       | Sign in to your Twilio account, Admin -> Account Management -> Manage account -> General settings, copy your Account SID |
+| APPLICATIONSERVICES_TWILIO_AUTHTOKEN          |       Secret       | Sign in to your Twilio account, Admin -> Account Management -> Keys & Credentials -> ApPI Keys & Tokens, copy your AuthToken |
+| APPLICATIONSERVICES_TWILIO_SENDERPHONENUMBER  |      Variable      | Sign in to your Twilio account, Account Dashboard -> Develop -> Phone numbers -> Manage -> Active numbers, and copy one of the phone numbers |
+| APPLICATIONSERVICES_TWILIO_WEBHOOKCALLBACKURL |      Variable      | Should be: `<HOSTS_ANCILLARYAPI_BASEURL>/webhooks/twilio`    |
+| APPLICATIONSERVICES_USERPILOT_BASEURL         |      Variable      | Should be: `https://analytex-eu.userpilot.io/v1`             |
+| APPLICATIONSERVICES_USERPILOT_APIKEY          |       Secret       | Sign in to your UserPilot account, Configure -> Environment, and copy the API Key |
 
 > Tip: Depending on the specific deployment environment you are deploying, you may find some of these values defined in your own copy of `appsettings.Testing.json` and `appsettings.Testing.local.json` in the `Infrastructure.External.IntegrationTests` project.  
 
@@ -265,7 +267,7 @@ This simple mechanism is a simple safety feature to prevent accidental deploymen
 
 > This step should be very intentional in any "production" environment where you are not practicing "Continuous Deployment".
 
-## Initial Deployment
+## Initial Deployment of Infrastructure
 
 By default, we assume that before deployment of any software, you have already (manually/automated) the creation of the actual target infrastructure, in your preferred cloud environment. (i.e, in Azure, AWS or GC).
 
@@ -283,7 +285,7 @@ To build out an initial infrastructure in Azure, we can use an ARM template like
 
 > This template can be easily customized, and run once to create your initial infrastructure in Azure.
 >
-> It has made some "low cost" choices to get started with, but lower cost is possible with some services, like SQLServer, ApplicationInsights and Storage accounts. 
+> It has made some "low cost" choices to get started with, but lower cost is possible with some services, like SQLServer, Application Insights and Storage accounts. 
 
 1. Determine the name of your new resource group in Azure (e.g. `saastack`). 
    - This will be referenced in the commands below as `<resourcegroupname>`
@@ -306,7 +308,7 @@ To build out an initial infrastructure in Azure, we can use an ARM template like
 
 
 
-#### Deployment credentials
+#### Create deployment credentials
 
 When the infrastructure is created, we now need to create a Service Principal to retrieve credentials, and the build pipeline will use these credentials to perform the automated deployment.
 
@@ -343,40 +345,51 @@ Now, just copy and paste the whole output JSON (`{` to `}` like the above) into 
 
 * sec: `DEPLOY_AZURE_CREDENTIALS` either at the GitHub repository level, or as a secret into the GitHub deployment environment you are using.
 
-Finally, one last task, is to give permissions to the Azure Functions to call APIs on the Azure FunctionHost.
+Finally, one last manual task, is to give permissions to the Azure Functions to call APIs on the Azure Function Host.
 
-In the Azure Portal, go to the Azure Function App, and select Identity tab. Turn ON the  'System assigned' identity, and then click the 'Azure role assignments'.
-You now need to assign the following role: 
-* Scope: Resource group
-* Resource group: `<resourcegroupname>`
-* Role: Contributor
+In the Azure Portal, go to the Azure Function App:
+
+* Select: Settings -> Identity tab.
+
+* Ensure that "System assigned" status is  `ON`
+
+* Click the 'Azure role assignments'. You now need to assign the following role: 
+
+  * Scope: `Resource group`
+
+  * Resource group: `<resourcegroupname>`
+
+  * Role: `Contributor`
+
 
 Then Save, and exit.
 
 > This last step is critical so that the Circuit breaker can be opened when messages cannot be processed by the Azure Functions that deliver them from the Azure Service Bus to the API hosts.
 
-#### Deployment variables and secrets
+#### Set deployment variables and secrets
 
-Now, that your Azure environment is provisioned, you need to update the following variables and secrets in your GitHub Project.
+Now, that your Azure environment is provisioned, before you deploy, you will need to update the following variables and secrets in your GitHub Project.
 
 Assign these GitHub variables (or secrets) in your deployment environment, depending on the technology adapters you are using :
 
-* sec: `APPLICATIONINSIGHTS_CONNECTIONSTRING` (read from Azure Portal: AppInsights -> Configure -> Properties -> Connection String)
-* sec: `APPLICATIONSERVICES_PERSISTENCE_AZURESERVICEBUS_CONNECTIONSTRING` (read from Azure Portal: ServiceBus -> Settings -> Shared Access Policies -> RootManageSharedAccessKey -> Primary Connection String)
-* sec: `APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTKEY` (read from Azure Portal: Storage Account -> Security + networking -> Access keys -> key1 -> Key)
-* sec: `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBCREDENTIALS` (as defined in initial setup, in format: `User Id=<USERNAME>;Password=<PASSWORD>`)
-* var: `APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTNAME` (as defined in initial setup)
-* var: `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBSERVERNAME` (as defined in initial setup)
-* var: `APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBNAME` (as defined in initial setup)
-* var: `DEPLOY_APIHOST1_APP_NAME` (as defined in initial setup)
-* var: `DEPLOY_WEBSITEHOST_APP_NAME` (as defined in initial setup)
-* var: `DEPLOY_AZUREFUNCTIONS_APP_NAME` (as defined in initial setup)
-* var: `HOSTS_ALLOWEDCORSORIGINS` (as defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com`)
-* var: `HOSTS_ANCILLARYAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
-* var: `HOSTS_APIHOST1_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
-* var: `HOSTS_IDENTITYAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
-* var: `HOSTS_IMAGESAPI_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com`)
-* var: `HOSTS_WEBSITEHOST_BASEURL` (as defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com`)
+| Name                                                         | Secret or Variable | How to find                                                  |
+| ------------------------------------------------------------ | :----------------: | ------------------------------------------------------------ |
+| APPLICATIONINSIGHTS_CONNECTIONSTRING                         |       Secret       | Azure Portal: AppInsights -> Configure -> Properties -> Connection String |
+| APPLICATIONSERVICES_PERSISTENCE_AZURESERVICEBUS_CONNECTIONSTRING |       Secret       | Azure Portal: ServiceBus -> Settings -> Shared access policies -> RootManageSharedAccessKey -> Primary Connection String |
+| APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTKEY |       Secret       | Azure Portal: Storage Account -> Security + networking -> Access keys -> key1 -> Key |
+| APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBCREDENTIALS      |       Secret       | As defined in initial setup, in format: `User Id=<USERNAME>;Password=<PASSWORD>` |
+| APPLICATIONSERVICES_PERSISTENCE_AZURESTORAGEACCOUNT_ACCOUNTNAME |      Variable      | As defined in initial setup                                  |
+| APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBSERVERNAME       |      Variable      | As defined in initial setup                                  |
+| APPLICATIONSERVICES_PERSISTENCE_SQLSERVER_DBNAME             |      Variable      | As defined in initial setup                                  |
+| DEPLOY_APIHOST1_APP_NAME                                     |      Variable      | As defined in initial setup                                  |
+| DEPLOY_WEBSITEHOST_APP_NAME                                  |      Variable      | As defined in initial setup                                  |
+| DEPLOY_AZUREFUNCTIONS_APP_NAME                               |      Variable      | As defined in initial setup                                  |
+| HOSTS_ALLOWEDCORSORIGINS                                     |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com` |
+| HOSTS_ANCILLARYAPI_BASEURL                                   |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
+| HOSTS_APIHOST1_BASEURL                                       |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
+| HOSTS_IDENTITYAPI_BASEURL                                    |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
+| HOSTS_IMAGESAPI_BASEURL                                      |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
+| HOSTS_WEBSITEHOST_BASEURL                                    |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com` |
 
 #### Initialize SQL Database
 
@@ -390,9 +403,13 @@ Using your favorite database tool (e.g. Microsoft SQL Server Management Studio),
 >
 > In order to connect your local machine to Azure, you will need to set a firewall rule in the Azure Portal to allow access from your IP address.
 >
-> Go to Azure Portal: SQL server -> Security -> Networking, then in the firewall rules, select "Add your client IPv4 address", and hit Save
+> Go to Azure Portal: 
+>
+> * SQL server -> Security -> Networking
+> * In the "Firewall rules", select "Add your client IPv4 address"
+> * Hit "Save"
 
-Once you have access to your database, you can write the database schema files located at: `../iac/Azure/SQLServer`.
+Once you have access to your database, you can write the many database schema files located at: `../iac/Azure/SQLServer`.
 
 For each of these files, (in no particular order):
 
