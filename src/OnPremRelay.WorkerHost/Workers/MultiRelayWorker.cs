@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Collections.Concurrent;
 using Application.Interfaces;
 using Application.Persistence.Shared.ReadModels;
 using OnPremRelay.WorkerHost.Messaging.Delivery;
@@ -15,10 +15,12 @@ public class MultiRelayWorker : BackgroundService
     private readonly IMessageBrokerService _messageBroker;
     private readonly ILogger<MultiRelayWorker> _logger;
 
-    // Dictionary mapping routing keys to processing delegates for queue messages.
-    private readonly Dictionary<string, Func<string, CancellationToken, Task>> _queueProcessors;
-    // Dictionary mapping routing keys to processing delegates for message bus messages.
-    private readonly Dictionary<string, Func<string, CancellationToken, Task>> _messageBusProcessors;
+    private readonly int _maxFailureCount = 5;
+    private readonly ConcurrentDictionary<string, int> _failureCounts = new ConcurrentDictionary<string, int>();
+
+    private readonly Dictionary<string, Func<string, string, CancellationToken, Task>> _queueProcessors;
+    private readonly Dictionary<string, Func<string, string, CancellationToken, Task>> _messageBusProcessors;
+    private readonly RabbitMqMetricsRegistry _metrics;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MultiRelayWorker" /> class.
@@ -44,76 +46,108 @@ public class MultiRelayWorker : BackgroundService
         _messageBroker = messageBroker ?? throw new ArgumentNullException(nameof(messageBroker));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        // Build dictionary mapping routing keys (or queue names) to processing delegates.
         _queueProcessors =
-            new Dictionary<string, Func<string, CancellationToken, Task>>(StringComparer.OrdinalIgnoreCase)
+            new Dictionary<string, Func<string, string, CancellationToken, Task>>(StringComparer.OrdinalIgnoreCase)
             {
                 {
-                    WorkerConstants.Queues.Audits, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<AuditMessage>(json);
-                        if (msg != null)
-                        {
-                            await auditDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
+                    WorkerConstants.Queues.Audits, async (json, routingKey, ct) =>
+                        await auditDelivery.HandleDeliveryAsync<AuditMessage>(json, routingKey,
+                            async (msg, token) => await auditDelivery.ProcessMessageAsync(msg, token),
+                            _failureCounts.GetValueOrDefault(WorkerConstants.Queues.Audits), ct)
                 },
-                {
-                    WorkerConstants.Queues.Usages, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<UsageMessage>(json);
-                        if (msg != null)
-                        {
-                            await usageDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
-                },
-                {
-                    WorkerConstants.Queues.Provisionings, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<ProvisioningMessage>(json);
-                        if (msg != null)
-                        {
-                            await provisioningDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
-                },
-                {
-                    WorkerConstants.Queues.Emails, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<EmailMessage>(json);
-                        if (msg != null)
-                        {
-                            await emailDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
-                },
-                {
-                    WorkerConstants.Queues.Smses, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<SmsMessage>(json);
-                        if (msg != null)
-                        {
-                            await smsDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
-                }
+                // {
+                //     WorkerConstants.Queues.Usages, async (json, routingKey, ct) =>
+                //         await usageDelivery.HandleDeliveryAsync<UsageMessage>(json, routingKey,
+                //             async (msg, token) => await usageDelivery.ProcessMessageAsync(msg, token),
+                //             _failureCounts.GetValueOrDefault(WorkerConstants.Queues.Audits), ct)
+                // },
+                // {
+                //     WorkerConstants.Queues.Provisionings, async (json, routingKey, ct) =>
+                //         await provisioningDelivery.HandleDeliveryAsync<ProvisioningMessage>(json, routingKey,
+                //             async (msg, token) => await provisioningDelivery.ProcessMessageAsync(msg, token),
+                //             _failureCounts.GetValueOrDefault(WorkerConstants.Queues.Audits), ct)
+                // },
+                // {
+                //     WorkerConstants.Queues.Emails, async (json, routingKey, ct) =>
+                //         await emailDelivery.HandleDeliveryAsync<EmailMessage>(json, routingKey,
+                //             async (msg, token) => await emailDelivery.ProcessMessageAsync(msg, token),
+                //             _failureCounts.GetValueOrDefault(WorkerConstants.Queues.Emails), ct)
+                // },
+                // {
+                //     WorkerConstants.Queues.Smses, async (json, routingKey, ct) =>
+                //         await smsDelivery.HandleDeliveryAsync<SmsMessage>(json, routingKey,
+                //             async (msg, token) => await smsDelivery.ProcessMessageAsync(msg, token),
+                //             _failureCounts.GetValueOrDefault(WorkerConstants.Queues.Smses), ct)
+                // }
             };
 
-        // Build dictionary for message bus processors.
         _messageBusProcessors =
-            new Dictionary<string, Func<string, CancellationToken, Task>>(StringComparer.OrdinalIgnoreCase)
+            new Dictionary<string, Func<string, string, CancellationToken, Task>>(StringComparer
+                .OrdinalIgnoreCase)
             {
-                {
-                    WorkerConstants.MessageBuses.Topics.DomainEvents, async (json, ct) =>
-                    {
-                        var msg = JsonSerializer.Deserialize<DomainEventingMessage>(json);
-                        if (msg != null)
-                        {
-                            await domainEventDelivery.ProcessMessageAsync(msg, ct);
-                        }
-                    }
-                }
+                // {
+                //     WorkerConstants.MessageBuses.Topics.DomainEvents, async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-UserProfiles-EndUser".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-UserProfiles-Image".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-EndUsers-Organization".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-EndUsers-Subscription".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-Organizations-EndUser".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-Organizations-Image".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-Organizations-Subscription".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // },
+                // {
+                //     "ApiHost1-Subscriptions-Organization".ToLower(), async (json, subscriptionName, ct) =>
+                //         await domainEventDelivery.HandleDeliveryAsync<DomainEventingMessage>(json, subscriptionName,
+                //             async (msg, token) =>
+                //                 await domainEventDelivery.ProcessMessageAsync(msg, subscriptionName, token),
+                //             _failureCounts.GetValueOrDefault(subscriptionName), ct)
+                // }
             };
     }
 
@@ -128,35 +162,45 @@ public class MultiRelayWorker : BackgroundService
 
         _messageBroker.MessageReceived += async (_, e) =>
         {
+            var routingKey = e.RoutingKey;
             try
             {
-                var routingKey = e.RoutingKey;
                 var json = e.Message;
-
-                _logger.LogInformation("Received message from RoutingKey {RoutingKey}: {Message}", routingKey, json);
+                _logger.LogInformation("Received message from RoutingKey [{RoutingKey}]", routingKey.ToUpper());
 
                 if (_queueProcessors.TryGetValue(routingKey, out var processor))
                 {
-                    await processor(json, stoppingToken);
+                    await processor(json, routingKey, stoppingToken);
+                    ResetFailureCount(routingKey);
                 }
                 else if (_messageBusProcessors.TryGetValue(routingKey, out var busProcessor))
                 {
-                    await busProcessor(json, stoppingToken);
+                    await busProcessor(json, routingKey, stoppingToken);
+                    ResetFailureCount(routingKey);
                 }
                 else
                 {
-                    _logger.LogWarning("No processor found for RoutingKey: {RoutingKey}", routingKey);
+                    _logger.LogWarning("No se encontró un processor para la RoutingKey: {RoutingKey}", routingKey);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing message.");
+                int currentFailureCount = IncrementFailureCount(routingKey);
+                _logger.LogError(
+                    "Error en el procesamiento del mensaje para RoutingKey {RoutingKey}. Fallos consecutivos: {FailureCount} => {msg}",
+                    routingKey, currentFailureCount, ex.Message);
+
+                if (currentFailureCount >= _maxFailureCount)
+                {
+                    _logger.LogError(
+                        "Circuit breaker activado para la RoutingKey {RoutingKey} tras {FailureCount} errores. Se recomienda intervenir manualmente o pausar el procesamiento de esta cola.",
+                        routingKey, currentFailureCount);
+                }
             }
         };
 
         await _messageBroker.StartAsync(stoppingToken);
 
-        // Keep the worker running until cancellation is requested.
         while (!stoppingToken.IsCancellationRequested)
         {
             await Task.Delay(1000, stoppingToken);
@@ -173,5 +217,15 @@ public class MultiRelayWorker : BackgroundService
         _logger.LogInformation("MultiRelayWorker is stopping.");
         await _messageBroker.StopAsync(cancellationToken);
         await base.StopAsync(cancellationToken);
+    }
+
+    private int IncrementFailureCount(string routingKey)
+    {
+        return _failureCounts.AddOrUpdate(routingKey, 1, (_, current) => current + 1);
+    }
+
+    private void ResetFailureCount(string routingKey)
+    {
+        _failureCounts.AddOrUpdate(routingKey, 0, (_, __) => 0);
     }
 }

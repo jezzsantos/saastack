@@ -1,114 +1,196 @@
-using System.Text.Json;
-using Application.Interfaces;
-using Application.Interfaces.Services;
-using Application.Persistence.Shared.ReadModels;
-using Common;
-using Common.Configuration;
-using Common.FeatureFlags;
-using Common.Recording;
-using Infrastructure.Common.Recording;
-using Infrastructure.Hosting.Common;
-using Infrastructure.Web.Api.Common.Clients;
-using Infrastructure.Web.Api.Interfaces.Clients;
-using Infrastructure.Workers.Api;
-using Infrastructure.Workers.Api.Workers;
-using OnPremRelay.WorkerHost.Configuration;
-using OnPremRelay.WorkerHost.Messaging.Delivery;
-using OnPremRelay.WorkerHost.Messaging.Interfaces;
-using OnPremRelay.WorkerHost.Messaging.Services;
-using OnPremRelay.WorkerHost.Workers;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using OnPremRelay.WorkerHost.Extensions;
+using Prometheus;
 
-namespace OnPremRelay.WorkerHost;
-
-public abstract class Program
-{
-    public static async Task Main(string[] args)
+var host = new HostBuilder()
+    .ConfigureAppConfiguration(builder =>
     {
-        // Create the Host for the Worker Service
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((_, config) =>
+        builder
+            .AddJsonFile("appsettings.json", false, false)
+            .AddJsonFile("appsettings.OnPremises.json", true, false)
+            .AddEnvironmentVariables();
+    })
+    .ConfigureWebHostDefaults(webBuilder =>
+    {
+        webBuilder.UseKestrel()
+            .ConfigureServices(services => { services.AddRouting(); })
+            .Configure(app =>
             {
-                config.AddJsonFile("appsettings.OnPremises.json", false, true);
-            })
-            .ConfigureServices((hostContext, services) =>
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapMetrics();
+                    endpoints.MapGet("/health", async context =>
+                    {
+                        // Lógica de verificación de salud personalizada
+                        // var isHealthy = await CheckHealthAsync();
+                        var isHealthy = true;
+                        context.Response.StatusCode = isHealthy
+                            ? StatusCodes.Status200OK
+                            : StatusCodes.Status503ServiceUnavailable;
+                        await context.Response.WriteAsync(isHealthy
+                            ? "Healthy"
+                            : "Unhealthy");
+                    });
+
+                    endpoints.MapPost("{*path}", async (HttpContext context, string path) =>
+                    {
+                        var receiptId = $"receipt_{Guid.NewGuid():N}";
+                        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                        if (path.Contains("event_notifications"))
+                        {
+                        }
+
+                        // Endpoint para Mailgun
+                        if (path.Contains("mailgun/"))
+                        {
+                            try
+                            {
+                                // var userPilotApi = context.RequestServices.GetRequiredService<MailgunApi>();
+                                // var request = JsonSerializer.Deserialize<MailgunSendMessageRequest>(requestDetails.Body);
+                                // if (request == null)
+                                // {
+                                //     return Results.BadRequest("Invalid request body");
+                                // }
+                                //
+                                // var result = await userPilotApi.SendMessage(request, context.RequestAborted);
+                                // return Results.Ok(result);
+                                return Results.Ok(new
+                                    {
+                                        Id = receiptId,
+                                        Message = "Queued. Thank you.",
+                                        Path = path
+                                    }
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error en TrackEvent");
+                                return Results.Problem("Error processing request");
+                            }
+                        }
+
+                        if (path.Contains("usages/deliver"))
+                        {
+                            return Results.Ok(new
+                                {
+                                    Id = receiptId,
+                                    Message = "Queued. Thank you.",
+                                    Path = path
+                                }
+                            );
+                        }
+
+                        return Results.Ok(new
+                            {
+                                Id = receiptId,
+                                Message = "Queued. Thank you.",
+                                Path = "UNKNOW - " + path
+                            }
+                        );
+                    });
+
+                    endpoints.MapPost("/userpilot/{*path}", async (HttpContext context, string path) =>
+                    {
+                        var receiptId = $"receipt_{Guid.NewGuid():N}";
+                        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                        var requestDetails = new
+                        {
+                            Body = await new StreamReader(context.Request.Body).ReadToEndAsync()
+                        };
+
+                        logger.LogInformation("Petición POST recibida: {@RequestDetails}", path);
+
+                        if (path.Contains("identify"))
+                        {
+                            try
+                            {
+                                // var userPilotApi = context.RequestServices.GetRequiredService<UserPilotApi>();
+                                // var request = JsonSerializer.Deserialize<UserPilotIdentifyUserRequest>(requestDetails.Body);
+                                // if (request == null)
+                                // {
+                                //     return Results.BadRequest("Invalid request body");
+                                // }
+                                //
+                                // await userPilotApi.IdentifyUser(request, context.RequestAborted);
+                                return Results.Ok(new
+                                    {
+                                        Id = receiptId,
+                                        Message = "Queued. Thank you."
+                                    }
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error en IdentifyUser");
+                                return Results.Problem("Error processing request");
+                            }
+                        }
+
+                        if (path.Contains("track"))
+                        {
+                            try
+                            {
+                                // var userPilotApi = context.RequestServices.GetRequiredService<UserPilotApi>();
+                                // var request = JsonSerializer.Deserialize<UserPilotTrackEventRequest>(requestDetails.Body);
+                                // if (request == null)
+                                // {
+                                //     return Results.BadRequest("Invalid request body");
+                                // }
+                                //
+                                // await userPilotApi.TrackEvent(request, context.RequestAborted);
+                                return Results.Ok(new
+                                    {
+                                        Id = receiptId,
+                                        Message = "Queued. Thank you."
+                                    }
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error en TrackEvent");
+                                return Results.Problem("Error processing request");
+                            }
+                        }
+
+                        return Results.Ok(new
+                            {
+                                Id = receiptId,
+                                Message = "Queued. Thank you."
+                            }
+                        );
+                    });
+                });
+            });
+    })
+    .ConfigureServices((context, services) =>
+    {
+        services.AddLogging(builder =>
+        {
+            builder.ClearProviders();
+            builder.AddSimpleConsole(options =>
             {
-                // Register RabbitMQ settings from configuration
-                services.Configure<RabbitMqSettings>(hostContext.Configuration.GetSection("RabbitMQ"));
+                options.TimestampFormat = "hh:mm:ss ";
+                options.SingleLine = true;
+                options.IncludeScopes = false;
+            });
+            builder.AddConsole();
+            builder.AddDebug();
+            builder.AddEventSourceLogger();
+        });
+        services.AddMessageProcessing(context.Configuration);
+    })
+    .Build();
 
-                // Register infrastructure services
-                services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
-                services.AddSingleton<IMessageBrokerService, RabbitMqBrokerService>();
+await host.RunAsync();
 
-                services.AddHttpClient();
-                services.AddSingleton<IConfigurationSettings>(
-                    new AspNetDynamicConfigurationSettings(hostContext.Configuration));
-                services.AddSingleton<IHostSettings, HostSettings>();
-                services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
-                services.AddSingleton(JsonSerializerOptions.Default);
-
-                services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
-                services.AddSingleton<IRecorder>(c => new CrashTraceOnlyRecorder("OnPremises Api Workers",
-                    c.GetRequiredService<ILoggerFactory>(), c.GetRequiredService<ICrashReporter>()));
-                services.AddSingleton<IServiceClientFactory>(c => new InterHostServiceClientFactory(
-                    c.GetRequiredService<IHttpClientFactory>(),
-                    c.GetRequiredService<JsonSerializerOptions>(),
-                    c.GetRequiredService<IHostSettings>()));
-
-                // Register concrete implementations of relay workers
-                services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
-                services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
-                services
-                    .AddSingleton<IQueueMonitoringApiRelayWorker<ProvisioningMessage>,
-                        DeliverProvisioningRelayWorker>();
-                services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, SendEmailRelayWorker>();
-                services.AddSingleton<IQueueMonitoringApiRelayWorker<SmsMessage>, SendSmsRelayWorker>();
-                services
-                    .AddSingleton<IMessageBusMonitoringApiRelayWorker<DomainEventingMessage>,
-                        DeliverDomainEventingRelayWorker>();
-
-                // Register generic delivery wrappers with the corresponding queue names
-                services.AddSingleton<QueueDelivery<AuditMessage>>(sp =>
-                    new QueueDelivery<AuditMessage>(
-                        sp.GetRequiredService<IQueueMonitoringApiRelayWorker<AuditMessage>>(),
-                        WorkerConstants.Queues.Audits));
-
-                services.AddSingleton<QueueDelivery<UsageMessage>>(sp =>
-                    new QueueDelivery<UsageMessage>(
-                        sp.GetRequiredService<IQueueMonitoringApiRelayWorker<UsageMessage>>(),
-                        WorkerConstants.Queues.Usages));
-
-                services.AddSingleton<QueueDelivery<ProvisioningMessage>>(sp =>
-                    new QueueDelivery<ProvisioningMessage>(
-                        sp.GetRequiredService<IQueueMonitoringApiRelayWorker<ProvisioningMessage>>(),
-                        WorkerConstants.Queues.Provisionings));
-
-                services.AddSingleton<QueueDelivery<EmailMessage>>(sp =>
-                    new QueueDelivery<EmailMessage>(
-                        sp.GetRequiredService<IQueueMonitoringApiRelayWorker<EmailMessage>>(),
-                        WorkerConstants.Queues.Emails));
-
-                services.AddSingleton<QueueDelivery<SmsMessage>>(sp =>
-                    new QueueDelivery<SmsMessage>(
-                        sp.GetRequiredService<IQueueMonitoringApiRelayWorker<SmsMessage>>(),
-                        WorkerConstants.Queues.Smses));
-
-                // Register generic message bus wrapper for domain events
-                services.AddSingleton<MessageBusDelivery<DomainEventingMessage>>(sp =>
-                    new MessageBusDelivery<DomainEventingMessage>(
-                        sp.GetRequiredService<IMessageBusMonitoringApiRelayWorker<DomainEventingMessage>>(),
-                        WorkerConstants.MessageBuses.SubscriberHosts.ApiHost1,
-                        WorkerConstants.MessageBuses.Topics.DomainEvents));
-
-                // Register the MultiRelayWorker as a hosted service
-                services.AddHostedService<MultiRelayWorker>();
-            })
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-            })
-            .Build();
-
-        await host.RunAsync();
-    }
+namespace AzureFunctions.Api.WorkerHost
+{
+    [UsedImplicitly]
+    public class Program;
 }

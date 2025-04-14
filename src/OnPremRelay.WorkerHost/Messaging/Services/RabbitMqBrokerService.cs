@@ -23,7 +23,16 @@ public class RabbitMqBrokerService : IMessageBrokerService
         WorkerConstants.Queues.Usages,
         WorkerConstants.Queues.Provisionings,
         WorkerConstants.Queues.Emails,
-        WorkerConstants.Queues.Smses
+        WorkerConstants.Queues.Smses,
+
+        "ApiHost1-UserProfiles-EndUser".ToLower(),
+        "ApiHost1-UserProfiles-Image".ToLower(),
+        "ApiHost1-EndUsers-Organization".ToLower(),
+        "ApiHost1-EndUsers-Subscription".ToLower(),
+        "ApiHost1-Organizations-EndUser".ToLower(),
+        "ApiHost1-Organizations-Image".ToLower(),
+        "ApiHost1-Organizations-Subscription".ToLower(),
+        "ApiHost1-Subscriptions-Organization".ToLower(),
     };
 
     /// <summary>
@@ -69,22 +78,22 @@ public class RabbitMqBrokerService : IMessageBrokerService
                     var source = currentQueue;
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
-                    _logger.LogInformation("Received message from queue {QueueName}: {Message}", source, message);
+                    _logger.LogInformation("Received message from queue [{QueueName}]", source.ToUpper());
 
-                    // Raise the event with the queue name and message.
-                    MessageReceived(this, new MessageReceivedEventArgs(source, message));
+                    // Se eleva el evento.
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(currentQueue, message));
 
-                    // Acknowledge the message.
+                    // Solo si no hay error se confirman los mensajes.
                     _channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error processing message from queue {QueueName}.", currentQueue);
+                    _logger.LogError(ex, "Error procesando mensaje de la cola {QueueName}. Se reintentará.",
+                        currentQueue);
+                    _channel.BasicNack(ea.DeliveryTag, false, true);
                 }
-                // return Task.CompletedTask;
             };
-
-            // Start consuming messages from the current queue.
+            
             _channel.BasicConsume(currentQueue, false, consumer);
         }
 
