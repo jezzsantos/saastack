@@ -447,7 +447,9 @@ internal static class AzureSqlServerStoreConversionExtensions
     private static object ToTableEntityProperty(Optional<object> propertyValue, Optional<Type> targetPropertyType)
     {
         if (targetPropertyType.HasValue &&
-            (targetPropertyType.Value.IsEnum || targetPropertyType.Value.IsNullableEnum()))
+            (targetPropertyType.Value.IsEnum
+             || targetPropertyType.Value.IsNullableEnum()
+             || targetPropertyType.Value.IsOptionalEnum()))
         {
             return ToValue(propertyValue);
         }

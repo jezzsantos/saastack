@@ -411,6 +411,23 @@ public abstract class AnyDataStoreBaseSpec
     }
 
     [Fact]
+    public virtual async Task WhenQueryForStringValueWithLikeNull_ThenReturnsNoResults()
+    {
+        await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity()), CancellationToken.None);
+        await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity()), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>()
+            .Where(e => e.AStringValue, ConditionOperator.Like, "avalue");
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.TotalCount.Should().Be(0);
+        results.Value.Results.Count.Should().Be(0);
+    }
+
+    [Fact]
     public async Task WhenQueryForAnEnumValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
