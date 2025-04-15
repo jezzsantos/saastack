@@ -4,6 +4,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.AppService;
 using Common;
 using Common.Extensions;
+using Common.Recording;
 using Infrastructure.Workers.Api;
 
 namespace AzureFunctions.Api.WorkerHost;
@@ -36,14 +37,20 @@ public class AzureFunctionWorkersRuntime : IWorkersRuntime
     public async Task CircuitBreakWorkerAsync(string workerName, CancellationToken cancellationToken)
     {
         var functionInfo = GetAzureFunctionInfo(_environmentVariables, workerName);
+        var functionName = functionInfo.FunctionName;
         var updated = await _azureManagementApi.DisableFunctionAsync(_recorder, functionInfo, cancellationToken);
         if (updated.IsFailure)
         {
             var ex = updated.Error.ToException<InvalidOperationException>();
             _recorder.TraceError(null, ex,
                 "Failed to stop Azure function {FunctionName} and circuit break delivery of message. Error was: {Error}",
-                functionInfo.FunctionName, ex);
+                functionName, ex);
+            return;
         }
+
+        _recorder.Crash(null, CrashLevel.Critical,
+            new InvalidOperationException(
+                Resources.AzureFunctionWorkersRuntime_CircuitBreakWorker.Format(functionName)));
     }
 
     private static AzureFunctionInfo GetAzureFunctionInfo(IEnvironmentVariables environmentVariables,

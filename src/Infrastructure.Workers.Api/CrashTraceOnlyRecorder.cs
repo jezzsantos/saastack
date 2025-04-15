@@ -22,7 +22,8 @@ public sealed class CrashTraceOnlyRecorder : TracingOnlyRecorder
 
     public override void Crash(ICallContext? context, CrashLevel level, Exception exception)
     {
-        throw new NotImplementedException();
+        base.Crash(context, level, exception);
+        _crasher.Crash(context, level, exception, string.Empty);
     }
 
     public override void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
