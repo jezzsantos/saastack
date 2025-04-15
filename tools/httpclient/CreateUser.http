@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 > {%
-    client.global.set("user_id", response.body.credential.user.id);
+    client.global.set("user_id", response.body.person.user.id);
 %}
 
 ### Get Registration Token (the one sent in an email)
