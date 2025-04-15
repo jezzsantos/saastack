@@ -4,6 +4,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces.Entities;
+using Domain.Services.Shared;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -22,8 +23,14 @@ public class AuthTokensRootSpec
         var idFactory = new Mock<IIdentifierFactory>();
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
+        var encryptionService = new Mock<IEncryptionService>();
+        encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
+            .Returns("anencryptedvalue");
+        encryptionService.Setup(es => es.Decrypt(It.IsAny<string>()))
+            .Returns("adecryptedvalue");
 
-        _authTokens = AuthTokensRoot.Create(recorder.Object, idFactory.Object, "auserid".ToId()).Value;
+        _authTokens = AuthTokensRoot
+            .Create(recorder.Object, idFactory.Object, encryptionService.Object, "auserid".ToId()).Value;
     }
 
     [Fact]

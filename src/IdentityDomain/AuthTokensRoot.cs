@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
+using Domain.Services.Shared;
 using JetBrains.Annotations;
 using QueryAny;
 
@@ -20,28 +21,41 @@ namespace IdentityDomain;
 ///     thousands and thousands of events in a user's lifetime, which would make loading this aggregate into memory
 ///     progressively slower over time.
 ///     At present, we are not actually too interested in the history of the token value, just the current state of it.
+///     We need to store the <see cref="AccessToken" /> value encrypted at rest, and we also need to store
+///     the <see cref="RefreshToken" /> in plain text, because we need to match on that for renewals.
 /// </summary>
 [EntityName("AuthToken")]
 public sealed class AuthTokensRoot : AggregateRootBase
 {
+    private readonly IEncryptionService _encryptionService;
+
     public static Result<AuthTokensRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
+        IEncryptionService encryptionService,
         Identifier userId)
     {
-        var root = new AuthTokensRoot(recorder, idFactory);
+        var root = new AuthTokensRoot(recorder, idFactory, encryptionService);
         root.RaiseCreateEvent(IdentityDomain.Events.AuthTokens.Created(root.Id, userId));
         return root;
     }
 
-    private AuthTokensRoot(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
+    private AuthTokensRoot(IRecorder recorder, IIdentifierFactory idFactory, IEncryptionService encryptionService) :
+        base(recorder, idFactory)
     {
+        _encryptionService = encryptionService;
     }
 
     private AuthTokensRoot(ISingleValueObject<string> identifier, IDependencyContainer container,
         HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
-        AccessToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(AccessToken));
+        _encryptionService = container.GetRequiredService<IEncryptionService>();
+
+        var accessToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(AccessToken));
+        AccessToken = accessToken.HasValue
+            ? _encryptionService.Decrypt(accessToken.Value).ToOptional()
+            : Optional<string>.None;
         AccessTokenExpiresOn =
             rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(AccessTokenExpiresOn));
+        //Note: refresh token cannot be encrypted because we search on its plain value
         RefreshToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(RefreshToken));
         RefreshTokenExpiresOn =
             rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(RefreshTokenExpiresOn));
@@ -66,8 +80,12 @@ public sealed class AuthTokensRoot : AggregateRootBase
     public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
-        properties.Add(nameof(AccessToken), AccessToken);
+        var accessToken = AccessToken.HasValue
+            ? _encryptionService.Encrypt(AccessToken.Value)
+            : string.Empty;
+        properties.Add(nameof(AccessToken), accessToken.ToOptional());
         properties.Add(nameof(AccessTokenExpiresOn), AccessTokenExpiresOn);
+        //Note: refresh token cannot be encrypted because we search on its plain value
         properties.Add(nameof(RefreshToken), RefreshToken);
         properties.Add(nameof(RefreshTokenExpiresOn), RefreshTokenExpiresOn);
         properties.Add(nameof(UserId), UserId);
@@ -190,10 +208,10 @@ public sealed class AuthTokensRoot : AggregateRootBase
     }
 
 #if TESTINGONLY
-    public Result<Error> TestingOnly_SetTokens(string accessToken, string refreshToken, DateTime accessTokenExpiresOn,
+    public void TestingOnly_SetTokens(string accessToken, string refreshToken, DateTime accessTokenExpiresOn,
         DateTime refreshTokenExpiresOn)
     {
-        return RaiseChangeEvent(
+        RaiseChangeEvent(
             IdentityDomain.Events.AuthTokens.TokensChanged(Id, UserId, accessToken, accessTokenExpiresOn,
                 refreshToken, refreshTokenExpiresOn));
     }

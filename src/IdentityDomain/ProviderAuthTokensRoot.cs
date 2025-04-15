@@ -18,6 +18,7 @@ namespace IdentityDomain;
 ///     Note: It is updated every time the external provider authenticates the user, and provides new tokens.
 ///     Tokens change all the time, we can assume at worst, every 15 minutes, for every day of use for every user.
 ///     This is why this aggregate is using snapshotting and not event-sourcing.
+///     We need to store the <see cref="Tokens" /> value encrypted at rest.
 /// </summary>
 [EntityName("ProviderAuthTokens")]
 public sealed class ProviderAuthTokensRoot : AggregateRootBase

@@ -5,6 +5,7 @@ using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using Domain.Services.Shared;
 using FluentAssertions;
 using IdentityApplication.ApplicationServices;
 using IdentityApplication.Persistence;
@@ -20,6 +21,7 @@ public class AuthTokensApplicationSpec
 {
     private readonly AuthTokensApplication _application;
     private readonly Mock<ICallerContext> _caller;
+    private readonly Mock<IEncryptionService> _encryptionService;
     private readonly Mock<IEndUsersService> _endUsersService;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IJWTTokensService> _jwtTokensService;
@@ -41,8 +43,14 @@ public class AuthTokensApplicationSpec
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()))
             .Returns((AuthTokensRoot root, CancellationToken _) =>
                 Task.FromResult<Result<AuthTokensRoot, Error>>(root));
+        _encryptionService = new Mock<IEncryptionService>();
+        _encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
+            .Returns((string value) => value);
+        _encryptionService.Setup(es => es.Decrypt(It.IsAny<string>()))
+            .Returns((string value) => value);
 
-        _application = new AuthTokensApplication(_recorder.Object, _idFactory.Object, _jwtTokensService.Object,
+        _application = new AuthTokensApplication(_recorder.Object, _idFactory.Object, _encryptionService.Object,
+            _jwtTokensService.Object,
             _endUsersService.Object, _repository.Object);
     }
 
@@ -82,7 +90,8 @@ public class AuthTokensApplicationSpec
         {
             Id = "anid"
         };
-        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        var authTokens = AuthTokensRoot
+            .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
             .ReturnsAsync(
@@ -128,7 +137,8 @@ public class AuthTokensApplicationSpec
             Classification = EndUserClassification.Machine
         };
         var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
-        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        var authTokens = AuthTokensRoot
+            .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authTokens.ToOptional());
@@ -155,7 +165,8 @@ public class AuthTokensApplicationSpec
             Access = EndUserAccess.Suspended
         };
         var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
-        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        var authTokens = AuthTokensRoot
+            .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authTokens.ToOptional());
@@ -181,7 +192,8 @@ public class AuthTokensApplicationSpec
         };
         var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
         var expiresOn2 = DateTime.UtcNow.AddMinutes(2);
-        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        var authTokens = AuthTokensRoot
+            .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authTokens.ToOptional());
@@ -227,7 +239,8 @@ public class AuthTokensApplicationSpec
     public async Task WhenRevokeRefreshTokenAsync_ThenRevokes()
     {
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
-        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        var authTokens = AuthTokensRoot
+            .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn, expiresOn);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authTokens.ToOptional());

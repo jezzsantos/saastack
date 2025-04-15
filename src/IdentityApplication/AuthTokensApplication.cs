@@ -5,25 +5,30 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Services.Shared;
 using IdentityApplication.ApplicationServices;
 using IdentityApplication.Persistence;
 using IdentityDomain;
 
 namespace IdentityApplication;
 
+
 public class AuthTokensApplication : IAuthTokensApplication
 {
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _idFactory;
+    private readonly IEncryptionService _encryptionService;
     private readonly IJWTTokensService _jwtTokensService;
     private readonly IRecorder _recorder;
     private readonly IAuthTokensRepository _repository;
 
-    public AuthTokensApplication(IRecorder recorder, IIdentifierFactory idFactory, IJWTTokensService jwtTokensService,
+    public AuthTokensApplication(IRecorder recorder, IIdentifierFactory idFactory, IEncryptionService encryptionService,
+        IJWTTokensService jwtTokensService,
         IEndUsersService endUsersService, IAuthTokensRepository repository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
+        _encryptionService = encryptionService;
         _jwtTokensService = jwtTokensService;
         _endUsersService = endUsersService;
         _repository = repository;
@@ -52,7 +57,7 @@ public class AuthTokensApplication : IAuthTokensApplication
         }
         else
         {
-            var root = AuthTokensRoot.Create(_recorder, _idFactory, user.Id.ToId());
+            var root = AuthTokensRoot.Create(_recorder, _idFactory, _encryptionService, user.Id.ToId());
             if (root.IsFailure)
             {
                 return root.Error;
