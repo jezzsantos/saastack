@@ -5,178 +5,90 @@ using AzureFunctions.Api.WorkerHost.Extensions;
 namespace AzureFunctions.Api.WorkerHost.Functions;
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1EndUsersOrganization
+public sealed class DeliverDomainEventToApiHost1EndUsers
 {
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
     private readonly Common.Configuration.IConfigurationSettings _settings;
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
 
-    public DeliverDomainEventToApiHost1EndUsersOrganization(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
+    public DeliverDomainEventToApiHost1EndUsers(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
     {
         _worker = worker;
         _runtime = runtime;
         _settings = settings;
     }
 
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersOrganization))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-endusers-organization", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
+    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsers))]
+    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-endusers", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
         var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-endusers-organization", context.CancellationToken);
+        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-endusers", context.CancellationToken);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1EndUsersSubscription
+public sealed class DeliverDomainEventToApiHost1Organizations
 {
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
     private readonly Common.Configuration.IConfigurationSettings _settings;
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
 
-    public DeliverDomainEventToApiHost1EndUsersSubscription(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
+    public DeliverDomainEventToApiHost1Organizations(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
     {
         _worker = worker;
         _runtime = runtime;
         _settings = settings;
     }
 
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1EndUsersSubscription))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-endusers-subscription", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
+    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1Organizations))]
+    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-organizations", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
         var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-endusers-subscription", context.CancellationToken);
+        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-organizations", context.CancellationToken);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsEndUser
+public sealed class DeliverDomainEventToApiHost1Subscriptions
 {
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
     private readonly Common.Configuration.IConfigurationSettings _settings;
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
 
-    public DeliverDomainEventToApiHost1OrganizationsEndUser(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
+    public DeliverDomainEventToApiHost1Subscriptions(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
     {
         _worker = worker;
         _runtime = runtime;
         _settings = settings;
     }
 
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsEndUser))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-organizations-enduser", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
+    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1Subscriptions))]
+    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-subscriptions", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
         var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-organizations-enduser", context.CancellationToken);
+        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-subscriptions", context.CancellationToken);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsImage
+public sealed class DeliverDomainEventToApiHost1UserProfiles
 {
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
     private readonly Common.Configuration.IConfigurationSettings _settings;
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
 
-    public DeliverDomainEventToApiHost1OrganizationsImage(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
+    public DeliverDomainEventToApiHost1UserProfiles(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
     {
         _worker = worker;
         _runtime = runtime;
         _settings = settings;
     }
 
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsImage))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-organizations-image", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
+    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfiles))]
+    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-userprofiles", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
     {
         var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-organizations-image", context.CancellationToken);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsSubscription
-{
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-    private readonly Common.Configuration.IConfigurationSettings _settings;
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-
-    public DeliverDomainEventToApiHost1OrganizationsSubscription(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
-    {
-        _worker = worker;
-        _runtime = runtime;
-        _settings = settings;
-    }
-
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1OrganizationsSubscription))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-organizations-subscription", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-organizations-subscription", context.CancellationToken);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1SubscriptionsOrganization
-{
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-    private readonly Common.Configuration.IConfigurationSettings _settings;
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-
-    public DeliverDomainEventToApiHost1SubscriptionsOrganization(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
-    {
-        _worker = worker;
-        _runtime = runtime;
-        _settings = settings;
-    }
-
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1SubscriptionsOrganization))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-subscriptions-organization", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-subscriptions-organization", context.CancellationToken);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1UserProfilesEndUser
-{
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-    private readonly Common.Configuration.IConfigurationSettings _settings;
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-
-    public DeliverDomainEventToApiHost1UserProfilesEndUser(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
-    {
-        _worker = worker;
-        _runtime = runtime;
-        _settings = settings;
-    }
-
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesEndUser))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-userprofiles-enduser", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-userprofiles-enduser", context.CancellationToken);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1UserProfilesImage
-{
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-    private readonly Common.Configuration.IConfigurationSettings _settings;
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-
-    public DeliverDomainEventToApiHost1UserProfilesImage(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime, Common.Configuration.IConfigurationSettings settings)
-    {
-        _worker = worker;
-        _runtime = runtime;
-        _settings = settings;
-    }
-
-    [Microsoft.Azure.Functions.Worker.Function(nameof(DeliverDomainEventToApiHost1UserProfilesImage))]
-    public async Task Run([Microsoft.Azure.Functions.Worker.ServiceBusTrigger(Application.Interfaces.WorkerConstants.MessageBuses.Topics.DomainEvents, "apihost1-userprofiles-image", Connection = "ServiceBusConnection", IsSessionsEnabled = true, AutoCompleteMessages = false)] Azure.Messaging.ServiceBus.ServiceBusReceivedMessage receivedMessage, Microsoft.Azure.Functions.Worker.ServiceBusMessageActions actions, Microsoft.Azure.Functions.Worker.FunctionContext context)
-    {
-        var handler = new AzureFunctionMessageDeliveryHandler(_settings, actions, _runtime, context.FunctionDefinition.Name);
-        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-userprofiles-image", context.CancellationToken);
+        await handler.HandleDelivery(receivedMessage, _worker, "ApiHost1", "apihost1-userprofiles", context.CancellationToken);
     }
 }
 #elif GENERATEDCODEFORAWSLAMBDAS
@@ -185,12 +97,12 @@ using AWSLambdas.Api.WorkerHost.Extensions;
 namespace AWSLambdas.Api.WorkerHost.Lambdas;
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1EndUsersOrganization
+public sealed class DeliverDomainEventToApiHost1EndUsers
 {
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
 
-    public DeliverDomainEventToApiHost1EndUsersOrganization(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
+    public DeliverDomainEventToApiHost1EndUsers(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
     {
         _worker = worker;
         _runtime = runtime;
@@ -200,17 +112,17 @@ public sealed class DeliverDomainEventToApiHost1EndUsersOrganization
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
         var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-endusers-organization", CancellationToken.None);
+        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-endusers", CancellationToken.None);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1EndUsersSubscription
+public sealed class DeliverDomainEventToApiHost1Organizations
 {
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
 
-    public DeliverDomainEventToApiHost1EndUsersSubscription(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
+    public DeliverDomainEventToApiHost1Organizations(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
     {
         _worker = worker;
         _runtime = runtime;
@@ -220,17 +132,17 @@ public sealed class DeliverDomainEventToApiHost1EndUsersSubscription
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
         var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-endusers-subscription", CancellationToken.None);
+        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-organizations", CancellationToken.None);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsEndUser
+public sealed class DeliverDomainEventToApiHost1Subscriptions
 {
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
 
-    public DeliverDomainEventToApiHost1OrganizationsEndUser(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
+    public DeliverDomainEventToApiHost1Subscriptions(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
     {
         _worker = worker;
         _runtime = runtime;
@@ -240,17 +152,17 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsEndUser
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
         var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-organizations-enduser", CancellationToken.None);
+        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-subscriptions", CancellationToken.None);
     }
 }
 
 [JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsImage
+public sealed class DeliverDomainEventToApiHost1UserProfiles
 {
     private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
     private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
 
-    public DeliverDomainEventToApiHost1OrganizationsImage(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
+    public DeliverDomainEventToApiHost1UserProfiles(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
     {
         _worker = worker;
         _runtime = runtime;
@@ -260,87 +172,7 @@ public sealed class DeliverDomainEventToApiHost1OrganizationsImage
     public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
     {
         var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-organizations-image", CancellationToken.None);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1OrganizationsSubscription
-{
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-
-    public DeliverDomainEventToApiHost1OrganizationsSubscription(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
-    {
-        _worker = worker;
-        _runtime = runtime;
-    }
-
-    [Amazon.Lambda.Annotations.LambdaFunction]
-    public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
-    {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-organizations-subscription", CancellationToken.None);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1SubscriptionsOrganization
-{
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-
-    public DeliverDomainEventToApiHost1SubscriptionsOrganization(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
-    {
-        _worker = worker;
-        _runtime = runtime;
-    }
-
-    [Amazon.Lambda.Annotations.LambdaFunction]
-    public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
-    {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-subscriptions-organization", CancellationToken.None);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1UserProfilesEndUser
-{
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-
-    public DeliverDomainEventToApiHost1UserProfilesEndUser(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
-    {
-        _worker = worker;
-        _runtime = runtime;
-    }
-
-    [Amazon.Lambda.Annotations.LambdaFunction]
-    public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
-    {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-userprofiles-enduser", CancellationToken.None);
-    }
-}
-
-[JetBrains.Annotations.UsedImplicitly]
-public sealed class DeliverDomainEventToApiHost1UserProfilesImage
-{
-    private readonly Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> _worker;
-    private readonly Infrastructure.Workers.Api.IWorkersRuntime _runtime;
-
-    public DeliverDomainEventToApiHost1UserProfilesImage(Infrastructure.Workers.Api.IMessageBusMonitoringApiRelayWorker<Application.Persistence.Shared.ReadModels.DomainEventingMessage> worker, Infrastructure.Workers.Api.IWorkersRuntime runtime)
-    {
-        _worker = worker;
-        _runtime = runtime;
-    }
-
-    [Amazon.Lambda.Annotations.LambdaFunction]
-    public async Task<bool> Run(Amazon.Lambda.SQSEvents.SQSEvent sqsEvent, Amazon.Lambda.Core.ILambdaContext context)
-    {
-        var handler = new AWSLambdaMessageDeliveryHandler(_runtime, context.FunctionName, 0);
-        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-userprofiles-image", CancellationToken.None);
+        return await handler.HandleDelivery(sqsEvent, _worker, "ApiHost1", "apihost1-userprofiles", CancellationToken.None);
     }
 }
 #endif

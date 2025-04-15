@@ -88,7 +88,7 @@
         "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.SendSms_Run_Generated::Run"
       }
     },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1EndUsersOrganizationRunGenerated": {
+    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1EndUsersRunGenerated": {
       "Type": "AWS::Serverless::Function",
       "Metadata": {
         "Tool": "Amazon.Lambda.Annotations"
@@ -102,10 +102,10 @@
           "AWSLambdaBasicExecutionRole"
         ],
         "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1EndUsersOrganization_Run_Generated::Run"
+        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1EndUsers_Run_Generated::Run"
       }
     },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1EndUsersSubscriptionRunGenerated": {
+    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1OrganizationsRunGenerated": {
       "Type": "AWS::Serverless::Function",
       "Metadata": {
         "Tool": "Amazon.Lambda.Annotations"
@@ -119,10 +119,10 @@
           "AWSLambdaBasicExecutionRole"
         ],
         "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1EndUsersSubscription_Run_Generated::Run"
+        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1Organizations_Run_Generated::Run"
       }
     },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1OrganizationsEndUserRunGenerated": {
+    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1SubscriptionsRunGenerated": {
       "Type": "AWS::Serverless::Function",
       "Metadata": {
         "Tool": "Amazon.Lambda.Annotations"
@@ -136,10 +136,10 @@
           "AWSLambdaBasicExecutionRole"
         ],
         "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1OrganizationsEndUser_Run_Generated::Run"
+        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1Subscriptions_Run_Generated::Run"
       }
     },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1OrganizationsImageRunGenerated": {
+    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1UserProfilesRunGenerated": {
       "Type": "AWS::Serverless::Function",
       "Metadata": {
         "Tool": "Amazon.Lambda.Annotations"
@@ -153,75 +153,7 @@
           "AWSLambdaBasicExecutionRole"
         ],
         "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1OrganizationsImage_Run_Generated::Run"
-      }
-    },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1OrganizationsSubscriptionRunGenerated": {
-      "Type": "AWS::Serverless::Function",
-      "Metadata": {
-        "Tool": "Amazon.Lambda.Annotations"
-      },
-      "Properties": {
-        "Runtime": "dotnet6",
-        "CodeUri": ".",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Policies": [
-          "AWSLambdaBasicExecutionRole"
-        ],
-        "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1OrganizationsSubscription_Run_Generated::Run"
-      }
-    },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1SubscriptionsOrganizationRunGenerated": {
-      "Type": "AWS::Serverless::Function",
-      "Metadata": {
-        "Tool": "Amazon.Lambda.Annotations"
-      },
-      "Properties": {
-        "Runtime": "dotnet6",
-        "CodeUri": ".",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Policies": [
-          "AWSLambdaBasicExecutionRole"
-        ],
-        "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1SubscriptionsOrganization_Run_Generated::Run"
-      }
-    },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1UserProfilesEndUserRunGenerated": {
-      "Type": "AWS::Serverless::Function",
-      "Metadata": {
-        "Tool": "Amazon.Lambda.Annotations"
-      },
-      "Properties": {
-        "Runtime": "dotnet6",
-        "CodeUri": ".",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Policies": [
-          "AWSLambdaBasicExecutionRole"
-        ],
-        "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1UserProfilesEndUser_Run_Generated::Run"
-      }
-    },
-    "AWSLambdasApiWorkerHostLambdasDeliverDomainEventToApiHost1UserProfilesImageRunGenerated": {
-      "Type": "AWS::Serverless::Function",
-      "Metadata": {
-        "Tool": "Amazon.Lambda.Annotations"
-      },
-      "Properties": {
-        "Runtime": "dotnet6",
-        "CodeUri": ".",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Policies": [
-          "AWSLambdaBasicExecutionRole"
-        ],
-        "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1UserProfilesImage_Run_Generated::Run"
+        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventToApiHost1UserProfiles_Run_Generated::Run"
       }
     }
   }

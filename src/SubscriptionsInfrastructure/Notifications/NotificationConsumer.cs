@@ -7,12 +7,12 @@ using SubscriptionsApplication;
 
 namespace SubscriptionsInfrastructure.Notifications;
 
-public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
+public class NotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly ISubscriptionsApplication _subscriptionsApplication;
 
-    public OrganizationNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public NotificationConsumer(ICallerContextFactory callerContextFactory,
         ISubscriptionsApplication subscriptionsApplication)
     {
         _callerContextFactory = callerContextFactory;

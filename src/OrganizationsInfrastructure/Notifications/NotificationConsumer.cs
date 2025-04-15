@@ -1,18 +1,21 @@
 using Common;
+using Domain.Events.Shared.EndUsers;
 using Domain.Events.Shared.Subscriptions;
 using Domain.Interfaces.Entities;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Interfaces;
 using OrganizationsApplication;
+using SubscriptionCreated = Domain.Events.Shared.Subscriptions.Created;
+using ImageDeleted = Domain.Events.Shared.Images.Deleted;
 
 namespace OrganizationsInfrastructure.Notifications;
 
-public class SubscriptionNotificationConsumer : IDomainEventNotificationConsumer
+public class NotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IOrganizationsApplication _organizationsApplication;
 
-    public SubscriptionNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public NotificationConsumer(ICallerContextFactory callerContextFactory,
         IOrganizationsApplication organizationsApplication)
     {
         _callerContextFactory = callerContextFactory;
@@ -23,7 +26,23 @@ public class SubscriptionNotificationConsumer : IDomainEventNotificationConsumer
     {
         switch (domainEvent)
         {
-            case Created created:
+            case Registered registered:
+                return await _organizationsApplication.HandleEndUserRegisteredAsync(_callerContextFactory.Create(),
+                    registered, cancellationToken);
+
+            case MembershipAdded added:
+                return await _organizationsApplication.HandleEndUserMembershipAddedAsync(
+                    _callerContextFactory.Create(), added, cancellationToken);
+
+            case MembershipRemoved removed:
+                return await _organizationsApplication.HandleEndUserMembershipRemovedAsync(
+                    _callerContextFactory.Create(), removed, cancellationToken);
+
+            case ImageDeleted deleted:
+                return await _organizationsApplication.HandleImageDeletedAsync(_callerContextFactory.Create(),
+                    deleted, cancellationToken);
+
+            case SubscriptionCreated created:
                 return await _organizationsApplication.HandleSubscriptionCreatedAsync(
                     _callerContextFactory.Create(), created, cancellationToken);
 

@@ -52,7 +52,7 @@ public class SubscriptionsModule : ISubdomainModule
                 services.AddPerHttpRequest<ISubscriptionRepository, SubscriptionRepository>();
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new OrganizationNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                        new NotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<ISubscriptionsApplication>()));
                 services.RegisterEventing<SubscriptionRoot, SubscriptionProjection, SubscriptionNotifier>(
                     c => new SubscriptionProjection(c.GetRequiredService<IRecorder>(),

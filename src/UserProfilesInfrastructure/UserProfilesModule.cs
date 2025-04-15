@@ -66,11 +66,7 @@ public class UserProfilesModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new EndUserNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
-                            c.GetRequiredService<IUserProfilesApplication>()));
-                services
-                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new ImageNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                        new NotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IUserProfilesApplication>()));
                 services.RegisterEventing<UserProfileRoot, UserProfileProjection, UserProfileNotifier>(
                     c => new UserProfileProjection(c.GetRequiredService<IRecorder>(),

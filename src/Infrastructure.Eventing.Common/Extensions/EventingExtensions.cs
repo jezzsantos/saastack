@@ -11,12 +11,15 @@ public static class EventingExtensions
     {
         var fullName = fullTypeName
             .Replace(".", "-");
-        var name = $"{assemblyName}-{fullName}"
+        var assem = assemblyName
+            .Replace(".", "-");
+        var name = $"{assem}-{fullName}"
             .Replace("Infrastructure", string.Empty)
             .Replace("Consumer", string.Empty)
             .Replace("Notifications", string.Empty)
             .Replace("Notification", string.Empty)
-            .Replace("--", "-");
+            .Replace("--", "-")
+            .TrimEnd('-');
 
         return name
             .Substring(0, Math.Min(name.Length, 50));

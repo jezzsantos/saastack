@@ -1,19 +1,22 @@
 using Common;
 using Domain.Events.Shared.Organizations;
+using Domain.Events.Shared.Subscriptions;
 using Domain.Interfaces.Entities;
 using EndUsersApplication;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Interfaces;
+using Created = Domain.Events.Shared.Organizations.Created;
+using Deleted = Domain.Events.Shared.Organizations.Deleted;
 
 namespace EndUsersInfrastructure.Notifications;
 
-public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
+public class NotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IEndUsersApplication _endUsersApplication;
     private readonly IInvitationsApplication _invitationsApplication;
 
-    public OrganizationNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public NotificationConsumer(ICallerContextFactory callerContextFactory,
         IEndUsersApplication endUsersApplication, IInvitationsApplication invitationsApplication)
     {
         _callerContextFactory = callerContextFactory;
@@ -48,6 +51,14 @@ public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
             case RoleUnassigned unassigned:
                 return await _endUsersApplication.HandleOrganizationRoleUnassignedAsync(
                     _callerContextFactory.Create(), unassigned, cancellationToken);
+
+            case SubscriptionPlanChanged changed:
+                return await _endUsersApplication.HandleSubscriptionPlanChangedAsync(
+                    _callerContextFactory.Create(), changed, cancellationToken);
+
+            case SubscriptionTransferred transferred:
+                return await _endUsersApplication.HandleSubscriptionTransferredAsync(
+                    _callerContextFactory.Create(), transferred, cancellationToken);
 
             default:
                 return Result.Ok;

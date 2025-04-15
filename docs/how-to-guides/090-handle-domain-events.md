@@ -8,15 +8,17 @@ e.g. When a user deletes a specific image, and that image is being used as the a
 
 ## What is the mechanism?
 
-Every subdomain that changes state, creates domain events as a handy side effect.
+Every subdomain that changes state, creates domain events, and publishes them as a side effect.
 
-Assuming that the subdomain of interest persists its state in some `IApplicationRepository`, it will also emit domain events whenever the state is persisted.
+Assuming that the subdomain of interest persists its state in some `IApplicationRepository`, it will also emit domain events whenever the state is persisted. This is built into both the `EventSourcingDddCommandStore<TAggregateRoot>` and `SnapshottingDddCommandStore<TAggregateRoot>` classes.
 
-Those domain events can be subscribed to, either in-process (as "domain events"), or out-of-process (as "integration events").
+These domain events can be subscribed to, either in-process (as "domain events"), or out-of-process (as "integration events").
 
-Any other subdomain can register a "notification consumer": to capture those events and process them, any way they see fit.
+Any other subdomain can register a "notification consumer" to capture those events, and process them, any way they see fit.
 
-See [Eventing](/design-principles/0170-eventing.md) for more details on how that Notifications mechanism works
+See [Eventing](/design-principles/0170-eventing.md) for more details on how that Notifications mechanism works.
+
+> Warning: a single subdomain can register one consumer, but must not register more than one consumer, since it will likely process events in parallel and cause concurrency issues, between the same instances of the same aggregate. 
 
 ## Where to start?
 
@@ -26,7 +28,9 @@ This is where you will wire up the pub/sub mechanism (if it not already wired-up
 
 ### Configure the Notifier
 
-Start on the notifier side, in the subdomain where the events of interest are generated.
+Start on the notifier side. This is the subdomain where the events of interest are generated and published.
+
+> a.k.a., the producer
 
 In `SubdomainInfrastructure` project, in the `Notifications` folder, create a new class derived from `IEventNotificationRegistration`.
 
@@ -80,7 +84,9 @@ For example, in [OrganizationsModule.cs](https://github.com/jezzsantos/saastack/
 
 ## Configure the Consumer
 
-Now that we have set up the notifier to publish any produced domain events, we now need to set up a consumer in the subdomain where you want to receive the events.
+Now that we have set up the notifier in the source subdomain to publish any produced domain events, we now need to set up a consumer in the target subdomain where you want to receive the events.
+
+> a.k.a., the consumer
 
 In `SubdomainInfrastructure` project, in the `Notifications` folder, create a new class derived from `IDomainEventNotificationConsumer`.
 
@@ -88,16 +94,16 @@ In `SubdomainInfrastructure` project, in the `Notifications` folder, create a ne
 
 Register a new `IDomainEventNotificationConsumer` and define the domain events that you wish to handle.
 
-For example, [OrganizationNotificationConsumer.cs](https://github.com/jezzsantos/saastack/blob/main/src/EndUsersInfrastructure/Notifications/OrganizationNotificationConsumer.cs) that handles
+For example, [NotificationConsumer.cs](https://github.com/jezzsantos/saastack/blob/main/src/EndUsersInfrastructure/Notifications/NotificationConsumer.cs) that handles all events of interest to the `EndUsers` subdomain.
 
 ```c#
-public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
+public class NotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IEndUsersApplication _endUsersApplication;
     private readonly IInvitationsApplication _invitationsApplication;
 
-    public EndUserNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public NotificationConsumer(ICallerContextFactory callerContextFactory,
         IEndUsersApplication endUsersApplication, IInvitationsApplication invitationsApplication)
     {
         _callerContextFactory = callerContextFactory;
@@ -118,7 +124,9 @@ public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
 }
 ```
 
-> Note: that you can in fact handle domain events from multiple other subdomains in the same consumer, or you can create and register separate `IDomainEventNotificationConsumer` classes, and for clarity, segregate the different domain event sources.
+> Note: that you MUST handle all domain events in this single consumer class. If you are handling events from multiple source subdomains, they are all handled by this single consumer class.
+>
+> You must avoid creating multiple consumer classes, because this may lead to concurrency issues (due to race conditions, due to parallel processing) as these two consumer classes may end up competing to work with, or update the same aggregate instance.
 >
 > Note: the injection of the `ICallerContextFactory` and the `IEndUsersApplication` application port.
 
@@ -133,7 +141,7 @@ Register your `IDomainEventNotificationConsumer`.
 ```c#
             services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new OrganizationNotificationConsumer(
+                        new NotificationConsumer(
                             c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IEndUsersApplication>(),
                             c.GetRequiredService<IInvitationsApplication>()));
@@ -145,7 +153,7 @@ The final step is to handle the domain events, as they are raised.
 
 In your `IDomainEventNotificationConsumer`, you simply now add a `swtch` `case` statement for the event of interest.
 
-For example, [OrganizationNotificationConsumer.cs](https://github.com/jezzsantos/saastack/blob/main/src/EndUsersInfrastructure/Notifications/OrganizationNotificationConsumercs)
+For example, [NotificationConsumer.cs](https://github.com/jezzsantos/saastack/blob/main/src/EndUsersInfrastructure/Notifications/NotificationConsumercs)
 
 ```c#
         switch (domainEvent)
