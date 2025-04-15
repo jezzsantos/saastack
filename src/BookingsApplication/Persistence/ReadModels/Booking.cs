@@ -5,7 +5,7 @@ using QueryAny;
 namespace BookingsApplication.Persistence.ReadModels;
 
 [EntityName("Booking")]
-public class Booking : ReadModelEntity
+public class Booking : SnapshottedReadModelEntity
 {
     public Optional<string> BorrowerId { get; set; }
 

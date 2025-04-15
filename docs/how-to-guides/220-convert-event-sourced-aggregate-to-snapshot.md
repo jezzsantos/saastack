@@ -24,12 +24,12 @@ You may or may not require changes to data store schemas, and existing data prod
 Consider your existing read models that are produced by projections from your current \[event-sourced\] aggregate.
 
 Constraints:
-* You will only be allowed to keep one of the read models that your aggregate currently produces moving forward. This will become your read/write model, as is common with snapshot aggregates.
-* You will need to upgrade your chosen read model to include any missing data fields/columns that are needed by your current aggregate to represent its current state in memory. This may or may not be a trivial task, depending on the complexity of your aggregate and the number of events that it has produced in its lifetime.
+* You will only be allowed to keep one of the read models that your aggregate currently produces, moving forward. This will become your read/write model, as is the norm for snapshot aggregates. (but is not how event-sourced aggregates work).
+* You will need to upgrade your chosen 'primary' read model to include any missing data fields/columns that are needed by your current aggregate to represent its current state in memory. This may or may not be a trivial task, depending on the complexity of your aggregate and the number of events that it has produced in its lifetime.
 
 > You must consider the impact of any changes to the read model for existing users of your software, to ensure an easy transition over when the new version of this software is released to your customers.
 
-Secondly, you will be changing both the aggregate root class, and the repository that is used to persist the aggregate.
+Secondly, you will be changing both the aggregate root class, the repository that is used to persist the aggregate, and the primary read model classes.
 
 ### Upgrading the aggregate root class
 
@@ -134,9 +134,22 @@ We need to switch from using `IEventSourcingDddCommandStore<TAggregateRoot>` to 
 
 7. Lastly, you can delete any other read-model classes that should now be unreferenced by any projections, and you can delete the now unused `MyAggregateProjection` class as well.
 
-### Other deployment issues
+### Upgrading the read model
 
-Finally, you may have had to change the definition of your tables/containers in your `IDataStore`, for example, if you use a relational database, like Microsoft SQLServer or Postgres.
+You need to upgrade the primary read model of your aggregate. This is the read model you will use in all queries for all aggregates.
+
+Instead of deriving from `ReadModelEntity` your read model class should be derived from `SnapshottedReadModelEntity`.
+
+This adds two new fields to the read model:
+
+```c#
+    Optional<DateTime> CreatedAtUtc { get; set;}
+    Optional<DateTime> LastModifiedAtUtc { get; set; }
+```
+
+### Upgrading deployments
+
+Finally, you may have to change the schema definition of your tables/containers in your `IDataStore`, for example, if you use a relational database, like Microsoft SQLServer or Postgres, you need to change the schema of the table containing your new aggregate.
 
 If this is the case, and you have schema for that `IDataStore` then update the files for that data store.
 
@@ -147,4 +160,4 @@ Aggregates that change from event-sourcing to snapshotting require 2 new columns
   [LastModifiedAtUtc]     [datetime]       NULL,
 ```
 
-> Lastly, if you are using Microsoft SQL Server, you will need to move the definition of the old read model from one file (e.g., from: `AzureSQLServer-Seed-Eventing-Generic.sql`) to another file (e.g., to: `AzureSQLServer-Seed-Snapshotting-Generic.sql`). 
+> Lastly, if you are using Microsoft SQL Server, you will need to move the seed definition of the old read model from one file (e.g., from: `AzureSQLServer-Seed-Eventing-Generic.sql`) to the other file (e.g., to: `AzureSQLServer-Seed-Snapshotting-Generic.sql`). 

@@ -6,7 +6,7 @@ using QueryAny;
 namespace IdentityApplication.Persistence.ReadModels;
 
 [EntityName("ProviderAuthTokens")]
-public class ProviderAuthTokens : ReadModelEntity
+public class ProviderAuthTokens : SnapshottedReadModelEntity
 {
     public Optional<string> ProviderName { get; set; }
 
