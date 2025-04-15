@@ -53,6 +53,14 @@ using Infrastructure.External.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+#elif HOSTEDONPREMISES
+using Infrastructure.External.Persistence.OnPremises.ApplicationServices;
+
+// using Common.Recording;
+// using Infrastructure.Common.Recording;
+// using Serilog;
+// using Serilog.Sinks.Grafana.Loki;
+// using Prometheus;
 #endif
 #endif
 
@@ -133,6 +141,8 @@ public static class HostExtensions
             appBuilder.Configuration.AddJsonFile("appsettings.Azure.json", true);
 #elif HOSTEDONAWS
             appBuilder.Configuration.AddJsonFile("appsettings.AWS.json", true);
+#elif HOSTEDONPREMISES
+            appBuilder.Configuration.AddJsonFile("appsettings.OnPremises.json", true);
 #endif
             appBuilder.Configuration.AddJsonFile("appsettings.local.json", true);
 
@@ -549,6 +559,56 @@ public static class HostExtensions
             {
                 services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, IMessageBusStore, NoOpStore>(_ =>
                     NoOpStore.Instance);
+            }
+#elif HOSTEDONPREMISES
+            // EXTEND: Add your production stores here
+            services.AddForPlatform<IDataStore, IEventStore, SqlServerStore>(c =>
+                SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                    SqlServerStoreOptions.Credentials(c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IBlobStore>(c =>
+                SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                    SqlServerStoreOptions.Credentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IQueueStore>(c =>
+                RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                    RabbitMqStoreOptions.FromCredentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+            services.AddForPlatform<IMessageBusStore>(c =>
+                RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                    RabbitMqStoreOptions.FromCredentials(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+
+            if (isMultiTenanted)
+            {
+                services.AddPerHttpRequest<IDataStore, IEventStore, SqlServerStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IBlobStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IQueueStore>(c =>
+                    RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddPerHttpRequest<IMessageBusStore>(c =>
+                    RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+            }
+            else
+            {
+                services.AddSingleton<IDataStore, IEventStore, SqlServerStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(
+                            c.GetRequiredServiceForPlatform<IConfigurationSettings>())));
+                services.AddSingleton<IBlobStore>(c =>
+                    SqlServerStore.Create(c.GetRequiredService<IRecorder>(),
+                        SqlServerStoreOptions.Credentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddSingleton<IQueueStore>(c =>
+                    RabbitMqQueueStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
+                services.AddSingleton<IMessageBusStore>(c =>
+                    RabbitMqMessageBusStore.Create(c.GetRequiredService<IRecorder>(),
+                        RabbitMqStoreOptions.FromCredentials(c.GetRequiredService<IConfigurationSettings>())));
             }
 #endif
 #endif
