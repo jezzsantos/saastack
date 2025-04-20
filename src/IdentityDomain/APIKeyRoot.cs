@@ -188,6 +188,13 @@ public sealed class APIKeyRoot : AggregateRootBase
             }
         }
 
+        var nothingHasChanged = description.ToOptional() == Description
+                                && expiresOn.ToOptional() == ExpiresOn;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged(Id, description, expiresOn));
     }
 

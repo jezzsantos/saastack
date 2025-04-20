@@ -95,7 +95,83 @@ This means, in practice, that a new method on the aggregate is created to manage
 
 This single method would normally represent a whole self-contained use case; sometimes, it represents a smaller component part of one or more larger use cases.
 
-#### Raising the event
+![Use case](../images/Usecase.png)
+
+#### Preconditions to validate
+
+Every method of the aggregate can be thought of as a use case. Or for some, a "command". 
+
+> The method (use case) should only come into existence if there is actually a use of it in the software.
+
+All use cases MUST validate the incoming data against the current state of the aggregate (and all its entities and value objects). This is performed by pre-condition statements or validations, a.k.a., business rules, that MUST be applied before raising any event.
+
+> Remember that no aggregate can exist in an invalid state. Validation rules must be applied before events are raised, and your use case method is the place to do that. 
+
+For example, in this use case, we must ensure that the given reservation has dates that make sense to the system being built.
+
+```c#
+    public Result<Error> MakeReservation(Identifier borrowerId, DateTime start, DateTime end)
+    {
+        if (!CarId.HasValue)
+        {
+            return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
+        }
+
+        if (end.IsInvalidParameter(e => e > start, nameof(end), Resources.BookingRoot_EndBeforeStart, out var error1))
+        {
+            return error1;
+        }
+
+        if (end.IsInvalidParameter(e => e.Subtract(start).Duration() >= Validations.Booking.MinimumBookingDuration,
+                nameof(end), Resources.BookingRoot_BookingDurationTooShort, out var error3))
+        {
+            return error3;
+        }
+
+        if (end.IsInvalidParameter(e => e.Subtract(start).Duration() <= Validations.Booking.MaximumBookingDuration,
+                nameof(end), Resources.BookingRoot_BookingDurationTooLong, out var error4))
+        {
+            return error4;
+        }
+
+        var nothingHasChanged = borrowerId == BorrowerId
+                                && start == Start
+                                && end == End;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            BookingsDomain.Events.ReservationMade(Id, OrganizationId, borrowerId, start, end));
+    }
+```
+
+#### Avoid raising duplicate events
+
+Raising events is expensive with respect to the fact that it takes time and resources to persist changed state (and risks concurrency issues), and are then propagated across the architecture as messages that can be handed by other consuming components.
+
+To raise events that do not change the state of the aggregate is inefficient, and should be avoided. These repeat or duplicate events are unnecessary for the software to work well, and only have negative consequences.
+
+> This is not about "idempotency", that is a different issue. This is about efficiency and redundancy, and duplicate events can possibly make event streams unnecessarily long and cumbersome. 
+
+For example, as you can see in the above use case, we have a statement like this to ensure that no duplicate event is raised, should it not change the state of the aggregate at all.
+
+```c#
+        ...preconditions
+
+		var nothingHasChanged = borrowerId == BorrowerId
+                                && start == Start
+                                && end == End;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
+		...raise the event
+```
+
+#### Raising the change event
 
 Create a new method on the aggregate, for example: `SetManufacturer()` in the `CarRoot`:
 

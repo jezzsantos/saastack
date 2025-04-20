@@ -265,7 +265,8 @@ public sealed class UserProfileRoot : AggregateRootBase
 
     public Result<Error> ChangeDefaultOrganization(Identifier modifierId, Identifier organizationId)
     {
-        if (DefaultOrganizationId.HasValue && DefaultOrganizationId.Value == organizationId)
+        var nothingHasChanged = organizationId.ToOptional() == DefaultOrganizationId;
+        if (nothingHasChanged)
         {
             return Result.Ok;
         }
@@ -281,6 +282,12 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
+        var nothingHasChanged = displayName.ToOptional() == DisplayName;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(UserProfilesDomain.Events.DisplayNameChanged(Id, UserId, displayName));
     }
 
@@ -289,6 +296,12 @@ public sealed class UserProfileRoot : AggregateRootBase
         if (IsNotOwner(modifierId))
         {
             return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
+        }
+
+        var nothingHasChanged = name.ToOptional() == Name;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.NameChanged(Id, UserId, name));
@@ -304,6 +317,12 @@ public sealed class UserProfileRoot : AggregateRootBase
         if (Type != ProfileType.Person)
         {
             return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
+        }
+
+        var nothingHasChanged = number.ToOptional() == PhoneNumber;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
@@ -364,6 +383,12 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
+        var nothingHasChanged = address == Address;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(UserProfilesDomain.Events.ContactAddressChanged(Id, UserId, address));
     }
 
@@ -379,6 +404,12 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
         }
 
+        var nothingHasChanged = emailAddress == EmailAddress;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(UserProfilesDomain.Events.EmailAddressChanged(Id, UserId, emailAddress));
     }
 
@@ -387,6 +418,12 @@ public sealed class UserProfileRoot : AggregateRootBase
         if (IsNotOwner(modifierId))
         {
             return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
+        }
+
+        var nothingHasChanged = timezone == Timezone;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged(Id, UserId, timezone));

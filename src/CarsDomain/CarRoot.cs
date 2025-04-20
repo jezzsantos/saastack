@@ -181,6 +181,12 @@ public sealed class CarRoot : AggregateRootBase
 
     public Result<Error> ChangeRegistration(LicensePlate plate)
     {
+        var nothingHasChanged = plate == License;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+        
         return RaiseChangeEvent(CarsDomain.Events.RegistrationChanged(Id, OrganizationId, plate));
     }
 
@@ -279,6 +285,12 @@ public sealed class CarRoot : AggregateRootBase
 
     public Result<Error> SetOwnership(VehicleOwner owner)
     {
+        var nothingHasChanged = owner == Owner;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+        
         return RaiseChangeEvent(CarsDomain.Events.OwnershipChanged(Id, OrganizationId, owner));
     }
 

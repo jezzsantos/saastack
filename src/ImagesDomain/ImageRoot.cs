@@ -126,6 +126,13 @@ public sealed class ImageRoot : AggregateRootBase
             }
         }
 
+        var nothingHasChanged = filename.ToOptional() == Filename
+                                && description.ToOptional() == Description;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(
             ImagesDomain.Events.DetailsChanged(Id, description ?? Description, filename ?? Filename));
     }
@@ -142,6 +149,12 @@ public sealed class ImageRoot : AggregateRootBase
 
     public Result<Error> SetAttributes(long imageSize)
     {
+        var nothingHasChanged = imageSize == Size;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+        
         if (imageSize.IsInvalidParameter(s => s < Validations.Images.MaxSizeInBytes, nameof(imageSize),
                 Resources.ImageRoot_ImageSizeExceeded.Format(imageSize), out var error2))
         {

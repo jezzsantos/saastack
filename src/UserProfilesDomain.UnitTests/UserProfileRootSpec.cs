@@ -119,12 +119,12 @@ public class UserProfileRootSpec
     [Fact]
     public void WhenSetTimezone_ThenSets()
     {
-        var timezone = Timezone.Create(Timezones.Default).Value;
+        var timezone = Timezone.Create(Timezones.NewZealand).Value;
 
         var result = _profile.SetTimezone("auserid".ToId(), timezone);
 
         result.Should().BeSuccess();
-        _profile.Address.CountryCode.Should().Be(CountryCodes.Default);
+        _profile.Timezone.Code.Should().Be(Timezones.NewZealand);
         _profile.Events.Last().Should().BeOfType<TimezoneChanged>();
     }
 

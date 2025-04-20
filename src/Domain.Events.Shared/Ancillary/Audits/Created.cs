@@ -24,6 +24,4 @@ public sealed class Created : DomainEvent
     public string? OrganizationId { get; set; }
 
     public required List<string> TemplateArguments { get; set; }
-
-    public required DateTime When { get; set; }
 }

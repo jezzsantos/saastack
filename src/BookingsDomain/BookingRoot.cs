@@ -159,6 +159,12 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> ChangeCar(Identifier carId)
     {
+        var nothingHasChanged = carId == CarId;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(BookingsDomain.Events.CarChanged(Id, OrganizationId, carId));
     }
 
@@ -184,6 +190,14 @@ public sealed class BookingRoot : AggregateRootBase
                 nameof(end), Resources.BookingRoot_BookingDurationTooLong, out var error4))
         {
             return error4;
+        }
+
+        var nothingHasChanged = borrowerId == BorrowerId
+                                && start == Start
+                                && end == End;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
         }
 
         return RaiseChangeEvent(

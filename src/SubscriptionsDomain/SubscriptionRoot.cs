@@ -596,9 +596,8 @@ public sealed class SubscriptionRoot : AggregateRootBase
 #endif
 
     public async Task<Result<ProviderSubscription, Error>> TransferSubscriptionAsync(
-        IBillingStateInterpreter interpreter,
-        Identifier transfererId, Identifier transfereeId, CanTransferSubscriptionCheck canTransfer,
-        TransferSubscriptionAction onTransfer)
+        IBillingStateInterpreter interpreter, Identifier transfererId, Identifier transfereeId,
+        CanTransferSubscriptionCheck canTransfer, TransferSubscriptionAction onTransfer)
     {
         var verified = VerifyProviderIsSameAsInstalled(interpreter);
         if (verified.IsFailure)

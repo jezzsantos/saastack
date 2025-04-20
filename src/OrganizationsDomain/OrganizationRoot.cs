@@ -390,6 +390,12 @@ public sealed class OrganizationRoot : AggregateRootBase
             return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
         }
 
+        var nothingHasChanged = name == Name;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
         return RaiseChangeEvent(OrganizationsDomain.Events.NameChanged(Id, name));
     }
 
