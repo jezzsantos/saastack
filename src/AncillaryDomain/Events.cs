@@ -187,7 +187,6 @@ public static class Events
         {
             return new Created(id)
             {
-                When = DateTime.UtcNow,
                 OrganizationId = organizationId.HasValue
                     ? organizationId.Value.Text
                     : null,
