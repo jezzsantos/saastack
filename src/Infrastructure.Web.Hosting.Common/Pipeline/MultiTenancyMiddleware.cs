@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Application.Interfaces.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -108,7 +107,7 @@ public class MultiTenancyMiddleware
         return detectedResult.ShouldHaveTenantId && detectedResult.TenantId.ValueOrDefault.HasNoValue();
     }
 
-    private async Task<Result<string?, Error>> VerifyDefaultOrganizationIdForCallerAsync(ICallerContext caller,
+    private static async Task<Result<string?, Error>> VerifyDefaultOrganizationIdForCallerAsync(ICallerContext caller,
         IEndUsersService endUsersService, List<Membership>? memberships, CancellationToken cancellationToken)
     {
         if (!caller.IsAuthenticated)
@@ -136,7 +135,7 @@ public class MultiTenancyMiddleware
         return Error.Validation(Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
     }
 
-    private async Task<Result<Error>> VerifyCallerMembershipAsync(ICallerContext caller,
+    private static async Task<Result<Error>> VerifyCallerMembershipAsync(ICallerContext caller,
         IEndUsersService endUsersService, List<Membership>? memberships,
         string tenantId, CancellationToken cancellationToken)
     {
@@ -189,7 +188,7 @@ public class MultiTenancyMiddleware
         return Result.Ok;
     }
 
-    private async Task<Result<List<Membership>, Error>> GetMembershipsForCallerAsync(ICallerContext caller,
+    private static async Task<Result<List<Membership>, Error>> GetMembershipsForCallerAsync(ICallerContext caller,
         IEndUsersService endUsersService, CancellationToken cancellationToken)
     {
         if (!IsTenantedUser(caller))
@@ -213,8 +212,7 @@ public class MultiTenancyMiddleware
             return false;
         }
 
-        return !caller.IsServiceAccount
-               && !caller.IsOperations();
+        return !caller.IsServiceAccount;
     }
 
     private static string? GetDefaultOrganizationId(List<Membership> memberships)
