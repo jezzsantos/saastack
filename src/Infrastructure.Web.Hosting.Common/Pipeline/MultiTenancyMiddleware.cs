@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Interfaces.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -14,11 +15,13 @@ using Microsoft.AspNetCore.Http;
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
 /// <summary>
-///     Provides middleware to detect the tenant of incoming requests.
+///     This middleware is responsible for verifying that a tenant ID is set in the request context,
+///     and that the caller is a member of that specific Organization.
 ///     Detects the current tenant using the <see cref="ITenantDetective" />,
-///     and if required and missing, then extracts the "DefaultOrganizationId" from the authenticated user
-///     and sets the <see cref="ITenancyContext.Current" /> tenant.
-///     Downstream, an endpoint filter will rewrite the required, missing tenant into the request
+///     and if the request type is deemed "tenanted", but the tenant ID is missing,
+///     then this middleware extracts the "DefaultOrganizationId" from the authenticated user
+///     and sets the value or <see cref="ITenancyContext.Current" /> to that tenant.
+///     Note: Downstream, another minimal endpoint filter will rewrite the missing tenant ID into the request DTO
 /// </summary>
 public class MultiTenancyMiddleware
 {
@@ -88,11 +91,15 @@ public class MultiTenancyMiddleware
             return Result.Ok;
         }
 
-        var isMember =
-            await VerifyCallerMembershipAsync(caller, endUsersService, memberships, tenantId, cancellationToken);
-        if (isMember.IsFailure)
+        if (detectedResult.ShouldHaveTenantId
+            || !caller.IsOperations())
         {
-            return isMember.Error;
+            var verifiedMember =
+                await VerifyCallerMembershipAsync(caller, endUsersService, memberships, tenantId, cancellationToken);
+            if (verifiedMember.IsFailure)
+            {
+                return verifiedMember.Error;
+            }
         }
 
         var set = await SetTenantIdAsync(caller, _identifierFactory, tenancyContext, organizationsService, tenantId,

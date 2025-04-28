@@ -197,6 +197,7 @@ public class MultiTenancyMiddlewareSpec
         private readonly Mock<IOrganizationsService> _organizationsService;
         private readonly Mock<ITenancyContext> _tenancyContext;
         private readonly Mock<ITenantDetective> _tenantDetective;
+        private readonly Mock<ICallerContext> _caller;
 
         public GivenAnAnonymousUser()
         {
@@ -205,11 +206,13 @@ public class MultiTenancyMiddlewareSpec
                 .Returns(true);
             _tenancyContext = new Mock<ITenancyContext>();
             _callerContextFactory = new Mock<ICallerContextFactory>();
-            var caller = new Mock<ICallerContext>();
-            caller.Setup(c => c.IsAuthenticated)
+            _caller = new Mock<ICallerContext>();
+            _caller.Setup(c => c.IsAuthenticated)
                 .Returns(false);
+            _caller.Setup(cc => cc.Roles)
+                .Returns(new ICallerContext.CallerRoles());
             _callerContextFactory.Setup(ccf => ccf.Create())
-                .Returns(caller.Object);
+                .Returns(_caller.Object);
             _organizationsService = new Mock<IOrganizationsService>();
             _organizationsService.Setup(os =>
                     os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -315,7 +318,7 @@ public class MultiTenancyMiddlewareSpec
                         It.IsAny<CancellationToken>()),
                 Times.Never);
             _organizationsService.Verify(os =>
-                os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), "atenantid", It.IsAny<CancellationToken>()));
+                os.GetSettingsPrivateAsync(_caller.Object, "atenantid", It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -339,7 +342,7 @@ public class MultiTenancyMiddlewareSpec
                         It.IsAny<CancellationToken>()),
                 Times.Never);
             _organizationsService.Verify(os =>
-                os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), "atenantid", It.IsAny<CancellationToken>()));
+                os.GetSettingsPrivateAsync(_caller.Object, "atenantid", It.IsAny<CancellationToken>()));
         }
     }
 
@@ -415,9 +418,35 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
             _tenancyContext.Verify(t => t.Set(It.IsAny<string>(), It.IsAny<TenantSettings>()), Times.Never);
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
 
+        [Fact]
+        public async Task
+            WhenInvokeAndUnRequiredTenantIdButIsAnOperatorButNotAMember_ThenSetsTenantAndContinuesPipeline()
+        {
+            _tenantDetective.Setup(td =>
+                    td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new TenantDetectionResult(false, "atenantid"));
+            var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
+            _caller.Setup(cc => cc.Roles)
+                .Returns(new ICallerContext.CallerRoles([PlatformRoles.Operations], null));
+
+            await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
+
+            _tenantDetective.Verify(td =>
+                td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
+            _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()));
+            _tenancyContext.Verify(t => t.Set("atenantid", It.IsAny<TenantSettings>()));
+            _endUsersService.Verify(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+            _organizationsService.Verify(os =>
+                os.GetSettingsPrivateAsync(_caller.Object, "atenantid", It.IsAny<CancellationToken>()));
+        }
+        
         [Fact]
         public async Task WhenInvokeAndRequiredTenantIdButIsAnOperatorButNotAMember_ThenRespondsWithAProblem()
         {
@@ -475,9 +504,9 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()));
             _tenancyContext.Verify(t => t.Set("atenantid", It.IsAny<TenantSettings>()));
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
             _organizationsService.Verify(os =>
-                os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), "atenantid", It.IsAny<CancellationToken>()));
+                os.GetSettingsPrivateAsync(_caller.Object, "atenantid", It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -486,7 +515,7 @@ public class MultiTenancyMiddlewareSpec
             _tenantDetective.Setup(td =>
                     td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
                         It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new TenantDetectionResult(false, "atenantid"));
+                .ReturnsAsync(new TenantDetectionResult(true, "atenantid"));
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
             _endUsersService.Setup(eus =>
                     eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -538,7 +567,7 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
             _tenancyContext.Verify(t => t.Set(It.IsAny<string>(), It.IsAny<TenantSettings>()), Times.Never);
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -576,7 +605,7 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
             _tenancyContext.Verify(t => t.Set(It.IsAny<string>(), It.IsAny<TenantSettings>()), Times.Never);
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -617,7 +646,7 @@ public class MultiTenancyMiddlewareSpec
             _endUsersService.Verify(eus =>
                 eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", CancellationToken.None));
             _organizationsService.Verify(os =>
-                os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), "adefaultorganizationid",
+                os.GetSettingsPrivateAsync(_caller.Object, "adefaultorganizationid",
                     It.IsAny<CancellationToken>()));
         }
 
@@ -660,7 +689,7 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()));
             _tenancyContext.Verify(t => t.Set("adefaultorganizationid", It.IsAny<TenantSettings>()));
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
         
         [Fact]
@@ -682,7 +711,7 @@ public class MultiTenancyMiddlewareSpec
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
             _tenancyContext.Verify(t => t.Set(It.IsAny<string>(), It.IsAny<TenantSettings>()), Times.Never);
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid", It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -767,10 +796,9 @@ public class MultiTenancyMiddlewareSpec
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
             _tenancyContext.Verify(t => t.Set("atenantid", It.IsAny<TenantSettings>()));
             _organizationsService.Verify(os =>
-                os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), "atenantid", It.IsAny<CancellationToken>()));
+                os.GetSettingsPrivateAsync(_caller.Object, "atenantid", It.IsAny<CancellationToken>()));
             _endUsersService.Verify(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), "acallerid",
-                    It.IsAny<CancellationToken>()));
+                eus.GetMembershipsPrivateAsync(_caller.Object, "acallerid", It.IsAny<CancellationToken>()));
         }
     }
 
