@@ -7,7 +7,9 @@ using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IO;
+using RouteAttribute = Infrastructure.Web.Api.Interfaces.RouteAttribute;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 
@@ -18,7 +20,7 @@ public static class RequestExtensions
     private static readonly RecyclableMemoryStreamManager MemoryManager = new();
 
     /// <summary>
-    ///     Extracts the <see cref="RequestInfo" /> from the <see cref="RouteAttribute" /> declared on the
+    ///     Extracts the <see cref="RequestInfo" /> from the <see cref="Interfaces.RouteAttribute" /> declared on the
     ///     <see cref="request" />
     /// </summary>
     public static RequestInfo GetRequestInfo(this IWebRequest request)
@@ -148,36 +150,116 @@ public static class RequestExtensions
         return request.GetRequestInfo().Route;
     }
 
-    /// <summary>
-    ///     Creates a HMAC signature for the specified <see cref="request" />
-    /// </summary>
-    private static string CreateHMACSignature(this IWebRequest request, string secret)
+    private static string SerializeToJson(this Dictionary<string, object?> fields)
     {
-        var signer = new HMACSigner(request, secret);
+        if (fields.HasNone())
+        {
+            return EmptyRequestJson;
+        }
 
-        return signer.Sign();
+        return fields.ToJson()!;
     }
 
     /// <summary>
-    ///     Creates a HMAC signature for the specified <see cref="message" />
+    ///     Creates a HMAC signature for the specified <see cref="request" />.
+    ///     Note: We define the data to be hashed with HMAC as: {body}
+    ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
+    ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="EmptyRequestJson" />
+    /// </summary>
+    private static string CreateHMACSignature(this IWebRequest request, string secret)
+    {
+        var body = request.CanHaveBody()
+            ? GetSerializedBody(request)
+            : EmptyRequestJson;
+
+        var data = HMACSigner.SignatureEncoding.GetBytes(body);
+        var signer = new HMACSigner(data, secret);
+
+        return signer.Sign();
+
+        static string GetSerializedBody(IWebRequest webRequest)
+        {
+            var fields = GetRequestFieldsWithValues(webRequest, false);
+            var fromRouteFields = GetRouteFields(webRequest);
+            foreach (var fromRouteField in fromRouteFields)
+            {
+                if (fields.TryGetValue(fromRouteField, out var field))
+                {
+                    field.Binding = RequestFieldBinding.FromRoute;
+                }
+            }
+
+            var bodyFields = fields
+                .Where(pair => pair.Value.Binding == RequestFieldBinding.Default)
+                .Where(pair => pair.Value.Value is not null)
+                .ToDictionary(field => field.Key, field => field.Value.Value);
+            return bodyFields.SerializeToJson();
+        }
+
+        static List<string> GetRouteFields(IWebRequest webRequest)
+        {
+            var attribute = TryGetRouteFromAttribute(webRequest.GetType());
+            if (attribute.NotExists())
+            {
+                return [];
+            }
+
+            var placeholders = GetPlaceholders(attribute.RouteTemplate);
+            return placeholders
+                .Select(pair => pair.Key)
+                .ToList();
+        }
+    }
+
+    /// <summary>
+    ///     Creates a HMAC signature for the specified <see cref="message" />.
+    ///     Note: We define the data to be hashed with HMAC as: {body}
+    ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
+    ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="EmptyRequestJson" />
     /// </summary>
     private static string CreateHMACSignature(this HttpRequestMessage message, string secret)
     {
-        var bytes = new List<byte>(Encoding.UTF8.GetBytes(EmptyRequestJson));
-        if (message.Content.Exists())
-        {
-            using var stream = MemoryManager.GetStream("HMACSigner");
-            message.Content.CopyTo(stream, null, CancellationToken.None);
-            if (stream.Length > 0)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                bytes = [..stream.ToArray()];
-            }
-        }
+        var bytes = message.Method.CanHaveBody()
+            ? GetSerializedBody(message)
+            : [..HMACSigner.SignatureEncoding.GetBytes(EmptyRequestJson)];
 
-        var signer = new HMACSigner(bytes.ToArray(), secret);
+        var data = bytes.ToArray();
+        var signer = new HMACSigner(data, secret);
 
         return signer.Sign();
+
+        static List<byte> GetSerializedBody(HttpRequestMessage message)
+        {
+            var emptyBody = new List<byte>(HMACSigner.SignatureEncoding.GetBytes(EmptyRequestJson));
+            if (message.Content.NotExists())
+            {
+                return emptyBody;
+            }
+
+            using var stream = MemoryManager.GetStream("HMACSigner");
+            message.Content.CopyTo(stream, null, CancellationToken.None);
+            if (stream.Length <= 0)
+            {
+                return emptyBody;
+            }
+
+            stream.Seek(0, SeekOrigin.Begin);
+            return [..stream.ToArray()];
+        }
+    }
+
+    private static bool CanHaveBody(this IWebRequest request)
+    {
+        var attribute = request.GetType().GetCustomAttribute<RouteAttribute>();
+        if (attribute.NotExists())
+        {
+            return false;
+        }
+
+        var method = attribute.Method;
+        return method.CanHaveBody();
     }
 
     private static IWebRequest NullifyRequestFields(Dictionary<string, object?> routeParams,
@@ -235,7 +317,7 @@ public static class RequestExtensions
 
         var route = new StringBuilder();
         var positionInOriginalRoute = 0;
-        var unSubstitutedRequestFields = new Dictionary<string, (Type Type, object? Value)>(requestFields);
+        var unSubstitutedRequestFields = new Dictionary<string, RequestFieldDescriptor>(requestFields);
         var substitutedRequestFields = new Dictionary<string, object?>();
         foreach (var placeholder in placeholders)
         {
@@ -300,7 +382,7 @@ public static class RequestExtensions
     }
 
     private static StringBuilder PopulateQueryString(RouteAttribute attribute,
-        Dictionary<string, (Type Type, object? Value)> requestFields,
+        Dictionary<string, RequestFieldDescriptor> requestFields,
         StringBuilder route)
     {
         if (attribute.Method is not OperationMethod.Get and not OperationMethod.Search)
@@ -340,7 +422,7 @@ public static class RequestExtensions
         return route;
     }
 
-    private static List<string> GetValuePairs(KeyValuePair<string, (Type Type, object? Value)> requestField)
+    private static List<string> GetValuePairs(KeyValuePair<string, RequestFieldDescriptor> requestField)
     {
         var fieldValue = requestField.Value.Value;
         if (fieldValue.NotExists())
@@ -386,22 +468,51 @@ public static class RequestExtensions
     ///     We need to build a dictionary of all public properties, and their values (even if they are null or default),
     ///     where the key is always lowercase (for matching)
     /// </summary>
-    private static Dictionary<string, (Type Type, object? Value)> GetRequestFieldsWithValues(IWebRequest request)
+    private static Dictionary<string, RequestFieldDescriptor> GetRequestFieldsWithValues(IWebRequest request,
+        bool lowercaseNames = true)
     {
         return request.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .ToDictionary
             (
-                GetPropertyName,
-                propInfo => (propInfo.PropertyType, propInfo.GetValue(request, null))
-            );
+                propInfo => GetPropertyName(propInfo, lowercaseNames),
+                propInfo =>
+                {
+                    var binding = RequestFieldBinding.Default;
+                    var fromQuery = propInfo.GetCustomAttribute<FromQueryAttribute>();
+                    if (fromQuery.Exists())
+                    {
+                        binding = RequestFieldBinding.FromQuery;
+                    }
+                    else
+                    {
+                        var fromRoute = propInfo.GetCustomAttribute<FromRouteAttribute>();
+                        if (fromRoute.Exists())
+                        {
+                            binding = RequestFieldBinding.FromRoute;
+                        }
+                        else
+                        {
+                            var ignore = propInfo.GetCustomAttribute<JsonIgnoreAttribute>();
+                            if (ignore.Exists())
+                            {
+                                binding = RequestFieldBinding.Ignore;
+                            }
+                        }
+                    }
 
-        static string GetPropertyName(PropertyInfo propInfo)
+                    return new RequestFieldDescriptor(propInfo.PropertyType, propInfo.GetValue(request, null),
+                        binding);
+                });
+
+        static string GetPropertyName(PropertyInfo propInfo, bool lowercaseNames)
         {
             var jsonPropertyName = propInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
             return jsonPropertyName.Exists()
                 ? jsonPropertyName.Name
-                : propInfo.Name.ToLowerInvariant();
+                : lowercaseNames
+                    ? propInfo.Name.ToLowerInvariant()
+                    : propInfo.Name;
         }
     }
 
@@ -417,5 +528,18 @@ public static class RequestExtensions
                 propInfo => propInfo.Name,
                 propInfo => propInfo.PropertyType
             );
+    }
+
+    private record RequestFieldDescriptor(Type Type, object? Value, RequestFieldBinding Binding)
+    {
+        public RequestFieldBinding Binding { get; set; } = Binding;
+    }
+
+    private enum RequestFieldBinding
+    {
+        Default = 0, //Noting defined
+        Ignore = 1, //Explicitly marked as [JsonIgnore]
+        FromQuery = 2, //Explicitly marked as [FromQuery]
+        FromRoute = 3 //Explicitly marked as [FromRoute]
     }
 }

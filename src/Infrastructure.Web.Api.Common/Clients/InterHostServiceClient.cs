@@ -35,19 +35,19 @@ public sealed class InterHostServiceClient : ApiServiceClient
         client.SetBaseUrl(BaseUrl);
         if (inboundRequestFilter.Exists())
         {
-            modifiedRequestFilter = req =>
+            modifiedRequestFilter = msg =>
             {
-                inboundRequestFilter(req);
-                AddCorrelationId(req, context);
-                AddCallerAuthorization(req, context, _privateInterHostSecret);
+                inboundRequestFilter(msg);
+                AddCorrelationId(msg, context);
+                AddCallerAuthorization(msg, context, _privateInterHostSecret);
             };
         }
         else
         {
-            modifiedRequestFilter = req =>
+            modifiedRequestFilter = msg =>
             {
-                AddCorrelationId(req, context);
-                AddCallerAuthorization(req, context, _privateInterHostSecret);
+                AddCorrelationId(msg, context);
+                AddCallerAuthorization(msg, context, _privateInterHostSecret);
             };
         }
 
@@ -62,7 +62,7 @@ public sealed class InterHostServiceClient : ApiServiceClient
         }
     }
 
-    private void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
+    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
         string privateInterHostSecret)
     {
         if (context.Exists())
@@ -71,7 +71,7 @@ public sealed class InterHostServiceClient : ApiServiceClient
         }
     }
 
-    internal void SetAuthorization(HttpRequestMessage message, ICallerContext caller,
+    internal static void SetAuthorization(HttpRequestMessage message, ICallerContext caller,
         string privateInterHostSecret)
     {
         var authorization = caller.Authorization;

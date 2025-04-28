@@ -1,9 +1,12 @@
+using System.Text.Json.Serialization;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using RouteAttribute = Infrastructure.Web.Api.Interfaces.RouteAttribute;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -13,28 +16,103 @@ namespace Infrastructure.Web.Api.Common.UnitTests.Extensions;
 [Trait("Category", "Unit")]
 public class RequestExtensionsSpec
 {
+    private const string EmptyRequestSignature =
+        "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653";
+
     [Fact]
-    public void WhenSetHmacAuthWithEmptyRequest_ThenSetsSignatureHeader()
+    public void WhenSetHMACAuthWithEmptyPostRequest_ThenSetsSignatureHeader()
     {
-        var request = new TestEmptyRequest();
+        var request = new TestEmptyPostRequest();
         var message = new HttpRequestMessage();
 
         message.SetHMACAuth(request, "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
-            hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+            hdr == EmptyRequestSignature);
     }
 
     [Fact]
-    public void WhenSetHmacAuthWithPopulatedRequest_ThenSetsSignatureHeader()
+    public void WhenSetHMACAuthWithEmptyPutPatchRequest_ThenSetsSignatureHeader()
     {
-        var request = new TestPopulatedRequest();
+        var request = new TestEmptyPutPatchRequest();
         var message = new HttpRequestMessage();
 
         message.SetHMACAuth(request, "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
-            hdr == "sha256=efab63816eb3c3ab799dfd64e717865116f7aa1547177293ec6598fe3cc8e3de");
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithEmptyGetRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestEmptyGetRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithEmptyDeleteRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestEmptyDeleteRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithPopulatedPostRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestPopulatedPostRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=39c08f3c039a00cbe36df51b325b058daef9ce54bc9a1b21eba71c048ca68c6c");
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithPopulatedPutPatchRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestPopulatedPutPatchRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=39c08f3c039a00cbe36df51b325b058daef9ce54bc9a1b21eba71c048ca68c6c");
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithPopulatedGetRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestPopulatedGetRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetHMACAuthWithPopulatedDeleteRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestPopulatedDeleteRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
     }
 
     [Fact]
@@ -381,6 +459,141 @@ public class RequestExtensionsSpec
         result[nameof(HasPlaceholdersPostRequest.AStringProperty2)].Should().Be(typeof(string));
     }
 
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithEmptyPostRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            Content = null
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithEmptyPutPatchRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            Content = null
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithEmptyGetRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            Content = null
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithEmptyDeleteRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            Content = null
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithPopulatedPostRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            Content = new StringContent("""
+                                        {
+                                          "ABodyProperty": "abodyvalue"
+                                        }
+                                        """)
+        };
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=39c08f3c039a00cbe36df51b325b058daef9ce54bc9a1b21eba71c048ca68c6c");
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithPopulatedPutPatchRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            Content = new StringContent("""
+                                        {
+                                          "ABodyProperty": "abodyvalue"
+                                        }
+                                        """)
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=39c08f3c039a00cbe36df51b325b058daef9ce54bc9a1b21eba71c048ca68c6c");
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithPopulatedGetRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            Content = new StringContent("""
+                                        {
+                                          "abodyproperty": "abodyvalue"
+                                        }
+                                        """)
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
+    public void WhenSetPrivateInterHostAuthWithPopulatedDeleteRequest_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            Content = new StringContent("""
+                                        {
+                                          "abodyproperty": "abodyvalue"
+                                        }
+                                        """)
+        };
+
+        message.SetPrivateInterHostAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
     private class NoRouteRequest : IWebRequest<TestResponse>;
 
     [Route("/aroute/{unknown}", OperationMethod.Get)]
@@ -468,10 +681,55 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    private class TestPopulatedRequest : IWebRequest
+    [Route("/aroute/{APathProperty}", OperationMethod.Post)]
+    private class TestPopulatedPostRequest : IWebRequest
     {
-        public string AProperty => "avalue";
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        public string APathProperty { get; set; } = "apathvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
     }
 
-    private class TestEmptyRequest : IWebRequest;
+    [Route("/aroute/{APathProperty}", OperationMethod.PutPatch)]
+    private class TestPopulatedPutPatchRequest : IWebRequest
+    {
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        public string APathProperty { get; set; } = "apathvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute/{APathProperty}", OperationMethod.Get)]
+    private class TestPopulatedGetRequest : IWebRequest
+    {
+        public string APathProperty { get; set; } = "apathvalue";
+
+        public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute/{APathProperty}", OperationMethod.Delete)]
+    private class TestPopulatedDeleteRequest : IWebRequest
+    {
+        public string APathProperty { get; set; } = "apathvalue";
+
+        public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute", OperationMethod.Post)]
+    private class TestEmptyPostRequest : IWebRequest;
+
+    [Route("/aroute", OperationMethod.PutPatch)]
+    private class TestEmptyPutPatchRequest : IWebRequest;
+
+    [Route("/aroute", OperationMethod.Get)]
+    private class TestEmptyGetRequest : IWebRequest;
+
+    [Route("/aroute", OperationMethod.Delete)]
+    private class TestEmptyDeleteRequest : IWebRequest;
 }

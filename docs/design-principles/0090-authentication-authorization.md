@@ -612,13 +612,15 @@ There are two reasons that this step is performed in the backend API (in the `Id
 
 HMAC authentication is a legacy hybrid, authentication authorization system. HMAC authentication and authorization is performed as a single interaction between client and the API, by the `HMACAuthenticationHandler`
 
-HMAC authentication is primarily used by trusted external services within the infrastructure of the architecture. (i.e. Azure Functions/AWS Lambdas).
+HMAC authentication is primarily used by trusted external services within the infrastructure of the architecture. (i.e. Azure Functions/AWS Lambdas), that share a secret. In this case its using a symmetrical encryption algorithm (e.g. HMAC-SHA256) to sign the body of the request.
 
-HMAC authentication is performed by the client signing the body of an inbound HTTP request with a signing key (that the client knows). The signature that is calculated is then send with the request in a `X-Hub-Signature` header in the HTTP request.
+HMAC authentication is performed by the client signing the body of an inbound HTTP request with a signing key (that the client and server both knows). The signature that is calculated is then send with the request in a `X-HMAC-Signature` header in the HTTP request.
+
+> POST and PUT/PATCH requests sign the JSON contents of the body of the request, whereas GET,SEARCH and DELETE only sign the empty JSON body of `{}`.
 
 When the request is received the signature is compared against the calculated signature of the request body (using a signing key that the server knows). If the signatures match it confirms the signature was created with the correct signing key, and thus proves that the sender is to be trusted.
 
-> The signing keys are typically symmetrical keys, but can be asymmetrical also
+> The signing keys used at present are symmetrical keys, but this can be upgraded to be asymmetrical also.
 
 When the signature check is confirmed, the API then assigns claims to the HTTP request, identifying the caller as a limited service account, and authorization checks are then performed for that service account.
 

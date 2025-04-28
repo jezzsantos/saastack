@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -24,64 +23,35 @@ public class HMACSignerSpec
         [Fact]
         public void WhenConstructedWithEmptySecret_ThenThrows()
         {
-            FluentActions.Invoking(() => new HMACSigner(new TestHmacRequest(), string.Empty))
+            FluentActions.Invoking(() => new HMACSigner("avalue", string.Empty))
                 .Should().Throw<ArgumentException>();
         }
 
         [Fact]
-        public void WhenSignAndRequestIsHollow_ThenReturnsSignature()
+        public void WhenSignAndEmptyData_ThenReturnsSignature()
         {
-            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner(string.Empty, "asecret");
 
             var result = signer.Sign();
 
-            result.Should().Be("sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+            result.Should().Be("sha256=a0619224b43c173b0bb02e163534fccf7e16060e2347a0e514416451a0923cdb");
         }
 
         [Fact]
-        public void WhenSignAndJsonIsEmpty_ThenReturnsSignature()
+        public void WhenSignAndHasData_ThenReturnsSignature()
         {
-            var signer = new HMACSigner("{}", "asecret");
+            var signer = new HMACSigner("avalue", "asecret");
 
             var result = signer.Sign();
 
-            result.Should().Be("sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+            result.Should().Be("sha256=2254d39b44e099ef8e4c2d732fe1980ca9b2ca2bbd5c02233b67019401979c99");
         }
 
         [Fact]
-        public void WhenSignAndJsonIsHollow_ThenReturnsSignature()
+        public void WhenSignAndDataIsSame_ThenReturnsSameSignatures()
         {
-            var signer = new HMACSigner("{ }", "asecret");
-
-            var result = signer.Sign();
-
-            result.Should().Be("sha256=8783b4ec700a5bd9714c5abe838923b6319eb32f59a7d02e01ecc4eca1cac02c");
-        }
-
-        [Fact]
-        public void WhenSignAndRequestIsPopulated_ThenReturnsSignature()
-        {
-            var signer = new HMACSigner(new TestHmacRequest
-            {
-                Id = "anid"
-            }, "asecret");
-
-            var result = signer.Sign();
-
-            result.Should().Be("sha256=5ac3c7a7378d5f293359720f1bf64cfcbfbf672b61640121a11526638a57a2c5");
-        }
-
-        [Fact]
-        public void WhenSignAndRequestsAreSame_ThenReturnsSameSignatures()
-        {
-            var signer1 = new HMACSigner(new TestHmacRequest
-            {
-                Id = "anid"
-            }, "asecret");
-            var signer2 = new HMACSigner(new TestHmacRequest
-            {
-                Id = "anid"
-            }, "asecret");
+            var signer1 = new HMACSigner("avalue", "asecret");
+            var signer2 = new HMACSigner("avalue", "asecret");
 
             var result1 = signer1.Sign();
             var result2 = signer2.Sign();
@@ -90,16 +60,10 @@ public class HMACSignerSpec
         }
 
         [Fact]
-        public void WhenSignAndRequestsAreDifferent_ThenReturnsDifferentSignatures()
+        public void WhenSignAndDataIsDifferent_ThenReturnsDifferentSignatures()
         {
-            var signer1 = new HMACSigner(new TestHmacRequest
-            {
-                Id = "anid1"
-            }, "asecret");
-            var signer2 = new HMACSigner(new TestHmacRequest
-            {
-                Id = "anid2"
-            }, "asecret");
+            var signer1 = new HMACSigner("avalue1", "asecret");
+            var signer2 = new HMACSigner("avalue2", "asecret");
 
             var result1 = signer1.Sign();
             var result2 = signer2.Sign();
@@ -114,8 +78,9 @@ public class HMACSignerSpec
         [Fact]
         public void WhenVerifyWithEmptySignature_ThenThrows()
         {
-            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner("", "asecret");
             var verifier = new HMACVerifier(signer);
+
             FluentActions.Invoking(() => verifier.Verify(string.Empty))
                 .Should().Throw<ArgumentException>();
         }
@@ -123,7 +88,7 @@ public class HMACSignerSpec
         [Fact]
         public void WhenVerifyWithWrongSignature_ThenReturnsFalse()
         {
-            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner("avalue", "asecret");
             var verifier = new HMACVerifier(signer);
 
             var result = verifier.Verify("awrongsignature");
@@ -134,7 +99,7 @@ public class HMACSignerSpec
         [Fact]
         public void WhenVerifyWithCorrectSignature_ThenReturnsTrue()
         {
-            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner("avalue", "asecret");
             var signature = signer.Sign();
             var verifier = new HMACVerifier(signer);
 
@@ -143,17 +108,4 @@ public class HMACSignerSpec
             result.Should().BeTrue();
         }
     }
-
-    [Route("/aroute", OperationMethod.Get)]
-    public class TestHmacRequest : WebRequest<TestHmacRequest, TestHmacResponse>
-    {
-        public int? ANumberProperty { get; set; }
-
-        public string? AStringProperty { get; set; }
-
-        public string? Id { get; set; }
-    }
-
-    [UsedImplicitly]
-    public class TestHmacResponse : IWebResponse;
 }

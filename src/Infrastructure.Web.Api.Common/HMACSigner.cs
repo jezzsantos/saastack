@@ -1,8 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Common;
 
@@ -12,14 +10,9 @@ namespace Infrastructure.Web.Api.Common;
 public class HMACSigner
 {
     private const string SignatureFormat = @"sha256={0}";
-    private static readonly Encoding SignatureEncoding = Encoding.UTF8;
+    internal static readonly Encoding SignatureEncoding = Encoding.UTF8;
     private readonly byte[] _data;
     private readonly string _secret;
-
-    public HMACSigner(IWebRequest request, string secret) : this(GetRequestData(request), secret)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-    }
 
     public HMACSigner(string text, string secret) : this(SignatureEncoding.GetBytes(text), secret)
     {
@@ -49,12 +42,6 @@ public class HMACSigner
         var signature = SignatureFormat.Format(SignBody(_data, key));
 
         return signature;
-    }
-
-    private static byte[] GetRequestData(IWebRequest request)
-    {
-        var json = request.SerializeToJson();
-        return SignatureEncoding.GetBytes(json);
     }
 
     private static string SignBody(byte[] body, byte[] key)
