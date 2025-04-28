@@ -10,4 +10,8 @@
         <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="AsyncKeyedLock" Version="7.1.6" />
+    </ItemGroup>
+
 </Project>

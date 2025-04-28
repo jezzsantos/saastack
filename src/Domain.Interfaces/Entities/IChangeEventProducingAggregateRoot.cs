@@ -5,7 +5,7 @@ namespace Domain.Interfaces.Entities;
 /// <summary>
 ///     Defines an aggregate root that produces a stream of change events
 /// </summary>
-public interface IChangeEventProducingAggregateRoot
+public interface IChangeEventProducingAggregateRoot : IIdentifiableEntity
 {
     IReadOnlyList<IDomainEvent> Events { get; }
 
