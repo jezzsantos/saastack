@@ -438,6 +438,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunctions.Api.WorkerHo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSLambdas.Api.WorkerHost.UnitTests", "AWSLambdas.Api.WorkerHost.UnitTests\AWSLambdas.Api.WorkerHost.UnitTests.csproj", "{CB4547D3-020F-419D-B205-F93A7EE7D45F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.External.Persistence.OnPremises", "Infrastructure.External.Persistence.OnPremises\Infrastructure.External.Persistence.OnPremises.csproj", "{5DD6A75B-8681-4234-8B87-606649B48380}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnPremRelay.WorkerHost", "OnPremRelay.WorkerHost\OnPremRelay.WorkerHost.csproj", "{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1393,6 +1397,18 @@ Global
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{5DD6A75B-8681-4234-8B87-606649B48380}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -1599,5 +1615,7 @@ Global
 		{0F4E5C4D-8E37-4542-98F8-CE1B837F2EB5} = {A25A3BA8-5602-4825-9595-2CF96B166920}
 		{A1CFACAA-D10E-4B60-8DF0-D3A07063A7C4} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
+		{5DD6A75B-8681-4234-8B87-606649B48380} = {DE3384F0-BE7B-44BD-933F-40B120C6139E}
+		{005915A8-4D4B-414B-B3CE-8EBA77AACAFE} = {4B1A213C-36A7-41A7-BFC7-B3CFF5795912}
 	EndGlobalSection
 EndGlobal
