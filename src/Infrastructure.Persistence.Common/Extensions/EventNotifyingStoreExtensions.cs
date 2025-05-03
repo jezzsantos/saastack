@@ -46,7 +46,7 @@ public static class EventNotifyingStoreExtensions
         // definitely not to guard against access to any and all aggregate instances and types across the codebase
         // (since that would definitely slow down writing all aggregates events in this whole executable process,
         // and cause unacceptable performance issues).
-        var lockKey = aggregate.Id.ToString()!;
+        var lockKey = aggregate.Id.Value;
         using (await PublishingPipelineSection.LockAsync(lockKey, cancellationToken))
         {
             var saved = await onSaveEventStreamToStore(aggregate, changedEvents, cancellationToken);
