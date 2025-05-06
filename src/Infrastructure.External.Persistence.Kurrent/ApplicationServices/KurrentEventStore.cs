@@ -74,13 +74,13 @@ public class KurrentEventStore : IEventStore
             if (events.Count > 1)
             {
                 _recorder.TraceInformation(null,
-                    "Kurrent added {Count} events to stream {StreamName}, from version {FromVersion} to version {ToVersion}",
+                    "KurrentEventStore added {Count} events to stream {StreamName}, from version {FromVersion} to version {ToVersion}",
                     events.Count, streamName, firstEventVersion, lastEventVersion);
             }
             else
             {
                 _recorder.TraceInformation(null,
-                    "Kurrent added 1 event to stream {StreamName}, at version {FromVersion}", streamName,
+                    "KurrentEventStore added 1 event to stream {StreamName}, at version {FromVersion}", streamName,
                     firstEventVersion);
             }
 
@@ -89,20 +89,20 @@ public class KurrentEventStore : IEventStore
         catch (WrongExpectedVersionException ex)
         {
             var actualKurrentRevision = ex.ActualStreamRevision;
+            var storeType = GetType().Name;
 
             if (IsStreamUnexpectedlyEmpty(expectedKurrentRevision, actualKurrentRevision))
             {
-                return Error.EntityExists(
-                    Infrastructure.Persistence.Common.Resources.EventStore_ConcurrencyVerificationFailed_StreamReset
-                        .Format(streamName));
+                return Error.EntityExists(Infrastructure.Persistence.Common.Resources
+                    .EventStore_ConcurrencyVerificationFailed_StreamReset.Format(storeType, streamName));
             }
 
             if (IsStreamAlreadyUpdated(expectedKurrentRevision, actualKurrentRevision))
             {
                 return Error.EntityExists(
                     Infrastructure.Persistence.Common.Resources
-                        .EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(streamName,
-                            firstEventVersion));
+                        .EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
+                        .Format(storeType, streamName, firstEventVersion));
             }
 
             if (IsStreamMissingUpdates(expectedKurrentRevision, actualKurrentRevision))
@@ -112,8 +112,7 @@ public class KurrentEventStore : IEventStore
 
                 return Error.EntityExists(
                     Infrastructure.Persistence.Common.Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates
-                        .Format(streamName,
-                            missingFromEventVersion, missingToEventVersion));
+                        .Format(storeType, streamName, missingFromEventVersion, missingToEventVersion));
             }
 
             return ex.ToError(ErrorCode.EntityExists);
@@ -184,7 +183,7 @@ public class KurrentEventStore : IEventStore
             var firstEventVersion = events.First().Version;
             var lastEventVersion = events.Last().Version;
             _recorder.TraceInformation(null,
-                "Kurrent retrieved {Count} events from stream {StreamName}, from version {FromVersion} to version {ToVersion}",
+                "KurrentEventStore retrieved {Count} events from stream {StreamName}, from version {FromVersion} to version {ToVersion}",
                 events.Count, streamName, firstEventVersion, lastEventVersion);
 
             return events;

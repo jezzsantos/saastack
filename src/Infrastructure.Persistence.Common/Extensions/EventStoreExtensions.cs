@@ -18,8 +18,9 @@ public static class EventStoreExtensions
         {
             if (nextEventVersion != EventStream.FirstVersion)
             {
+                var storeType = eventStore.GetType().Name;
                 return Error.EntityExists(
-                    Resources.EventStore_ConcurrencyVerificationFailed_StreamReset.Format(streamName));
+                    Resources.EventStore_ConcurrencyVerificationFailed_StreamReset.Format(storeType, streamName));
             }
 
             return Result.Ok;
@@ -28,8 +29,9 @@ public static class EventStoreExtensions
         var expectedNextVersion = latestStoredEventVersion + 1;
         if (nextEventVersion > expectedNextVersion)
         {
+            var storeType = eventStore.GetType().Name;
             return Error.EntityExists(
-                Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(streamName,
+                Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(storeType, streamName,
                     expectedNextVersion, nextEventVersion));
         }
 

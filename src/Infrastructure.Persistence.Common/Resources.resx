@@ -64,13 +64,13 @@
         <value>The type {0} does not exist</value>
     </data>
     <data name="EventStore_ConcurrencyVerificationFailed_StreamReset" xml:space="preserve">
-        <value>Could not write new events to event stream: {0}, another process may have cleared the stream?</value>
+        <value>{0} could not write new events to event stream: {1}, another process may have cleared the stream?</value>
     </data>
     <data name="EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated" xml:space="preserve">
-        <value>Could not write new events to event stream: {0}, another process has updated the stream at the same time, since version {1}</value>
+        <value>{0} could not write new events to event stream: {1}, another process has updated the stream at the same time, since version {2}</value>
     </data>
     <data name="EventStore_ConcurrencyVerificationFailed_MissingUpdates" xml:space="preserve">
-        <value>Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet</value>
+        <value>{0} could not write new events to event stream: {1}, events between version {2} and version {3} have not been entered into stream yet</value>
     </data>
     <data name="EventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
         <value>Publishing of changed events for {0} failed.</value>

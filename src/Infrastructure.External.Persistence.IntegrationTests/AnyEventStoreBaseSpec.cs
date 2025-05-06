@@ -182,11 +182,12 @@ public abstract class AnyEventStoreBaseSpec
 
         var result = await Task.WhenAll(add1, add2, add3);
 
+        var storeType = _setup.Store.GetType().Name;
         result.Length.Should().Be(3);
         result.Count(x => x.IsSuccessful).Should().Be(1);
         result.Count(x => x is { IsFailure: true, Error.Code: ErrorCode.EntityExists } && x.Error.Message ==
             Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
-                .Format($"testentities_{entityId}", 1)).Should().Be(2);
+                .Format(storeType, $"testentities_{entityId}", 1)).Should().Be(2);
     }
 
     [Fact]
@@ -197,9 +198,10 @@ public abstract class AnyEventStoreBaseSpec
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
             [CreateEvent(3)], CancellationToken.None);
 
+        var storeType = _setup.Store.GetType().Name;
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStore_ConcurrencyVerificationFailed_StreamReset
-                .Format($"testentities_{entityId}"));
+                .Format(storeType, $"testentities_{entityId}"));
     }
 
     [Fact]
@@ -216,8 +218,9 @@ public abstract class AnyEventStoreBaseSpec
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
             [CreateEvent(1)], CancellationToken.None);
 
+        var storeType = _setup.Store.GetType().Name;
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(storeType,
                 $"testentities_{entityId}", 1));
     }
 
@@ -235,8 +238,9 @@ public abstract class AnyEventStoreBaseSpec
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
             [CreateEvent(10)], CancellationToken.None);
 
+        var storeType = _setup.Store.GetType().Name;
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(
+            Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(storeType,
                 $"testentities_{entityId}", 4, 10));
     }
 

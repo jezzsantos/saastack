@@ -96,7 +96,7 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet.
+        ///   Looks up a localized string similar to {0} could not write new events to event stream: {1}, events between version {2} and version {3} have not been entered into stream yet.
         /// </summary>
         internal static string EventStore_ConcurrencyVerificationFailed_MissingUpdates {
             get {
@@ -105,7 +105,7 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not write new events to event stream: {0}, another process has updated the stream at the same time, since version {1}.
+        ///   Looks up a localized string similar to {0} could not write new events to event stream: {1}, another process has updated the stream at the same time, since version {2}.
         /// </summary>
         internal static string EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated {
             get {
@@ -114,7 +114,7 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not write new events to event stream: {0}, another process may have cleared the stream?.
+        ///   Looks up a localized string similar to {0} could not write new events to event stream: {1}, another process may have cleared the stream?.
         /// </summary>
         internal static string EventStore_ConcurrencyVerificationFailed_StreamReset {
             get {

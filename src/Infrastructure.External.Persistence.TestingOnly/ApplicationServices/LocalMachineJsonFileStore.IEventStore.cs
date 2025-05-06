@@ -46,10 +46,11 @@ partial class LocalMachineJsonFileStore : IEventStore
             {
                 if (added.Error.Is(ErrorCode.EntityExists))
                 {
+                    var storeType = GetType().Name;
                     return Error.EntityExists(
                         Infrastructure.Persistence.Common.Resources
-                            .EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
-                                streamName, version));
+                            .EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated
+                            .Format(storeType, streamName, version));
                 }
 
                 return added.Error;
