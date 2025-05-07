@@ -9,6 +9,9 @@ namespace SubscriptionsApplication.Persistence;
 
 public interface ISubscriptionRepository : IApplicationRepository
 {
+    Task<Result<Optional<SubscriptionRoot>, Error>> FindByBuyerIdAsync(string buyerId,
+        CancellationToken cancellationToken);
+
     Task<Result<Optional<SubscriptionRoot>, Error>> FindByBuyerReferenceAsync(string buyerReference,
         CancellationToken cancellationToken);
 

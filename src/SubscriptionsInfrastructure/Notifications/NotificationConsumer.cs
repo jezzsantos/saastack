@@ -4,6 +4,8 @@ using Domain.Interfaces.Entities;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Interfaces;
 using SubscriptionsApplication;
+using OrganizationCreated = Domain.Events.Shared.Organizations.Created;
+using UserProfileCreated = Domain.Events.Shared.UserProfiles.Created;
 
 namespace SubscriptionsInfrastructure.Notifications;
 
@@ -23,7 +25,11 @@ public class NotificationConsumer : IDomainEventNotificationConsumer
     {
         switch (domainEvent)
         {
-            case Created created:
+            case UserProfileCreated created:
+                return await _subscriptionsApplication.HandleUserProfileCreatedAsync(_callerContextFactory.Create(),
+                    created, cancellationToken);
+
+            case OrganizationCreated created:
                 return await _subscriptionsApplication.HandleOrganizationCreatedAsync(_callerContextFactory.Create(),
                     created, cancellationToken);
 

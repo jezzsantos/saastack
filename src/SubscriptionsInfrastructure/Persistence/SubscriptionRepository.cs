@@ -36,11 +36,19 @@ public class SubscriptionRepository : ISubscriptionRepository
     }
 #endif
 
+    public async Task<Result<Optional<SubscriptionRoot>, Error>> FindByBuyerIdAsync(string buyerId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<Subscription>()
+            .Where<string>(sub => sub.BuyerId, ConditionOperator.EqualTo, buyerId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<Optional<SubscriptionRoot>, Error>> FindByBuyerReferenceAsync(string buyerReference,
         CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
-            .Where<string>(at => at.BuyerReference, ConditionOperator.EqualTo, buyerReference);
+            .Where<string>(sub => sub.BuyerReference, ConditionOperator.EqualTo, buyerReference);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
@@ -48,7 +56,7 @@ public class SubscriptionRepository : ISubscriptionRepository
         CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
-            .Where<string>(at => at.OwningEntityId, ConditionOperator.EqualTo, owningEntityId);
+            .Where<string>(sub => sub.OwningEntityId, ConditionOperator.EqualTo, owningEntityId);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
@@ -56,7 +64,7 @@ public class SubscriptionRepository : ISubscriptionRepository
         string subscriptionReference, CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
-            .Where<string>(at => at.SubscriptionReference, ConditionOperator.EqualTo, subscriptionReference);
+            .Where<string>(sub => sub.SubscriptionReference, ConditionOperator.EqualTo, subscriptionReference);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
@@ -113,12 +121,12 @@ public class SubscriptionRepository : ISubscriptionRepository
             return Optional<SubscriptionRoot>.None;
         }
 
-        var subscriptions = await _subscriptions.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (subscriptions.IsFailure)
+        var subscription = await _subscriptions.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (subscription.IsFailure)
         {
-            return subscriptions.Error;
+            return subscription.Error;
         }
 
-        return subscriptions.Value.ToOptional();
+        return subscription.Value.ToOptional();
     }
 }

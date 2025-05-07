@@ -473,17 +473,31 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
         return retrievedSubscription.Value.Value;
     }
 
-    private async Task<Result<SubscriptionBuyer, Error>> CreateBuyerAsync(ICallerContext caller, Identifier buyerId,
-        Identifier owningEntityId, CancellationToken cancellationToken)
+    private async Task<Result<Optional<SubscriptionBuyer>, Error>> CreateBuyerAsync(ICallerContext caller,
+        Identifier buyerId, Optional<Identifier> owningEntityId, CancellationToken cancellationToken)
     {
         var retrievedProfile = await _userProfilesService.GetProfilePrivateAsync(caller, buyerId, cancellationToken);
         if (retrievedProfile.IsFailure)
         {
+            if (retrievedProfile.Error.Is(ErrorCode.EntityNotFound))
+            {
+                return Optional<SubscriptionBuyer>.None;
+            }
+
             return retrievedProfile.Error;
         }
 
         var profile = retrievedProfile.Value;
-        var buyer = new SubscriptionBuyer
+        var buyer = ToSubscriptionBuyer(buyerId, owningEntityId, profile);
+
+        return buyer.ToOptional();
+    }
+
+    private static SubscriptionBuyer ToSubscriptionBuyer(Identifier buyerId,
+        Identifier owningEntityId,
+        UserProfile profile)
+    {
+        return new SubscriptionBuyer
         {
             Id = buyerId.ToString(),
             Name = profile.Name,
@@ -492,12 +506,10 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
             Address = profile.Address,
             Subscriber = new Subscriber
             {
-                EntityId = owningEntityId.ToString(),
+                EntityId = owningEntityId,
                 EntityType = nameof(Organization)
             }
         };
-
-        return buyer;
     }
 }
 

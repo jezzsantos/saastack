@@ -494,7 +494,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
 
     public Result<Error> DeleteSubscription(Identifier deleterId, Identifier owningEntityId)
     {
-        if (!IsOwningEntityId(owningEntityId))
+        if (IsOwnedBy(owningEntityId))
         {
             return Error.RuleViolation(Resources.SubscriptionRoot_DeleteSubscription_NotOwningEntityId);
         }
@@ -905,8 +905,8 @@ public sealed class SubscriptionRoot : AggregateRootBase
                || userId == CallerConstants.ExternalWebhookAccountUserId;
     }
 
-    private bool IsOwningEntityId(Identifier entityId)
+    private bool IsOwnedBy(Identifier owner)
     {
-        return OwningEntityId == entityId;
+        return OwningEntityId != owner;
     }
 }

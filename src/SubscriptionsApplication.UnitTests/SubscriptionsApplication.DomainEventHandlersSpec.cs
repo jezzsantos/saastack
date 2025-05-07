@@ -12,9 +12,11 @@ using OrganizationsDomain;
 using SubscriptionsApplication.Persistence;
 using SubscriptionsDomain;
 using UnitTesting.Common;
+using UserProfilesDomain;
 using Xunit;
-using Events = OrganizationsDomain.Events;
 using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
+using OrganizationsDomainEvents = OrganizationsDomain.Events;
+using UserProfileEvents = Domain.Events.Shared.UserProfiles;
 
 namespace SubscriptionsApplication.UnitTests;
 
@@ -59,7 +61,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleOrganizationCreatedAsync_ThenReturnsOk()
+    public async Task WhenHandleOrganizationCreatedAsyncAndProfileNotExists_ThenCreatesPartialSubscription()
     {
         _billingProvider.Setup(bp =>
                 bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
@@ -67,9 +69,155 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
         _userProfilesService.Setup(ups =>
                 ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+        _billingProvider.Setup(bp => bp.GatewayService.SubscribeAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<SubscriptionBuyer>(), It.IsAny<SubscribeOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscriptionMetadata
+            {
+                { "aname", "avalue" }
+            });
+
+        var domainEvent = OrganizationsDomainEvents.Created("anowningentityid".ToId(), OrganizationOwnership.Personal,
+            "abuyerid".ToId(), DisplayName.Create("aname").Value);
+
+        var result =
+            await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<SubscriptionRoot>(root =>
+            root.BuyerId == "abuyerid".ToId()
+            && root.OwningEntityId == "anowningentityid".ToId()
+            && root.Provider.HasValue == false
+        ), It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ps =>
+            ps.GetProfilePrivateAsync(_caller.Object, "abuyerid".ToId(), CancellationToken.None));
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetBuyerReference(It.IsAny<BillingProvider>()), Times.Never);
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetSubscriptionReference(It.IsAny<BillingProvider>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenHandleOrganizationCreatedAsyncAndProfileExists_ThenCreatesCompletedSubscription()
+    {
+        var stateInterpreter = new Mock<IBillingStateInterpreter>();
+        _billingProvider.Setup(bp =>
+                bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create(ProviderStatus.Empty).Value);
+        var subscription = SubscriptionRoot.Create(_recorder.Object, _identifierFactory.Object,
+            "anowningentityid".ToId(), "abuyerid".ToId(), stateInterpreter.Object).Value;
+        _repository.Setup(r =>
+                r.FindByOwningEntityIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subscription.ToOptional());
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserProfile
             {
                 DisplayName = "adisplayname",
+                EmailAddress = "anemailaddress",
+                PhoneNumber = "aphonenumbernumber",
+                Classification = UserProfileClassification.Person,
+                Name = new PersonName
+                {
+                    FirstName = "afirstname"
+                },
+                UserId = "abuyerid",
+                Id = "aprofileid"
+            });
+        _billingProvider.Setup(bp => bp.GatewayService.SubscribeAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<SubscriptionBuyer>(), It.IsAny<SubscribeOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscriptionMetadata
+            {
+                { "aname", "avalue" }
+            });
+
+        var domainEvent = OrganizationsDomainEvents.Created("anowningentityid".ToId(), OrganizationOwnership.Personal,
+            "abuyerid".ToId(), DisplayName.Create("aname").Value);
+
+        var result =
+            await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<SubscriptionRoot>(root =>
+            root.BuyerId == "abuyerid".ToId()
+            && root.OwningEntityId == "anowningentityid".ToId()
+            && root.Provider.Value.Name == "aprovidername"
+        ), It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ps =>
+            ps.GetProfilePrivateAsync(_caller.Object, "abuyerid".ToId(), CancellationToken.None));
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetBuyerReference(It.IsAny<BillingProvider>()));
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetSubscriptionReference(It.IsAny<BillingProvider>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleHandleUserProfileCreatedAsyncAndSubscriptionNotExists_ThenNoSubscription()
+    {
+        _billingProvider.Setup(bp =>
+                bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create(ProviderStatus.Empty).Value);
+        _repository.Setup(r =>
+                r.FindByBuyerIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<SubscriptionRoot>.None);
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                DisplayName = "adisplayname",
+                EmailAddress = "anemailaddress",
+                PhoneNumber = "aphonenumber",
+                Classification = UserProfileClassification.Person,
+                Name = new PersonName
+                {
+                    FirstName = "afirstname"
+                },
+                UserId = "auserid",
+                Id = "aprofileid"
+            });
+
+        var domainEvent = new UserProfileEvents.Created("aprofileid".ToId())
+        {
+            DisplayName = "adisplayname",
+            FirstName = "anemailaddress",
+            LastName = "aphonenumber",
+            Type = nameof(ProfileType.Person),
+            UserId = "auserid"
+        };
+
+        var result =
+            await _application.HandleUserProfileCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<SubscriptionRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _userProfilesService.Verify(
+            ps => ps.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetBuyerReference(It.IsAny<BillingProvider>()), Times.Never);
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetSubscriptionReference(It.IsAny<BillingProvider>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenHandleHandleUserProfileCreatedAsyncAndSubscriptionExists_ThenCreatesCompletedSubscription()
+    {
+        var stateInterpreter = new Mock<IBillingStateInterpreter>();
+        _billingProvider.Setup(bp =>
+                bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create(ProviderStatus.Empty).Value);
+        var subscription = SubscriptionRoot.Create(_recorder.Object, _identifierFactory.Object,
+            "anowningentityid".ToId(), "auserid".ToId(), stateInterpreter.Object).Value;
+        _repository.Setup(r =>
+                r.FindByBuyerIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subscription.ToOptional());
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                DisplayName = "adisplayname",
+                EmailAddress = "anemailaddress",
+                PhoneNumber = "aphonenumber",
                 Classification = UserProfileClassification.Person,
                 Name = new PersonName
                 {
@@ -85,16 +233,22 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
                 { "aname", "avalue" }
             });
 
-        var domainEvent = Events.Created("anorganizationid".ToId(), OrganizationOwnership.Personal, "auserid".ToId(),
-            DisplayName.Create("aname").Value);
+        var domainEvent = new UserProfileEvents.Created("aprofileid".ToId())
+        {
+            DisplayName = "adisplayname",
+            FirstName = "anemailaddress",
+            LastName = "aphonenumber",
+            Type = nameof(ProfileType.Person),
+            UserId = "auserid"
+        };
 
         var result =
-            await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+            await _application.HandleUserProfileCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
         _repository.Verify(rep => rep.SaveAsync(It.Is<SubscriptionRoot>(root =>
             root.BuyerId == "auserid".ToId()
-            && root.OwningEntityId == "anorganizationid".ToId()
+            && root.OwningEntityId == "anowningentityid".ToId()
             && root.Provider.Value.Name == "aprovidername"
         ), It.IsAny<CancellationToken>()));
         _userProfilesService.Verify(ps =>
@@ -109,7 +263,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
         var stateInterpreter = new Mock<IBillingStateInterpreter>();
         var subscription = SubscriptionRoot.Create(_recorder.Object, _identifierFactory.Object,
             "anowningentityid".ToId(), "abuyerid".ToId(), stateInterpreter.Object).Value;
-        var domainEvent = Events.Deleted("anowningentityid".ToId(), "adeleterid".ToId());
+        var domainEvent = OrganizationsDomainEvents.Deleted("anowningentityid".ToId(), "adeleterid".ToId());
         _repository.Setup(rep => rep.FindByOwningEntityIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription.ToOptional());
 
