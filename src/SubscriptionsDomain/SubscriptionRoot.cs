@@ -83,6 +83,8 @@ public sealed class SubscriptionRoot : AggregateRootBase
     /// </summary>
     public Optional<string> ProviderSubscriptionReference { get; private set; }
 
+    public bool IsCompleted => Provider.HasValue && !BuyerId.IsEmpty() && !OwningEntityId.IsEmpty();
+
     [UsedImplicitly]
     public static AggregateRootFactory<SubscriptionRoot> Rehydrate()
     {

@@ -34,22 +34,23 @@ partial class SubscriptionsApplication
     }
 
     /// <summary>
-    ///     To create a subscription in full we need both and existing organization, and an existing buyer (UserProfile).
+    ///     To create a subscription in full we need both and existing organization (OwningEntity),
+    ///     and an existing buyer (UserProfile).
     ///     The organization is created separately from the profile, and these events happen in parallel,
-    ///     and so we have to wait for both events to occur before we can complete the subscription.
+    ///     in response to other events, and so we have to wait for both events to occur before we can "complete" the
+    ///     subscription. A "complete" subscription being one that has both an OwningEntity and a Buyer and a Provider.
     ///     Thus, we have to react to either event arriving first, and then wait for the other event to arrive
     ///     to complete the process, and we have to respond differently depending on which event arrives
-    ///     first and which event arrives second.
+    ///     first and which event arrives second. They can also arrive at pretty much the same time too.
     ///     Note: If we receive the <see cref="Domain.Events.UserProfiles.Created" /> event first, we can do nothing. Since,
-    ///     Not all Users associated to a UserProfile are Buyers of Subscriptions.
-    ///     Note: If we receive the <see cref="Domain.Events.Organizations.Created" /> event first, we can create a partial
-    ///     subscription if the UserProfile does not exist yet. Or we can create the complete subscription if the UserProfile
-    ///     exists at that time.
+    ///     Not all Users associated to a newly created UserProfile are going to be Buyers of a subscription.
+    ///     Note: If we receive the <see cref="Domain.Events.Organizations.Created" /> event first, we can create a "partial"
+    ///     subscription if the UserProfile does not exist yet. Or, we can create the "complete" subscription if the
+    ///     UserProfile does exist at that time.
     ///     Note: If we receive the <see cref="Domain.Events.UserProfiles.Created" /> event second, and there is an
-    ///     associated partial subscription for this Buyer already, then we can complete the subscription.
-    ///     Otherwise, we can ignore the event.
+    ///     associated "partial" subscription for this Buyer already, then we can complete the subscription.
     ///     Note: If we receive the <see cref="Domain.Events.Organizations.Created" /> event second, and the Buyer is found,
-    ///     then we can complete the subscription.
+    ///     then we can "complete" the subscription.
     /// </summary>
     private async Task<Result<Error>> CreateSubscriptionInternalAsync(ICallerContext caller, Identifier buyerId,
         Optional<Identifier> owningEntityId, CancellationToken cancellationToken)
@@ -90,6 +91,14 @@ partial class SubscriptionsApplication
             if (retrievedSubscription.Value.HasValue)
             {
                 var subscription = retrievedSubscription.Value.Value;
+                if (subscription.IsCompleted)
+                {
+                    _recorder.TraceInformation(caller.ToCall(),
+                        "Subscription {Id} has already been completed for {BuyerId}", subscription.Id,
+                        subscription.BuyerId);
+                    return Result.Ok;
+                }
+
                 var buyer = await CreateBuyerAsync(caller, buyerId, subscription.OwningEntityId, cancellationToken);
                 if (buyer.IsFailure)
                 {

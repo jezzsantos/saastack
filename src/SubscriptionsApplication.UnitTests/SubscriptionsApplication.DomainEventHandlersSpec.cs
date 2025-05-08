@@ -150,7 +150,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleHandleUserProfileCreatedAsyncAndSubscriptionNotExists_ThenNoSubscription()
+    public async Task WhenHandleHandleUserProfileCreatedAsyncAndSubscriptionNotExists_ThenIgnores()
     {
         _billingProvider.Setup(bp =>
                 bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
@@ -199,7 +199,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleHandleUserProfileCreatedAsyncAndSubscriptionExists_ThenCreatesCompletedSubscription()
+    public async Task WhenHandleHandleUserProfileCreatedAsyncAndPartialSubscriptionExists_ThenCompletedSubscription()
     {
         var stateInterpreter = new Mock<IBillingStateInterpreter>();
         _billingProvider.Setup(bp =>
@@ -253,6 +253,44 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
         ), It.IsAny<CancellationToken>()));
         _userProfilesService.Verify(ps =>
             ps.GetProfilePrivateAsync(_caller.Object, "auserid".ToId(), CancellationToken.None));
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetBuyerReference(It.IsAny<BillingProvider>()));
+        _billingProvider.Verify(bp => bp.StateInterpreter.GetSubscriptionReference(It.IsAny<BillingProvider>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleHandleUserProfileCreatedAsyncAndCompletedSubscriptionExists_ThenIgnores()
+    {
+        var stateInterpreter = new Mock<IBillingStateInterpreter>();
+        _billingProvider.Setup(bp =>
+                bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create(ProviderStatus.Empty).Value);
+        var subscription = SubscriptionRoot.Create(_recorder.Object, _identifierFactory.Object,
+            "anowningentityid".ToId(), "auserid".ToId(), stateInterpreter.Object).Value;
+        var metadata = new SubscriptionMetadata(new Dictionary<string, string> { { "aname", "avalue" } });
+        subscription.SetProvider(BillingProvider.Create("aprovidername", metadata).Value,
+            "auserid".ToId(), _billingProvider.Object.StateInterpreter);
+        _repository.Setup(r =>
+                r.FindByBuyerIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subscription.ToOptional());
+
+        var domainEvent = new UserProfileEvents.Created("aprofileid".ToId())
+        {
+            DisplayName = "adisplayname",
+            FirstName = "anemailaddress",
+            LastName = "aphonenumber",
+            Type = nameof(ProfileType.Person),
+            UserId = "auserid"
+        };
+
+        var result =
+            await _application.HandleUserProfileCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<SubscriptionRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _userProfilesService.Verify(
+            ps => ps.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         _billingProvider.Verify(bp => bp.StateInterpreter.GetBuyerReference(It.IsAny<BillingProvider>()));
         _billingProvider.Verify(bp => bp.StateInterpreter.GetSubscriptionReference(It.IsAny<BillingProvider>()));
     }
