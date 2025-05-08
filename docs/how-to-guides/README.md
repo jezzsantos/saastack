@@ -16,6 +16,8 @@
 * [Migrating a Billing Provider](900-migrate-billing-provider.md) - how to upgrade from `SimpleBillingProvider` to another one specific to your chosen Billing Management System.
 * [Build a Pattern Toolkit](200-create-pattern-toolkit.md) - how to create a pattern toolkit, for things like automating the creation of a new Subdomain
 * [Split your subdomain modules into multiple hosts](210-split-modules.md) - how to split your subdomain modules into multiple hosts and deploy them separately
+* [Convert an Event-Sourced aggregate to a Snapshotting aggregate](220-convert-event-sourced-aggregate-to-snapshot.md)
+* [Async Workloads](230-async-workloads.md) - offload an Asynchronous workload
 
 ---
 
