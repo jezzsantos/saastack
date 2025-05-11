@@ -308,14 +308,24 @@ public static class RequestExtensions
                 new Dictionary<string, object?>());
         }
 
+        var routeSegments = new List<string>();
+        if (routeTemplate.Contains("#"))
+        {
+            var startIndex = routeTemplate.IndexOf("#", StringComparison.Ordinal);
+            var bookmarkSegment = routeTemplate.Substring(startIndex);
+            routeSegments.Add(bookmarkSegment);
+            routeTemplate = routeTemplate.Substring(0, startIndex);
+        }
+
         var placeholders = GetPlaceholders(routeTemplate);
         if (placeholders.HasNone())
         {
-            return (PopulateQueryString(attribute, requestFields, new StringBuilder(routeTemplate)).ToString(),
-                new Dictionary<string, object?>());
+            routeSegments.Insert(0, routeTemplate);
+            PopulateQueryString(attribute, requestFields, ref routeSegments);
+
+            return (routeSegments.Join(string.Empty), new Dictionary<string, object?>());
         }
 
-        var route = new StringBuilder();
         var positionInOriginalRoute = 0;
         var unSubstitutedRequestFields = new Dictionary<string, RequestFieldDescriptor>(requestFields);
         var substitutedRequestFields = new Dictionary<string, object?>();
@@ -326,7 +336,7 @@ public static class RequestExtensions
             var placeholderEndsAt = placeholderStartsAt + placeholderLength;
             var placeholderText = routeTemplate.Substring(placeholderStartsAt, placeholderLength);
 
-            AppendRouteBeforePlaceholder(routeTemplate, positionInOriginalRoute, placeholderStartsAt, route);
+            AppendRouteBeforePlaceholder(routeTemplate, positionInOriginalRoute, placeholderStartsAt, routeSegments);
 
             var requestFieldName = placeholder.Key.ToLowerInvariant();
             if (requestFields.TryGetValue(requestFieldName, out var substitute))
@@ -335,62 +345,70 @@ public static class RequestExtensions
                 if (substitute.Value.Exists() && substitute.Value.ToString().HasValue())
                 {
                     substitutedRequestFields.Add(requestFieldName, substitute.Value);
-                    route.Append(substitute.Value);
+                    var segment = substitute.Value.ToString();
+                    if (segment.HasValue())
+                    {
+                        routeSegments.Add(segment);
+                    }
                 }
             }
             else
             {
-                route.Append(placeholderText);
+                routeSegments.Add(placeholderText);
             }
 
             positionInOriginalRoute = placeholderEndsAt;
         }
 
-        AppendRemainingRoute(routeTemplate, positionInOriginalRoute, route);
+        AppendRemainingRoute(routeTemplate, positionInOriginalRoute, routeSegments);
+        PopulateQueryString(attribute, unSubstitutedRequestFields, ref routeSegments);
 
-        return (PopulateQueryString(attribute, unSubstitutedRequestFields, route).ToString(),
-            substitutedRequestFields);
+        return (routeSegments.Join(string.Empty), substitutedRequestFields);
 
         static void AppendRouteBeforePlaceholder(string routeTemplate, int positionInOriginalRoute,
-            int placeholderStartsAt, StringBuilder route)
+            int placeholderStartsAt, List<string> routeSegments)
         {
             var leftOfPlaceholder =
                 routeTemplate.Substring(positionInOriginalRoute, placeholderStartsAt - positionInOriginalRoute);
-            PruneEmptySegments(route, leftOfPlaceholder);
-            route.Append(leftOfPlaceholder);
+            PruneEmptySegments(routeSegments, leftOfPlaceholder);
+            routeSegments.Add(leftOfPlaceholder);
         }
 
-        static void AppendRemainingRoute(string routeTemplate, int positionInOriginalRoute, StringBuilder route)
+        static void AppendRemainingRoute(string routeTemplate, int positionInOriginalRoute, List<string> routeSegments)
         {
             var rightOfPlaceholders = routeTemplate.Substring(positionInOriginalRoute);
-            PruneEmptySegments(route, rightOfPlaceholders);
-            route.Append(rightOfPlaceholders);
+            PruneEmptySegments(routeSegments, rightOfPlaceholders);
+            if (rightOfPlaceholders.HasValue())
+            {
+                routeSegments.Add(rightOfPlaceholders);
+            }
         }
 
-        static void PruneEmptySegments(StringBuilder route, string append)
+        static void PruneEmptySegments(List<string> routeSegments, string append)
         {
             if (!append.StartsWith(RouteSegmentDelimiter))
             {
                 return;
             }
 
-            if (route.Length > 0 && route[^1] == RouteSegmentDelimiter)
+            if (routeSegments.Count > 0
+                && routeSegments[^1].EndsWith(RouteSegmentDelimiter))
             {
-                route.Remove(route.Length - 1, 1);
+                routeSegments[^1] = routeSegments[^1].TrimEnd(RouteSegmentDelimiter);
             }
         }
     }
 
-    private static StringBuilder PopulateQueryString(RouteAttribute attribute,
-        Dictionary<string, RequestFieldDescriptor> requestFields,
-        StringBuilder route)
+    private static void PopulateQueryString(RouteAttribute attribute,
+        Dictionary<string, RequestFieldDescriptor> requestFields, ref List<string> routeSegments)
     {
-        if (attribute.Method is not OperationMethod.Get and not OperationMethod.Search)
+        if (requestFields.HasNone())
         {
-            return route;
+            return;
         }
 
-        var fieldCount = 0;
+        var requiresFromQueryDeclaration = attribute.Method is not OperationMethod.Get and not OperationMethod.Search;
+        var addedFieldCount = 0;
         foreach (var requestField in requestFields)
         {
             var fieldValue = requestField.Value.Value;
@@ -399,27 +417,44 @@ public static class RequestExtensions
                 continue;
             }
 
-            route.Append(fieldCount == 0
+            if (requiresFromQueryDeclaration
+                && requestField.Value.Binding != RequestFieldBinding.FromQuery)
+            {
+                continue;
+            }
+
+            var segment = new StringBuilder();
+            segment.Append(addedFieldCount == 0
                 ? '?'
                 : '&');
 
-            var pair = GetValuePairs(requestField);
+            var values = GetValuePairs(requestField);
             var valueCount = 0;
-            foreach (var pairValue in pair)
+            foreach (var value in values)
             {
                 if (valueCount > 0)
                 {
-                    route.Append('&');
+                    segment.Append('&');
                 }
 
-                route.Append(pairValue);
+                segment.Append(value);
                 valueCount++;
             }
 
-            fieldCount++;
+            routeSegments.Add(segment.ToString());
+            addedFieldCount++;
         }
 
-        return route;
+        var bookmarkSegment = routeSegments
+            .FirstOrDefault(segment => segment.StartsWith("#"));
+        var hasBookmark = bookmarkSegment.Exists();
+        if (hasBookmark
+            && addedFieldCount > 0)
+        {
+            var oldIndex = routeSegments.IndexOf(bookmarkSegment!);
+            routeSegments.RemoveAt(oldIndex);
+            routeSegments.Add(bookmarkSegment!);
+        }
     }
 
     private static List<string> GetValuePairs(KeyValuePair<string, RequestFieldDescriptor> requestField)

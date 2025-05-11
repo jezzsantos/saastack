@@ -4,7 +4,6 @@ using Application.Persistence.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Domain.Interfaces;
 
 namespace Infrastructure.External.ApplicationServices;
 
@@ -14,37 +13,22 @@ namespace Infrastructure.External.ApplicationServices;
 ///     In UserPilot, a user is assumed to be unique across all companies, which means that a unique user belongs to a
 ///     unique company. A unique user cannot belong to two different companies at the same time (also they cannot be
 ///     removed from a company).
-///     Thus, when we identify a user, we need to use their userId@organizationId as their unique identifier.
-///     Certain events will "identify" users to UserPilot, and we will these moments to set the user's details,
-///     and set their company's details:
-///     * UserLogin - identify/create the platform-user and default-tenant-user with their email and name (2x calls)
-///     * PersonRegistrationCreated/MachineRegistered - identify/create the platform-user with their email and name
-///     * UserProfileChanged - identify/create the platform-user and default-tenant-user and change the email and name of
-///     both (2x calls)
-///     * OrganizationCreated - identify/create the tenant-user and create the company with its name
-///     * OrganizationChanged - identify/create the platform-user and change their company's name
-///     * MembershipAdded - identify/create the tenant-user and change their company
-///     * MembershipChanged - identify/create the tenanted-user and change their email and name (of their "changed"
-///     organization)
+///     Thus, when we identify a user, we need to use their userId@tenantId as their unique identifier.
+///     Certain events will require us to send two usage events, one for the platform user and one for the tenant user.
+///     * <see cref="UsageConstants.Events.UsageScenarios.Generic.UserLogin" /> AND
+///     * <see cref="UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged" />
 /// </summary>
 public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
 {
     internal const string CompanyIdPropertyName = "id";
     internal const string CompanyNamePropertyName = "name";
     internal const string CreatedAtPropertyName = "created_at";
-    internal const string UnTenantedValue = "platform";
     internal const string UserEmailAddressPropertyName = "email";
     internal const string UserNamePropertyName = "name";
-    private const string AnonymousUserId = "anonymous";
-    private const string UserIdDelimiter = "@";
-    private static readonly string[] IgnoredCustomEventProperties =
-    [
-        UsageConstants.Properties.UserIdOverride,
-        UsageConstants.Properties.TenantIdOverride,
-        UsageConstants.Properties.DefaultOrganizationId
-    ];
+
     private readonly IRecorder _recorder;
     private readonly IUserPilotClient _serviceClient;
+    private readonly IUsageDeliveryTranslator _translator;
 
     public UserPilotHttpServiceClient(IRecorder recorder, IConfigurationSettings settings,
         IHttpClientFactory httpClientFactory) : this(recorder,
@@ -56,14 +40,15 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
     {
         _recorder = recorder;
         _serviceClient = serviceClient;
+        _translator = new UsageDeliveryTranslator();
     }
 
     public async Task<Result<Error>> DeliverAsync(ICallerContext caller, string forId, string eventName,
         Dictionary<string, string>? additional = null, CancellationToken cancellationToken = default)
     {
-        var options = DetermineOptions(caller, forId, eventName, additional);
-        var userId = DetermineUserId(options, additional);
-        var isIdentifiableEvent = IsReIdentifiableEvent(eventName, additional);
+        _translator.StartTranslation(caller, forId, eventName, additional);
+        var userId = _translator.UserId;
+        var isIdentifiableEvent = _translator.IsUserIdentifiableEvent();
         if (isIdentifiableEvent)
         {
             var identified = await IdentifyUserAsync(caller, userId, eventName, additional, cancellationToken);
@@ -73,8 +58,8 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
             }
         }
 
-        var trackedMetadata = CreateTrackedEventProperties(options, eventName, additional);
-        var tracked = await TrackEventAsync(caller, userId, eventName, trackedMetadata, cancellationToken);
+        var eventProperties = _translator.PrepareProperties(ConvertToUserPilotDataType);
+        var tracked = await TrackEventAsync(caller, userId, eventName, eventProperties, cancellationToken);
         if (tracked.IsFailure)
         {
             return tracked.Error;
@@ -96,9 +81,9 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
                 return Result.Ok;
             }
 
-            options.ResetTenantIdOverride(defaultOrganizationId);
-            var secondUserId = DetermineUserId(options, additional);
-            var secondTrackedMetadata = CreateTrackedEventProperties(options, eventName, additional);
+            _translator.RecalculateTenantId(defaultOrganizationId);
+            var secondUserId = _translator.UserId;
+            var secondEventProperties = _translator.PrepareProperties(ConvertToUserPilotDataType);
 
             var identifiedTenant =
                 await IdentifyUserAsync(caller, secondUserId, eventName, additional, cancellationToken);
@@ -107,89 +92,15 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
                 return identifiedTenant.Error;
             }
 
-            var trackedTenant =
-                await TrackEventAsync(caller, secondUserId, eventName, secondTrackedMetadata, cancellationToken);
-            if (trackedTenant.IsFailure)
+            var secondTracked =
+                await TrackEventAsync(caller, secondUserId, eventName, secondEventProperties, cancellationToken);
+            if (secondTracked.IsFailure)
             {
-                return trackedTenant.Error;
+                return secondTracked.Error;
             }
         }
 
         return Result.Ok;
-    }
-
-    private static ContextOptions DetermineOptions(ICallerContext caller, string forId, string eventName,
-        Dictionary<string, string>? additional)
-    {
-        string? tenantIdOverride = null;
-        switch (eventName)
-        {
-            case UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated:
-            case UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged:
-                tenantIdOverride = additional.Exists()
-                                   && additional.TryGetValue(UsageConstants.Properties.Id,
-                                       out var organizationId)
-                    ? organizationId
-                    : null;
-                break;
-        }
-
-        return new ContextOptions(
-            forId,
-            caller.TenantId.HasValue()
-                ? caller.TenantId
-                : UnTenantedValue,
-            tenantIdOverride);
-    }
-
-    private static bool IsReIdentifiableEvent(string eventName, Dictionary<string, string>? additional)
-    {
-        if (additional.NotExists())
-        {
-            return false;
-        }
-
-        // Updates the user details
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.UserLogin)
-        {
-            return additional.TryGetValue(UsageConstants.Properties.UserIdOverride, out _);
-        }
-
-        // Updates the email or name of a user
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated
-            or UsageConstants.Events.UsageScenarios.Generic.MachineRegistered)
-        {
-            return additional.TryGetValue(UsageConstants.Properties.Id, out _);
-        }
-
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged)
-        {
-            return additional.TryGetValue(UsageConstants.Properties.Id, out _)
-                   && (additional.TryGetValue(UsageConstants.Properties.Name, out _)
-                       || additional.TryGetValue(UsageConstants.Properties.EmailAddress, out _));
-        }
-
-        // Updates the company details
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated
-            or UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged)
-        {
-            return additional.TryGetValue(UsageConstants.Properties.Id, out _);
-        }
-
-        // Updates the company details and user details
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.MembershipAdded
-            or UsageConstants.Events.UsageScenarios.Generic.MembershipChanged)
-        {
-            return additional.TryGetValue(UsageConstants.Properties.Id, out _)
-                   && additional.TryGetValue(UsageConstants.Properties.TenantIdOverride, out _);
-        }
-
-        return false;
     }
 
     private async Task<Result<Error>> IdentifyUserAsync(ICallerContext caller, string userId,
@@ -330,40 +241,6 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
         return metadata;
     }
 
-    private static Dictionary<string, string> CreateTrackedEventProperties(ContextOptions options, string eventName,
-        Dictionary<string, string>? additional)
-    {
-        var metadata = new Dictionary<string, string>();
-
-        var tenantId = DetermineTenantId(options, additional);
-        metadata.TryAdd(UsageConstants.Properties.TenantId, tenantId);
-
-        if (additional.NotExists())
-        {
-            return metadata;
-        }
-
-        if (eventName
-            is UsageConstants.Events.UsageScenarios.Generic.UserLogin
-            or UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated
-            or UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged
-           )
-        {
-            if (additional.TryGetValue(UsageConstants.Properties.UserIdOverride, out var overriddenUserId))
-            {
-                metadata.TryAdd(UsageConstants.Properties.Id, ConvertToUserPilotDataType(overriddenUserId));
-            }
-        }
-
-        foreach (var pair in additional.Where(
-                     pair => IgnoredCustomEventProperties.NotContainsIgnoreCase(pair.Key)))
-        {
-            metadata.TryAdd(pair.Key, ConvertToUserPilotDataType(pair.Value));
-        }
-
-        return metadata;
-    }
-
     /// <summary>
     ///     UserPilot only supports strings, where: datetime is in UnixSeconds
     /// </summary>
@@ -375,75 +252,5 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
         }
 
         return value;
-    }
-
-    private static string DetermineUserId(ContextOptions options, Dictionary<string, string>? additional)
-    {
-        var tenantId = DetermineTenantId(options, additional);
-        return DetermineUserId(options, additional, tenantId);
-    }
-
-    private static string DetermineUserId(ContextOptions options, Dictionary<string, string>? additional,
-        string tenantId)
-    {
-        var userId = options.ForId;
-        if (additional.Exists())
-        {
-            if (additional.TryGetValue(UsageConstants.Properties.UserIdOverride, out var overriddenUserId))
-            {
-                userId = overriddenUserId;
-            }
-        }
-
-        if (userId.EqualsIgnoreCase(CallerConstants.AnonymousUserId))
-        {
-            userId = AnonymousUserId;
-        }
-
-        return $"{userId}{UserIdDelimiter}{tenantId}";
-    }
-
-    private static string DetermineTenantId(ContextOptions options, Dictionary<string, string>? additional)
-    {
-        if (additional.Exists())
-        {
-            if (options.TenantIdOverride.HasValue())
-            {
-                return options.TenantIdOverride;
-            }
-
-            if (additional.TryGetValue(UsageConstants.Properties.TenantIdOverride, out var overriddenTenantId))
-            {
-                return overriddenTenantId;
-            }
-
-            if (additional.TryGetValue(UsageConstants.Properties.TenantId, out var specifiedTenantId))
-            {
-                return specifiedTenantId;
-            }
-        }
-
-        return options.TenantId;
-    }
-
-    private sealed class ContextOptions
-    {
-        public ContextOptions(string forId, string tenantId, string? tenantIdOverride)
-        {
-            ForId = forId;
-            TenantId = tenantId;
-            TenantIdOverride = tenantIdOverride;
-        }
-
-        public string ForId { get; }
-
-        public string TenantId { get; }
-
-        public string? TenantIdOverride { get; private set; }
-
-        public void ResetTenantIdOverride(string tenantId)
-        {
-            TenantIdOverride = tenantId;
-        }
     }
 }

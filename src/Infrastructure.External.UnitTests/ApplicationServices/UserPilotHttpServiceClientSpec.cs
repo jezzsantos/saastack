@@ -46,7 +46,7 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anonymous@platform", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -65,7 +65,7 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -136,7 +136,7 @@ public class UserPilotHttpServiceClientSpec
                     dic.Count == 3
                     && dic["aname1"] == "avalue1"
                     && dic["aname2"] == datum.ToUnixSeconds().ToString()
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -165,7 +165,7 @@ public class UserPilotHttpServiceClientSpec
                     dic.Count == 3
                     && dic["aname1"] == "avalue1"
                     && dic["aname2"] == datum.ToUnixSeconds().ToString()
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
     }
@@ -205,7 +205,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -231,7 +231,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -263,7 +263,7 @@ public class UserPilotHttpServiceClientSpec
                     dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -304,7 +304,7 @@ public class UserPilotHttpServiceClientSpec
                     dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
@@ -359,7 +359,7 @@ public class UserPilotHttpServiceClientSpec
                     dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                 ), It.IsAny<CancellationToken>()));
@@ -411,7 +411,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -437,7 +437,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -470,7 +470,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -504,7 +504,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -542,7 +542,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 4
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                 ), It.IsAny<CancellationToken>()));
@@ -584,7 +584,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -610,7 +610,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -638,7 +638,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
                 ), It.IsAny<CancellationToken>()));
         }
@@ -676,7 +676,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
@@ -726,7 +726,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
@@ -779,7 +779,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -805,7 +805,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -958,7 +958,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -984,7 +984,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1128,7 +1128,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1154,7 +1154,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1180,7 +1180,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1291,7 +1291,7 @@ public class UserPilotHttpServiceClientSpec
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1317,7 +1317,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1343,7 +1343,7 @@ public class UserPilotHttpServiceClientSpec
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
                 ), It.IsAny<CancellationToken>()));
         }
 
