@@ -33,7 +33,7 @@ public interface IUsageDeliveryTranslator
     ///     Note: must be called before any other methods.
     /// </summary>
     void StartTranslation(ICallerContext caller, string forId, string eventName,
-        Dictionary<string, string>? additional);
+        Dictionary<string, string>? additional, bool createdTenantedUserIds);
 }
 
 /// <summary>
@@ -177,9 +177,9 @@ public class UsageDeliveryTranslator : IUsageDeliveryTranslator
     }
 
     public void StartTranslation(ICallerContext caller, string forId, string eventName,
-        Dictionary<string, string>? additional)
+        Dictionary<string, string>? additional, bool createdTenantedUserIds)
     {
-        _options = new UsageTranslationOptions(caller, forId, eventName, additional);
+        _options = new UsageTranslationOptions(caller, forId, eventName, additional, createdTenantedUserIds);
     }
 
     public string UserId
@@ -202,11 +202,12 @@ public class UsageDeliveryTranslator : IUsageDeliveryTranslator
         private const string UnTenantedValue = "platform";
         private const string UserIdDelimiter = "@";
         private readonly Dictionary<string, string>? _additional;
+        private readonly bool _createdTenantedUserIds;
         private string _tenantId;
         private string? _tenantIdOverride;
 
         public UsageTranslationOptions(ICallerContext caller, string forId, string eventName,
-            Dictionary<string, string>? additional)
+            Dictionary<string, string>? additional, bool createdTenantedUserIds)
         {
             string? tenantIdOverride = null;
             switch (eventName)
@@ -221,10 +222,11 @@ public class UsageDeliveryTranslator : IUsageDeliveryTranslator
                     break;
             }
 
+            _createdTenantedUserIds = createdTenantedUserIds;
             EventName = eventName;
             var tenantId = DetermineTenantId(caller.TenantId, tenantIdOverride, additional);
             _tenantId = tenantId;
-            UserId = DetermineUserId(forId, tenantId, additional);
+            UserId = DetermineUserId(forId, tenantId, additional, createdTenantedUserIds);
             _tenantIdOverride = tenantIdOverride;
             _additional = additional;
         }
@@ -262,10 +264,11 @@ public class UsageDeliveryTranslator : IUsageDeliveryTranslator
         {
             _tenantIdOverride = tenantId;
             _tenantId = DetermineTenantId(tenantId, _tenantIdOverride, _additional);
-            UserId = DetermineUserId(UserId, _tenantId, _additional);
+            UserId = DetermineUserId(UserId, _tenantId, _additional, _createdTenantedUserIds);
         }
 
-        private static string DetermineUserId(string forId, string? tenantId, Dictionary<string, string>? additional)
+        private static string DetermineUserId(string forId, string? tenantId, Dictionary<string, string>? additional,
+            bool createdTenantedUserIds)
         {
             var userId = forId;
             if (additional.Exists())
@@ -281,7 +284,9 @@ public class UsageDeliveryTranslator : IUsageDeliveryTranslator
                 userId = AnonymousUserId;
             }
 
-            return $"{userId}{UserIdDelimiter}{tenantId}";
+            return createdTenantedUserIds
+                ? $"{userId}{UserIdDelimiter}{tenantId}"
+                : userId;
         }
 
         private static string DetermineTenantId(string? tenantId, string? tenantIdOverride,

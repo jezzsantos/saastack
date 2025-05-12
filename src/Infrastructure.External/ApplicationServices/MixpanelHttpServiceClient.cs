@@ -6,6 +6,7 @@ using Application.Persistence.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
+using Domain.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Mixpanel;
 using UAParser;
 
@@ -14,25 +15,14 @@ namespace Infrastructure.External.ApplicationServices;
 /// <summary>
 ///     Provides an adapter to the Mixpanel.com service
 ///     <see href="https://developer.mixpanel.com/reference/overview" />
-///     In Mixpanel, a user is assumed to be unique across all companies, which means that a unique user belongs to a
-///     unique company. A unique user cannot belong to two different companies at the same time (also they cannot be
-///     removed from a company).
-///     Thus, when we identify a user, we need to use their userId@tenantId as their unique identifier.
-///     Certain events will "identify" users to Mixpanel, and we will these moments to set the user's details,
-///     and set their company's details:
-///     * UserLogin - identify/create the platform-user and default-tenant-user with their email and name (2x calls)
-///     * PersonRegistrationCreated/MachineRegistered - identify/create the platform-user with their email and name
-///     * UserProfileChanged - identify/create the platform-user and default-tenant-user and change the email and name of
-///     both (2x calls)
-///     * OrganizationCreated - identify/create the tenant-user and create the company with its name
-///     * OrganizationChanged - identify/create the platform-user and change their company's name
-///     * MembershipAdded - identify/create the tenant-user and change their company
-///     * MembershipChanged - identify/create the tenanted-user and change their email and name (of their "changed"
-///     organization)
+///     Note: In Mixpanel, users are unique across all companies.
+///     Thus, when we identify/profile a user, we use their userId as their distinct_id.
+///     Anonymous users should have an empty distinct_id.
+///     Events will be treated as duplicates if they share the same $insert_id + distinct_id + time + eventName.
 /// </summary>
 public class MixpanelHttpServiceClient : IUsageDeliveryService
 {
-    internal static readonly string[]
+    private static readonly string[]
         ForbiddenMixpanelDistinctIds = //See: https://developer.mixpanel.com/reference/import-events
         {
             "00000000-0000-0000-0000-000000000000",
@@ -88,7 +78,7 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
     public async Task<Result<Error>> DeliverAsync(ICallerContext caller, string forId, string eventName,
         Dictionary<string, string>? additional = null, CancellationToken cancellationToken = default)
     {
-        _translator.StartTranslation(caller, forId, eventName, additional);
+        _translator.StartTranslation(caller, forId, eventName, additional, false);
         var userId = _translator.UserId;
         var isIdentifiableEvent = _translator.IsUserIdentifiableEvent();
         if (isIdentifiableEvent)
@@ -100,7 +90,7 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
             }
         }
 
-        var eventProperties = _translator.PrepareProperties(value => value);
+        var eventProperties = _translator.PrepareProperties(value => ConvertToMixpanelDataType(value).ToString()!);
         var imported = await ImportEventAsync(caller, userId, eventName, eventProperties, cancellationToken);
         if (imported.IsFailure)
         {
@@ -109,6 +99,19 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
 
         return Result.Ok;
     }
+#if TESTINGONLY
+    public static string TestingOnly_SanitizeDistinctId(string distinctId)
+    {
+        return SanitizeDistinctId(distinctId);
+    }
+#endif
+
+#if TESTINGONLY
+    public static string TestingOnly_SanitizeInsertId(string insertId)
+    {
+        return SanitizeInsertId(insertId);
+    }
+#endif
 
     private async Task<Result<Error>> ImportEventAsync(ICallerContext caller, string userId, string eventName,
         Dictionary<string, string> eventProperties, CancellationToken cancellationToken)
@@ -125,8 +128,7 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
             return imported.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(),
-            "Imported event {Event} in Mixpanel for {User} successfully",
+        _recorder.TraceInformation(caller.ToCall(), "Imported event {Event} in Mixpanel for {User} successfully",
             eventName, userId);
 
         return Result.Ok;
@@ -159,8 +161,8 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
             Name = additional?.GetValueOrDefault(UsageConstants.Properties.Name),
             Email = additional?.GetValueOrDefault(UsageConstants.Properties.EmailAddress),
             Timezone = additional?.GetValueOrDefault(UsageConstants.Properties.Timezone),
-            Avatar = additional?.GetValueOrDefault(UsageConstants.Properties.AvatarUrl),
-            CountryCode = additional?.GetValueOrDefault(UsageConstants.Properties.CountryCode)
+            CountryCode = additional?.GetValueOrDefault(UsageConstants.Properties.CountryCode),
+            Avatar = additional?.GetValueOrDefault(UsageConstants.Properties.AvatarUrl)
         };
 
         return properties;
@@ -170,12 +172,13 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
         string userId, Dictionary<string, string> eventProperties)
     {
         var distinctId = SanitizeDistinctId(userId);
+        var insertId = SanitizeInsertId(caller.CallId);
         var time = GetTimestamp(eventProperties);
         var properties = new MixpanelEventProperties
         {
             Time = time,
             DistinctId = distinctId,
-            InsertId = caller.CallId,
+            InsertId = insertId,
             ReferredBy = eventProperties.GetValueOrDefault("Referrer") ??
                          eventProperties.GetValueOrDefault(UsageConstants.Properties.ReferredBy),
             Url = eventProperties.GetValueOrDefault(UsageConstants.Properties.Path),
@@ -234,9 +237,24 @@ public class MixpanelHttpServiceClient : IUsageDeliveryService
             return string.Empty;
         }
 
+        if (distinctId.EqualsIgnoreCase(CallerConstants.AnonymousUserId)
+            || distinctId.EqualsIgnoreCase("anonymous")) // UsageTranslationOptions.AnonymousUserId
+        {
+            return string.Empty;
+        }
+
         return ForbiddenMixpanelDistinctIds.ContainsIgnoreCase(distinctId)
             ? string.Empty
             : distinctId;
+    }
+
+    /// <summary>
+    ///     Mixpanel requires a value for this that is only alphanumeric plus dashes and less than 36 characters long.
+    /// </summary>
+    private static string SanitizeInsertId(string insertId)
+    {
+        return insertId.ReplaceWith(@"[^a-zA-Z0-9-]", string.Empty)
+            .Substring(0, Math.Min(insertId.Length, 36));
     }
 
     /// <summary>

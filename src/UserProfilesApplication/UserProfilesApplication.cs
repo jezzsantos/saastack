@@ -85,7 +85,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {UserId}",
             profile.Id, userId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUserProfileChangedUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent());
 
         return profile.ToProfile();
     }
@@ -178,7 +178,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id,
             profile.UserId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUserProfileChangedUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent());
 
         return profile.ToProfile();
     }
@@ -214,7 +214,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was added for user {UserId}", profile.Id,
             userId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUserProfileChangedUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent());
 
         return profile.ToProfile();
     }
@@ -256,7 +256,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was deleted for user {UserId}", profile.Id,
             userId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUserProfileChangedUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent());
 
         return profile.ToProfile();
     }
@@ -444,8 +444,7 @@ internal static class UserProfileConversionExtensions
         };
     }
 
-    public static Dictionary<string, object> ToUserProfileChangedUsageEvent(this UserProfileRoot profile,
-        ICallerContext caller)
+    public static Dictionary<string, object> ToUserProfileChangedUsageEvent(this UserProfileRoot profile)
     {
         var context = new Dictionary<string, object>
         {
@@ -453,7 +452,8 @@ internal static class UserProfileConversionExtensions
             [UsageConstants.Properties.UserIdOverride] = profile.UserId,
             [UsageConstants.Properties.Name] = profile.Name.Value.FullName.Text,
             [UsageConstants.Properties.Classification] = profile.Type.ToString(),
-            [UsageConstants.Properties.Timezone] = profile.Timezone.Code.ToString()
+            [UsageConstants.Properties.Timezone] = profile.Timezone.Code.ToString(),
+            [UsageConstants.Properties.CountryCode] = profile.Address.CountryCode.ToString()
         };
         if (profile.EmailAddress.HasValue)
         {

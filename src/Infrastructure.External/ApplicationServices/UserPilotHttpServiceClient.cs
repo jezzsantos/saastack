@@ -10,9 +10,9 @@ namespace Infrastructure.External.ApplicationServices;
 /// <summary>
 ///     Provides an adapter to the UserPilot.com service
 ///     <see href="https://docs.userpilot.com/article/195-identify-users-and-track-api" />
-///     In UserPilot, a user is assumed to be unique across all companies, which means that a unique user belongs to a
+///     Note: In UserPilot, users are not unique across all companies, which means that a unique user belongs to a
 ///     unique company. A unique user cannot belong to two different companies at the same time (also they cannot be
-///     removed from a company).
+///     removed from a company). Thus, each user's identity is specific to a specific company /tenant. 
 ///     Thus, when we identify a user, we need to use their userId@tenantId as their unique identifier.
 ///     Certain events will require us to send two usage events, one for the platform user and one for the tenant user.
 ///     * <see cref="UsageConstants.Events.UsageScenarios.Generic.UserLogin" /> AND
@@ -46,7 +46,7 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
     public async Task<Result<Error>> DeliverAsync(ICallerContext caller, string forId, string eventName,
         Dictionary<string, string>? additional = null, CancellationToken cancellationToken = default)
     {
-        _translator.StartTranslation(caller, forId, eventName, additional);
+        _translator.StartTranslation(caller, forId, eventName, additional, true);
         var userId = _translator.UserId;
         var isIdentifiableEvent = _translator.IsUserIdentifiableEvent();
         if (isIdentifiableEvent)
