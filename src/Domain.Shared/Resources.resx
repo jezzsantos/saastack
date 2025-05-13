@@ -63,4 +63,7 @@
     <data name="ProviderPlan_InvalidPlanId" xml:space="preserve">
         <value>PlanId is empty</value>
     </data>
+    <data name="Name_InvalidName" xml:space="preserve">
+        <value>The Name is invalid</value>
+    </data>
 </root>

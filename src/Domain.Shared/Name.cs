@@ -1,5 +1,5 @@
 using Common;
-using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using JetBrains.Annotations;
@@ -10,7 +10,7 @@ public sealed class Name : SingleValueObjectBase<Name, string>
 {
     public static Result<Name, Error> Create(string name)
     {
-        if (name.IsNotValuedParameter(nameof(name), out var error))
+        if (name.IsInvalidParameter(Validations.Names.Name, nameof(name), Resources.Name_InvalidName, out var error))
         {
             return error;
         }

@@ -16,4 +16,9 @@ public static class Validations
             });
         }
     }
+
+    public static class Names
+    {
+        public static readonly Validation Name = CommonValidations.DescriptiveName();
+    }
 }
