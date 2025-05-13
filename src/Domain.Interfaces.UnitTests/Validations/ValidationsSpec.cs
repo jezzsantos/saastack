@@ -115,6 +115,15 @@ public class ValidationsSpec
     }
 
     [Fact]
+    public void WhenDescriptiveNameWithRightQuotationMark_ThenReturnsTrue()
+    {
+        var result = CommonValidations.DescriptiveName()
+            .Matches("avalue’avalue");
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
     public void WhenEmailWithCommonFormat_ThenReturnsTrue()
     {
         var result = CommonValidations.EmailAddress.Matches("aname@acompany.com");
