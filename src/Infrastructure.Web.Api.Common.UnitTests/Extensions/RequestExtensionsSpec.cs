@@ -396,6 +396,60 @@ public class RequestExtensionsSpec
     }
 
     [Fact]
+    public void WhenGetRequestInfoForPostWithQueryParams_ThenReturnsInfo()
+    {
+        var request = new TestQueryStringNoPathPostRequest();
+
+        var result = request.GetRequestInfo();
+
+        result.Route.Should().Be("/aroute?aqueryproperty=aqueryvalue");
+        result.Method.Should().Be(OperationMethod.Post);
+        result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersForPostWithQueryParams_ThenReturnsInfo()
+    {
+        var request = new TestQueryStringAndPathPostRequest();
+
+        var result = request.GetRequestInfo();
+
+        result.Route.Should().Be("/aroute/apathvalue?aqueryproperty=aqueryvalue");
+        result.Method.Should().Be(OperationMethod.Post);
+        result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(1);
+        result.RouteParams["apathproperty"].Should().Be("apathvalue");
+    }
+
+    [Fact]
+    public void WhenGetRequestInfoForPostWithQueryParamsAndBookmark_ThenReturnsInfo()
+    {
+        var request = new TestQueryStringAndNoPathAndBookmarkPostRequest();
+
+        var result = request.GetRequestInfo();
+
+        result.Route.Should().Be("/aroute?aqueryproperty=aqueryvalue#abookmark");
+        result.Method.Should().Be(OperationMethod.Post);
+        result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersForPostWithQueryParamsAndBookmark_ThenReturnsInfo()
+    {
+        var request = new TestQueryStringAndPathAndBookmarkPostRequest();
+
+        var result = request.GetRequestInfo();
+
+        result.Route.Should().Be("/aroute/apathvalue?aqueryproperty=aqueryvalue#abookmark");
+        result.Method.Should().Be(OperationMethod.Post);
+        result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(1);
+        result.RouteParams["apathproperty"].Should().Be("apathvalue");
+    }
+
+    [Fact]
     public void WhenToUrl_ThenReturnsUrl()
     {
         var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
@@ -732,4 +786,48 @@ public class RequestExtensionsSpec
 
     [Route("/aroute", OperationMethod.Delete)]
     private class TestEmptyDeleteRequest : IWebRequest;
+
+    [Route("/aroute", OperationMethod.Post)]
+    private class TestQueryStringNoPathPostRequest : IWebRequest
+    {
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute#abookmark", OperationMethod.Post)]
+    private class TestQueryStringAndNoPathAndBookmarkPostRequest : IWebRequest
+    {
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute/{APathProperty}", OperationMethod.Post)]
+    private class TestQueryStringAndPathPostRequest : IWebRequest
+    {
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        public string APathProperty { get; set; } = "apathvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
+
+    [Route("/aroute/{APathProperty}#abookmark", OperationMethod.Post)]
+    private class TestQueryStringAndPathAndBookmarkPostRequest : IWebRequest
+    {
+        public string ABodyProperty { get; set; } = "abodyvalue";
+
+        [JsonIgnore] public string AnIgnoredProperty { get; set; } = "anignoredvalue";
+
+        public string APathProperty { get; set; } = "apathvalue";
+
+        [FromQuery] public string AQueryProperty { get; set; } = "aqueryvalue";
+    }
 }
