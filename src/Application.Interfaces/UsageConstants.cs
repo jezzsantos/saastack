@@ -22,6 +22,7 @@ public static class UsageConstants
         public const string CarYear = "Year";
         public const string Classification = "Classification";
         public const string Component = "Component";
+        public const string CountryCode = "CountryCode";
         public const string CreatedById = "CreateBy";
         public const string DefaultOrganizationId = "DefaultOrganizationId";
         public const string Duration = "Duration";

@@ -57,4 +57,7 @@
     <data name="ChargebeeHttpServiceClient_Transfer_BuyerInvalid" xml:space="preserve">
         <value>Cannot transfer a subscription to another buyer without the buyer information</value>
     </data>
+    <data name="UsageDeliveryTranslator_NotStarted" xml:space="preserve">
+        <value>The translation has not been started. You must call {0}() first</value>
+    </data>
 </root>

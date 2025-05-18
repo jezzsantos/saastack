@@ -157,5 +157,14 @@ namespace Infrastructure.External {
                 return ResourceManager.GetString("FlagsmithHttpServiceClient_UnknownFeature", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The translation has not been started. You must call {0}() first.
+        /// </summary>
+        internal static string UsageDeliveryTranslator_NotStarted {
+            get {
+                return ResourceManager.GetString("UsageDeliveryTranslator_NotStarted", resourceCulture);
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -25,6 +26,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -45,8 +48,9 @@ public class UserPilotHttpServiceClientSpec
                     It.IsAny<CancellationToken>()), Times.Never);
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anonymous@platform", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -64,8 +68,9 @@ public class UserPilotHttpServiceClientSpec
                     It.IsAny<CancellationToken>()), Times.Never);
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -85,8 +90,9 @@ public class UserPilotHttpServiceClientSpec
                     It.IsAny<CancellationToken>()), Times.Never);
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anonymous@atenantid", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
+                    dic.Count == 2
                     && dic[UsageConstants.Properties.TenantId] == "atenantid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -106,8 +112,9 @@ public class UserPilotHttpServiceClientSpec
                     It.IsAny<CancellationToken>()), Times.Never);
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@atenantid", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
+                    dic.Count == 2
                     && dic[UsageConstants.Properties.TenantId] == "atenantid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -133,10 +140,11 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anoverriddenuserid@platform",
                 "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic["aname1"] == "avalue1"
                     && dic["aname2"] == datum.ToUnixSeconds().ToString()
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -162,26 +170,70 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anoverriddenuserid@platform",
                 "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic["aname1"] == "avalue1"
                     && dic["aname2"] == datum.ToUnixSeconds().ToString()
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
+                ), It.IsAny<CancellationToken>()));
+        }
+
+        [Fact]
+        public async Task WhenDeliverAsyncAndAdditionalBrowserPropertiesByUser_ThenImports()
+        {
+            var datum = DateTime.UtcNow;
+
+            var result =
+                await _serviceClient.DeliverAsync(_caller.Object, "aforid", "aneventname",
+                    new Dictionary<string, string>
+                    {
+                        { "aname1", "avalue1" },
+                        { "aname2", datum.ToIso8601() },
+                        { UsageConstants.Properties.ReferredBy, "areferrer" },
+                        { UsageConstants.Properties.Path, "aurl" },
+                        { UsageConstants.Properties.IpAddress, "anipaddress" },
+                        { UsageConstants.Properties.CallId, "acallid" },
+                        { UsageConstants.Properties.UserAgent, "auseragent" },
+                        { UsageConstants.Properties.UserIdOverride, "anoverriddenuserid" }
+                    }, CancellationToken.None);
+
+            result.Should().BeSuccess();
+            _client.Verify(
+                c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, string>>(), It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+            _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "anoverriddenuserid@platform",
+                "aneventname",
+                It.Is<Dictionary<string, string>>(dic =>
+                    dic.Count == 10
+                    && dic[UserPilotConstants.MetadataProperties.ReferredBy] == "areferrer"
+                    && dic[UserPilotConstants.MetadataProperties.Url] == "aurl"
+                    && dic[UserPilotConstants.MetadataProperties.IpAddress] == "anipaddress"
+                    && dic[UserPilotConstants.MetadataProperties.Browser] == "Other"
+                    && dic[UserPilotConstants.MetadataProperties.BrowserVersion] == ".."
+                    && dic[UserPilotConstants.MetadataProperties.OperatingSystem] == "Other"
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
+                    && dic["aname1"] == "avalue1"
+                    && dic["aname2"] == datum.ToUnixSeconds().ToString()
                 ), It.IsAny<CancellationToken>()));
         }
     }
 
     [Trait("Category", "Unit")]
-    public class GivenAnAuthenticationEvent
+    public class GivenTheUserLoginEvent
     {
         private readonly Mock<ICallerContext> _caller;
         private readonly Mock<IUserPilotClient> _client;
         private readonly UserPilotHttpServiceClient _serviceClient;
 
-        public GivenAnAuthenticationEvent()
+        public GivenTheUserLoginEvent()
         {
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -204,8 +256,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -229,9 +282,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -260,10 +314,11 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -301,18 +356,20 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
                     && dic[UsageConstants.Properties.TenantId] == "adefaultorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -337,8 +394,8 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
                     ),
@@ -347,8 +404,8 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
                     ),
@@ -356,20 +413,22 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 5
+                    dic.Count == 6
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                 ), It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.UserLogin,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 5
+                    dic.Count == 6
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.AuthProvider] == "aprovider"
                     && dic[UsageConstants.Properties.TenantId] == "adefaultorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                 ), It.IsAny<CancellationToken>()));
@@ -388,6 +447,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -410,8 +471,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -435,9 +497,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -459,7 +522,7 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "aforid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now)
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
@@ -468,9 +531,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -493,7 +557,7 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now)
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
@@ -502,9 +566,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -529,9 +594,9 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 3
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now)
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
@@ -540,9 +605,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                 ), It.IsAny<CancellationToken>()));
@@ -561,6 +627,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -583,8 +651,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -608,9 +677,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -636,9 +706,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 3
+                    dic.Count == 4
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
                 ), It.IsAny<CancellationToken>()));
         }
@@ -665,8 +736,8 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
                     ),
@@ -674,9 +745,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 5
+                    dic.Count == 6
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
@@ -705,8 +777,8 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@platform",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
                     ),
@@ -715,8 +787,8 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 0
                     ),
@@ -724,9 +796,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 5
+                    dic.Count == 6
                     && dic[UsageConstants.Properties.Id] == "auserid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
@@ -734,9 +807,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@adefaultorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 5
+                    dic.Count == 6
                     && dic[UsageConstants.Properties.Id] == "auserid"
                     && dic[UsageConstants.Properties.TenantId] == "adefaultorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.Classification] == "aclassification"
@@ -756,6 +830,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -778,8 +854,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -803,9 +880,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -829,17 +907,18 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now, TimeSpan.FromMinutes(1))
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -865,18 +944,19 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 3
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
-                        && dic[UserPilotHttpServiceClient.CompanyNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now, TimeSpan.FromMinutes(1))
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.Ownership] == "anownership"
                 ), It.IsAny<CancellationToken>()));
@@ -905,18 +985,19 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 3
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
-                        && dic[UserPilotHttpServiceClient.CompanyNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now, TimeSpan.FromMinutes(1))
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.Ownership] == "anownership"
                 ), It.IsAny<CancellationToken>()));
@@ -935,6 +1016,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -957,8 +1040,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -982,9 +1066,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1007,15 +1092,16 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1040,16 +1126,17 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
-                        && dic[UserPilotHttpServiceClient.CompanyNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyNamePropertyName] == "aname"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.Ownership] == "anownership"
                 ), It.IsAny<CancellationToken>()));
@@ -1077,16 +1164,17 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
-                        && dic[UserPilotHttpServiceClient.CompanyNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyNamePropertyName] == "aname"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "anorganizationid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.Ownership] == "anownership"
                 ), It.IsAny<CancellationToken>()));
@@ -1105,6 +1193,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -1127,8 +1217,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1152,9 +1243,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1178,9 +1270,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1203,19 +1296,20 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now)
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1239,19 +1333,20 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
+                        && dic[UserPilotConstants.MetadataProperties.CreatedAtPropertyName].ToLong().FromUnixTimestamp()
                             .IsNear(now)
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
     }
@@ -1268,6 +1363,8 @@ public class UserPilotHttpServiceClientSpec
             _caller = new Mock<ICallerContext>();
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.CallId)
+                .Returns("acallid");
             var recorder = new Mock<IRecorder>();
             _client = new Mock<IUserPilotClient>();
 
@@ -1290,8 +1387,9 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1315,9 +1413,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic["aname"] == "avalue"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1341,9 +1440,10 @@ public class UserPilotHttpServiceClientSpec
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@platform",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
-                    && dic[UsageConstants.Properties.TenantId] == UserPilotHttpServiceClient.UnTenantedValue
+                    && dic[UsageConstants.Properties.TenantId] == "platform"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1367,15 +1467,16 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "aforid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1400,15 +1501,16 @@ public class UserPilotHttpServiceClientSpec
                         dic.Count == 0
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 2
+                    dic.Count == 3
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -1434,21 +1536,22 @@ public class UserPilotHttpServiceClientSpec
                 c => c.IdentifyUserAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                     It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 2
-                        && dic[UserPilotHttpServiceClient.UserNamePropertyName] == "aname"
-                        && dic[UserPilotHttpServiceClient.UserEmailAddressPropertyName] == "anemailaddress"
+                        && dic[UserPilotConstants.MetadataProperties.UserNamePropertyName] == "aname"
+                        && dic[UserPilotConstants.MetadataProperties.UserEmailAddressPropertyName] == "anemailaddress"
                     ), It.Is<Dictionary<string, string>>(dic =>
                         dic.Count == 1
-                        && dic[UserPilotHttpServiceClient.CompanyIdPropertyName] == "anorganizationid"
+                        && dic[UserPilotConstants.MetadataProperties.CompanyIdPropertyName] == "anorganizationid"
                     ),
                     It.IsAny<CancellationToken>()));
             _client.Verify(c => c.TrackEventAsync(It.IsAny<ICallContext>(), "auserid@anorganizationid",
                 UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 4
+                    dic.Count == 5
                     && dic[UsageConstants.Properties.Id] == "amembershipid"
                     && dic[UsageConstants.Properties.Name] == "aname"
                     && dic[UsageConstants.Properties.EmailAddress] == "anemailaddress"
                     && dic[UsageConstants.Properties.TenantId] == "anorganizationid"
+                    && dic[UsageConstants.Properties.CallId] == "acallid"
                 ), It.IsAny<CancellationToken>()));
         }
     }
