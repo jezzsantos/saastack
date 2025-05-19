@@ -20,5 +20,7 @@ public sealed class Created : DomainEvent
 
     public UserClassification Classification { get; set; }
 
+    public required string HostRegion { get; set; }
+
     public UserStatus Status { get; set; }
 }

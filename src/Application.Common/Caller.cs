@@ -10,17 +10,17 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used to represent an authenticated caller with no access
     /// </summary>
-    public static ICallerContext CreateAsAnonymous()
+    public static ICallerContext CreateAsAnonymous(DatacenterLocation region)
     {
-        return new AnonymousCaller();
+        return new AnonymousCaller(Optional<string>.None, region);
     }
 
     /// <summary>
     ///     Returns a caller used to represent an authenticated caller with no access
     /// </summary>
-    public static ICallerContext CreateAsAnonymousTenant(string tenantId)
+    public static ICallerContext CreateAsAnonymousTenant(string tenantId, DatacenterLocation region)
     {
-        return new AnonymousCaller(tenantId);
+        return new AnonymousCaller(tenantId, region);
     }
 
     /// <summary>
@@ -34,53 +34,62 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used to represent inbound webhook calls from 3rd party integrations
     /// </summary>
-    public static ICallerContext CreateAsExternalWebHook(string callId)
+    public static ICallerContext CreateAsExternalWebHook(string callId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(callId);
-        return new ExternalWebHookAccountCaller(callId);
+        return new ExternalWebHookAccountCaller(callId, region);
     }
 
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenance()
+    public static ICallerContext CreateAsMaintenance(DatacenterLocation region)
     {
-        return new MaintenanceAccountCaller();
+        return new MaintenanceAccountCaller(Optional<string>.None, Optional<string>.None, region);
     }
 
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenance(string callId)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(callId);
-        return new MaintenanceAccountCaller(callId);
-    }
-
-    /// <summary>
-    ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
-    /// </summary>
-    public static ICallerContext CreateAsMaintenanceTenant(string callId, string? tenantId)
+    public static ICallerContext CreateAsMaintenance(string callId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(callId);
-        return new MaintenanceAccountCaller(callId, tenantId);
+        return new MaintenanceAccountCaller(callId, Optional<string>.None, region);
     }
 
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenanceTenant(string tenantId)
+    public static ICallerContext CreateAsMaintenance(ICallerContext caller)
+    {
+        return new MaintenanceAccountCaller(caller.CallId, Optional<string>.None, caller.HostRegion);
+    }
+
+    /// <summary>
+    ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
+    /// </summary>
+    public static ICallerContext CreateAsMaintenanceTenant(string callId, Optional<string> tenantId,
+        DatacenterLocation region)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(callId);
+        return new MaintenanceAccountCaller(callId, tenantId, region);
+    }
+
+    /// <summary>
+    ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
+    /// </summary>
+    public static ICallerContext CreateAsMaintenanceTenant(string tenantId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(tenantId);
-        return new MaintenanceAccountCaller(null, tenantId);
+        return new MaintenanceAccountCaller(null, tenantId, region);
     }
 
     /// <summary>
     ///     Returns a caller used for calling 3rd party [external] services
     /// </summary>
-    public static ICallerContext CreateAsServiceClient()
+    public static ICallerContext CreateAsServiceClient(DatacenterLocation region)
     {
-        return new ServiceClientAccountCaller();
+        return new ServiceClientAccountCaller(region);
     }
 
     /// <summary>
@@ -96,11 +105,12 @@ public static class Caller
     /// </summary>
     private sealed class AnonymousCaller : ICallerContext
     {
-        public AnonymousCaller(string? tenantId = null)
+        public AnonymousCaller(Optional<string> tenantId, DatacenterLocation region)
         {
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles();
-            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
+            Features = new ICallerContext.CallerFeatures([PlatformFeatures.Basic], null);
+            HostRegion = region;
         }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
@@ -112,13 +122,15 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
+        public DatacenterLocation HostRegion { get; }
+
         public bool IsAuthenticated => false;
 
         public bool IsServiceAccount => false;
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public string? TenantId { get; }
+        public Optional<string> TenantId { get; }
     }
 
     /// <summary>
@@ -126,14 +138,17 @@ public static class Caller
     /// </summary>
     private sealed class MaintenanceAccountCaller : ICallerContext
     {
-        public MaintenanceAccountCaller(string? callId = null, string? tenantId = null)
+        public MaintenanceAccountCaller(Optional<string> callId, Optional<string> tenantId, DatacenterLocation region)
         {
-            CallId = callId ?? GenerateCallId();
+            CallId = callId.HasValue
+                ? callId.Value
+                : GenerateCallId();
             TenantId = tenantId;
-            Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
+            Roles = new ICallerContext.CallerRoles([PlatformRoles.ServiceAccount], null);
             Features =
                 new ICallerContext.CallerFeatures(
-                    new[] { PlatformFeatures.Paid2 }, null);
+                    [PlatformFeatures.Paid2], null);
+            HostRegion = region;
         }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
@@ -145,13 +160,15 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
+        public DatacenterLocation HostRegion { get; }
+
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public string? TenantId { get; }
+        public Optional<string> TenantId { get; }
     }
 
     /// <summary>
@@ -159,6 +176,11 @@ public static class Caller
     /// </summary>
     private sealed class ServiceClientAccountCaller : ICallerContext
     {
+        public ServiceClientAccountCaller(DatacenterLocation region)
+        {
+            HostRegion = region;
+        }
+
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
 
@@ -167,15 +189,17 @@ public static class Caller
         public string CallId => GenerateCallId();
 
         public ICallerContext.CallerFeatures Features { get; } = new(
-            new[] { PlatformFeatures.Paid2 }, null);
+            [PlatformFeatures.Paid2], null);
+
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
-        public ICallerContext.CallerRoles Roles { get; } = new(new[] { PlatformRoles.ServiceAccount }, null);
+        public ICallerContext.CallerRoles Roles { get; } = new([PlatformRoles.ServiceAccount], null);
 
-        public string? TenantId => null;
+        public Optional<string> TenantId => null;
     }
 
     /// <summary>
@@ -183,11 +207,14 @@ public static class Caller
     /// </summary>
     private sealed class ExternalWebHookAccountCaller : ICallerContext
     {
-        public ExternalWebHookAccountCaller(string? callId = null)
+        public ExternalWebHookAccountCaller(Optional<string> callId, DatacenterLocation region)
         {
-            CallId = callId ?? GenerateCallId();
-            Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
-            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
+            CallId = callId.HasValue
+                ? callId.Value
+                : GenerateCallId();
+            Roles = new ICallerContext.CallerRoles([PlatformRoles.ServiceAccount], null);
+            Features = new ICallerContext.CallerFeatures([PlatformFeatures.Basic], null);
+            HostRegion = region;
         }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
@@ -199,13 +226,15 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
+        public DatacenterLocation HostRegion { get; }
+
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public string? TenantId => null;
+        public Optional<string> TenantId => null;
     }
 
     /// <summary>
@@ -219,7 +248,8 @@ public static class Caller
             CallId = call.CallId;
             TenantId = call.TenantId;
             Roles = new ICallerContext.CallerRoles();
-            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
+            Features = new ICallerContext.CallerFeatures([PlatformFeatures.Basic], null);
+            HostRegion = call.HostRegion;
         }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
@@ -231,12 +261,14 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
+        public DatacenterLocation HostRegion { get; }
+
         public bool IsAuthenticated => false;
 
         public bool IsServiceAccount => false;
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public string? TenantId { get; }
+        public Optional<string> TenantId { get; }
     }
 }

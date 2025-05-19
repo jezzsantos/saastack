@@ -39,9 +39,10 @@ public class EndUserProjection : IReadModelProjection
             case Created e:
                 return await Tasks.WhenAllAsync(_users.HandleCreateAsync(e.RootId, dto =>
                     {
-                        dto.Classification = e.Classification;
                         dto.Access = e.Access;
                         dto.Status = e.Status;
+                        dto.Classification = e.Classification;
+                        dto.RegisteredRegion = e.HostRegion;
                     }, cancellationToken),
                     _invitations.HandleCreateAsync(e.RootId, dto => { dto.Status = e.Status; },
                         cancellationToken));

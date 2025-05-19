@@ -31,6 +31,7 @@ public class OrganizationProjection : IReadModelProjection
                         dto.Name = e.Name;
                         dto.Ownership = e.Ownership;
                         dto.CreatedById = e.CreatedById;
+                        dto.RegisteredRegion = e.HostRegion;
                         dto.BillingSubscriberId = e.CreatedById; // a useful intermediary default
                     },
                     cancellationToken);

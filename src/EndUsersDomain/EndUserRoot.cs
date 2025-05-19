@@ -25,10 +25,10 @@ public sealed partial class EndUserRoot : AggregateRootBase
 #endif
 
     public static Result<EndUserRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        UserClassification classification)
+        UserClassification classification, DatacenterLocation hostRegion)
     {
         var root = new EndUserRoot(recorder, idFactory);
-        root.RaiseCreateEvent(EndUsersDomain.Events.Created(root.Id, classification));
+        root.RaiseCreateEvent(EndUsersDomain.Events.Created(root.Id, classification, hostRegion));
         return root;
     }
 
@@ -50,6 +50,8 @@ public sealed partial class EndUserRoot : AggregateRootBase
     public Features Features { get; private set; } = Features.Empty;
 
     public GuestInvitation GuestInvitation { get; private set; } = GuestInvitation.Empty;
+
+    public DatacenterLocation HostRegion { get; private set; } = DatacenterLocations.Unknown;
 
     public bool IsMachine => Classification == UserClassification.Machine;
 
@@ -119,6 +121,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
                 Access = created.Access;
                 Status = created.Status;
                 Classification = created.Classification;
+                HostRegion = DatacenterLocations.FindOrDefault(created.HostRegion);
                 Features = Features.Empty;
                 Roles = Roles.Empty;
                 return Result.Ok;

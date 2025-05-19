@@ -386,10 +386,12 @@ public static class HostExtensions
             {
                 services.AddSingleton<IEmailMessageQueue>(c =>
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<ISmsMessageQueue>(c =>
                     new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();

@@ -6,6 +6,7 @@ using AncillaryInfrastructure.Api.Usages;
 using AncillaryInfrastructure.ApplicationServices;
 using AncillaryInfrastructure.Persistence;
 using AncillaryInfrastructure.Persistence.ReadModels;
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
@@ -54,18 +55,22 @@ public class AncillaryModule : ISubdomainModule
                 services.AddPerHttpRequest<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.AddSingleton<IUsageMessageQueue>(c =>
                     new UsageMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddPerHttpRequest<IAuditMessageQueueRepository>(c =>
                     new AuditMessageQueueRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailMessageQueue>(c =>
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<ISmsMessageQueue>(c =>
                     new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddPerHttpRequest<IAuditRepository>(c =>
@@ -97,6 +102,7 @@ public class AncillaryModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.AddSingleton<IProvisioningMessageQueue>(c =>
                     new ProvisioningMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostSettings>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services

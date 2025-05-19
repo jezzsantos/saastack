@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -17,18 +18,21 @@ namespace Infrastructure.Eventing.Common.Notifications;
 /// </summary>
 public class AsynchronousQueueConsumerRelay : IDomainEventConsumerRelay
 {
+    private readonly IHostSettings _hostSettings;
     private readonly IDomainEventingMessageBusTopic _messageBusTopic;
 
-    public AsynchronousQueueConsumerRelay(IRecorder recorder,
+    public AsynchronousQueueConsumerRelay(IRecorder recorder, IHostSettings hostSettings,
         IMessageBusTopicMessageIdFactory messageBusTopicMessageIdFactory,
         IMessageBusStore store) : this(
-        new DomainEventingMessageBusTopic(recorder, messageBusTopicMessageIdFactory, store))
+        new DomainEventingMessageBusTopic(recorder, messageBusTopicMessageIdFactory, store), hostSettings)
     {
     }
 
-    internal AsynchronousQueueConsumerRelay(IDomainEventingMessageBusTopic messageBusTopic)
+    internal AsynchronousQueueConsumerRelay(IDomainEventingMessageBusTopic messageBusTopic,
+        IHostSettings hostSettings)
     {
         _messageBusTopic = messageBusTopic;
+        _hostSettings = hostSettings;
     }
 
     public async Task<Result<Error>> RelayDomainEventAsync(IDomainEvent @event,
@@ -39,7 +43,8 @@ public class AsynchronousQueueConsumerRelay : IDomainEventConsumerRelay
             Event = changeEvent
         };
 
-        var call = CallContext.CreateUnknown();
+        var region = _hostSettings.GetRegion();
+        var call = CallContext.CreateUnknown(region);
         var queued = await _messageBusTopic.SendAsync(call, message, cancellationToken);
         if (queued.IsFailure)
         {

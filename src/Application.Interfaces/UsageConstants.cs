@@ -42,6 +42,7 @@ public static class UsageConstants
         public const string Ownership = "Ownership";
         public const string Path = "Path";
         public const string ReferredBy = "ReferredBy";
+        public const string Region = "Region";
         public const string ResourceId = "ResourceId";
         public const string Started = "Started";
         public const string TenantId = "TenantId";

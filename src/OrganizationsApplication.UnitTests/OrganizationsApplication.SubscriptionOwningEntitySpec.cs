@@ -81,7 +81,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value);
+            DisplayName.Create("aname").Value, DatacenterLocations.Local);
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
         _endUsersService.Setup(eus =>
@@ -105,7 +105,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
         organization.SubscribeBilling("asubscriptionid".ToId(), "acancellerid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
@@ -154,7 +154,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value);
+            DisplayName.Create("aname").Value, DatacenterLocations.Local);
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
         _endUsersService.Setup(eus =>
@@ -178,7 +178,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
         organization.SubscribeBilling("asubscriptionid".ToId(), "amodifierid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
@@ -228,7 +228,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value);
+            DisplayName.Create("aname").Value, DatacenterLocations.Local);
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
         _endUsersService.Setup(eus =>
@@ -253,7 +253,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
         organization.SubscribeBilling("asubscriptionid".ToId(), "atransfererid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
@@ -304,7 +304,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
         organization.SubscribeBilling("asubscriptionid".ToId(), "anunsubsciberid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
@@ -335,7 +335,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value);
+            DisplayName.Create("aname").Value, DatacenterLocations.Local);
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);
         _endUsersService.Setup(eus =>
@@ -359,7 +359,7 @@ public class OrganizationsApplicationSubscriptionOwningEntitySpec
     {
         var organization = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
         organization.SubscribeBilling("asubscriptionid".ToId(), "aviewerid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organization);

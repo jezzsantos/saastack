@@ -30,7 +30,7 @@ public class TwilioApi : IWebApiService
 
         var caller = _callerFactory.Create();
         var eventData = request.Convert<TwilioNotifyWebhookEventRequest, TwilioEventData>();
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var notified =
             await _twilioApplication.NotifyWebhookEvent(maintenance, eventData, cancellationToken);
 

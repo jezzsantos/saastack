@@ -8,45 +8,45 @@ namespace Common;
 /// </summary>
 public interface IRecorder
 {
-    void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
+    void Audit(ICallContext? call, string auditCode, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void AuditAgainst(ICallContext? context, string againstId, string auditCode,
+    void AuditAgainst(ICallContext? call, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void Crash(ICallContext? context, CrashLevel level, Exception exception);
+    void Crash(ICallContext? call, CrashLevel level, Exception exception);
 
-    void Crash(ICallContext? context, CrashLevel level, Exception exception,
+    void Crash(ICallContext? call, CrashLevel level, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null);
+    void Measure(ICallContext? call, string eventName, Dictionary<string, object>? additional = null);
 
-    void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    void TraceDebug(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceError(ICallContext? context, Exception exception, [StructuredMessageTemplate] string messageTemplate,
+    void TraceError(ICallContext? call, Exception exception, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    void TraceError(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceInformation(ICallContext? context, Exception exception,
+    void TraceInformation(ICallContext? call, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    void TraceInformation(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceWarning(ICallContext? context, Exception exception, [StructuredMessageTemplate] string messageTemplate,
+    void TraceWarning(ICallContext? call, Exception exception, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    void TraceWarning(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 
-    void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null);
+    void TrackUsage(ICallContext? call, string eventName, Dictionary<string, object>? additional = null);
 
-    void TrackUsageFor(ICallContext? context, string forId, string eventName,
+    void TrackUsageFor(ICallContext? call, string forId, string eventName,
         Dictionary<string, object>? additional = null);
 }

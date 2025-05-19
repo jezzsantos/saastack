@@ -35,6 +35,8 @@ public class InvitationsApplicationSpec
     {
         _recorder = new Mock<IRecorder>();
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.HostRegion)
+            .Returns(DatacenterLocations.Local);
         var idFactory = new Mock<IIdentifierFactory>();
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
@@ -62,11 +64,13 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot
-            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         invitee.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("aninvitee@company.com").Value);
         _repository.Setup(rep =>
@@ -104,7 +108,8 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -126,7 +131,8 @@ public class InvitationsApplicationSpec
                 Id = "aprofileid"
             }.ToOptional());
         var invitee = EndUserRoot
-            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviteeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(invitee);
 
@@ -158,11 +164,13 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot
-            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         await invitee.InviteGuestAsync(_tokensService.Object, "aninviterid".ToId(),
             EmailAddress.Create("aninvitee@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
         _repository.Setup(rep =>
@@ -206,7 +214,8 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -257,7 +266,8 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -276,11 +286,13 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot
-            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         await invitee.InviteGuestAsync(_tokensService.Object, "aninviterid".ToId(),
             EmailAddress.Create("aninvitee@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
         _repository.Setup(rep =>
@@ -316,7 +328,8 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -335,11 +348,13 @@ public class InvitationsApplicationSpec
         _caller.Setup(cc => cc.CallerId)
             .Returns("aninviterid");
         var inviter = EndUserRoot
-            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot
-            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+            .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local).Value;
         await invitee.InviteGuestAsync(_tokensService.Object, "aninviterid".ToId(),
             EmailAddress.Create("aninvitee@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
         _repository.Setup(rep =>

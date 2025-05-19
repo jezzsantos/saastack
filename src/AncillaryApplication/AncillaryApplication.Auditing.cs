@@ -93,7 +93,8 @@ partial class AncillaryApplication
         }
 
         audit = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Audit {Id} was created", audit.Id);
+        _recorder.TraceInformation(caller.ToCall(), "Audit {Id} (from {Region}) was created", audit.Id,
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

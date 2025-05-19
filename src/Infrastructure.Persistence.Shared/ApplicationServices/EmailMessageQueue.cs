@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -12,10 +13,12 @@ public class EmailMessageQueue : IEmailMessageQueue
 {
     private readonly MessageQueueStore<EmailMessage> _messageQueue;
 
-    public EmailMessageQueue(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+    public EmailMessageQueue(IRecorder recorder, IHostSettings hostSettings,
+        IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<EmailMessage>(recorder, messageQueueMessageIdFactory, store);
+        _messageQueue =
+            new MessageQueueStore<EmailMessage>(recorder, hostSettings, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

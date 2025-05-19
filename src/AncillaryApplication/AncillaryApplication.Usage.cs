@@ -53,15 +53,19 @@ partial class AncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_Usage_MissingEventName);
         }
 
+        var region = message.OriginHostRegion ?? DatacenterLocations.Unknown.Code;
+        var additional = message.Additional ?? new Dictionary<string, string>();
+        additional.TryAdd(UsageConstants.Properties.Region, region);
+
         var delivered = await _usageDeliveryService.DeliverAsync(caller, message.ForId!, message.EventName!,
-            message.Additional,
-            cancellationToken);
+            additional, cancellationToken);
         if (delivered.IsFailure)
         {
             return delivered.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Delivered usage for {For}", message.ForId!);
+        _recorder.TraceInformation(caller.ToCall(), "Delivered usage for {For} (from {Region})", message.ForId!,
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

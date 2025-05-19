@@ -19,11 +19,13 @@ public class TestCaller : ICallerContext
 
     public ICallerContext.CallerFeatures Features => new();
 
+    public DatacenterLocation HostRegion => DatacenterLocations.Local;
+
     public bool IsAuthenticated => false;
 
     public bool IsServiceAccount => false;
 
     public ICallerContext.CallerRoles Roles => new();
 
-    public string? TenantId { get; }
+    public Optional<string> TenantId { get; }
 }

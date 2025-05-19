@@ -68,7 +68,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDrainAllUsagesAndSome_ThenDrains()
     {
-        var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid");
+        var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid", DatacenterLocations.Local);
         await _usageMessageQueue.PushAsync(call, new UsageMessage
         {
             MessageId = "amessageid1",

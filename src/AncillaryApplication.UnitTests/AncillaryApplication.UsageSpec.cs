@@ -86,7 +86,7 @@ public class AncillaryApplicationUsageSpec
     }
 
     [Fact]
-    public async Task WhenDeliverUsageAsync_ThenDelivers()
+    public async Task WhenDeliverUsageAsyncAndNoRegionInMessage_ThenDelivers()
     {
         var messageAsJson = new UsageMessage
         {
@@ -104,7 +104,34 @@ public class AncillaryApplicationUsageSpec
         _usageDeliveryService.Verify(
             urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.Region] == DatacenterLocations.Unknown.Code
+                    && dic["aname"] == "avalue"
+                ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeliverUsageAsync_ThenDelivers()
+    {
+        var messageAsJson = new UsageMessage
+        {
+            ForId = "aforid",
+            EventName = "aneventname",
+            Additional = new Dictionary<string, string>
+            {
+                { "aname", "avalue" },
+                { UsageConstants.Properties.Region, "aregion" }
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverUsageAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
+                It.Is<Dictionary<string, string>>(dic =>
+                    dic.Count == 2
+                    && dic[UsageConstants.Properties.Region] == "aregion"
                     && dic["aname"] == "avalue"
                 ), It.IsAny<CancellationToken>()));
     }

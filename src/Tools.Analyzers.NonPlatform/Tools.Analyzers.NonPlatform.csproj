@@ -67,6 +67,9 @@
         <Compile Include="..\Common\ICallContext.cs">
             <Link>Reference\Common\ICallContext.cs</Link>
         </Compile>
+        <Compile Include="..\Common\DatacenterLocations.cs">
+            <Link>Reference\Common\DatacenterLocations.cs</Link>
+        </Compile>
         <Compile Include="..\Common\Recording\CrashLevel.cs">
             <Link>Reference\Common\Recording\CrashLevel.cs</Link>
         </Compile>

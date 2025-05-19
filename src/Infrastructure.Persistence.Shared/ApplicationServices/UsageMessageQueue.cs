@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -12,10 +13,12 @@ public class UsageMessageQueue : IUsageMessageQueue
 {
     private readonly MessageQueueStore<UsageMessage> _messageQueue;
 
-    public UsageMessageQueue(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+    public UsageMessageQueue(IRecorder recorder, IHostSettings hostSettings,
+        IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<UsageMessage>(recorder, messageQueueMessageIdFactory, store);
+        _messageQueue =
+            new MessageQueueStore<UsageMessage>(recorder, hostSettings, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
@@ -13,16 +14,19 @@ namespace Infrastructure.Persistence.Common;
 public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
     where TMessage : IQueuedMessage, new()
 {
+    private readonly IHostSettings _hostSettings;
     private readonly IMessageQueueMessageIdFactory _messageQueueMessageIdFactory;
     private readonly string _queueName;
     private readonly IQueueStore _queueStore;
     private readonly IRecorder _recorder;
 
-    public MessageQueueStore(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+    public MessageQueueStore(IRecorder recorder, IHostSettings hostSettings,
+        IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore queueStore)
     {
         InstanceId = Guid.NewGuid();
         _recorder = recorder;
+        _hostSettings = hostSettings;
         _messageQueueMessageIdFactory = messageQueueMessageIdFactory;
         _queueStore = queueStore;
         _queueName = typeof(TMessage).GetEntityNameSafe();
@@ -88,7 +92,10 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
         message.CallerId = message.CallerId.HasValue()
             ? message.CallerId
             : call.CallerId;
-        message.MessageId = message.MessageId ?? CreateMessageId();
+        var messageId = message.MessageId ?? CreateMessageId();
+        message.MessageId = messageId;
+        var region = message.OriginHostRegion ?? _hostSettings.GetRegion().Code;
+        message.OriginHostRegion = region;
         var messageJson = message.ToJson()!;
 
         var pushed = await _queueStore.PushAsync(_queueName, messageJson, cancellationToken);
@@ -97,8 +104,10 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
             return pushed.Error;
         }
 
-        _recorder.TraceDebug(null, "Message {Message} was added to the queue {Queue} in the {Store} store", messageJson,
-            _queueName, _queueStore.GetType().Name);
+        _recorder.TraceDebug(null,
+            "Message {Message} was added to the queue {Queue} (in {Region}) by the {Store} store",
+            messageJson,
+            _queueName, region, _queueStore.GetType().Name);
 
         return message;
     }

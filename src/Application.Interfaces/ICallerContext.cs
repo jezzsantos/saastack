@@ -39,6 +39,11 @@ public partial interface ICallerContext
     CallerFeatures Features { get; }
 
     /// <summary>
+    ///     The region that this call is hosted within
+    /// </summary>
+    DatacenterLocation HostRegion { get; }
+
+    /// <summary>
     ///     Whether the called is authenticated or not
     /// </summary>
     public bool IsAuthenticated { get; }
@@ -56,7 +61,7 @@ public partial interface ICallerContext
     /// <summary>
     ///     The ID of the tenant of the caller
     /// </summary>
-    string? TenantId { get; }
+    Optional<string> TenantId { get; }
 
     /// <summary>
     ///     Defines the authorization details of the caller

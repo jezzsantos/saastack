@@ -258,8 +258,9 @@ partial class AncillaryApplication
         var isAlreadyDelivered = makeAttempt.Value;
         if (isAlreadyDelivered)
         {
-            _recorder.TraceInformation(caller.ToCall(), "Email for {For} is already sent",
-                email.Recipient.Value.EmailAddress.Address);
+            _recorder.TraceInformation(caller.ToCall(), "Email {Id} for {For} (from {Region}) is already sent",
+                email.Id, email.Recipient.Value.EmailAddress.Address,
+                message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
             return true;
         }
 
@@ -306,8 +307,10 @@ partial class AncillaryApplication
                 return savedFailure.Error;
             }
 
-            _recorder.TraceInformation(caller.ToCall(), "Sending of email for delivery for {For}, failed",
-                savedFailure.Value.Recipient.Value.EmailAddress.Address);
+            _recorder.TraceInformation(caller.ToCall(),
+                "Sending of email {Id} for delivery for {For} (from {Region}), failed",
+                email.Id, savedFailure.Value.Recipient.Value.EmailAddress.Address,
+                message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
             return sent.Error;
         }
@@ -325,8 +328,9 @@ partial class AncillaryApplication
         }
 
         email = updated.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Sent email for delivery for {For}",
-            email.Recipient.Value.EmailAddress.Address);
+        _recorder.TraceInformation(caller.ToCall(), "Sent email {Id} for delivery for {For} (from {Region})",
+            email.Id, email.Recipient.Value.EmailAddress.Address,
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

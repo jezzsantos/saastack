@@ -94,7 +94,7 @@ public class MailgunApi : IWebApiService
             return () => new EmptyResponse();
         }
 
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var notified =
             await _mailgunApplication.NotifyWebhookEvent(maintenance, request.EventData, cancellationToken);
 

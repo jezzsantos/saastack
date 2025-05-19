@@ -9,5 +9,7 @@ public interface ICallContext
 
     public string CallId { get; }
 
-    public string? TenantId { get; }
+    DatacenterLocation HostRegion { get; set; }
+
+    public Optional<string> TenantId { get; }
 }

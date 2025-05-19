@@ -39,6 +39,8 @@ public class EndUsersApplicationSpec
     {
         _recorder = new Mock<IRecorder>();
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.HostRegion)
+            .Returns(DatacenterLocations.Local);
         _idFactory = new Mock<IIdentifierFactory>();
         var membershipCounter = 0;
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
@@ -74,7 +76,8 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenGetPersonAndUnregistered_ThenReturnsUser()
     {
-        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
@@ -105,7 +108,8 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallId)
             .Returns("acallid");
-        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _userProfilesService.Setup(ups =>
                 ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -162,7 +166,8 @@ public class EndUsersApplicationSpec
         var tokensService = new Mock<ITokensService>();
         tokensService.Setup(ts => ts.CreateGuestInvitationToken())
             .Returns(TestingToken);
-        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         await invitee.InviteGuestAsync(tokensService.Object, "aninviterid".ToId(),
             EmailAddress.Create("auser@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
         _invitationRepository.Setup(rep =>
@@ -225,7 +230,8 @@ public class EndUsersApplicationSpec
         _invitationRepository.Setup(rep =>
                 rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<EndUserRoot>.None);
-        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _userProfilesService.Setup(ups =>
                 ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -277,11 +283,13 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns(CallerConstants.AnonymousUserId);
-        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _invitationRepository.Setup(rep =>
                 rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(invitee.ToOptional());
-        var otherUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var otherUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(otherUser);
         _userProfilesService.Setup(ups =>
@@ -323,7 +331,8 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenRegisterPersonAsyncAndAlreadyRegistered_ThenRegisters()
     {
-        var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         endUser.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("auser@company.com").Value);
         _userProfilesService.Setup(ups =>
@@ -478,7 +487,8 @@ public class EndUsersApplicationSpec
             .Returns(true);
         _caller.Setup(cc => cc.CallId)
             .Returns("acallid");
-        var adder = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var adder = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(adder);
         adder.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
@@ -531,12 +541,14 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns("anassignerid");
-        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assignee);
-        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
@@ -557,13 +569,15 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns("anassignerid");
-        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         assignee.Register(Roles.Create(PlatformRoles.Standard, PlatformRoles.TestingOnly).Value,
             Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
             Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assignee);
-        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
@@ -581,7 +595,8 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenGetMembershipsAndNotRegisteredOrMemberAsync_ThenReturnsUser()
     {
-        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
@@ -600,7 +615,8 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenGetMembershipsAsync_ThenReturnsUser()
     {
-        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         user.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
             EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
         user.AddMembership(user, OrganizationOwnership.Shared, "anorganizationid".ToId(),
@@ -631,7 +647,8 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallId)
             .Returns("acallid");
-        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person,
+            DatacenterLocations.Local).Value;
         user.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         user.AddMembership(user, OrganizationOwnership.Shared, "anorganizationid".ToId(),

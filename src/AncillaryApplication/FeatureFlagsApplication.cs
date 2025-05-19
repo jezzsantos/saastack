@@ -53,7 +53,9 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
 
         _recorder.TraceInformation(caller.ToCall(),
             "Feature flag {Name} was retrieved for user {User} in tenant {Tenant}", name, caller.CallerId,
-            caller.TenantId ?? "none");
+            caller.TenantId.HasValue
+                ? caller.TenantId
+                : "none");
 
         return flag.Value;
     }

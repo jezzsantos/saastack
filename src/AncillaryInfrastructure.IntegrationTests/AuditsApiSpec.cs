@@ -161,7 +161,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync(LoginUser.Operator);
         var tenantId = login.DefaultOrganizationId;
-        var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
+        var call = CallContext.CreateCustom("acallid", "acallerid", tenantId, DatacenterLocations.Local);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {
             MessageId = "amessageid1",

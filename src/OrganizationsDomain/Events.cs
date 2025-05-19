@@ -48,13 +48,14 @@ public static class Events
     }
 
     public static Created Created(Identifier id, OrganizationOwnership ownership, Identifier createdBy,
-        DisplayName name)
+        DisplayName name, DatacenterLocation hostRegion)
     {
         return new Created(id)
         {
             Name = name,
             Ownership = ownership,
-            CreatedById = createdBy
+            CreatedById = createdBy,
+            HostRegion = hostRegion.Code
         };
     }
 

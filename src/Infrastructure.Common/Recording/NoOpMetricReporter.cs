@@ -10,7 +10,7 @@ namespace Infrastructure.Common.Recording;
 [ExcludeFromCodeCoverage]
 public class NoOpMetricReporter : IMetricReporter
 {
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    public void Measure(ICallContext? call, string eventName, Dictionary<string, object>? additional = null)
     {
     }
 }

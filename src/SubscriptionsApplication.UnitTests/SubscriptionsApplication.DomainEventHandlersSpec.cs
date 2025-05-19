@@ -78,7 +78,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
             });
 
         var domainEvent = OrganizationsDomainEvents.Created("anowningentityid".ToId(), OrganizationOwnership.Personal,
-            "abuyerid".ToId(), DisplayName.Create("aname").Value);
+            "abuyerid".ToId(), DisplayName.Create("aname").Value, DatacenterLocations.Local);
 
         var result =
             await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
@@ -115,7 +115,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
             {
                 DisplayName = "adisplayname",
                 EmailAddress = "anemailaddress",
-                PhoneNumber = "aphonenumbernumber",
+                PhoneNumber = "aphonenumber",
                 Classification = UserProfileClassification.Person,
                 Name = new PersonName
                 {
@@ -132,7 +132,7 @@ public class SubscriptionsApplicationDomainEventHandlersSpec
             });
 
         var domainEvent = OrganizationsDomainEvents.Created("anowningentityid".ToId(), OrganizationOwnership.Personal,
-            "abuyerid".ToId(), DisplayName.Create("aname").Value);
+            "abuyerid".ToId(), DisplayName.Create("aname").Value, DatacenterLocations.Local);
 
         var result =
             await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);

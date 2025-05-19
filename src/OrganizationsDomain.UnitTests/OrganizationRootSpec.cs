@@ -40,7 +40,7 @@ public class OrganizationRootSpec
 
         _org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Shared, "acreatorid".ToId(), UserClassification.Person,
-            DisplayName.Create("aname").Value).Value;
+            DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class OrganizationRootSpec
     {
         var result = OrganizationRoot.Create(new Mock<IRecorder>().Object, new Mock<IIdentifierFactory>().Object,
             new Mock<ITenantSettingService>().Object, OrganizationOwnership.Shared, "acreatorid".ToId(),
-            UserClassification.Machine, DisplayName.Create("aname").Value);
+            UserClassification.Machine, DisplayName.Create("aname").Value, DatacenterLocations.Local);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_Create_SharedRequiresPerson);
     }
@@ -61,6 +61,7 @@ public class OrganizationRootSpec
         _org.BillingSubscriber.Should().Be(Optional<BillingSubscriber>.None);
         _org.Ownership.Should().Be(OrganizationOwnership.Shared);
         _org.Settings.Should().Be(Settings.Empty);
+        _org.HostRegion.Should().Be(DatacenterLocations.Local);
     }
 
     [Fact]
@@ -176,7 +177,7 @@ public class OrganizationRootSpec
     {
         var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
             _tenantSettingService.Object, OrganizationOwnership.Personal, "acreatorid".ToId(),
-            UserClassification.Person, DisplayName.Create("aname").Value).Value;
+            UserClassification.Person, DisplayName.Create("aname").Value, DatacenterLocations.Local).Value;
 
         var result = org.UnInviteMember("aremoverid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId());
 

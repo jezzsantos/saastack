@@ -23,10 +23,12 @@ namespace EndUsersDomain.UnitTests;
 public class EndUserRootSpec
 {
     private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
+
     private static EndUserRoot CreateOrgOwner(Mock<IRecorder> recorder, string organizationId,
         UserClassification classification = UserClassification.Person)
     {
-        var owner = EndUserRoot.Create(recorder.Object, "anownerid".ToIdentifierFactory(), classification)
+        var owner = EndUserRoot.Create(recorder.Object, "anownerid".ToIdentifierFactory(), classification,
+                DatacenterLocations.Local)
             .Value;
         owner.Register(Roles.Create(PlatformRoles.Standard).Value,
             Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -40,7 +42,8 @@ public class EndUserRootSpec
     private static EndUserRoot CreateOrgMember(Mock<IRecorder> recorder, string organizationId)
     {
         var owner = EndUserRoot
-            .Create(recorder.Object, "amemberid".ToIdentifierFactory(), UserClassification.Person)
+            .Create(recorder.Object, "amemberid".ToIdentifierFactory(), UserClassification.Person,
+                DatacenterLocations.Local)
             .Value;
         owner.Register(Roles.Create(PlatformRoles.Standard).Value,
             Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -53,7 +56,8 @@ public class EndUserRootSpec
 
     private static EndUserRoot CreateOperator(Mock<IRecorder> recorder, Mock<IIdentifierFactory> identifierFactory)
     {
-        var @operator = EndUserRoot.Create(recorder.Object, identifierFactory.Object, UserClassification.Person)
+        var @operator = EndUserRoot.Create(recorder.Object, identifierFactory.Object, UserClassification.Person,
+                DatacenterLocations.Local)
             .Value;
         @operator.Register(Roles.Create(PlatformRoles.Standard, PlatformRoles.Operations).Value,
             Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
@@ -89,7 +93,8 @@ public class EndUserRootSpec
             _tokensService.Setup(ts => ts.CreateGuestInvitationToken())
                 .Returns(TestingToken);
 
-            _user = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person).Value;
+            _user = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                DatacenterLocations.Local).Value;
         }
 
         [Fact]
@@ -98,6 +103,7 @@ public class EndUserRootSpec
             _user.Access.Should().Be(UserAccess.Enabled);
             _user.Status.Should().Be(UserStatus.Unregistered);
             _user.Classification.Should().Be(UserClassification.Person);
+            _user.HostRegion.Should().Be(DatacenterLocations.Local);
             _user.Roles.HasNone().Should().BeTrue();
             _user.Features.HasNone().Should().BeTrue();
             _user.GuestInvitation.IsInvited.Should().BeFalse();
@@ -217,7 +223,7 @@ public class EndUserRootSpec
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
-            
+
             var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 roles, features);
 
@@ -394,7 +400,6 @@ public class EndUserRootSpec
             _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
-
 #if TESTINGONLY
         [Fact]
         public void WhenAssignMembershipFeaturesAndNoMembership_ThenReturnsError()
@@ -542,7 +547,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenAssignMembershipRolesAndAssignerNotOwner_ThenReturnsError()
         {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
 
             var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
@@ -622,7 +628,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenUnassignMembershipRolesAndAssignerNotOwner_ThenReturnsError()
         {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
 
             var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
@@ -742,7 +749,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenAssignPlatformRolesAndAssignerNotOperator_ThenReturnsError()
         {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
 
             var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
@@ -800,7 +808,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenUnassignPlatformRolesAndAssignerNotOperator_ThenReturnsError()
         {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
 
             var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
@@ -1192,7 +1201,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenRemoveMembershipAndNotMember_ThenDoesNothing()
         {
-            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
             uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
@@ -1207,7 +1217,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenRemoveMembershipAndIsNotDefaultMembership_ThenRemoves()
         {
-            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
             uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
@@ -1228,7 +1239,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenRemoveMembershipAndIsDefaultMembership_ThenRemovesAndResetsDefault()
         {
-            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person,
+                    DatacenterLocations.Local)
                 .Value;
             uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid2".ToId(),
                 Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
@@ -1321,7 +1333,8 @@ public class EndUserRootSpec
             tokensService.Setup(ts => ts.CreateGuestInvitationToken())
                 .Returns("aninvitationtoken");
 
-            _user = EndUserRoot.Create(_recorder.Object, identifierFactory.Object, UserClassification.Machine).Value;
+            _user = EndUserRoot.Create(_recorder.Object, identifierFactory.Object, UserClassification.Machine,
+                DatacenterLocations.Local).Value;
         }
 
         [Fact]
@@ -1330,6 +1343,7 @@ public class EndUserRootSpec
             _user.Access.Should().Be(UserAccess.Enabled);
             _user.Status.Should().Be(UserStatus.Unregistered);
             _user.Classification.Should().Be(UserClassification.Machine);
+            _user.HostRegion.Should().Be(DatacenterLocations.Local);
             _user.Roles.HasNone().Should().BeTrue();
             _user.Features.HasNone().Should().BeTrue();
             _user.GuestInvitation.IsInvited.Should().BeFalse();
@@ -1352,7 +1366,7 @@ public class EndUserRootSpec
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
-            
+
             var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 roles, features);
 

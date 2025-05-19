@@ -21,4 +21,6 @@ public sealed class Created : DomainEvent
     public required string Name { get; set; }
 
     public OrganizationOwnership Ownership { get; set; }
+
+    public required string HostRegion { get; set; }
 }

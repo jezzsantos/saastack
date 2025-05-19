@@ -18,5 +18,7 @@ public class TestQueuedMessage : IQueuedMessage
 
     public string? MessageId { get; set; } = "amessageid";
 
+    public string? OriginHostRegion { get; set; }
+
     public string? TenantId { get; set; }
 }

@@ -111,7 +111,7 @@ public class ChargebeeApi : IWebApiService
             return () => new EmptyResponse();
         }
 
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var notified =
             await _chargebeeApplication.NotifyWebhookEvent(maintenance, request.Id!, request.EventType, request.Content,
                 cancellationToken);

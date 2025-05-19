@@ -553,7 +553,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
-            ownership, creatorId.ToId(), classification, displayName.Value);
+            ownership, creatorId.ToId(), classification, displayName.Value, DatacenterLocations.Local);
         if (created.IsFailure)
         {
             return created.Error;

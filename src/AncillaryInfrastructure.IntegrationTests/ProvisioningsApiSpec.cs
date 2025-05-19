@@ -76,7 +76,7 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
         var tenantId = login.DefaultOrganizationId;
-        var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
+        var call = CallContext.CreateCustom("acallid", "acallerid", tenantId, DatacenterLocations.Local);
         await _provisioningMessageQueue.PushAsync(call, new ProvisioningMessage
         {
             MessageId = "amessageid1",

@@ -21,4 +21,6 @@ public class Organization : ReadModelEntity
     public Optional<string> Name { get; set; }
 
     public Optional<OrganizationOwnership> Ownership { get; set; }
+
+    public Optional<string> RegisteredRegion { get; set; }
 }

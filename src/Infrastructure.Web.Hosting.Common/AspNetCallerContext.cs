@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Application.Common;
 using Application.Interfaces;
+using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -24,7 +25,8 @@ internal sealed class AspNetCallerContext : ICallerContext
     public AspNetCallerContext(IHttpContextAccessor httpContextAccessor)
     {
         var httpContext = httpContextAccessor.HttpContext!;
-        var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>();
+        var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>()!;
+        var regionService = httpContext.RequestServices.GetService<IHostSettings>()!;
         TenantId = GetTenantId(tenancyContext);
         CallId = httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
             out var callId)
@@ -38,6 +40,7 @@ internal sealed class AspNetCallerContext : ICallerContext
         Authorization = GetAuthorization(httpContext);
         IsAuthenticated = IsServiceAccount
                           || (Authorization.HasValue && !CallerConstants.IsAnonymousUser(CallerId));
+        HostRegion = regionService.GetRegion();
     }
 
     public Optional<ICallerContext.CallerAuthorization> Authorization { get; }
@@ -48,13 +51,15 @@ internal sealed class AspNetCallerContext : ICallerContext
 
     public ICallerContext.CallerFeatures Features { get; }
 
+    public DatacenterLocation HostRegion { get; }
+
     public bool IsAuthenticated { get; }
 
     public bool IsServiceAccount { get; }
 
     public ICallerContext.CallerRoles Roles { get; }
 
-    public string? TenantId { get; }
+    public Optional<string> TenantId { get; }
 
     private static string? GetTenantId(ITenancyContext? tenancyContext)
     {

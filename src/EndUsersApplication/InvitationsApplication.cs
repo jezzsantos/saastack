@@ -194,7 +194,7 @@ public partial class InvitationsApplication : IInvitationsApplication
                 return (retrievedInvitee.Value, retrievedEmailOwner.Value.Value);
             }
 
-            var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person);
+            var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person, caller.HostRegion);
             if (created.IsFailure)
             {
                 return created.Error;

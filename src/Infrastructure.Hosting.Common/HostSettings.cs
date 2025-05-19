@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.Services;
+using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -22,6 +23,7 @@ public class HostSettings : IHostSettings
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
     internal const string WebsiteHostCSRFEncryptionSettingName = "Hosts:WebsiteHost:CSRFAESSecret";
     internal const string WebsiteHostCSRFSigningSettingName = "Hosts:WebsiteHost:CSRFHMACSecret";
+    private const string RegionSettingName = "Hosts:ThisHost:Region";
     private static readonly char[] SubscribedHostIdSeparators = [',', ';', ' '];
 
     private readonly IConfigurationSettings _settings;
@@ -94,6 +96,11 @@ public class HostSettings : IHostSettings
 
         throw new InvalidOperationException(
             Resources.HostSettings_MissingSetting.Format(PrivateInterHostHmacSecretSettingName));
+    }
+
+    public DatacenterLocation GetRegion()
+    {
+        return DatacenterLocations.FindOrDefault(_settings.GetString(RegionSettingName));
     }
 
     public virtual string GetWebsiteHostBaseUrl()

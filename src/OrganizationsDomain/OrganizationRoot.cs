@@ -25,7 +25,7 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public static Result<OrganizationRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         ITenantSettingService tenantSettingService, OrganizationOwnership ownership, Identifier createdBy,
-        UserClassification classification, DisplayName name)
+        UserClassification classification, DisplayName name, DatacenterLocation hostRegion)
     {
         if (ownership == OrganizationOwnership.Shared
             && classification != UserClassification.Person)
@@ -34,7 +34,7 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         var root = new OrganizationRoot(recorder, idFactory, tenantSettingService);
-        root.RaiseCreateEvent(OrganizationsDomain.Events.Created(root.Id, ownership, createdBy, name));
+        root.RaiseCreateEvent(OrganizationsDomain.Events.Created(root.Id, ownership, createdBy, name, hostRegion));
         return root;
     }
 
@@ -64,6 +64,8 @@ public sealed class OrganizationRoot : AggregateRootBase
     public DisplayName Name { get; private set; } = DisplayName.Empty;
 
     public OrganizationOwnership Ownership { get; private set; }
+
+    public DatacenterLocation HostRegion { get; private set; } = DatacenterLocations.Unknown;
 
     public Settings Settings { get; private set; } = Settings.Empty;
 
@@ -101,6 +103,7 @@ public sealed class OrganizationRoot : AggregateRootBase
                 Name = name.Value;
                 Ownership = created.Ownership;
                 CreatedById = created.CreatedById.ToId();
+                HostRegion = DatacenterLocations.FindOrDefault(created.HostRegion);
                 return Result.Ok;
             }
 

@@ -282,6 +282,7 @@ CREATE TABLE [dbo].[EndUser]
     [Access]             [nvarchar](max) NULL,
     [Classification]     [nvarchar](max) NULL,
     [Features]           [nvarchar](max) NULL,
+    [RegisteredRegion]   [nvarchar](max) NULL,
     [Roles]              [nvarchar](max) NULL,
     [Status]             [nvarchar](max) NULL,
     [Username]           [nvarchar](max) NULL,
@@ -404,6 +405,7 @@ CREATE TABLE [dbo].[Organization]
     [CreatedById]           [nvarchar](100) NULL,
     [Name]                  [nvarchar](max) NULL,
     [Ownership]             [nvarchar](max) NULL,
+    [RegisteredRegion]      [nvarchar](max) NULL,
 ) ON [PRIMARY]
 GO
 

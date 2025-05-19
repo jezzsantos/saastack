@@ -215,7 +215,7 @@ public partial class EndUsersApplication : IEndUsersApplication
     public async Task<Result<EndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
-        var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Machine);
+        var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Machine, caller.HostRegion);
         if (created.IsFailure)
         {
             return created.Error;
@@ -380,7 +380,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         }
         else
         {
-            var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person);
+            var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person, caller.HostRegion);
             if (created.IsFailure)
             {
                 return created.Error;
@@ -577,7 +577,7 @@ public partial class EndUsersApplication : IEndUsersApplication
     private async Task<Result<UserProfile, Error>> GetUserProfileAsync(ICallerContext caller, Identifier userId,
         CancellationToken cancellationToken)
     {
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         return await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
     }
 

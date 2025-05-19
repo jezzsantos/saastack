@@ -30,11 +30,13 @@ public class AnonymousCallerContext : ICallerContext
 
     public ICallerContext.CallerFeatures Features => new(new[] { PlatformFeatures.Basic }, null);
 
+    public DatacenterLocation HostRegion => DatacenterLocations.Local;
+
     public bool IsAuthenticated => false;
 
     public bool IsServiceAccount => false;
 
     public ICallerContext.CallerRoles Roles => new();
 
-    public string? TenantId => null;
+    public Optional<string> TenantId => null;
 }

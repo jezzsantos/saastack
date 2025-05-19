@@ -210,7 +210,7 @@ public sealed class TimezoneIANA : IEquatable<TimezoneIANA>
 
     public override int GetHashCode()
     {
-        ArgumentException.ThrowIfNullOrEmpty(Id);
+        Id.ThrowIfNotValuedParameter(nameof(Id));
 
         return Id.GetHashCode();
     }

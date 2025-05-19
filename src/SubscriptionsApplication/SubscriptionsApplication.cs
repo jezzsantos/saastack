@@ -268,7 +268,7 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
 
         Task<Result<SubscriptionMetadata, Error>> OnTransfer(BillingProvider provider, Identifier transfereeId1)
         {
-            var maintenanceCaller = Caller.CreateAsMaintenance(caller.CallId);
+            var maintenanceCaller = Caller.CreateAsMaintenance(caller);
             var transferee = CreateBuyerAsync(maintenanceCaller, transfereeId1, owningEntityId.ToId(),
                 cancellationToken);
             if (transferee.Result.IsFailure)

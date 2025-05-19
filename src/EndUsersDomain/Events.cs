@@ -10,13 +10,14 @@ namespace EndUsersDomain;
 
 public static class Events
 {
-    public static Created Created(Identifier id, UserClassification classification)
+    public static Created Created(Identifier id, UserClassification classification, DatacenterLocation hostRegion)
     {
         return new Created(id)
         {
             Classification = classification,
             Access = UserAccess.Enabled,
-            Status = UserStatus.Unregistered
+            Status = UserStatus.Unregistered,
+            HostRegion = hostRegion.Code
         };
     }
 

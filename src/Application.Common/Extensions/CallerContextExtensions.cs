@@ -10,14 +10,14 @@ public static class CallerContextExtensions
     /// <summary>
     ///     Returns the call context from the context
     /// </summary>
-    public static ICallContext ToCall(this ICallerContext? context)
+    public static ICallContext ToCall(this ICallerContext? caller)
     {
-        if (context.NotExists())
+        if (caller.NotExists())
         {
-            return CallContext.CreateUnknown();
+            return CallContext.CreateUnknown(DatacenterLocations.Unknown);
         }
 
-        return CallContext.CreateCustom(context.CallId, context.CallerId, context.TenantId);
+        return CallContext.CreateCustom(caller.CallId, caller.CallerId, caller.TenantId, caller.HostRegion);
     }
 
     /// <summary>

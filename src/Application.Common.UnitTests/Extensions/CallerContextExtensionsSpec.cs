@@ -4,6 +4,7 @@ using Common;
 using Domain.Common.ValueObjects;
 using FluentAssertions;
 using Moq;
+using UnitTesting.Common;
 using Xunit;
 
 namespace Application.Common.UnitTests.Extensions;
@@ -18,7 +19,7 @@ public class CallerContextExtensionsSpec
 
         result.CallId.Should().Be(CallConstants.UncorrelatedCallId);
         result.CallerId.Should().Be(CallConstants.UnknownCallerId);
-        result.TenantId.Should().BeNull();
+        result.TenantId.Should().BeNone();
     }
 
     [Fact]
@@ -33,7 +34,7 @@ public class CallerContextExtensionsSpec
 
         result.CallId.Should().Be("acallid");
         result.CallerId.Should().Be("acallerid");
-        result.TenantId.Should().BeNull();
+        result.TenantId.Should().BeNone();
     }
 
     [Fact]

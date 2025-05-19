@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -12,10 +13,12 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
 {
     private readonly MessageQueueStore<AuditMessage> _messageQueue;
 
-    public AuditMessageQueueRepository(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+    public AuditMessageQueueRepository(IRecorder recorder, IHostSettings hostSettings,
+        IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<AuditMessage>(recorder, messageQueueMessageIdFactory, store);
+        _messageQueue =
+            new MessageQueueStore<AuditMessage>(recorder, hostSettings, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

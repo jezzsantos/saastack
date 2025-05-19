@@ -1,4 +1,5 @@
-﻿using Application.Persistence.Interfaces;
+﻿using Application.Interfaces.Services;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -23,9 +24,12 @@ public class MessageQueueStoreSpec
         var messageQueueIdFactory = new Mock<IMessageQueueMessageIdFactory>();
         messageQueueIdFactory.Setup(mqif => mqif.Create(It.IsAny<string>()))
             .Returns("anid");
+        var hostSettings = new Mock<IHostSettings>();
+        hostSettings.Setup(h => h.GetRegion())
+            .Returns(DatacenterLocations.Local);
 
-        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, messageQueueIdFactory.Object,
-            _queueStore.Object);
+        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, hostSettings.Object,
+            messageQueueIdFactory.Object, _queueStore.Object);
     }
 
 #if TESTINGONLY
@@ -117,6 +121,7 @@ public class MessageQueueStoreSpec
             json.FromJson<TestQueuedMessage>()!.MessageId.HasValue()
             && json.FromJson<TestQueuedMessage>()!.CallId == "acallid"
             && json.FromJson<TestQueuedMessage>()!.CallerId == "acallerid"
+            && json.FromJson<TestQueuedMessage>()!.OriginHostRegion! == DatacenterLocations.Local.Code
             && json.FromJson<TestQueuedMessage>()!.AStringProperty == "avalue"
         ), CancellationToken.None));
     }

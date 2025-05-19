@@ -15,6 +15,8 @@ public class EndUser : ReadModelEntity
 
     public Optional<Features> Features { get; set; }
 
+    public Optional<string> RegisteredRegion { get; set; }
+
     public Optional<Roles> Roles { get; set; }
 
     public Optional<UserStatus> Status { get; set; }

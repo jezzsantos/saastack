@@ -22,7 +22,7 @@ public class TracingOnlyRecorder : IRecorder
         _logger.Log(LogLevel.Debug, Resources.TracingOnlyRecorder_Started);
     }
 
-    public virtual void Audit(ICallContext? context, string auditCode,
+    public virtual void Audit(ICallContext? call, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -31,20 +31,20 @@ public class TracingOnlyRecorder : IRecorder
             return;
         }
 
-        var againstId = context.Exists()
-            ? context.CallerId
+        var againstId = call.Exists()
+            ? call.CallerId
             : null;
         if (againstId.HasValue())
         {
-            AuditAgainst(context, againstId, auditCode, messageTemplate, templateArgs);
+            AuditAgainst(call, againstId, auditCode, messageTemplate, templateArgs);
         }
         else
         {
-            TraceInformation(context, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
+            TraceInformation(call, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
         }
     }
 
-    public virtual void AuditAgainst(ICallContext? context, string againstId, string auditCode,
+    public virtual void AuditAgainst(ICallContext? call, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -53,16 +53,16 @@ public class TracingOnlyRecorder : IRecorder
             return;
         }
 
-        TraceInformation(context, $"Audit: {auditCode}, against {againstId}, with message: {messageTemplate}",
+        TraceInformation(call, $"Audit: {auditCode}, against {againstId}, with message: {messageTemplate}",
             templateArgs);
     }
 
-    public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    public virtual void Crash(ICallContext? call, CrashLevel level, Exception exception)
     {
-        Crash(context, level, exception, exception.Message);
+        Crash(call, level, exception, exception.Message);
     }
 
-    public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception,
+    public virtual void Crash(ICallContext? call, CrashLevel level, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -70,23 +70,23 @@ public class TracingOnlyRecorder : IRecorder
             ? LogLevel.Critical
             : LogLevel.Error;
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Crash ({level}): {messageTemplate}", templateArgs);
+            AugmentMessageTemplateAndArguments(call, $"Crash ({level}): {messageTemplate}", templateArgs);
         _logger.Log(logLevel, exception,
             $"{Colors.Reverse}{Colors.Red}{augmentedMessageTemplate}{Colors.Normal}{Colors.NoReverse}",
             augmentedArguments);
     }
 
-    public virtual void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    public virtual void Measure(ICallContext? call, string eventName, Dictionary<string, object>? additional = null)
     {
         if (eventName.HasNoValue())
         {
             return;
         }
 
-        TraceInformation(context, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
+        TraceInformation(call, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
     }
 
-    public virtual void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceDebug(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         if (messageTemplate.HasNoValue())
@@ -95,20 +95,20 @@ public class TracingOnlyRecorder : IRecorder
         }
 
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceError(ICallContext? context, Exception exception,
+    public virtual void TraceError(ICallContext? call, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogError(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceError(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         if (messageTemplate.HasNoValue())
@@ -117,20 +117,20 @@ public class TracingOnlyRecorder : IRecorder
         }
 
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogError(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceInformation(ICallContext? context, Exception exception,
+    public virtual void TraceInformation(ICallContext? call, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogInformation(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceInformation(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         if (messageTemplate.HasNoValue())
@@ -139,20 +139,20 @@ public class TracingOnlyRecorder : IRecorder
         }
 
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogInformation(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceWarning(ICallContext? context, Exception exception,
+    public virtual void TraceWarning(ICallContext? call, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogWarning(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceWarning(ICallContext? call, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         if (messageTemplate.HasNoValue())
@@ -161,11 +161,11 @@ public class TracingOnlyRecorder : IRecorder
         }
 
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+            AugmentMessageTemplateAndArguments(call, messageTemplate, templateArgs);
         _logger.LogWarning(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public virtual void TrackUsage(ICallContext? context, string eventName,
+    public virtual void TrackUsage(ICallContext? call, string eventName,
         Dictionary<string, object>? additional = null)
     {
         if (eventName.HasNoValue())
@@ -173,20 +173,20 @@ public class TracingOnlyRecorder : IRecorder
             return;
         }
 
-        var forId = context.Exists()
-            ? context.CallerId
+        var forId = call.Exists()
+            ? call.CallerId
             : null;
         if (forId.HasValue())
         {
-            TrackUsageFor(context, forId, eventName, additional);
+            TrackUsageFor(call, forId, eventName, additional);
         }
         else
         {
-            TraceInformation(context, $"Usage: {eventName}, with context: {additional.DumpSafely()}");
+            TraceInformation(call, $"Usage: {eventName}, with context: {additional.DumpSafely()}");
         }
     }
 
-    public virtual void TrackUsageFor(ICallContext? context, string forId, string eventName,
+    public virtual void TrackUsageFor(ICallContext? call, string forId, string eventName,
         Dictionary<string, object>? additional = null)
     {
         if (eventName.HasNoValue())
@@ -194,7 +194,7 @@ public class TracingOnlyRecorder : IRecorder
             return;
         }
 
-        TraceInformation(context, $"Usage: {eventName}, for: {forId}, with context: {additional.DumpSafely()}");
+        TraceInformation(call, $"Usage: {eventName}, for: {forId}, with context: {additional.DumpSafely()}");
     }
 
     private static (string MessageTemplate, object[] Arguments) AugmentMessageTemplateAndArguments(

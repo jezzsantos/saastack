@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Common;
-using Common.Extensions;
 using Common.FeatureFlags;
 
 namespace Application.Common.Extensions;
@@ -19,9 +18,9 @@ public static class FeatureFlagsExtensions
                 cancellationToken);
         }
 
-        if (caller.TenantId.HasValue())
+        if (caller.TenantId.HasValue)
         {
-            return await featureFlags.GetFlagAsync(flag, caller.TenantId, caller.CallerId, cancellationToken);
+            return await featureFlags.GetFlagAsync(flag, caller.TenantId.Value, caller.CallerId, cancellationToken);
         }
 
         return await featureFlags.GetFlagAsync(flag, Optional<string>.None, caller.CallerId, cancellationToken);
@@ -37,9 +36,9 @@ public static class FeatureFlagsExtensions
             return featureFlags.IsEnabled(flag);
         }
 
-        if (caller.TenantId.HasValue())
+        if (caller.TenantId.HasValue)
         {
-            return featureFlags.IsEnabled(flag, caller.TenantId, caller.CallerId);
+            return featureFlags.IsEnabled(flag, caller.TenantId.Value, caller.CallerId);
         }
 
         return featureFlags.IsEnabled(flag, caller.CallerId);
