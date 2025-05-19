@@ -7,7 +7,6 @@ namespace Common.Recording;
 /// </summary>
 public interface IAuditReporter
 {
-    void Audit(ICallContext? context, string againstId, string auditCode,
-        [StructuredMessageTemplate] string messageTemplate,
-        params object[] templateArgs);
+    void Audit(ICallContext? call, string againstId, string auditCode,
+        [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs);
 }

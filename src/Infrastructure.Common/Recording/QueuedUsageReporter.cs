@@ -11,6 +11,7 @@ using Infrastructure.Persistence.Interfaces;
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
+using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -28,10 +29,13 @@ namespace Infrastructure.Common.Recording;
 public class QueuedUsageReporter : IUsageReporter
 {
     private readonly IUsageMessageQueue _queue;
+    private readonly IHostRegionService _hostRegionService;
 
     // ReSharper disable once UnusedParameter.Local
-    public QueuedUsageReporter(IDependencyContainer container, IConfigurationSettings settings)
+    public QueuedUsageReporter(IDependencyContainer container, IConfigurationSettings settings,
+        IHostRegionService hostRegionService)
         : this(new UsageMessageQueue(NoOpRecorder.Instance,
+            container.GetRequiredService<IHostRegionService>(),
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -42,13 +46,14 @@ public class QueuedUsageReporter : IUsageReporter
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()
 #endif
-        ))
+        ), hostRegionService)
     {
     }
 
-    internal QueuedUsageReporter(IUsageMessageQueue queue)
+    internal QueuedUsageReporter(IUsageMessageQueue queue, IHostRegionService hostRegionService)
     {
         _queue = queue;
+        _hostRegionService = hostRegionService;
     }
 
     public async Task<Result<Error>> TrackAsync(ICallContext? call, string forId, string eventName,
@@ -57,11 +62,12 @@ public class QueuedUsageReporter : IUsageReporter
         ArgumentException.ThrowIfNullOrEmpty(forId);
         ArgumentException.ThrowIfNullOrEmpty(eventName);
 
-        var safeCall = call ?? CallContext.CreateUnknown();
+        var region = _hostRegionService.GetRegion();
+        var safeCall = call ?? CallContext.CreateUnknown(region);
         var properties = additional ?? new Dictionary<string, object>();
 
         properties[UsageConstants.Properties.CallId] = safeCall.CallId;
-        properties[UsageConstants.Properties.TenantId] = safeCall.TenantId!;
+        properties[UsageConstants.Properties.TenantId] = safeCall.TenantId.ValueOrNull!;
 
         var message = new UsageMessage
         {

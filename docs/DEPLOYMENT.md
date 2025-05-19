@@ -137,6 +137,16 @@ This list is populated before the respective user accounts are registered. When 
 
 > For user accounts that already exist, they can be promoted by existing operator accounts.
 
+#### Deployment Region
+
+Setting name: `HOSTS_REGION`
+
+This is the name of the data center to which you deploy your deployable unit of code.
+
+These names have no specific meaning, so you can use whatever you like. This data is exposed through the `IHostRegionContext` service, and stored by various subdomains in their read models.
+
+For example, for Azure deployments you may want to use the  `name` property of the location returned from running this command (in PowerShell): `az account list-locations`
+
 ### GitHub secrets
 
 The following MUST be defined as secrets in your GitHub project, NOT as environment variables:

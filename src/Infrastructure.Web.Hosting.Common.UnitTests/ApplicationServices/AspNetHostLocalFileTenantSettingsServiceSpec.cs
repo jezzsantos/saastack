@@ -1,5 +1,6 @@
 using Application.Common;
 using Application.Interfaces.Services;
+using Common;
 using FluentAssertions;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using JetBrains.Annotations;
@@ -34,7 +35,8 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid",
+                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid", Region.Local),
+                    "atenantid",
                     CancellationToken.None);
 
             result.Value.Count.Should().Be(1);
@@ -61,7 +63,8 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid",
+                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid", Region.Local),
+                    "atenantid",
                     CancellationToken.None);
 
             result.Value.Count.Should().Be(3);

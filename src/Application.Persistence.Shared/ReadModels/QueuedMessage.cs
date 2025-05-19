@@ -1,4 +1,5 @@
 using Application.Persistence.Interfaces;
+using Common;
 
 namespace Application.Persistence.Shared.ReadModels;
 
@@ -11,4 +12,6 @@ public class QueuedMessage : IQueuedMessage
     public string? MessageId { get; set; }
 
     public string? TenantId { get; set; }
+
+    public Region? OriginHostRegion { get; set; }
 }

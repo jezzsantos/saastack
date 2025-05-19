@@ -374,7 +374,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDrainAllSmsesAndSome_ThenDrains()
     {
-        var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid");
+        var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid", Region.Local);
         var messageId1 = CreateMessageId();
         var messageId2 = CreateMessageId();
         var messageId3 = CreateMessageId();

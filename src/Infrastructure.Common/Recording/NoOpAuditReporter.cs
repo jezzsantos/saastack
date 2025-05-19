@@ -11,7 +11,7 @@ namespace Infrastructure.Common.Recording;
 [ExcludeFromCodeCoverage]
 public class NoOpAuditReporter : IAuditReporter
 {
-    public void Audit(ICallContext? context, string againstId, string auditCode,
+    public void Audit(ICallContext? call, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs)
     {
     }

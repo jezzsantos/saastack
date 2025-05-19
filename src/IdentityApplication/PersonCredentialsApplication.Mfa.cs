@@ -45,7 +45,7 @@ partial class PersonCredentialsApplication
             return Error.PreconditionViolation(Resources.PersonCredentialsApplication_NotPerson);
         }
 
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var retrievedProfile =
             await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
         if (retrievedProfile.IsFailure)

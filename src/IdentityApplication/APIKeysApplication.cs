@@ -87,7 +87,7 @@ public class APIKeysApplication : IAPIKeysApplication
             return Error.EntityExists(Resources.APIKeysApplication_AccountSuspended);
         }
 
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var profiled = await _userProfilesService.GetProfilePrivateAsync(maintenance, user.Id, cancellationToken);
         if (profiled.IsFailure)
         {

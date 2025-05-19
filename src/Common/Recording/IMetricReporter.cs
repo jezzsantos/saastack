@@ -5,5 +5,5 @@ namespace Common.Recording;
 /// </summary>
 public interface IMetricReporter
 {
-    void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null);
+    void Measure(ICallContext? call, string eventName, Dictionary<string, object>? additional = null);
 }

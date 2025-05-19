@@ -7,7 +7,6 @@ namespace Common.Recording;
 /// </summary>
 public interface ICrashReporter
 {
-    void Crash(ICallContext? context, CrashLevel level, Exception exception,
-        [StructuredMessageTemplate] string messageTemplate,
-        params object[] templateArgs);
+    void Crash(ICallContext? call, CrashLevel level, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs);
 }

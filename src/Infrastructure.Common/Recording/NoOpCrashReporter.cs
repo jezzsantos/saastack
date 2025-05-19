@@ -11,7 +11,7 @@ namespace Infrastructure.Common.Recording;
 [ExcludeFromCodeCoverage]
 public class NoOpCrashReporter : ICrashReporter
 {
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+    public void Crash(ICallContext? call, CrashLevel level, Exception exception,
         [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs)
     {
     }

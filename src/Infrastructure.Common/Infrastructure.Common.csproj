@@ -8,6 +8,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
+        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.External.Persistence.AWS\Infrastructure.External.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />

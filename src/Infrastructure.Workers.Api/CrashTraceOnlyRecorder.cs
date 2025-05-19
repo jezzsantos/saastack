@@ -20,16 +20,16 @@ public sealed class CrashTraceOnlyRecorder : TracingOnlyRecorder
         _crasher = crashReporter;
     }
 
-    public override void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    public override void Crash(ICallContext? call, CrashLevel level, Exception exception)
     {
-        base.Crash(context, level, exception);
-        _crasher.Crash(context, level, exception, string.Empty);
+        base.Crash(call, level, exception);
+        _crasher.Crash(call, level, exception, string.Empty);
     }
 
-    public override void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+    public override void Crash(ICallContext? call, CrashLevel level, Exception exception, string messageTemplate,
         params object[] templateArgs)
     {
-        base.Crash(context, level, exception, messageTemplate);
-        _crasher.Crash(context, level, exception, messageTemplate, templateArgs);
+        base.Crash(call, level, exception, messageTemplate);
+        _crasher.Crash(call, level, exception, messageTemplate, templateArgs);
     }
 }

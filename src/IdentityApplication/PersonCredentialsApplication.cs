@@ -169,7 +169,7 @@ public partial class PersonCredentialsApplication : IPersonCredentialsApplicatio
             return Error.PreconditionViolation(Resources.PersonCredentialsApplication_RegistrationNotVerified);
         }
 
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         var profiled = await _userProfilesService.GetProfilePrivateAsync(maintenance, user.Id, cancellationToken);
         if (profiled.IsFailure)
         {

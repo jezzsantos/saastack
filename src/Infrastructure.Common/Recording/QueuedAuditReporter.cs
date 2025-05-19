@@ -10,6 +10,7 @@ using Infrastructure.Persistence.Interfaces;
 #endif
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
+using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -27,10 +28,13 @@ namespace Infrastructure.Common.Recording;
 public class QueuedAuditReporter : IAuditReporter
 {
     private readonly IAuditMessageQueueRepository _repository;
+    private readonly IHostRegionService _hostRegionService;
 
     // ReSharper disable once UnusedParameter.Local
-    public QueuedAuditReporter(IDependencyContainer container, IConfigurationSettings settings)
+    public QueuedAuditReporter(IDependencyContainer container, IConfigurationSettings settings,
+        IHostRegionService hostRegionService)
         : this(new AuditMessageQueueRepository(NoOpRecorder.Instance,
+            container.GetRequiredService<IHostRegionService>(),
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -41,22 +45,24 @@ public class QueuedAuditReporter : IAuditReporter
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()
 #endif
-        ))
+        ), hostRegionService)
     {
     }
 
-    internal QueuedAuditReporter(IAuditMessageQueueRepository repository)
+    internal QueuedAuditReporter(IAuditMessageQueueRepository repository, IHostRegionService hostRegionService)
     {
         _repository = repository;
+        _hostRegionService = hostRegionService;
     }
 
-    public void Audit(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+    public void Audit(ICallContext? call, string againstId, string auditCode, string messageTemplate,
         params object[] templateArgs)
     {
         ArgumentException.ThrowIfNullOrEmpty(againstId);
         ArgumentException.ThrowIfNullOrEmpty(auditCode);
 
-        var call = context ?? CallContext.CreateUnknown();
+        var region = _hostRegionService.GetRegion();
+        var safeCall = call ?? CallContext.CreateUnknown(region);
         var message = new AuditMessage
         {
             AuditCode = auditCode,
@@ -68,6 +74,6 @@ public class QueuedAuditReporter : IAuditReporter
                 : new List<string>()
         };
 
-        _repository.PushAsync(call, message, CancellationToken.None).GetAwaiter().GetResult();
+        _repository.PushAsync(safeCall, message, CancellationToken.None).GetAwaiter().GetResult();
     }
 }

@@ -577,7 +577,7 @@ public partial class EndUsersApplication : IEndUsersApplication
     private async Task<Result<UserProfile, Error>> GetUserProfileAsync(ICallerContext caller, Identifier userId,
         CancellationToken cancellationToken)
     {
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var maintenance = Caller.CreateAsMaintenance(caller);
         return await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
     }
 

@@ -19,7 +19,7 @@ public class ApplicationInsightsMetricReporter : IMetricReporter
         _telemetryClient = container.GetRequiredService<TelemetryClient>();
     }
 
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    public void Measure(ICallContext? call, string eventName, Dictionary<string, object>? additional = null)
     {
         if (_telemetryClient.Exists())
         {

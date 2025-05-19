@@ -121,6 +121,8 @@ public static class HostExtensions
             services.AddHttpContextAccessor();
 
             // EXTEND: Default technology adapters
+            services.AddSingleton<IHostRegionService>(c =>
+                new HostRegionService(c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
             services.AddSingleton<IFeatureFlags>(c =>
                 new FlagsmithHttpServiceClient(c.GetRequiredService<IRecorder>(),
                     c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
@@ -386,10 +388,12 @@ public static class HostExtensions
             {
                 services.AddSingleton<IEmailMessageQueue>(c =>
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostRegionService>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<ISmsMessageQueue>(c =>
                     new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IHostRegionService>(),
                         c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();

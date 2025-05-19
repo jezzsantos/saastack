@@ -1,6 +1,7 @@
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
@@ -20,8 +21,11 @@ public class AsynchronousQueueConsumerRelaySpec
     public AsynchronousQueueConsumerRelaySpec()
     {
         _queue = new Mock<IDomainEventingMessageBusTopic>();
+        var hostRegionService = new Mock<IHostRegionService>();
+        hostRegionService.Setup(c => c.GetRegion())
+            .Returns(Region.Local);
 
-        _relay = new AsynchronousQueueConsumerRelay(_queue.Object);
+        _relay = new AsynchronousQueueConsumerRelay(_queue.Object, hostRegionService.Object);
     }
 
     [Fact]
@@ -49,7 +53,8 @@ public class AsynchronousQueueConsumerRelaySpec
             .Wrap(Resources.AsynchronousConsumerRelay_RelayFailed.Format(
                 "AsynchronousQueueConsumerRelay",
                 "arootid", "anfqn")).ToString());
-        _queue.Verify(c => c.SendAsync(It.IsAny<ICallContext>(), It.Is<DomainEventingMessage>(msg =>
+        _queue.Verify(c => c.SendAsync(It.Is<ICallContext>(call =>
+            call.HostRegion == Region.Local), It.Is<DomainEventingMessage>(msg =>
             msg.Event == changeEvent
         ), It.IsAny<CancellationToken>()));
     }
@@ -77,7 +82,8 @@ public class AsynchronousQueueConsumerRelaySpec
             await _relay.RelayDomainEventAsync(new TestDomainEvent(), changeEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _queue.Verify(c => c.SendAsync(It.IsAny<ICallContext>(), It.Is<DomainEventingMessage>(msg =>
+        _queue.Verify(c => c.SendAsync(It.Is<ICallContext>(call =>
+            call.HostRegion == Region.Local), It.Is<DomainEventingMessage>(msg =>
             msg.Event == changeEvent
         ), It.IsAny<CancellationToken>()));
     }

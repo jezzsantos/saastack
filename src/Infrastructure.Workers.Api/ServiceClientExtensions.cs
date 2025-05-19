@@ -26,7 +26,8 @@ public static class ServiceClientExtensions
             : "unknown";
         var messageType = typeof(TQueuedMessage).FullName!;
         var messageId = message.MessageId!; // we expect all messages pulled from queue to be assigned an ID
-        var caller = Caller.CreateAsMaintenanceTenant(callId, message.TenantId);
+        var region = message.OriginHostRegion ?? Region.Unknown;
+        var caller = Caller.CreateAsMaintenanceTenant(callId, message.TenantId, region);
 
         try
         {
@@ -43,11 +44,12 @@ public static class ServiceClientExtensions
         catch (Exception ex)
         {
             recorder.TraceError(caller.ToCall(),
-                ex, "Queued message {Id} of type {Type} failed delivery to API", messageId, messageType);
+                ex, "Queued message {Id} (in {Region}) of type {Type} failed delivery to API", messageId, region,
+                messageType);
             throw;
         }
 
-        recorder.TraceInformation(caller.ToCall(), "Relayed message {Id} of type {Type} to API", messageId,
-            messageType);
+        recorder.TraceInformation(caller.ToCall(), "Relayed message {Id} (in {Region}) of type {Type} to API",
+            messageId, region, messageType);
     }
 }

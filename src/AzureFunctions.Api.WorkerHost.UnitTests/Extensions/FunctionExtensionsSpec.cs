@@ -1,6 +1,7 @@
 using Application.Persistence.Interfaces;
 using Azure.Messaging.ServiceBus;
 using AzureFunctions.Api.WorkerHost.Extensions;
+using Common;
 using FluentAssertions;
 using Infrastructure.Workers.Api;
 using JetBrains.Annotations;
@@ -77,4 +78,6 @@ public class TestMessage : IQueuedMessage
     public string? MessageId { get; set; }
 
     public string? TenantId { get; set; }
+
+    public Region? OriginHostRegion { get; set; }
 }
