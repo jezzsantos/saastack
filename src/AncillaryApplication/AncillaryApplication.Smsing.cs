@@ -209,7 +209,7 @@ partial class AncillaryApplication
         if (isAlreadyDelivered)
         {
             _recorder.TraceInformation(caller.ToCall(), "Sms {Id} or {For} (from {Region}) is already sent",
-                sms.Id, sms.Recipient.Value.Number, message.OriginHostRegion ?? Region.Unknown);
+                sms.Id, sms.Recipient.Value.Number, message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
             return true;
         }
 
@@ -237,7 +237,8 @@ partial class AncillaryApplication
 
             _recorder.TraceInformation(caller.ToCall(),
                 "Sending of sms {Id} for delivery for {For} (from {Region}), failed",
-                sms.Id, savedFailure.Value.Recipient.Value.Number, message.OriginHostRegion ?? Region.Unknown);
+                sms.Id, savedFailure.Value.Recipient.Value.Number,
+                message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
             return sent.Error;
         }
@@ -256,7 +257,7 @@ partial class AncillaryApplication
 
         sms = updated.Value;
         _recorder.TraceInformation(caller.ToCall(), "Sent sms {Id} for delivery for {For} (from {Region})",
-            sms.Id, sms.Recipient.Value.Number, message.OriginHostRegion ?? Region.Unknown);
+            sms.Id, sms.Recipient.Value.Number, message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

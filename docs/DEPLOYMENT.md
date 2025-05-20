@@ -139,11 +139,11 @@ This list is populated before the respective user accounts are registered. When 
 
 #### Deployment Region
 
-Setting name: `HOSTS_REGION`
+Setting name: `HOSTS_THISHOST_REGION`
 
 This is the name of the data center to which you deploy your deployable unit of code.
 
-These names have no specific meaning, so you can use whatever you like. This data is exposed through the `IHostRegionContext` service, and stored by various subdomains in their read models.
+These names have no specific meaning, so you can use whatever you like. This data is exposed through the `IHostRegionService` service, and stored by various subdomains in their read models.
 
 For example, for Azure deployments you may want to use the  `name` property of the location returned from running this command (in PowerShell): `az account list-locations`
 
@@ -400,6 +400,8 @@ Assign these GitHub variables (or secrets) in your deployment environment, depen
 | HOSTS_IDENTITYAPI_BASEURL                                    |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
 | HOSTS_IMAGESAPI_BASEURL                                      |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_APIHOST1_APP_NAME>.azurewebsites.com` |
 | HOSTS_WEBSITEHOST_BASEURL                                    |      Variable      | As defined in initial setup, in format: `https://<DEPLOY_WEBSITEHOST_APP_NAME>.azurewebsites.com` |
+| HOSTS_THISHOST_REGION                                        |      Variable      | As defined [above](#github-environment-variables)            |
+| HOSTS_ENDUSERSAPI_AUTHORIZATION_OPERATORWHITELIST            |      Variable      | As defined [above](#github-environment-variables)            |
 
 #### Initialize SQL Database
 

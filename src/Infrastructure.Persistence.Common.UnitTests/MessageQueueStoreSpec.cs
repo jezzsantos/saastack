@@ -26,7 +26,7 @@ public class MessageQueueStoreSpec
             .Returns("anid");
         var hostRegionService = new Mock<IHostRegionService>();
         hostRegionService.Setup(h => h.GetRegion())
-            .Returns(Region.Local);
+            .Returns(DatacenterLocations.Local);
 
         _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, hostRegionService.Object,
             messageQueueIdFactory.Object, _queueStore.Object);
@@ -121,7 +121,7 @@ public class MessageQueueStoreSpec
             json.FromJson<TestQueuedMessage>()!.MessageId.HasValue()
             && json.FromJson<TestQueuedMessage>()!.CallId == "acallid"
             && json.FromJson<TestQueuedMessage>()!.CallerId == "acallerid"
-            && json.FromJson<TestQueuedMessage>()!.OriginHostRegion == Region.Local
+            && json.FromJson<TestQueuedMessage>()!.OriginHostRegion! == DatacenterLocations.Local.Code
             && json.FromJson<TestQueuedMessage>()!.AStringProperty == "avalue"
         ), CancellationToken.None));
     }

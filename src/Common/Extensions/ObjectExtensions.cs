@@ -124,17 +124,6 @@ public static class ObjectExtensions
         mapper.Map(source, target);
     }
 
-    /// <summary>
-    ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> is invalid
-    /// </summary>
-    public static void ThrowIfInvalidParameter<TValue>(this TValue? value, Predicate<TValue?> predicate,
-        string parameterName, string? errorMessage = null)
-    {
-        if (value.IsInvalidParameter(predicate, parameterName, errorMessage, out _))
-        {
-            throw new ArgumentOutOfRangeException(parameterName, errorMessage);
-        }
-    }
 #endif
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
     /// <summary>
@@ -143,6 +132,18 @@ public static class ObjectExtensions
     public static void ThrowIfNotValuedParameter(this string? value, string parameterName, string? errorMessage = null)
     {
         if (value.IsNotValuedParameter(parameterName, errorMessage, out _))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, errorMessage);
+        }
+    }
+
+    /// <summary>
+    ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> is invalid
+    /// </summary>
+    public static void ThrowIfInvalidParameter<TValue>(this TValue? value, Predicate<TValue?> predicate,
+        string parameterName, string? errorMessage = null)
+    {
+        if (value.IsInvalidParameter(predicate, parameterName, errorMessage, out _))
         {
             throw new ArgumentOutOfRangeException(parameterName, errorMessage);
         }

@@ -10,7 +10,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used to represent an authenticated caller with no access
     /// </summary>
-    public static ICallerContext CreateAsAnonymous(Region region)
+    public static ICallerContext CreateAsAnonymous(DatacenterLocation region)
     {
         return new AnonymousCaller(Optional<string>.None, region);
     }
@@ -18,7 +18,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used to represent an authenticated caller with no access
     /// </summary>
-    public static ICallerContext CreateAsAnonymousTenant(string tenantId, Region region)
+    public static ICallerContext CreateAsAnonymousTenant(string tenantId, DatacenterLocation region)
     {
         return new AnonymousCaller(tenantId, region);
     }
@@ -34,7 +34,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used to represent inbound webhook calls from 3rd party integrations
     /// </summary>
-    public static ICallerContext CreateAsExternalWebHook(string callId, Region region)
+    public static ICallerContext CreateAsExternalWebHook(string callId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(callId);
         return new ExternalWebHookAccountCaller(callId, region);
@@ -43,7 +43,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenance(Region region)
+    public static ICallerContext CreateAsMaintenance(DatacenterLocation region)
     {
         return new MaintenanceAccountCaller(Optional<string>.None, Optional<string>.None, region);
     }
@@ -51,7 +51,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenance(string callId, Region region)
+    public static ICallerContext CreateAsMaintenance(string callId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(callId);
         return new MaintenanceAccountCaller(callId, Optional<string>.None, region);
@@ -68,7 +68,8 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenanceTenant(string callId, Optional<string> tenantId, Region region)
+    public static ICallerContext CreateAsMaintenanceTenant(string callId, Optional<string> tenantId,
+        DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(callId);
         return new MaintenanceAccountCaller(callId, tenantId, region);
@@ -77,7 +78,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
-    public static ICallerContext CreateAsMaintenanceTenant(string tenantId, Region region)
+    public static ICallerContext CreateAsMaintenanceTenant(string tenantId, DatacenterLocation region)
     {
         ArgumentException.ThrowIfNullOrEmpty(tenantId);
         return new MaintenanceAccountCaller(null, tenantId, region);
@@ -86,7 +87,7 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for calling 3rd party [external] services
     /// </summary>
-    public static ICallerContext CreateAsServiceClient(Region region)
+    public static ICallerContext CreateAsServiceClient(DatacenterLocation region)
     {
         return new ServiceClientAccountCaller(region);
     }
@@ -104,7 +105,7 @@ public static class Caller
     /// </summary>
     private sealed class AnonymousCaller : ICallerContext
     {
-        public AnonymousCaller(Optional<string> tenantId, Region region)
+        public AnonymousCaller(Optional<string> tenantId, DatacenterLocation region)
         {
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles();
@@ -121,7 +122,7 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
-        public Region HostRegion { get; }
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => false;
 
@@ -137,7 +138,7 @@ public static class Caller
     /// </summary>
     private sealed class MaintenanceAccountCaller : ICallerContext
     {
-        public MaintenanceAccountCaller(Optional<string> callId, Optional<string> tenantId, Region region)
+        public MaintenanceAccountCaller(Optional<string> callId, Optional<string> tenantId, DatacenterLocation region)
         {
             CallId = callId.HasValue
                 ? callId.Value
@@ -159,7 +160,7 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
-        public Region HostRegion { get; }
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => true;
 
@@ -175,7 +176,7 @@ public static class Caller
     /// </summary>
     private sealed class ServiceClientAccountCaller : ICallerContext
     {
-        public ServiceClientAccountCaller(Region region)
+        public ServiceClientAccountCaller(DatacenterLocation region)
         {
             HostRegion = region;
         }
@@ -190,7 +191,7 @@ public static class Caller
         public ICallerContext.CallerFeatures Features { get; } = new(
             [PlatformFeatures.Paid2], null);
 
-        public Region HostRegion { get; }
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => true;
 
@@ -206,7 +207,7 @@ public static class Caller
     /// </summary>
     private sealed class ExternalWebHookAccountCaller : ICallerContext
     {
-        public ExternalWebHookAccountCaller(Optional<string> callId, Region region)
+        public ExternalWebHookAccountCaller(Optional<string> callId, DatacenterLocation region)
         {
             CallId = callId.HasValue
                 ? callId.Value
@@ -225,7 +226,7 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
-        public Region HostRegion { get; }
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => true;
 
@@ -260,7 +261,7 @@ public static class Caller
 
         public ICallerContext.CallerFeatures Features { get; }
 
-        public Region HostRegion { get; }
+        public DatacenterLocation HostRegion { get; }
 
         public bool IsAuthenticated => false;
 

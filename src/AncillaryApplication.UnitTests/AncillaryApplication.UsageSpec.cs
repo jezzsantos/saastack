@@ -105,7 +105,7 @@ public class AncillaryApplicationUsageSpec
             urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 2
-                    && dic[UsageConstants.Properties.Region] == Region.Unknown.GetDisplayName()
+                    && dic[UsageConstants.Properties.Region] == DatacenterLocations.Unknown.Code
                     && dic["aname"] == "avalue"
                 ), It.IsAny<CancellationToken>()));
     }

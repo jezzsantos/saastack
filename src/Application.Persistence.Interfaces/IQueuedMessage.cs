@@ -1,5 +1,3 @@
-using Common;
-
 namespace Application.Persistence.Interfaces;
 
 /// <summary>
@@ -26,7 +24,7 @@ public interface IQueuedMessage
     /// <summary>
     ///     Returns the region of the host that originated the message
     /// </summary>
-    Region? OriginHostRegion { get; set; } //Nullable for backwards compatibility
+    string? OriginHostRegion { get; set; } //Nullable for backwards compatibility
 
     /// <summary>
     ///     Returns the ID of the tenant

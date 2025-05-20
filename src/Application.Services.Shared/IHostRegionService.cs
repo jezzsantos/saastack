@@ -10,5 +10,5 @@ public interface IHostRegionService
     /// <summary>
     ///     Returns the region that this host is running in
     /// </summary>
-    public Region GetRegion();
+    public DatacenterLocation GetRegion();
 }

@@ -35,7 +35,8 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid", Region.Local),
+                await _service.CreateForTenantAsync(
+                    Caller.CreateAsAnonymousTenant("atenantid", DatacenterLocations.Local),
                     "atenantid",
                     CancellationToken.None);
 
@@ -63,7 +64,8 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid", Region.Local),
+                await _service.CreateForTenantAsync(
+                    Caller.CreateAsAnonymousTenant("atenantid", DatacenterLocations.Local),
                     "atenantid",
                     CancellationToken.None);
 

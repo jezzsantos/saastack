@@ -1,7 +1,6 @@
 using Amazon.Lambda.SQSEvents;
 using Application.Persistence.Interfaces;
 using AWSLambdas.Api.WorkerHost.Extensions;
-using Common;
 using FluentAssertions;
 using Infrastructure.Workers.Api;
 using JetBrains.Annotations;
@@ -82,7 +81,7 @@ public class TestMessage : IQueuedMessage
 
     public string? MessageId { get; set; }
 
-    public string? TenantId { get; set; }
+    public string? OriginHostRegion { get; set; }
 
-    public Region? OriginHostRegion { get; set; }
+    public string? TenantId { get; set; }
 }

@@ -259,7 +259,8 @@ partial class AncillaryApplication
         if (isAlreadyDelivered)
         {
             _recorder.TraceInformation(caller.ToCall(), "Email {Id} for {For} (from {Region}) is already sent",
-                email.Id, email.Recipient.Value.EmailAddress.Address, message.OriginHostRegion ?? Region.Unknown);
+                email.Id, email.Recipient.Value.EmailAddress.Address,
+                message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
             return true;
         }
 
@@ -309,7 +310,7 @@ partial class AncillaryApplication
             _recorder.TraceInformation(caller.ToCall(),
                 "Sending of email {Id} for delivery for {For} (from {Region}), failed",
                 email.Id, savedFailure.Value.Recipient.Value.EmailAddress.Address,
-                message.OriginHostRegion ?? Region.Unknown);
+                message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
             return sent.Error;
         }
@@ -328,7 +329,8 @@ partial class AncillaryApplication
 
         email = updated.Value;
         _recorder.TraceInformation(caller.ToCall(), "Sent email {Id} for delivery for {For} (from {Region})",
-            email.Id, email.Recipient.Value.EmailAddress.Address, message.OriginHostRegion ?? Region.Unknown);
+            email.Id, email.Recipient.Value.EmailAddress.Address,
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

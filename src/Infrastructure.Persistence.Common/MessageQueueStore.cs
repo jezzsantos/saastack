@@ -94,7 +94,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
             : call.CallerId;
         var messageId = message.MessageId ?? CreateMessageId();
         message.MessageId = messageId;
-        var region = message.OriginHostRegion ?? _hostRegionService.GetRegion();
+        var region = message.OriginHostRegion ?? _hostRegionService.GetRegion().Code;
         message.OriginHostRegion = region;
         var messageJson = message.ToJson()!;
 

@@ -78,7 +78,7 @@ partial class AncillaryApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Notified provisioning for {Tenant} (from {Region})",
-            message.TenantId!, message.OriginHostRegion ?? Region.Unknown);
+            message.TenantId!, message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

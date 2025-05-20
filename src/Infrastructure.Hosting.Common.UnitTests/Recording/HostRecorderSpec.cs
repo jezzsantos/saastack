@@ -26,7 +26,7 @@ public sealed class HostRecorderSpec : IDisposable
         var follower = new Mock<IUsageReporter>();
         _call = new Mock<ICallContext>();
         _call.Setup(c => c.HostRegion)
-            .Returns(Region.AustraliaEast);
+            .Returns(DatacenterLocations.AustraliaEast);
 
         _recorder = new HostRecorder(_logger, new RecorderOptions(), crasher.Object,
             auditor.Object, measurer.Object, follower.Object);
@@ -89,7 +89,7 @@ public sealed class HostRecorderSpec : IDisposable
         item.Level.Should().Be(LogLevel.Information);
         item.Message.Should()
             .Be(
-                $"Request: {CallConstants.UncorrelatedCallId}, (by anonymous, in australiaeast)  amessagetemplateanarg1anarg2");
+                $"Request: {CallConstants.UncorrelatedCallId}, (by anonymous, in aus)  amessagetemplateanarg1anarg2");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class HostRecorderSpec : IDisposable
 
         var item = _logger.Items.Single();
         item.Level.Should().Be(LogLevel.Information);
-        item.Message.Should().Be("Request: acallid, (by acallerid, in australiaeast)  amessagetemplateanarg1anarg2");
+        item.Message.Should().Be("Request: acallid, (by acallerid, in aus)  amessagetemplateanarg1anarg2");
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public sealed class HostRecorderSpec : IDisposable
 
         var item = _logger.Items.Single();
         item.Level.Should().Be(LogLevel.Error);
-        item.Message.Should().Be("Request: acallid, (by acallerid, in australiaeast)  ");
+        item.Message.Should().Be("Request: acallid, (by acallerid, in aus)  ");
         item.Exception.Should().Be(exception);
     }
 
@@ -174,7 +174,7 @@ public sealed class HostRecorderSpec : IDisposable
 
         var item = _logger.Items.Single();
         item.Level.Should().Be(LogLevel.Error);
-        item.Message.Should().Be("Request: acallid, (by acallerid, in australiaeast)  amessagetemplateanarg1anarg2");
+        item.Message.Should().Be("Request: acallid, (by acallerid, in aus)  amessagetemplateanarg1anarg2");
         item.Exception.Should().Be(exception);
     }
 
@@ -208,11 +208,11 @@ public sealed class HostRecorderSpec : IDisposable
         _logger.Items[0].Level.Should().Be(LogLevel.Information);
         _logger.Items[0].Message.Should()
             .Be(
-                "Request: uncorrelated, (by acallerid, in australiaeast)  Audit: anAuditCode, against: acallerid, with message: amessagetemplateanarg1anarg2");
+                "Request: uncorrelated, (by acallerid, in aus)  Audit: anAuditCode, against: acallerid, with message: amessagetemplateanarg1anarg2");
         _logger.Items[1].Level.Should().Be(LogLevel.Information);
         _logger.Items[1].Message.Should()
             .Be(
-                "Request: uncorrelated, (by acallerid, in australiaeast)  Usage: Audited, for: acallerid, with properties: <\"UserId\": acallerid, \"Code\": anauditcode>");
+                "Request: uncorrelated, (by acallerid, in aus)  Usage: Audited, for: acallerid, with properties: <\"UserId\": acallerid, \"Code\": anauditcode>");
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public sealed class HostRecorderSpec : IDisposable
         item.Level.Should().Be(LogLevel.Information);
         item.Message.Should()
             .Be(
-                $"Request: {CallConstants.UncorrelatedCallId}, (by acallerid, in australiaeast)  Usage: aneventname, for: aforid, with properties: <\"aname1\": avalue1, \"aname2\": avalue2>");
+                $"Request: {CallConstants.UncorrelatedCallId}, (by acallerid, in aus)  Usage: aneventname, for: aforid, with properties: <\"aname1\": avalue1, \"aname2\": avalue2>");
     }
 
     [Fact]

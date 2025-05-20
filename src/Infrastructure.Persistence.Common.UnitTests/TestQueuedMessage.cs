@@ -1,5 +1,4 @@
 using Application.Persistence.Interfaces;
-using Common;
 using QueryAny;
 
 namespace Infrastructure.Persistence.Common.UnitTests;
@@ -19,7 +18,7 @@ public class TestQueuedMessage : IQueuedMessage
 
     public string? MessageId { get; set; } = "amessageid";
 
-    public string? TenantId { get; set; }
+    public string? OriginHostRegion { get; set; }
 
-    public Region? OriginHostRegion { get; set; }
+    public string? TenantId { get; set; }
 }

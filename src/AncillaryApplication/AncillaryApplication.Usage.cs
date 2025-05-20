@@ -53,7 +53,7 @@ partial class AncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_Usage_MissingEventName);
         }
 
-        var region = (message.OriginHostRegion ?? Region.Unknown).GetDisplayName();
+        var region = message.OriginHostRegion ?? DatacenterLocations.Unknown.Code;
         var additional = message.Additional ?? new Dictionary<string, string>();
         additional.TryAdd(UsageConstants.Properties.Region, region);
 
@@ -65,7 +65,7 @@ partial class AncillaryApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Delivered usage for {For} (from {Region})", message.ForId!,
-            message.OriginHostRegion ?? Region.Unknown);
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

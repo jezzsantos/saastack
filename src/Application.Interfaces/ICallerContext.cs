@@ -41,7 +41,7 @@ public partial interface ICallerContext
     /// <summary>
     ///     The region that this call is hosted within
     /// </summary>
-    Region HostRegion { get; }
+    DatacenterLocation HostRegion { get; }
 
     /// <summary>
     ///     Whether the called is authenticated or not

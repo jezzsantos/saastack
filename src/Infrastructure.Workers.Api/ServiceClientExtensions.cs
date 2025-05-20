@@ -26,7 +26,9 @@ public static class ServiceClientExtensions
             : "unknown";
         var messageType = typeof(TQueuedMessage).FullName!;
         var messageId = message.MessageId!; // we expect all messages pulled from queue to be assigned an ID
-        var region = message.OriginHostRegion ?? Region.Unknown;
+        var region = message.OriginHostRegion.HasValue()
+            ? DatacenterLocations.FindOrDefault(message.OriginHostRegion)
+            : DatacenterLocations.Unknown;
         var caller = Caller.CreateAsMaintenanceTenant(callId, message.TenantId, region);
 
         try

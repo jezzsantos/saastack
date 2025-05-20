@@ -51,7 +51,7 @@ internal sealed class AspNetCallerContext : ICallerContext
 
     public ICallerContext.CallerFeatures Features { get; }
 
-    public Region HostRegion { get; }
+    public DatacenterLocation HostRegion { get; }
 
     public bool IsAuthenticated { get; }
 

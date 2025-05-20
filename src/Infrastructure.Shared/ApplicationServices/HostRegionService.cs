@@ -1,7 +1,6 @@
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
-using Common.Extensions;
 
 namespace Infrastructure.Shared.ApplicationServices;
 
@@ -11,15 +10,15 @@ namespace Infrastructure.Shared.ApplicationServices;
 public class HostRegionService : IHostRegionService
 {
     private const string RegionSettingName = "Hosts:ThisHost:Region";
-    private readonly Region _region;
+    private readonly DatacenterLocation _datacenterLocation;
 
     public HostRegionService(IConfigurationSettings settings)
     {
-        _region = settings.GetString(RegionSettingName).ToEnum<Region>();
+        _datacenterLocation = DatacenterLocations.FindOrDefault(settings.GetString(RegionSettingName));
     }
 
-    public Region GetRegion()
+    public DatacenterLocation GetRegion()
     {
-        return _region;
+        return _datacenterLocation;
     }
 }

@@ -30,7 +30,7 @@ public class AnonymousCallerContext : ICallerContext
 
     public ICallerContext.CallerFeatures Features => new(new[] { PlatformFeatures.Basic }, null);
 
-    public Region HostRegion => Region.Local;
+    public DatacenterLocation HostRegion => DatacenterLocations.Local;
 
     public bool IsAuthenticated => false;
 

@@ -35,7 +35,7 @@ public class AspNetCallerContextSpec
             .Returns("atenantid");
         var hostRegionService = new Mock<IHostRegionService>();
         hostRegionService.Setup(h => h.GetRegion())
-            .Returns(Region.AustraliaEast);
+            .Returns(DatacenterLocations.AustraliaEast);
         _serviceProvider = new Mock<IServiceProvider>();
         _serviceProvider.Setup(sp => sp.GetService(typeof(ITenancyContext)))
             .Returns(_tenancyContext.Object);

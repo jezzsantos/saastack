@@ -94,7 +94,7 @@ partial class AncillaryApplication
 
         audit = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Audit {Id} (from {Region}) was created", audit.Id,
-            message.OriginHostRegion ?? Region.Unknown);
+            message.OriginHostRegion ?? DatacenterLocations.Unknown.Code);
 
         return true;
     }

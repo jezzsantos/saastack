@@ -14,7 +14,7 @@ public static class CallerContextExtensions
     {
         if (caller.NotExists())
         {
-            return CallContext.CreateUnknown(Region.Unknown);
+            return CallContext.CreateUnknown(DatacenterLocations.Unknown);
         }
 
         return CallContext.CreateCustom(caller.CallId, caller.CallerId, caller.TenantId, caller.HostRegion);

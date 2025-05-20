@@ -346,7 +346,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
             var isAuthenticatedCaller =
                 call.CallerId.HasValue() && call.CallerId != CallerConstants.AnonymousUserId;
-            var region = call.HostRegion.GetDisplayName();
+            var region = call.HostRegion.Abbreviation;
             builder.Append(isAuthenticatedCaller
                 ? "(by {Caller}, in {Region}) "
                 : "(by anonymous, in {Region}) ");

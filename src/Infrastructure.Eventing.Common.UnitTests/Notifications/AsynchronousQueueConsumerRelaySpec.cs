@@ -23,7 +23,7 @@ public class AsynchronousQueueConsumerRelaySpec
         _queue = new Mock<IDomainEventingMessageBusTopic>();
         var hostRegionService = new Mock<IHostRegionService>();
         hostRegionService.Setup(c => c.GetRegion())
-            .Returns(Region.Local);
+            .Returns(DatacenterLocations.Local);
 
         _relay = new AsynchronousQueueConsumerRelay(_queue.Object, hostRegionService.Object);
     }
@@ -54,7 +54,7 @@ public class AsynchronousQueueConsumerRelaySpec
                 "AsynchronousQueueConsumerRelay",
                 "arootid", "anfqn")).ToString());
         _queue.Verify(c => c.SendAsync(It.Is<ICallContext>(call =>
-            call.HostRegion == Region.Local), It.Is<DomainEventingMessage>(msg =>
+            call.HostRegion == DatacenterLocations.Local), It.Is<DomainEventingMessage>(msg =>
             msg.Event == changeEvent
         ), It.IsAny<CancellationToken>()));
     }
@@ -83,7 +83,7 @@ public class AsynchronousQueueConsumerRelaySpec
 
         result.Should().BeSuccess();
         _queue.Verify(c => c.SendAsync(It.Is<ICallContext>(call =>
-            call.HostRegion == Region.Local), It.Is<DomainEventingMessage>(msg =>
+            call.HostRegion == DatacenterLocations.Local), It.Is<DomainEventingMessage>(msg =>
             msg.Event == changeEvent
         ), It.IsAny<CancellationToken>()));
     }
