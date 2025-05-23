@@ -1,6 +1,8 @@
 import { AzureRecorder } from "./recorders/azureRecorder";
 import { AwsRecorder } from "./recorders/awsRecorder";
 import { NoOpRecorder } from "./recorders/noOpRecorder";
+import { anonymousUserId } from "./index";
+import { UsageConstants } from "./UsageConstants";
 
 export interface Recorder {
   crash: (error: Error, message?: string) => void;
@@ -48,6 +50,8 @@ class LazyLoadingRecorder implements Recorder {
 
   trackUsage(eventName: string, additional?: { [val: string]: any } | undefined): void {
     this.ensureUnderlyingRecorder();
+
+    this.AppendUserIdentity(additional);
     this.recorder?.trackUsage(eventName, additional);
   }
 
@@ -67,6 +71,19 @@ class LazyLoadingRecorder implements Recorder {
     }
 
     this.recorder = new NoOpRecorder();
+  }
+
+  private AppendUserIdentity(additional: { [val: string]: any } | undefined) {
+    if (!additional) {
+      additional = {};
+    }
+
+    //EXTEND: Obtain the ID of the authenticated user
+    //if (auth.user != null && auth.isAuthenticated) {
+    //additional[UsageConstants.Properties.ForId] = auth.user.userId
+    //} else {
+    additional[UsageConstants.Properties.ForId] = anonymousUserId;
+    //}
   }
 }
 

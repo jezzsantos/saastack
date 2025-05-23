@@ -3,6 +3,7 @@ import { client as apiHost1 } from "./apiHost1/services.gen";
 import { client as websiteHost, refreshToken } from "./websiteHost/services.gen";
 import { recorder } from "../recorder";
 import { ProblemDetails } from "./websiteHost";
+import { UsageConstants } from "../UsageConstants";
 
 const unRetryableRequestUrls: string[] = ["/api/auth/refresh", "/api/auth"];
 const loginPath = "/login";
@@ -81,7 +82,7 @@ async function handleUnauthorizedResponse(error: AxiosError) {
         }
         return Promise.reject(error);
       } else {
-        recorder.trackUsage("Browser Authentication Refreshed");
+        recorder.trackUsage(UsageConstants.UsageScenarios.BrowserAuthRefresh);
         // Retry the original request
         return axios.request(requestConfig).then((res) => {
           if (axios.isAxiosError(res)) {

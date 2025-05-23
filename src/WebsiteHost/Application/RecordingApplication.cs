@@ -96,7 +96,14 @@ public class RecordingApplication : IRecordingApplication
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
             : null)!);
-        _recorder.TrackUsage(caller.ToCall(), eventName, more);
+        if (more.Remove(UsageConstants.Properties.ForId, out var forId))
+        {
+            _recorder.TrackUsageFor(caller.ToCall(), forId.ToString()!, eventName, more);
+        }
+        else
+        {
+            _recorder.TrackUsage(caller.ToCall(), eventName, more);
+        }
 
         return Task.FromResult(Result.Ok);
     }

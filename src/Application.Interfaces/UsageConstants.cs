@@ -29,11 +29,12 @@ public static class UsageConstants
         public const string EmailAddress = "EmailAddress";
         public const string Enabled = "Enabled";
         public const string EndPoint = "EndPoint";
+        public const string ForId = "ForId";
         public const string HttpMethod = "Method";
         public const string HttpPath = "Path";
         public const string HttpRoute = "Route";
         public const string HttpStatusCode = "Status";
-        public const string Id = "ResourceId";
+        public const string Id = ResourceId; // how we identify any resource, including users
         public const string IpAddress = "IpAddress";
         public const string MetricEventName = "Metric";
         public const string MfaAuthenticatorType = "MfaAuthenticatorType";

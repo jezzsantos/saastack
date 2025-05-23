@@ -4,6 +4,8 @@ import { initializeApiClient } from "./api";
 import { showLoginForm } from "./pages/login";
 import { getFeatureFlagForCaller, logout } from "./api/websiteHost";
 
+export const anonymousUserId = "xxx_anonymous0000000000000";
+
 initializeApiClient();
 
 if (window.isTestingOnly) {
@@ -19,7 +21,8 @@ getProfileForCaller().then((res) => {
   if (!res.data?.profile?.isAuthenticated) {
     recorder.traceInformation(`User is signed out`);
   } else {
-    recorder.traceInformation( `User is signed in as: ${res.data?.profile?.name?.firstName} ${res.data?.profile?.name?.lastName}`
+    recorder.traceInformation(
+        `User is signed in as: ${res.data?.profile?.name?.firstName} ${res.data?.profile?.name?.lastName}`
     );
     const defaultOrganizationId = res.data?.profile?.defaultOrganizationId!;
     if (window.location.pathname === "/") {
