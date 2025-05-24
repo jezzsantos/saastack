@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using Common;
 
 namespace Application.Interfaces.Services;
 
@@ -29,6 +30,16 @@ public interface IHostSettings
     IReadOnlyList<SubscriberHost> GetEventNotificationSubscriberHosts();
 
     /// <summary>
+    ///     Returns the HMAC auth secret for Inter Host
+    /// </summary>
+    string GetPrivateInterHostHmacAuthSecret();
+
+    /// <summary>
+    ///     Returns the region that this host is running in
+    /// </summary>
+    public DatacenterLocation GetRegion();
+
+    /// <summary>
     ///     Returns the URL of the Website host
     /// </summary>
     string GetWebsiteHostBaseUrl();
@@ -47,11 +58,6 @@ public interface IHostSettings
     ///     Returns the URL for the specified <see cref="MediaTypeNames.Image" />
     /// </summary>
     string MakeImagesApiGetUrl(string imageId);
-
-    /// <summary>
-    ///     Returns the HMAC auth secret for Inter Host
-    /// </summary>
-    string GetPrivateInterHostHmacAuthSecret();
 }
 
 /// <summary>

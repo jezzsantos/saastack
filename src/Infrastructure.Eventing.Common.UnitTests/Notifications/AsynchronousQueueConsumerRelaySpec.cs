@@ -1,7 +1,7 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
-using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
@@ -21,7 +21,7 @@ public class AsynchronousQueueConsumerRelaySpec
     public AsynchronousQueueConsumerRelaySpec()
     {
         _queue = new Mock<IDomainEventingMessageBusTopic>();
-        var hostRegionService = new Mock<IHostRegionService>();
+        var hostRegionService = new Mock<IHostSettings>();
         hostRegionService.Setup(c => c.GetRegion())
             .Returns(DatacenterLocations.Local);
 

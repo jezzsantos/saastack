@@ -1,5 +1,5 @@
-﻿using Application.Persistence.Interfaces;
-using Application.Services.Shared;
+﻿using Application.Interfaces.Services;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -24,11 +24,11 @@ public class MessageQueueStoreSpec
         var messageQueueIdFactory = new Mock<IMessageQueueMessageIdFactory>();
         messageQueueIdFactory.Setup(mqif => mqif.Create(It.IsAny<string>()))
             .Returns("anid");
-        var hostRegionService = new Mock<IHostRegionService>();
-        hostRegionService.Setup(h => h.GetRegion())
+        var hostSettings = new Mock<IHostSettings>();
+        hostSettings.Setup(h => h.GetRegion())
             .Returns(DatacenterLocations.Local);
 
-        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, hostRegionService.Object,
+        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, hostSettings.Object,
             messageQueueIdFactory.Object, _queueStore.Object);
     }
 

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Application.Common;
 using Application.Interfaces;
-using Application.Services.Shared;
+using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -26,7 +26,7 @@ internal sealed class AspNetCallerContext : ICallerContext
     {
         var httpContext = httpContextAccessor.HttpContext!;
         var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>()!;
-        var regionService = httpContext.RequestServices.GetService<IHostRegionService>()!;
+        var regionService = httpContext.RequestServices.GetService<IHostSettings>()!;
         TenantId = GetTenantId(tenancyContext);
         CallId = httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
             out var callId)

@@ -1,7 +1,7 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
-using Application.Services.Shared;
 using Common;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
@@ -13,12 +13,12 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
 {
     private readonly MessageQueueStore<AuditMessage> _messageQueue;
 
-    public AuditMessageQueueRepository(IRecorder recorder, IHostRegionService hostRegionService,
+    public AuditMessageQueueRepository(IRecorder recorder, IHostSettings hostSettings,
         IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore store)
     {
         _messageQueue =
-            new MessageQueueStore<AuditMessage>(recorder, hostRegionService, messageQueueMessageIdFactory, store);
+            new MessageQueueStore<AuditMessage>(recorder, hostSettings, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Application.Interfaces;
-using Application.Services.Shared;
+using Application.Interfaces.Services;
 using Common;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
@@ -33,14 +33,14 @@ public class AspNetCallerContextSpec
         _tenancyContext = new Mock<ITenancyContext>();
         _tenancyContext.Setup(tc => tc.Current)
             .Returns("atenantid");
-        var hostRegionService = new Mock<IHostRegionService>();
-        hostRegionService.Setup(h => h.GetRegion())
+        var hostSettings = new Mock<IHostSettings>();
+        hostSettings.Setup(h => h.GetRegion())
             .Returns(DatacenterLocations.AustraliaEast);
         _serviceProvider = new Mock<IServiceProvider>();
         _serviceProvider.Setup(sp => sp.GetService(typeof(ITenancyContext)))
             .Returns(_tenancyContext.Object);
-        _serviceProvider.Setup(sp => sp.GetService(typeof(IHostRegionService)))
-            .Returns(hostRegionService.Object);
+        _serviceProvider.Setup(sp => sp.GetService(typeof(IHostSettings)))
+            .Returns(hostSettings.Object);
         _httpContext = new Mock<IHttpContextAccessor>();
         _httpContext.Setup(hc => hc.HttpContext!.Items).Returns(new Dictionary<object, object?>());
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>());

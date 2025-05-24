@@ -1,5 +1,5 @@
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
-using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -14,19 +14,19 @@ namespace Infrastructure.Persistence.Common;
 public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
     where TMessage : IQueuedMessage, new()
 {
-    private readonly IHostRegionService _hostRegionService;
+    private readonly IHostSettings _hostSettings;
     private readonly IMessageQueueMessageIdFactory _messageQueueMessageIdFactory;
     private readonly string _queueName;
     private readonly IQueueStore _queueStore;
     private readonly IRecorder _recorder;
 
-    public MessageQueueStore(IRecorder recorder, IHostRegionService hostRegionService,
+    public MessageQueueStore(IRecorder recorder, IHostSettings hostSettings,
         IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore queueStore)
     {
         InstanceId = Guid.NewGuid();
         _recorder = recorder;
-        _hostRegionService = hostRegionService;
+        _hostSettings = hostSettings;
         _messageQueueMessageIdFactory = messageQueueMessageIdFactory;
         _queueStore = queueStore;
         _queueName = typeof(TMessage).GetEntityNameSafe();
@@ -94,7 +94,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
             : call.CallerId;
         var messageId = message.MessageId ?? CreateMessageId();
         message.MessageId = messageId;
-        var region = message.OriginHostRegion ?? _hostRegionService.GetRegion().Code;
+        var region = message.OriginHostRegion ?? _hostSettings.GetRegion().Code;
         message.OriginHostRegion = region;
         var messageJson = message.ToJson()!;
 

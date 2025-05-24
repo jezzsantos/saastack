@@ -9,9 +9,9 @@ using Infrastructure.External.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 #endif
 using Application.Interfaces;
+using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
-using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -28,14 +28,14 @@ namespace Infrastructure.Common.Recording;
 /// </summary>
 public class QueuedUsageReporter : IUsageReporter
 {
+    private readonly IHostSettings _hostSettings;
     private readonly IUsageMessageQueue _queue;
-    private readonly IHostRegionService _hostRegionService;
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedUsageReporter(IDependencyContainer container, IConfigurationSettings settings,
-        IHostRegionService hostRegionService)
+        IHostSettings hostSettings)
         : this(new UsageMessageQueue(NoOpRecorder.Instance,
-            container.GetRequiredService<IHostRegionService>(),
+            container.GetRequiredService<IHostSettings>(),
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -46,14 +46,14 @@ public class QueuedUsageReporter : IUsageReporter
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()
 #endif
-        ), hostRegionService)
+        ), hostSettings)
     {
     }
 
-    internal QueuedUsageReporter(IUsageMessageQueue queue, IHostRegionService hostRegionService)
+    internal QueuedUsageReporter(IUsageMessageQueue queue, IHostSettings hostSettings)
     {
         _queue = queue;
-        _hostRegionService = hostRegionService;
+        _hostSettings = hostSettings;
     }
 
     public async Task<Result<Error>> TrackAsync(ICallContext? call, string forId, string eventName,
@@ -62,7 +62,7 @@ public class QueuedUsageReporter : IUsageReporter
         ArgumentException.ThrowIfNullOrEmpty(forId);
         ArgumentException.ThrowIfNullOrEmpty(eventName);
 
-        var region = _hostRegionService.GetRegion();
+        var region = _hostSettings.GetRegion();
         var safeCall = call ?? CallContext.CreateUnknown(region);
         var properties = additional ?? new Dictionary<string, object>();
 

@@ -8,9 +8,9 @@ using Infrastructure.External.Persistence.AWS.ApplicationServices;
 #else
 using Infrastructure.Persistence.Interfaces;
 #endif
+using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
-using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -27,14 +27,14 @@ namespace Infrastructure.Common.Recording;
 /// </summary>
 public class QueuedAuditReporter : IAuditReporter
 {
+    private readonly IHostSettings _hostSettings;
     private readonly IAuditMessageQueueRepository _repository;
-    private readonly IHostRegionService _hostRegionService;
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedAuditReporter(IDependencyContainer container, IConfigurationSettings settings,
-        IHostRegionService hostRegionService)
+        IHostSettings hostSettings)
         : this(new AuditMessageQueueRepository(NoOpRecorder.Instance,
-            container.GetRequiredService<IHostRegionService>(),
+            container.GetRequiredService<IHostSettings>(),
             container.GetRequiredService<IMessageQueueMessageIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -45,14 +45,14 @@ public class QueuedAuditReporter : IAuditReporter
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()
 #endif
-        ), hostRegionService)
+        ), hostSettings)
     {
     }
 
-    internal QueuedAuditReporter(IAuditMessageQueueRepository repository, IHostRegionService hostRegionService)
+    internal QueuedAuditReporter(IAuditMessageQueueRepository repository, IHostSettings hostSettings)
     {
         _repository = repository;
-        _hostRegionService = hostRegionService;
+        _hostSettings = hostSettings;
     }
 
     public void Audit(ICallContext? call, string againstId, string auditCode, string messageTemplate,
@@ -61,7 +61,7 @@ public class QueuedAuditReporter : IAuditReporter
         ArgumentException.ThrowIfNullOrEmpty(againstId);
         ArgumentException.ThrowIfNullOrEmpty(auditCode);
 
-        var region = _hostRegionService.GetRegion();
+        var region = _hostSettings.GetRegion();
         var safeCall = call ?? CallContext.CreateUnknown(region);
         var message = new AuditMessage
         {

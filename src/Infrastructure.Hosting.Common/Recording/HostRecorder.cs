@@ -1,6 +1,6 @@
 using System.Text;
 using Application.Interfaces;
-using Application.Services.Shared;
+using Application.Interfaces.Services;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -298,7 +298,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
             AuditReporterOption.None => new NoOpAuditReporter(),
             AuditReporterOption.ReliableQueue => new QueuedAuditReporter(container,
                 container.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                container.GetRequiredService<IHostRegionService>()),
+                container.GetRequiredService<IHostSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }
@@ -327,7 +327,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
             UsageReporterOption.None => new NoOpUsageReporter(),
             UsageReporterOption.ReliableQueue => new QueuedUsageReporter(container,
                 container.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                container.GetRequiredService<IHostRegionService>()),
+                container.GetRequiredService<IHostSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }
