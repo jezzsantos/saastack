@@ -39,6 +39,7 @@ beforeAll(() => {
 
     return null;
   });
+
   // @ts-ignore
   delete global.window.location;
   // noinspection JSConstantReassignment

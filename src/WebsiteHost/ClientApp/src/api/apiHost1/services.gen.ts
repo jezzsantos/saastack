@@ -508,10 +508,10 @@ export const deleteApiKey = <ThrowOnError extends boolean = false>(options: Opti
  * (request type: RevokeAPIKeyRequest)
  */
 export const revokeApiKey = <ThrowOnError extends boolean = false>(options: Options<RevokeApiKeyData, ThrowOnError>) =>
-    (options?.client ?? client).delete<RevokeApiKeyResponse, RevokeApiKeyError, ThrowOnError>({
-      ...options,
-      url: "/apikeys/{Id}/revoke"
-    });
+  (options?.client ?? client).delete<RevokeApiKeyResponse, RevokeApiKeyError, ThrowOnError>({
+    ...options,
+    url: "/apikeys/{Id}/revoke"
+  });
 
 /**
  * Delivers an audit message
@@ -776,24 +776,24 @@ export const chargebeeNotifyWebhookEvent = <ThrowOnError extends boolean = false
  * (request type: AuthenticateCredentialRequest)
  */
 export const authenticateCredential = <ThrowOnError extends boolean = false>(
-    options?: Options<AuthenticateCredentialData, ThrowOnError>
+  options?: Options<AuthenticateCredentialData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<AuthenticateCredentialResponse, AuthenticateCredentialError, ThrowOnError>({
-      ...options,
-      url: "/credentials/auth"
-    });
+  (options?.client ?? client).post<AuthenticateCredentialResponse, AuthenticateCredentialError, ThrowOnError>({
+    ...options,
+    url: "/credentials/auth"
+  });
 
 /**
  * Completes a password reset attempt
  * (request type: CompleteCredentialResetRequest)
  */
 export const completeCredentialReset = <ThrowOnError extends boolean = false>(
-    options: Options<CompleteCredentialResetData, ThrowOnError>
+  options: Options<CompleteCredentialResetData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<CompleteCredentialResetResponse, CompleteCredentialResetError, ThrowOnError>({
-      ...options,
-      url: "/credentials/{Token}/reset/complete"
-    });
+  (options?.client ?? client).post<CompleteCredentialResetResponse, CompleteCredentialResetError, ThrowOnError>({
+    ...options,
+    url: "/credentials/{Token}/reset/complete"
+  });
 
 /**
  * Confirms the invitation to register a new person (verifying their email address)
@@ -832,23 +832,23 @@ export const getRegistrationPersonConfirmation = <ThrowOnError extends boolean =
  * (request type: RegisterPersonCredentialRequest)
  */
 export const registerPersonCredential = <ThrowOnError extends boolean = false>(
-    options?: Options<RegisterPersonCredentialData, ThrowOnError>
+  options?: Options<RegisterPersonCredentialData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<RegisterPersonCredentialResponse2, RegisterPersonCredentialError, ThrowOnError>({
-      ...options,
-      url: "/credentials/register"
-    });
+  (options?.client ?? client).post<RegisterPersonCredentialResponse2, RegisterPersonCredentialError, ThrowOnError>({
+    ...options,
+    url: "/credentials/register"
+  });
 
 /**
  * Begins a password reset attempt
  * (request type: InitiatePasswordResetRequest)
  */
 export const initiatePasswordReset = <ThrowOnError extends boolean = false>(
-    options?: Options<InitiatePasswordResetData, ThrowOnError>
+  options?: Options<InitiatePasswordResetData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<InitiatePasswordResetResponse, InitiatePasswordResetError, ThrowOnError>({
-      ...options,
-      url: "/credentials/reset"
+  (options?.client ?? client).post<InitiatePasswordResetResponse, InitiatePasswordResetError, ThrowOnError>({
+    ...options,
+    url: "/credentials/reset"
   });
 
 /**
@@ -856,36 +856,36 @@ export const initiatePasswordReset = <ThrowOnError extends boolean = false>(
  * (request type: ResendPasswordResetRequest)
  */
 export const resendPasswordReset = <ThrowOnError extends boolean = false>(
-    options: Options<ResendPasswordResetData, ThrowOnError>
+  options: Options<ResendPasswordResetData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<ResendPasswordResetResponse, ResendPasswordResetError, ThrowOnError>({
-      ...options,
-      url: "/credentials/{Token}/reset/resend"
-    });
+  (options?.client ?? client).post<ResendPasswordResetResponse, ResendPasswordResetError, ThrowOnError>({
+    ...options,
+    url: "/credentials/{Token}/reset/resend"
+  });
 
 /**
  * Verifies that the password reset attempt is still valid
  * (request type: VerifyPasswordResetRequest)
  */
 export const verifyPasswordReset = <ThrowOnError extends boolean = false>(
-    options: Options<VerifyPasswordResetData, ThrowOnError>
+  options: Options<VerifyPasswordResetData, ThrowOnError>
 ) =>
-    (options?.client ?? client).get<VerifyPasswordResetResponse, VerifyPasswordResetError, ThrowOnError>({
-      ...options,
-      url: "/credentials/{Token}/reset/verify"
-    });
+  (options?.client ?? client).get<VerifyPasswordResetResponse, VerifyPasswordResetError, ThrowOnError>({
+    ...options,
+    url: "/credentials/{Token}/reset/verify"
+  });
 
 /**
  * Drains all the pending event notifications
  * (request type: DrainAllEventNotificationsRequest)
  */
 export const drainAllEventNotifications = <ThrowOnError extends boolean = false>(
-    options?: Options<DrainAllEventNotificationsData, ThrowOnError>
+  options?: Options<DrainAllEventNotificationsData, ThrowOnError>
 ) =>
-    (options?.client ?? client).post<DrainAllEventNotificationsResponse, DrainAllEventNotificationsError, ThrowOnError>({
-      ...options,
-      url: "/event_notifications/drain"
-    });
+  (options?.client ?? client).post<DrainAllEventNotificationsResponse, DrainAllEventNotificationsError, ThrowOnError>({
+    ...options,
+    url: "/event_notifications/drain"
+  });
 
 /**
  * Notifies when a domain_event has been raised to a subscriber
@@ -2090,9 +2090,7 @@ export const searchTestingOnly = <ThrowOnError extends boolean = false>(
  * Tests access with anonymous access
  * (request type: GetInsecureTestingOnlyRequest)
  */
-export const getInsecureTestingOnly = <ThrowOnError extends boolean = false>(
-  options?: Options<unknown, ThrowOnError>
-) =>
+export const getInsecureTestingOnly = <ThrowOnError extends boolean = false>(options?: Options<unknown, ThrowOnError>) =>
   (options?.client ?? client).get<GetInsecureTestingOnlyResponse, GetInsecureTestingOnlyError, ThrowOnError>({
     ...options,
     url: "/testingonly/security/none"
