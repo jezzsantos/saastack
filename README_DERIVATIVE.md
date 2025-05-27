@@ -382,3 +382,7 @@ The latest changes for this new version are recorded in [CHANGELOG.md](CHANGELOG
 3. Commit, tag, and push the new version changes.
 
 > Note: Each build in CI will automatically append the last build number to the SemVer and update the version in `GlobalAssemblyInfo.cs`
+
+# Coding Standards
+
+Please read the [Coding Standards](docs/CODING_STANDARDS.md) document for the coding standards and rules for programming in this codebase.

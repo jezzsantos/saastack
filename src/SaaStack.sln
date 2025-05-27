@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
 		..\docs\DEPLOYMENT.md = ..\docs\DEPLOYMENT.md
+		..\docs\CODING_STANDARDS.md = ..\docs\CODING_STANDARDS.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{508E7DA4-4DF2-4201-955D-CCF70C41AD05}"

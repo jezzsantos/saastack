@@ -50,3 +50,7 @@ The codebase is ready for deployment immediately, from your GitHub repository.
 Deployment can be performed by any tool set to any environment, any way you like, we just made it easy for GitHub actions.
 
 For more details, see the [Deployment](DEPLOYMENT.md) documentation.
+
+## Coding Standards
+
+Please read the [Coding Standards](CODING_STANDARDS.md) document for the coding standards and rules for programming in this codebase.
