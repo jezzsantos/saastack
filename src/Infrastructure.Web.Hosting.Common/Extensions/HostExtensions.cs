@@ -87,7 +87,8 @@ public static class HostExtensions
         RegisterApiDocumentation(hostOptions.HostName, hostOptions.HostVersion, hostOptions.UsesApiDocumentation);
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
-        RegisterApplicationServices(hostOptions.IsMultiTenanted, hostOptions.ReceivesWebhooks);
+        RegisterApplicationServices(hostOptions.IsBackendForFrontEnd, hostOptions.IsMultiTenanted,
+            hostOptions.ReceivesWebhooks);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
         RegisterEventing(hostOptions.Persistence.UsesEventing);
         RegisterCors(hostOptions.CORS);
@@ -198,6 +199,10 @@ public static class HostExtensions
             {
                 services.AddPerHttpRequest<ITenancyContext, SimpleTenancyContext>();
                 services.AddPerHttpRequest<ITenantDetective, RequestTenantDetective>();
+            }
+            else
+            {
+                services.AddSingleton<ITenancyContext, NoOpTenancyContext>();
             }
         }
 
@@ -433,16 +438,24 @@ public static class HostExtensions
             services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
         }
 
-        void RegisterApplicationServices(bool isMultiTenanted, bool receivesWebhooks)
+        void RegisterApplicationServices(bool isBeffeHost, bool isMultiTenanted, bool receivesWebhooks)
         {
             services.AddHttpClient();
             var prefixes = modules.EntityPrefixes;
             prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
             services.AddSingleton<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
 
+            if (isBeffeHost)
+            {
+                services.AddPerHttpRequest<ICallerContextFactory, AspNetBeffeCallerFactory>();
+            }
+            else
+            {
+                services.AddPerHttpRequest<ICallerContextFactory, AspNetHttpContextCallerFactory>();
+            }
+
             if (isMultiTenanted)
             {
-                services.AddPerHttpRequest<ICallerContextFactory, AspNetCallerContextFactory>();
                 if (receivesWebhooks)
                 {
                     services
@@ -452,7 +465,6 @@ public static class HostExtensions
             }
             else
             {
-                services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
                 if (receivesWebhooks)
                 {
                     services.AddSingleton<IWebhookNotificationAuditRepository, WebhookNotificationAuditRepository>();

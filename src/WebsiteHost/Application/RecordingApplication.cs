@@ -4,6 +4,7 @@ using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Common.Recording;
+using Domain.Interfaces;
 using Task = System.Threading.Tasks.Task;
 
 namespace WebsiteHost.Application;
@@ -30,7 +31,7 @@ public class RecordingApplication : IRecordingApplication
         Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
-        var more = AddClientContext(clientDetails, (additional.Exists()
+        var more = AddClientContext(caller, clientDetails, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -43,14 +44,20 @@ public class RecordingApplication : IRecordingApplication
     public Task<Result<Error>> RecordPageViewAsync(ICallerContext caller, string path, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
-        const string eventName = UsageConstants.Events.Web.WebPageVisit;
-
-        var additional = AddClientContext(clientDetails, new Dictionary<string, object>
+        var additional = AddClientContext(caller, clientDetails, new Dictionary<string, object>
         {
             { UsageConstants.Properties.Path, path }
         });
-
-        _recorder.TrackUsage(caller.ToCall(), eventName, additional);
+        
+        const string eventName = UsageConstants.Events.Web.WebPageVisit;
+        if (additional.Remove(UsageConstants.Properties.ForId, out var forId))
+        {
+            _recorder.TrackUsageFor(caller.ToCall(), forId.ToString()!, eventName, additional);
+        }
+        else
+        {
+            _recorder.TrackUsage(caller.ToCall(), eventName, additional);
+        }
 
         return Task.FromResult(Result.Ok);
     }
@@ -91,7 +98,7 @@ public class RecordingApplication : IRecordingApplication
         Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
-        var more = AddClientContext(clientDetails, (additional.Exists()
+        var more = AddClientContext(caller, clientDetails, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -108,10 +115,14 @@ public class RecordingApplication : IRecordingApplication
         return Task.FromResult(Result.Ok);
     }
 
-    private static Dictionary<string, object> AddClientContext(ClientDetails clientDetails,
+    private static Dictionary<string, object> AddClientContext(ICallerContext caller, ClientDetails clientDetails,
         IDictionary<string, object> additional)
     {
         var more = new Dictionary<string, object>(additional);
+        if (caller.CallerId.HasValue() && CallerConstants.IsAnonymousUser(caller.CallerId))
+        {
+            more.TryAdd(UsageConstants.Properties.ForId, caller.CallerId);
+        }
         more.TryAdd(UsageConstants.Properties.Timestamp, DateTime.UtcNow);
         more.TryAdd(UsageConstants.Properties.IpAddress, clientDetails.IpAddress.HasValue()
             ? clientDetails.IpAddress
@@ -123,7 +134,7 @@ public class RecordingApplication : IRecordingApplication
             ? clientDetails.Referer
             : "unknown");
         more.TryAdd(UsageConstants.Properties.Component, UsageConstants.Components.BackEndForFrontEndWebHost);
-
+     
         return more;
     }
 }

@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
@@ -9,12 +10,34 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 public static class RequestExtensions
 {
     /// <summary>
+    ///     Returns the claims from the JWT token that is stored in the cookie,
+    /// </summary>
+    public static Claim[] GetClaimsFromAuthNCookie(this HttpRequest request)
+    {
+        var token = TokenFromAuthNCookie(request);
+        if (!token.HasValue)
+        {
+            return [];
+        }
+
+        try
+        {
+            var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token.Value);
+            return jwtToken.Claims.ToArray();
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Returns the ID of the user from the JWT token that is stored in the cookie,
     ///     while the cookie has not expired
     /// </summary>
     public static Result<Optional<string>, Error> GetUserIdFromAuthNCookie(this HttpRequest request)
     {
-        var token = GetAuthNCookie(request);
+        var token = TokenFromAuthNCookie(request);
         if (!token.HasValue)
         {
             return Optional<string>.None;
@@ -25,7 +48,7 @@ public static class RequestExtensions
         {
             return Error.ForbiddenAccess(Resources.RequestExtensions_InvalidToken);
         }
-        
+
         return userId.Value.ToOptional();
     }
 
@@ -33,7 +56,7 @@ public static class RequestExtensions
     ///     Returns the cookie containing the JWT token.
     ///     If the cookie has expired (same expiry as the JWT token) then cookie no longer exists, and this will return None.
     /// </summary>
-    private static Optional<string> GetAuthNCookie(HttpRequest request)
+    public static Optional<string> TokenFromAuthNCookie(this HttpRequest request)
     {
         if (request.Cookies.TryGetValue(AuthenticationConstants.Cookies.Token, out var value))
         {

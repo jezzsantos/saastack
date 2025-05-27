@@ -13,34 +13,31 @@ using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Hosting.Common;
 
 /// <summary>
-///     A <see cref="ICallerContext" /> that reads the context from ASP.NET
+///     Provides <see cref="ICallerContext" /> that reads the context of the caller from the claims in ASPNET.
 /// </summary>
-internal sealed class AspNetCallerContext : ICallerContext
+public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
 {
-    public AspNetCallerContext(IHttpContextAccessor httpContextAccessor)
+    protected AspNetClaimsBasedCallerContextBase(IHostSettings hostSettings,
+        IReadOnlyList<Claim> claims, Optional<ICallerContext.CallerAuthorization> authorization, string tenantId,
+        string correlationId)
     {
-        var httpContext = httpContextAccessor.HttpContext!;
-        var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>()!;
-        var regionService = httpContext.RequestServices.GetService<IHostSettings>()!;
-        TenantId = GetTenantId(tenancyContext);
-        CallId = httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
-            out var callId)
-            ? callId!.ToString()!
-            : Caller.GenerateCallId();
-        var claims = httpContext.User.Claims.ToArray();
+        TenantId = tenantId;
+        CallId = correlationId;
         CallerId = GetCallerId(claims);
-        IsServiceAccount = CallerConstants.IsServiceAccount(CallerId);
         Roles = GetRoles(claims, TenantId);
         Features = GetFeatures(claims, TenantId);
-        Authorization = GetAuthorization(httpContext);
+        IsServiceAccount = CallerConstants.IsServiceAccount(CallerId);
+        var isAnonymous = CallerConstants.IsAnonymousUser(CallerId);
+        Authorization = authorization.HasValue && !isAnonymous
+            ? authorization
+            : Optional<ICallerContext.CallerAuthorization>.None;
         IsAuthenticated = IsServiceAccount
-                          || (Authorization.HasValue && !CallerConstants.IsAnonymousUser(CallerId));
-        HostRegion = regionService.GetRegion();
+                          || (Authorization.HasValue && !isAnonymous);
+        HostRegion = hostSettings.GetRegion();
     }
 
     public Optional<ICallerContext.CallerAuthorization> Authorization { get; }
@@ -61,16 +58,28 @@ internal sealed class AspNetCallerContext : ICallerContext
 
     public Optional<string> TenantId { get; }
 
-    private static string? GetTenantId(ITenancyContext? tenancyContext)
+    /// <summary>
+    ///     Extracts the tenant ID from the tenancy context.
+    /// </summary>
+    public static Optional<string> GetTenantId(ITenancyContext? tenancyContext)
     {
         return tenancyContext.Exists()
             ? tenancyContext.Current
             : null;
     }
 
-    private static Optional<ICallerContext.CallerAuthorization> GetAuthorization(HttpContext context)
+    /// <summary>
+    ///     Returns authorization details from ASPNET Authentication adn Authorization configuration
+    /// </summary>
+    protected static Optional<ICallerContext.CallerAuthorization> GetAuthorization(IHttpContextAccessor contextAccessor)
     {
-        var authenticationFeature = context.Features.Get<IAuthenticateResultFeature>();
+        var httpContext = contextAccessor.HttpContext;
+        if (httpContext.NotExists())
+        {
+            return Optional<ICallerContext.CallerAuthorization>.None;
+        }
+
+        var authenticationFeature = httpContext.Features.Get<IAuthenticateResultFeature>();
         if (authenticationFeature.NotExists())
         {
             return Optional<ICallerContext.CallerAuthorization>.None;
@@ -85,9 +94,30 @@ internal sealed class AspNetCallerContext : ICallerContext
             return Optional<ICallerContext.CallerAuthorization>.None;
         }
 
-        return GetCallerAuthorization(context, schemes.ToList());
+        return GetCallerAuthorization(httpContext, schemes.ToList());
     }
 
+    /// <summary>
+    ///     Retrieves the correlation ID from the items collection in the request pipeline,
+    ///     that should have been set by the <see cref="RequestCorrelationFilter" />.
+    /// </summary>
+    protected static string GetCorrelationId(IHttpContextAccessor contextAccessor)
+    {
+        var httpContext = contextAccessor.HttpContext;
+        if (httpContext.NotExists())
+        {
+            return Caller.GenerateCallId();
+        }
+
+        return httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
+            out var callId)
+            ? callId!.ToString()!
+            : Caller.GenerateCallId();
+    }
+
+    /// <summary>
+    ///     Extracts the authorization details from the request, based on the available authentication schemes
+    /// </summary>
     private static Optional<ICallerContext.CallerAuthorization> GetCallerAuthorization(HttpContext context,
         List<string> schemes)
     {
@@ -137,7 +167,7 @@ internal sealed class AspNetCallerContext : ICallerContext
     ///     Get the claim identifying the ID of the user.
     ///     Note: Can also be the <see cref="CallerConstants.AnonymousUserId" /> user too!
     /// </summary>
-    private static string GetCallerId(Claim[] claims)
+    private static string GetCallerId(IReadOnlyList<Claim> claims)
     {
         var userClaim = claims.FirstOrDefault(claim => claim.Type == AuthenticationConstants.Claims.ForId);
         if (userClaim.Exists())
@@ -148,18 +178,18 @@ internal sealed class AspNetCallerContext : ICallerContext
         return CallerConstants.AnonymousUserId;
     }
 
-    private static ICallerContext.CallerFeatures GetFeatures(Claim[] claims, string? tenantId)
+    private static ICallerContext.CallerFeatures GetFeatures(IReadOnlyList<Claim> claims, string? tenantId)
     {
-        var platformFeatures = claims.GetPlatformFeatures();
-        var tenantFeatures = claims.GetTenantFeatures(tenantId);
+        var platformFeatures = claims.ToArray().GetPlatformFeatures();
+        var tenantFeatures = claims.ToArray().GetTenantFeatures(tenantId);
 
         return new ICallerContext.CallerFeatures(platformFeatures, tenantFeatures);
     }
 
-    private static ICallerContext.CallerRoles GetRoles(Claim[] claims, string? tenantId)
+    private static ICallerContext.CallerRoles GetRoles(IReadOnlyList<Claim> claims, string? tenantId)
     {
-        var platformRoles = claims.GetPlatformRoles();
-        var tenantRoles = claims.GetTenantRoles(tenantId);
+        var platformRoles = claims.ToArray().GetPlatformRoles();
+        var tenantRoles = claims.ToArray().GetTenantRoles(tenantId);
 
         return new ICallerContext.CallerRoles(platformRoles, tenantRoles);
     }
