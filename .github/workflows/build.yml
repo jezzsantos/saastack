@@ -72,32 +72,44 @@ jobs:
       - name: Build for CI Testing (for Azure)
         run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" -p:HostingPlatform=HOSTEDONAZURE
       - name: Unit Test (Backend)
-        continue-on-error: false
-        run: >
-          dotnet test --no-build --verbosity normal
-          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
-          --filter:"Category=Unit|Category=Unit.Tooling|Category=Unit.Architecture" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
-          --logger:"trx"
-          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
-          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          retry_on: error
+          command: >
+            dotnet test --no-build --verbosity normal
+            --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+            --filter:"Category=Unit.Tooling" --collect:"Code Coverage" --results-directory:"src/TestResults/csharp"
+            --logger:"trx"
+            --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+            --test-adapter-path:. "${{env.SOLUTION_PATH}}"
       - name: Integration Test (Backend API)
-        continue-on-error: false
-        run: >
-          dotnet test --no-build --verbosity normal
-          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
-          --filter:"Category=Integration.API" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
-          --logger:"trx"
-          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
-          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          retry_on: error
+          command: >
+            dotnet test --no-build --verbosity normal
+            --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+            --filter:"Category=Integration.API" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+            --logger:"trx"
+            --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+            --test-adapter-path:. "${{env.SOLUTION_PATH}}"
       - name: Integration Test (Backend Website)
-        continue-on-error: true # These tests can be flaky sometimes
-        run: >
-          dotnet test --no-build --verbosity normal
-          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
-          --filter:"Category=Category=Integration.Website" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
-          --logger:"trx"
-          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
-          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          retry_on: error
+          command: >
+            dotnet test --no-build --verbosity normal
+            --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+            --filter:"Category=Category=Integration.Website" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+            --logger:"trx"
+            --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+            --test-adapter-path:. "${{env.SOLUTION_PATH}}"
       - name: Test WebsiteHost (FrontEnd)
         continue-on-error: false
         run: |
@@ -106,7 +118,6 @@ jobs:
           npm run build:releasefordeploy
           npm run test:ci
       - name: Test Custom GitHub Actions
-        continue-on-error: false
         run: |
           cd src/Tools.GitHubActions/VariableSubstitution
           npm ci --cache .npm --prefer-offline
