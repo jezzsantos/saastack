@@ -14,15 +14,17 @@ public static class HydrationPropertiesExtensions
         string propertyName)
 
     {
-        if (!properties.ContainsKey(propertyName))
+        if (properties.TryGetValue(propertyName, out var propertyValue))
         {
-            return Optional<TValue>.None;
-        }
+            if (propertyValue.HasValue)
+            {
+                var value = propertyValue.Value;
+                return value.IsOptional(out var optional)
+                    ? new Optional<TValue>((TValue?)optional)
+                    : new Optional<TValue>((TValue)value);
+            }
 
-        var propertyValue = properties[propertyName];
-        if (propertyValue.HasValue)
-        {
-            return new Optional<TValue>((TValue)propertyValue.Value);
+            return Optional<TValue>.None;
         }
 
         return Optional<TValue>.None;
@@ -36,21 +38,23 @@ public static class HydrationPropertiesExtensions
         string propertyName, TValue defaultValue)
 
     {
-        if (!properties.ContainsKey(propertyName))
+        if (properties.TryGetValue(propertyName, out var propertyValue))
         {
+            if (propertyValue.HasValue)
+            {
+                var value = propertyValue.Value;
+                return value.IsOptional(out var optional)
+                    ? new Optional<TValue>((TValue?)optional)
+                    : new Optional<TValue>((TValue)value);
+            }
+
             return defaultValue.Exists()
                 ? defaultValue
-                : default!;
-        }
-
-        var propertyValue = properties[propertyName];
-        if (propertyValue.HasValue)
-        {
-            return new Optional<TValue>((TValue)propertyValue.Value);
+                : Optional<TValue>.None;
         }
 
         return defaultValue.Exists()
             ? defaultValue
-            : Optional<TValue>.None;
+            : default!;
     }
 }

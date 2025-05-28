@@ -36,7 +36,7 @@ public sealed class ProviderAuthTokensRoot : AggregateRootBase
     {
         ProviderName = rehydratingProperties.GetValueOrDefault<string>(nameof(ProviderName));
         UserId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(UserId));
-        Tokens = rehydratingProperties.GetValueOrDefault<Optional<AuthTokens>>(nameof(Tokens));
+        Tokens = rehydratingProperties.GetValueOrDefault<AuthTokens>(nameof(Tokens));
     }
 
     private ProviderAuthTokensRoot(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)

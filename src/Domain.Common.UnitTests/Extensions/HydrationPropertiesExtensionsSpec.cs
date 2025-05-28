@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common.Extensions;
 using Domain.Interfaces;
 using UnitTesting.Common;
@@ -30,6 +31,30 @@ public class HydrationPropertiesExtensionsSpec
     }
 
     [Fact]
+    public void WhenGetValueOrDefaultForOptionalReferenceTypeAndNullWithNoDefault_ThenReturnsNone()
+    {
+        var result = new HydrationProperties
+            {
+                { "aname", (Optional<string>)null }
+            }
+            .GetValueOrDefault<string>("aname");
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenGetValueOrDefaultForOptionalReferenceTypeAndValueWithNoDefault_ThenReturnsNone()
+    {
+        var result = new HydrationProperties
+            {
+                { "aname", (Optional<string>)"avalue" }
+            }
+            .GetValueOrDefault<string>("aname");
+
+        result.Should().BeSome("avalue");
+    }
+
+    [Fact]
     public void WhenGetValueOrDefaultForValueTypeAndNullWithNoDefault_ThenReturnsNone()
     {
         var result = new HydrationProperties
@@ -39,6 +64,31 @@ public class HydrationPropertiesExtensionsSpec
             .GetValueOrDefault<DateTime>("aname");
 
         result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenGetValueOrDefaultForOptionalValueTypeAndNullWithNoDefault_ThenReturnsNone()
+    {
+        var result = new HydrationProperties
+            {
+                { "aname", (Optional<DateTime?>)null }
+            }
+            .GetValueOrDefault<DateTime>("aname");
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenGetValueOrDefaultForOptionalValueTypeAndValueWithNoDefault_ThenReturnsNone()
+    {
+        var datum = DateTime.UtcNow;
+        var result = new HydrationProperties
+            {
+                { "aname", (Optional<DateTime?>)datum }
+            }
+            .GetValueOrDefault<DateTime>("aname");
+
+        result.Should().BeSome(datum);
     }
 
     [Fact]

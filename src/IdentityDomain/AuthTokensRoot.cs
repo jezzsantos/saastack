@@ -49,16 +49,16 @@ public sealed class AuthTokensRoot : AggregateRootBase
     {
         _encryptionService = container.GetRequiredService<IEncryptionService>();
 
-        var accessToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(AccessToken));
+        var accessToken = rehydratingProperties.GetValueOrDefault<string>(nameof(AccessToken));
         AccessToken = accessToken.HasValue
             ? _encryptionService.Decrypt(accessToken.Value).ToOptional()
             : Optional<string>.None;
         AccessTokenExpiresOn =
-            rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(AccessTokenExpiresOn));
+            rehydratingProperties.GetValueOrDefault<DateTime>(nameof(AccessTokenExpiresOn));
         //Note: refresh token cannot be encrypted because we search on its plain value
-        RefreshToken = rehydratingProperties.GetValueOrDefault<Optional<string>>(nameof(RefreshToken));
+        RefreshToken = rehydratingProperties.GetValueOrDefault<string>(nameof(RefreshToken));
         RefreshTokenExpiresOn =
-            rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(RefreshTokenExpiresOn));
+            rehydratingProperties.GetValueOrDefault<DateTime>(nameof(RefreshTokenExpiresOn));
         UserId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(UserId));
     }
 

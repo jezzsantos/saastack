@@ -33,10 +33,10 @@ public sealed class BookingRoot : AggregateRootBase
         HydrationProperties rehydratingProperties) : base(
         identifier, container, rehydratingProperties)
     {
-        Start = rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(Start));
-        End = rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(End));
-        CarId = rehydratingProperties.GetValueOrDefault<Optional<Identifier>>(nameof(CarId));
-        BorrowerId = rehydratingProperties.GetValueOrDefault<Optional<Identifier>>(nameof(BorrowerId));
+        Start = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(Start));
+        End = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(End));
+        CarId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(CarId));
+        BorrowerId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(BorrowerId));
         OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId));
     }
 
