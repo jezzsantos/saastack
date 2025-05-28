@@ -16,10 +16,11 @@ namespace AncillaryDomain;
 public sealed class EmailDeliveryRoot : AggregateRootBase
 {
     public static Result<EmailDeliveryRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        QueuedMessageId messageId, Optional<Identifier> organizationId)
+        QueuedMessageId messageId, Optional<Identifier> organizationId, DatacenterLocation hostRegion)
     {
         var root = new EmailDeliveryRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.EmailDelivery.Created(root.Id, messageId, organizationId));
+        root.RaiseCreateEvent(
+            AncillaryDomain.Events.EmailDelivery.Created(root.Id, messageId, organizationId, hostRegion));
         return root;
     }
 
@@ -60,6 +61,8 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
     public List<string> Tags { get; private set; } = [];
 
+    public DatacenterLocation HostRegion { get; private set; } = DatacenterLocations.Unknown;
+
     [UsedImplicitly]
     public static AggregateRootFactory<EmailDeliveryRoot> Rehydrate()
     {
@@ -94,6 +97,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 OrganizationId = created.OrganizationId.HasValue()
                     ? created.OrganizationId.ToId()
                     : Optional<Identifier>.None;
+                HostRegion = DatacenterLocations.FindOrDefault(created.HostRegion);
                 return Result.Ok;
             }
 

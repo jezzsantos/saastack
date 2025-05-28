@@ -18,5 +18,7 @@ public class Audit : ReadModelEntity
 
     public Optional<string> OrganizationId { get; set; }
 
+    public Optional<string> RegisteredRegion { get; set; }
+
     public TemplateArguments TemplateArguments { get; set; } = TemplateArguments.Create().Value;
 }

@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common;
 using Domain.Common.ValueObjects;
 using Domain.Shared.EndUsers;
@@ -20,7 +21,7 @@ public sealed class Created : DomainEvent
 
     public UserClassification Classification { get; set; }
 
-    public required string HostRegion { get; set; }
+    public required string HostRegion { get; set; } = DatacenterLocations.Unknown.Code;
 
     public UserStatus Status { get; set; }
 }

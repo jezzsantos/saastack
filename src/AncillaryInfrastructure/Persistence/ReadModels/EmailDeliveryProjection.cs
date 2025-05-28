@@ -36,6 +36,7 @@ public class EmailDeliveryProjection : IReadModelProjection
                         dto.LastAttempted = Optional<DateTime?>.None;
                         dto.SendFailed = Optional<DateTime?>.None;
                         dto.Sent = Optional<DateTime?>.None;
+                        dto.RegisteredRegion = e.HostRegion;
                     },
                     cancellationToken);
 

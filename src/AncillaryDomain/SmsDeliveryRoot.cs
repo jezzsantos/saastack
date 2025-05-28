@@ -15,10 +15,11 @@ namespace AncillaryDomain;
 public sealed class SmsDeliveryRoot : AggregateRootBase
 {
     public static Result<SmsDeliveryRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        QueuedMessageId messageId, Optional<Identifier> organizationId)
+        QueuedMessageId messageId, Optional<Identifier> organizationId, DatacenterLocation hostRegion)
     {
         var root = new SmsDeliveryRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.SmsDelivery.Created(root.Id, messageId, organizationId));
+        root.RaiseCreateEvent(
+            AncillaryDomain.Events.SmsDelivery.Created(root.Id, messageId, organizationId, hostRegion));
         return root;
     }
 
@@ -56,6 +57,8 @@ public sealed class SmsDeliveryRoot : AggregateRootBase
 
     public List<string> Tags { get; private set; } = [];
 
+    public DatacenterLocation HostRegion { get; private set; } = DatacenterLocations.Unknown;
+
     [UsedImplicitly]
     public static AggregateRootFactory<SmsDeliveryRoot> Rehydrate()
     {
@@ -90,6 +93,7 @@ public sealed class SmsDeliveryRoot : AggregateRootBase
                 OrganizationId = created.OrganizationId.HasValue()
                     ? created.OrganizationId.ToId()
                     : Optional<Identifier>.None;
+                HostRegion = DatacenterLocations.FindOrDefault(created.HostRegion);
                 return Result.Ok;
             }
 

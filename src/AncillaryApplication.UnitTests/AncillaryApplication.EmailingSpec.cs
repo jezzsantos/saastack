@@ -38,6 +38,8 @@ public class AncillaryApplicationEmailingSpec
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.HostRegion)
+            .Returns(DatacenterLocations.AustraliaEast);
         var usageMessageQueue = new Mock<IUsageMessageQueue>();
         var usageDeliveryService = new Mock<IUsageDeliveryService>();
         var auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
@@ -108,7 +110,7 @@ public class AncillaryApplicationEmailingSpec
         }.ToJson()!;
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -164,7 +166,7 @@ public class AncillaryApplicationEmailingSpec
         }.ToJson()!;
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -402,7 +404,7 @@ public class AncillaryApplicationEmailingSpec
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -427,7 +429,7 @@ public class AncillaryApplicationEmailingSpec
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -472,7 +474,7 @@ public class AncillaryApplicationEmailingSpec
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });
@@ -497,7 +499,7 @@ public class AncillaryApplicationEmailingSpec
         var messageId = CreateMessageId();
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         email.SetContent("asubject", "abody",
             EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
             new List<string> { "atag" });

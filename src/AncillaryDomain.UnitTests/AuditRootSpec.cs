@@ -22,7 +22,7 @@ public class AuditRootSpec
             .Returns("anid".ToId());
         _audit = AuditRoot.Create(recorder.Object, identifierFactory.Object,
             "anagainstid".ToId(), "atenantid".ToId(), "anauditcode", "amessagetemplate",
-            TemplateArguments.Create(["anarg1", "anarg2"]).Value).Value;
+            TemplateArguments.Create(["anarg1", "anarg2"]).Value, DatacenterLocations.AustraliaEast).Value;
     }
 
     [Fact]
@@ -35,5 +35,6 @@ public class AuditRootSpec
         _audit.TemplateArguments.Value.Items.Count.Should().Be(2);
         _audit.TemplateArguments.Value.Items[0].Should().Be("anarg1");
         _audit.TemplateArguments.Value.Items[1].Should().Be("anarg2");
+        _audit.HostRegion.Should().Be(DatacenterLocations.AustraliaEast);
     }
 }

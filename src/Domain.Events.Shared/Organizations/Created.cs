@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common;
 using Domain.Common.ValueObjects;
 using Domain.Shared.Organizations;
@@ -18,9 +19,9 @@ public sealed class Created : DomainEvent
 
     public required string CreatedById { get; set; }
 
+    public required string HostRegion { get; set; } = DatacenterLocations.Unknown.Code;
+
     public required string Name { get; set; }
 
     public OrganizationOwnership Ownership { get; set; }
-
-    public required string HostRegion { get; set; }
 }

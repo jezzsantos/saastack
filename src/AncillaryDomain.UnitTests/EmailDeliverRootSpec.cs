@@ -34,11 +34,13 @@ public class EmailDeliverRootSpec
     {
         var messageId = CreateMessageId();
 
-        var result = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, "anorganizationid".ToId())
+        var result = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, "anorganizationid".ToId(),
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         result.MessageId.Should().Be(messageId);
         result.OrganizationId.Should().Be("anorganizationid".ToId());
+        result.HostRegion.Should().Be(DatacenterLocations.AustraliaEast);
         result.Events.Last().Should().BeOfType<Created>();
     }
 
@@ -46,7 +48,8 @@ public class EmailDeliverRootSpec
     public void WhenSetContentForHtmlEmailAndMissingSubject_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
@@ -59,7 +62,8 @@ public class EmailDeliverRootSpec
     public void WhenSetContentForHtmlEmailAndMissingBody_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
@@ -72,7 +76,8 @@ public class EmailDeliverRootSpec
     public void WhenSetContentForHtmlEmail_ThenDetailsAssigned()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
@@ -90,7 +95,8 @@ public class EmailDeliverRootSpec
     public void WhenSetContentForTemplatedEmailAndMissingTemplateId_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
@@ -104,7 +110,8 @@ public class EmailDeliverRootSpec
     public void WhenSetContentForTemplatedEmail_ThenDetailsAssigned()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
@@ -124,7 +131,8 @@ public class EmailDeliverRootSpec
     public void WhenAttemptSendingAndAlreadyDelivered_ThenDoesNotAttemptAndReturnsTrue()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverEmail();
@@ -140,7 +148,8 @@ public class EmailDeliverRootSpec
     public void WhenAttemptSendingAndNotDelivered_ThenAddsAnAttempt()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         var result = root.AttemptSending();
@@ -156,7 +165,8 @@ public class EmailDeliverRootSpec
     public void WhenFailSendingAndDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverEmail();
@@ -171,7 +181,8 @@ public class EmailDeliverRootSpec
     public void WhenFailSendingAndNotAttempted_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         var result = root.FailedSending();
@@ -183,7 +194,8 @@ public class EmailDeliverRootSpec
     public void WhenFailSending_ThenFails()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
 
@@ -197,7 +209,8 @@ public class EmailDeliverRootSpec
     public void WhenSucceededSendingAndDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 #if TESTINGONLY
         root.TestingOnly_DeliverEmail();
@@ -212,7 +225,8 @@ public class EmailDeliverRootSpec
     public void WhenSucceededSendingAndNotAttempted_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         var result = root.SucceededSending(Optional<string>.None);
@@ -224,7 +238,8 @@ public class EmailDeliverRootSpec
     public void WhenSucceededSending_ThenSent()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
 
@@ -242,7 +257,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryAndNotSent_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         var result = root.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -254,7 +270,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryAndAlreadyDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
@@ -269,7 +286,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryAnd_ThenConfirmsDelivery()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
@@ -287,7 +305,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryFailedAndNotSent_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
 
         var result = root.ConfirmDeliveryFailed("areceiptid", DateTime.UtcNow, "areason");
@@ -299,7 +318,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryFailedAndAlreadyDelivered_ThenReturnsError()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");
@@ -314,7 +334,8 @@ public class EmailDeliverRootSpec
     public void WhenConfirmDeliveryFailedAnd_ThenConfirmsDelivery()
     {
         var messageId = CreateMessageId();
-        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None)
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId, Optional<Identifier>.None,
+                DatacenterLocations.AustraliaEast)
             .Value;
         root.AttemptSending();
         root.SucceededSending("areceiptid");

@@ -91,6 +91,7 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
             ? message.CallerId
             : call.CallerId;
         message.MessageId = message.MessageId ?? CreateMessageId();
+        message.OriginHostRegion = message.OriginHostRegion ?? call.HostRegion.Code;
         var messageJson = message.ToJson()!;
 
         var pushed = await _messageBusStore.SendAsync(_topicName, messageJson, cancellationToken);
@@ -99,8 +100,10 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
             return pushed.Error;
         }
 
-        _recorder.TraceDebug(null, "Message {Message} was added to the queue {Topic} in the {Store} store", messageJson,
-            _topicName, _messageBusStore.GetType().Name);
+        _recorder.TraceInformation(null,
+            "Message {Message} was added to the queue {Topic} in the {Store} store (from {Region}), with content: {Content}",
+            message.MessageId,
+            _topicName, _messageBusStore.GetType().Name, message.OriginHostRegion, messageJson);
 
         return message;
     }

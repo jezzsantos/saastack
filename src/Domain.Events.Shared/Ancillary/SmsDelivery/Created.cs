@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common;
 using Domain.Common.ValueObjects;
 using JetBrains.Annotations;
@@ -14,6 +15,8 @@ public sealed class Created : DomainEvent
     public Created()
     {
     }
+
+    public required string HostRegion { get; set; } = DatacenterLocations.Unknown.Code;
 
     public required string MessageId { get; set; }
 

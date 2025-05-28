@@ -15,12 +15,11 @@ public sealed class AuditRoot : AggregateRootBase
 {
     public static Result<AuditRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         Identifier againstId, Optional<Identifier> organizationId, string auditCode, Optional<string> messageTemplate,
-        TemplateArguments templateArguments)
+        TemplateArguments templateArguments, DatacenterLocation hostRegion)
     {
         var root = new AuditRoot(recorder, idFactory);
         root.RaiseCreateEvent(AncillaryDomain.Events.Audits.Created(root.Id, againstId, organizationId,
-            auditCode,
-            messageTemplate, templateArguments));
+            auditCode, messageTemplate, templateArguments, hostRegion));
         return root;
     }
 
@@ -42,6 +41,8 @@ public sealed class AuditRoot : AggregateRootBase
     public Optional<Identifier> OrganizationId { get; private set; }
 
     public Optional<TemplateArguments> TemplateArguments { get; private set; }
+
+    public DatacenterLocation HostRegion { get; private set; } = DatacenterLocations.Unknown;
 
     [UsedImplicitly]
     public static AggregateRootFactory<AuditRoot> Rehydrate()
@@ -74,6 +75,7 @@ public sealed class AuditRoot : AggregateRootBase
                 AuditCode = created.AuditCode;
                 MessageTemplate = Optional<string>.Some(created.MessageTemplate);
                 TemplateArguments = AncillaryDomain.TemplateArguments.Create(created.TemplateArguments).Value;
+                HostRegion = DatacenterLocations.FindOrDefault(created.HostRegion);
                 return Result.Ok;
             }
 

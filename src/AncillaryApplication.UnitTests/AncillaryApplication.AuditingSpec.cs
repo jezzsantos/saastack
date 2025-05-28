@@ -33,6 +33,8 @@ public class AncillaryApplicationAuditingSpec
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.HostRegion)
+            .Returns(DatacenterLocations.AustraliaEast);
         var usageMessageQueue = new Mock<IUsageMessageQueue>();
         var usageDeliveryService = new Mock<IUsageDeliveryService>();
         _auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
@@ -80,7 +82,8 @@ public class AncillaryApplicationAuditingSpec
             AgainstId = "anagainstid",
             Arguments = ["anarg1", "anarg2"],
             MessageTemplate = "amessagetemplate",
-            TenantId = "atenantid"
+            TenantId = "atenantid",
+            OriginHostRegion = DatacenterLocations.AustraliaEast.Code
         }.ToJson()!;
 
         var result = await _application.DeliverAuditAsync(_caller.Object, messageAsJson, CancellationToken.None);
@@ -95,6 +98,7 @@ public class AncillaryApplicationAuditingSpec
                 && aud.TemplateArguments.Value.Items[0] == "anarg1"
                 && aud.TemplateArguments.Value.Items[1] == "anarg2"
                 && aud.OrganizationId.Value == "atenantid"
+                && aud.HostRegion == DatacenterLocations.AustraliaEast
             ), It.IsAny<CancellationToken>()));
     }
 

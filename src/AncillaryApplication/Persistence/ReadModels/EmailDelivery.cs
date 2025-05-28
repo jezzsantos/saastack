@@ -31,6 +31,8 @@ public class EmailDelivery : ReadModelEntity
 
     public Optional<string> ReceiptId { get; set; }
 
+    public Optional<string> RegisteredRegion { get; set; }
+
     public Optional<DateTime?> SendFailed { get; set; }
 
     public Optional<DateTime?> Sent { get; set; }

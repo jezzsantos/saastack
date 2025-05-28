@@ -79,7 +79,7 @@ partial class AncillaryApplication
         var created = AuditRoot.Create(_recorder, _idFactory, message.AgainstId.ToId(), message.TenantId.HasValue()
                 ? message.TenantId.ToId()
                 : Optional<Identifier>.None,
-            message.AuditCode!, message.MessageTemplate.ToOptional(), templateArguments.Value);
+            message.AuditCode!, message.MessageTemplate.ToOptional(), templateArguments.Value, caller.HostRegion);
         if (created.IsFailure)
         {
             return created.Error;

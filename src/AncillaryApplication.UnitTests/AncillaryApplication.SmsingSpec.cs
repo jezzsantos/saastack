@@ -38,6 +38,8 @@ public class AncillaryApplicationSmsingSpec
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.HostRegion)
+            .Returns(DatacenterLocations.AustraliaEast);
         var usageMessageQueue = new Mock<IUsageMessageQueue>();
         var usageDeliveryService = new Mock<IUsageDeliveryService>();
         var auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
@@ -101,7 +103,7 @@ public class AncillaryApplicationSmsingSpec
         }.ToJson()!;
         var sms = SmsDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");
@@ -244,7 +246,7 @@ public class AncillaryApplicationSmsingSpec
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.SucceededSending("areceiptid");
         sms.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -267,7 +269,7 @@ public class AncillaryApplicationSmsingSpec
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");
@@ -310,7 +312,7 @@ public class AncillaryApplicationSmsingSpec
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.SucceededSending("areceiptid");
         sms.ConfirmDelivery("areceiptid", DateTime.UtcNow);
@@ -333,7 +335,7 @@ public class AncillaryApplicationSmsingSpec
         var messageId = CreateMessageId();
         var sms = SmsDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value,
-                Optional<Identifier>.None).Value;
+                Optional<Identifier>.None, DatacenterLocations.AustraliaEast).Value;
         sms.SetSmsDetails("abody", PhoneNumber.Create("+6498876986").Value, new List<string> { "atag" });
         sms.AttemptSending();
         sms.SucceededSending("areceiptid");

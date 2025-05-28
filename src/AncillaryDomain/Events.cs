@@ -18,8 +18,7 @@ public static class Events
     public static class EmailDelivery
     {
         public static Domain.Events.Shared.Ancillary.EmailDelivery.Created Created(Identifier id,
-            QueuedMessageId messageId,
-            Optional<Identifier> organizationId)
+            QueuedMessageId messageId, Optional<Identifier> organizationId, DatacenterLocation hostRegion)
         {
             return new Domain.Events.Shared.Ancillary.EmailDelivery.Created(id)
             {
@@ -27,7 +26,8 @@ public static class Events
                 MessageId = messageId,
                 OrganizationId = organizationId.HasValue
                     ? organizationId.Value.Text
-                    : null
+                    : null,
+                HostRegion = hostRegion.Code
             };
         }
 
@@ -103,8 +103,7 @@ public static class Events
     public static class SmsDelivery
     {
         public static Domain.Events.Shared.Ancillary.SmsDelivery.Created Created(Identifier id,
-            QueuedMessageId messageId,
-            Optional<Identifier> organizationId)
+            QueuedMessageId messageId, Optional<Identifier> organizationId, DatacenterLocation hostRegion)
         {
             return new Domain.Events.Shared.Ancillary.SmsDelivery.Created(id)
             {
@@ -112,7 +111,8 @@ public static class Events
                 MessageId = messageId,
                 OrganizationId = organizationId.HasValue
                     ? organizationId.Value.Text
-                    : null
+                    : null,
+                HostRegion = hostRegion.Code
             };
         }
 
@@ -183,7 +183,8 @@ public static class Events
     public static class Audits
     {
         public static Created Created(Identifier id, Identifier againstId, Optional<Identifier> organizationId,
-            string auditCode, Optional<string> messageTemplate, TemplateArguments templateArguments)
+            string auditCode, Optional<string> messageTemplate, TemplateArguments templateArguments,
+            DatacenterLocation hostRegion)
         {
             return new Created(id)
             {
@@ -193,7 +194,8 @@ public static class Events
                 AgainstId = againstId,
                 AuditCode = auditCode,
                 MessageTemplate = messageTemplate.ValueOrDefault ?? string.Empty,
-                TemplateArguments = templateArguments.Items
+                TemplateArguments = templateArguments.Items,
+                HostRegion = hostRegion.Code
             };
         }
     }

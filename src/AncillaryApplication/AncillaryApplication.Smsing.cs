@@ -184,7 +184,7 @@ partial class AncillaryApplication
         {
             var created = SmsDeliveryRoot.Create(_recorder, _idFactory, messageId.Value, message.TenantId.HasValue()
                 ? message.TenantId.ToId()
-                : Optional<Identifier>.None);
+                : Optional<Identifier>.None, caller.HostRegion);
             if (created.IsFailure)
             {
                 return created.Error;

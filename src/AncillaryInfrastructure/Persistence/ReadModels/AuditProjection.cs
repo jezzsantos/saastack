@@ -34,6 +34,7 @@ public class AuditProjection : IReadModelProjection
                     dto.AgainstId = e.AgainstId;
                     dto.MessageTemplate = e.MessageTemplate;
                     dto.TemplateArguments = TemplateArguments.Create(e.TemplateArguments).Value;
+                    dto.RegisteredRegion = e.HostRegion;
                 }, cancellationToken);
 
             default:

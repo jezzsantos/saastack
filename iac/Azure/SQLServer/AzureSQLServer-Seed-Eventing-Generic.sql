@@ -169,6 +169,7 @@ CREATE TABLE [dbo].[Audit]
     [Created]            [datetime]      NULL,
     [MessageTemplate]    [nvarchar](max) NULL,
     [OrganizationId]     [nvarchar](100) NULL,
+    [RegisteredRegion]   [nvarchar](100) NULL,
     [TemplateArguments]  [nvarchar](max) NULL,
 ) ON [PRIMARY]
 GO
@@ -245,6 +246,7 @@ CREATE TABLE [dbo].[EmailDelivery]
     [MessageId]            [nvarchar](450) NULL,
     [OrganizationId]       [nvarchar](450) NULL,
     [ReceiptId]            [nvarchar](450) NULL,
+    [RegisteredRegion]     [nvarchar](100) NULL,
     [SendFailed]           [datetime]      NULL,
     [Sent]                 [datetime]      NULL,
     [Subject]              [nvarchar](max) NULL,
@@ -435,6 +437,7 @@ CREATE TABLE [dbo].[SmsDelivery]
     [MessageId]            [nvarchar](450) NULL,
     [OrganizationId]       [nvarchar](450) NULL,
     [ReceiptId]            [nvarchar](450) NULL,
+    [RegisteredRegion]     [nvarchar](100) NULL,
     [SendFailed]           [datetime]      NULL,
     [Sent]                 [datetime]      NULL,
     [Tags]                 [nvarchar](max) NULL,
