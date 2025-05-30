@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using Application.Interfaces;
 using Application.Resources.Shared;
@@ -113,11 +114,11 @@ internal static class MicrosoftSSOAuthenticationProviderExtensions
             return Error.NotAuthenticated();
         }
 
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(idToken.Value).Claims.ToArray();
+        var claims = new JwtSecurityTokenHandler().ReadJwtToken(idToken.Value).Claims.ToList();
         var oId = claims.Single(c => c.Type == MicrosoftIdentityClaims.ObjectId).Value;
         var emailAddress = claims.Single(c => c.Type == MicrosoftIdentityClaims.PreferredUserName).Value;
-        var firstName = claims.Single(c => c.Type == MicrosoftIdentityClaims.GivenName).Value;
-        var lastName = claims.Single(c => c.Type == MicrosoftIdentityClaims.FamilyName).Value;
+        var firstName = GetFirstNameFromClaims(claims);
+        var lastName = GetLastNameFromClaims(claims);
         var timezone = Timezones.Gmt; // Note, we cannot reliably derive the users timezone from these claims!
         var countryCode = claims.FirstOrDefault(c => c.Type == MicrosoftIdentityClaims.Country)?.Value
                           ?? claims.FirstOrDefault(c => c.Type == MicrosoftIdentityClaims.TenantCountry)?.Value
@@ -125,6 +126,48 @@ internal static class MicrosoftSSOAuthenticationProviderExtensions
         var country = CountryCodes.FindOrDefault(countryCode);
 
         return new SSOAuthUserInfo(tokens, oId, emailAddress, firstName, lastName, timezone, country);
+    }
+
+    private static string GetFirstNameFromClaims(List<Claim> claims)
+    {
+        var firstNameFromClaim = claims.Find(c => c.Type == MicrosoftIdentityClaims.GivenName);
+        if (firstNameFromClaim.Exists())
+        {
+            return firstNameFromClaim.Value;
+        }
+
+        var fullName = claims.Find(c => c.Type == MicrosoftIdentityClaims.FullName);
+        if (fullName.Exists())
+        {
+            var names = fullName.Value.Split(' ');
+            if (names.Length > 0)
+            {
+                return names.First();
+            }
+        }
+
+        return claims.Single(c => c.Type == MicrosoftIdentityClaims.PreferredUserName).Value;
+    }
+
+    private static string? GetLastNameFromClaims(List<Claim> claims)
+    {
+        var lastNameFromClaim = claims.Find(c => c.Type == MicrosoftIdentityClaims.FamilyName);
+        if (lastNameFromClaim.Exists())
+        {
+            return lastNameFromClaim.Value;
+        }
+
+        var fullName = claims.Find(c => c.Type == MicrosoftIdentityClaims.FullName);
+        if (fullName.Exists())
+        {
+            var names = fullName.Value.Split(' ');
+            if (names.Length > 1)
+            {
+                return names.Last();
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -136,6 +179,7 @@ internal static class MicrosoftSSOAuthenticationProviderExtensions
     {
         public const string Country = "ctry";
         public const string FamilyName = "family_name";
+        public const string FullName = "name";
         public const string GivenName = "given_name";
         public const string ObjectId = "oid";
         public const string PreferredUserName = "preferred_username";
