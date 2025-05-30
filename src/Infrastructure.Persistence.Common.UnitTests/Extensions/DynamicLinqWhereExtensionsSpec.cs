@@ -26,7 +26,7 @@ public class DynamicLinqWhereExtensionsSpec
 
         var result = wheres.ToDynamicLinqWhereClause();
 
-        result.Should().Be("String(Value[\"afield1\"]) == \"astringvalue\"");
+        result.Should().Be("Value.ContainsKey(\"afield1\") && String(Value[\"afield1\"]) == \"astringvalue\"");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class DynamicLinqWhereExtensionsSpec
 
         result.Should()
             .Be(
-                "String(Value[\"afield1\"]) == \"astringvalue\" and String(Value[\"afield2\"]) >= \"astringvalue\"");
+                "Value.ContainsKey(\"afield1\") && String(Value[\"afield1\"]) == \"astringvalue\" and Value.ContainsKey(\"afield2\") && String(Value[\"afield2\"]) >= \"astringvalue\"");
     }
 
     [Fact]
@@ -109,6 +109,6 @@ public class DynamicLinqWhereExtensionsSpec
 
         result.Should()
             .Be(
-                "String(Value[\"afield1\"]) == \"astringvalue\" and (String(Value[\"afield2\"]) == \"astringvalue2\" or String(Value[\"afield3\"]) == \"astringvalue3\")");
+                "Value.ContainsKey(\"afield1\") && String(Value[\"afield1\"]) == \"astringvalue\" and (Value.ContainsKey(\"afield2\") && String(Value[\"afield2\"]) == \"astringvalue2\" or Value.ContainsKey(\"afield3\") && String(Value[\"afield3\"]) == \"astringvalue3\")");
     }
 }

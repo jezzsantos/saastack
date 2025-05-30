@@ -124,10 +124,12 @@ public static class DynamicLinqWhereExtensions
         {
             if (condition.Operator == ConditionOperator.Like)
             {
-                return $"String({fieldName}).contains(\"{value}\")";
+                return
+                    $"Value.ContainsKey(\"{condition.FieldName}\") && {fieldName} != null && String({fieldName}).contains(\"{value}\")";
             }
 
-            return $"String({fieldName}) {@operator} \"{value}\"";
+            return
+                $"Value.ContainsKey(\"{condition.FieldName}\") && String({fieldName}) {@operator} \"{value}\"";
         }
 
         if (value is bool boolean)
