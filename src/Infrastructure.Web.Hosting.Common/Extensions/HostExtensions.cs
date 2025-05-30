@@ -1,3 +1,14 @@
+#if !TESTINGONLY
+#if HOSTEDONAZURE
+using Infrastructure.External.Persistence.Azure.ApplicationServices;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Extensibility;
+#elif HOSTEDONAWS
+using Amazon.XRay.Recorder.Core;
+using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using Infrastructure.Persistence.Common.ApplicationServices;
+#endif
+#endif
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -43,18 +54,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-#if !TESTINGONLY
-using Infrastructure.Persistence.Common.ApplicationServices;
-
-#if HOSTEDONAZURE
-using Microsoft.ApplicationInsights.Extensibility;
-using Infrastructure.External.Persistence.Azure.ApplicationServices;
-
-#elif HOSTEDONAWS
-using Amazon.XRay.Recorder.Core;
-using Amazon.XRay.Recorder.Handlers.AwsSdk;
-#endif
-#endif
 
 namespace Infrastructure.Web.Hosting.Common.Extensions;
 
@@ -72,11 +71,6 @@ public static class HostExtensions
         WebHostOptions hostOptions)
     {
         var services = appBuilder.Services;
-#if HOSTEDONAZURE
-        // HACK: We need to add this dependency before registering any keyed dependencies, for ApplicationInsights v2.22.0.
-        // See https://github.com/microsoft/ApplicationInsights-dotnet/issues/2879
-        services.AddApplicationInsightsTelemetry();
-#endif
         RegisterSharedServices();
         RegisterConfiguration(hostOptions.IsMultiTenanted);
         RegisterRecording();
@@ -157,7 +151,24 @@ public static class HostExtensions
 
         void RegisterRecording()
         {
-#if HOSTEDONAWS
+#if HOSTEDONAZURE
+#if !TESTINGONLY
+            // Note: Apply sampling, but never sample any Exceptions
+            services.Configure<TelemetryConfiguration>(config =>
+            {
+                var builder = config.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
+                builder.UseAdaptiveSampling(10, "Exception");
+                builder.Build();
+            });
+
+            services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+            {
+                // We always want this to be false
+                // See https://learn.microsoft.com/en-us/azure/azure-monitor/app/sampling-classic-api#configure-sampling-settings
+                EnableAdaptiveSampling = false
+            });
+#endif
+#elif HOSTEDONAWS
 #if !TESTINGONLY
             AWSXRayRecorder.InitializeInstance(appBuilder.Configuration);
             AWSSDKHandler.RegisterXRayForAllServices();
