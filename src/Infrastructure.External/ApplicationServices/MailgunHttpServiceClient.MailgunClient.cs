@@ -168,7 +168,7 @@ public class MailgunClient : IMailgunClient
                         ? tags.ToList()
                         : null,
 #if TESTINGONLY
-                    TestingOnly = "no",
+                    TestingOnly = "yes",
 #else
                     TestingOnly = "no",
 #endif

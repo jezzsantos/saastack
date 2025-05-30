@@ -27,7 +27,7 @@ public class MailgunClientSpec
     }
 
     [Fact]
-    public async Task WhenSendAsync_ThenSends()
+    public async Task WhenSendHtmlAsync_ThenSends()
     {
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<MailgunSendMessageRequest>(),
                 It.IsAny<Action<HttpRequestMessage>>(), It.IsAny<CancellationToken>()))
