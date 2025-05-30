@@ -159,8 +159,10 @@ public sealed class InProcessSynchronousReadModelProjector : IReadModelProjector
     {
         if (firstEventVersion > checkpointVersion)
         {
-            return Error.RuleViolation(
-                Resources.ReadModelProjector_CheckpointError.Format(streamName, checkpointVersion, firstEventVersion));
+            throw Error.RuleViolation(
+                    Resources.ReadModelProjector_CheckpointError.Format(streamName, checkpointVersion,
+                        firstEventVersion))
+                .ToException<InvalidOperationException>();
         }
 
         return Result.Ok;

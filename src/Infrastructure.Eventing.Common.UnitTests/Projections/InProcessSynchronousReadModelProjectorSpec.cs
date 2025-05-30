@@ -5,10 +5,12 @@ using Domain.Common;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using FluentAssertions;
 using Infrastructure.Eventing.Common.Projections;
 using Infrastructure.Eventing.Interfaces.Projections;
 using Moq;
 using UnitTesting.Common;
+using UnitTesting.Common.Validation;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
@@ -58,7 +60,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     [Fact]
     public async Task WhenWriteEventStreamAsyncAndNoEvents_ThenReturns()
     {
-        await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>(),
+        await _projector.WriteEventStreamAsync("astreamname", [],
             CancellationToken.None);
 
         _checkpointRepository.Verify(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -76,9 +78,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _projection.Setup(prj => prj.RootAggregateType)
             .Returns(typeof(string));
 
-        var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Data = null!,
                 RootAggregateType = "atypename",
@@ -89,7 +90,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 StreamName = null!,
                 Version = 0
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.ReadModelProjector_ProjectionNotConfigured.Format("atypename"));
@@ -104,7 +105,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     }
 
     [Fact]
-    public async Task WhenWriteEventStreamAsyncAndEventVersionGreaterThanCheckpoint_ThenReturnsError()
+    public async Task WhenWriteEventStreamAsyncAndEventVersionGreaterThanCheckpoint_ThenThrows()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .ReturnsAsync(5);
@@ -112,22 +113,21 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _projection.Setup(prj => prj.RootAggregateType)
             .Returns(typeof(string));
 
-        var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
-            {
-                Data = null!,
-                RootAggregateType = nameof(String),
-                EventType = null!,
-                Id = null!,
-                LastPersistedAtUtc = default,
-                Metadata = null!,
-                StreamName = null!,
-                Version = 6
-            }
-        }, CancellationToken.None);
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.ReadModelProjector_CheckpointError.Format("astreamname", 5, 6));
+        await _projector.Invoking(x => x.WriteEventStreamAsync("astreamname", [
+                new EventStreamChangeEvent
+                {
+                    Data = null!,
+                    RootAggregateType = nameof(String),
+                    EventType = null!,
+                    Id = null!,
+                    LastPersistedAtUtc = default,
+                    Metadata = null!,
+                    StreamName = null!,
+                    Version = 6
+                }
+            ], CancellationToken.None))
+            .Should().ThrowAsync<InvalidOperationException>()
+            .WithMessageLike(Resources.ReadModelProjector_CheckpointError.Format("astreamname", 5, 6));
     }
 
     [Fact]
@@ -136,9 +136,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .ReturnsAsync(5);
 
-        await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
                 RootAggregateType = nameof(String),
@@ -149,7 +148,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid2",
                 RootAggregateType = nameof(String),
@@ -160,7 +160,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid3",
                 RootAggregateType = nameof(String),
@@ -171,7 +172,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         _checkpointRepository.Verify(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()));
         _projection.Verify(prj => prj.ProjectEventAsync(It.Is<TestEvent>(e =>
@@ -192,9 +193,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .ReturnsAsync(3);
 
-        var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid",
                 LastPersistedAtUtc = default,
@@ -208,7 +208,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 Metadata = new EventMetadata("unknowntype"),
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation);
     }
@@ -220,9 +220,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .ReturnsAsync(startingCheckpoint);
 
-        await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
                 RootAggregateType = nameof(String),
@@ -233,7 +232,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid2",
                 RootAggregateType = nameof(String),
@@ -244,7 +244,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid3",
                 RootAggregateType = nameof(String),
@@ -255,7 +256,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         _checkpointRepository.Verify(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()));
         _projection.Verify(prj => prj.ProjectEventAsync(It.Is<TestEvent>(e =>
@@ -279,9 +280,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _projection.Setup(prj => prj.ProjectEventAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
-        var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
                 RootAggregateType = nameof(String),
@@ -292,7 +292,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.Unexpected,
             Resources.ReadModelProjector_ProjectionError_MissingHandler.Format("IReadModelProjectionProxy", "anid1",
@@ -312,9 +312,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .ReturnsAsync(3);
 
-        await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        await _projector.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
                 RootAggregateType = nameof(String),
@@ -325,7 +324,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid2",
                 RootAggregateType = nameof(String),
@@ -336,7 +336,8 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid3",
                 RootAggregateType = nameof(String),
@@ -347,7 +348,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         _checkpointRepository.Verify(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()));
         _projection.Verify(prj => prj.ProjectEventAsync(It.Is<TestEvent>(e =>

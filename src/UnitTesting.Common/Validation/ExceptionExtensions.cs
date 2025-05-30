@@ -14,7 +14,7 @@ public static class ExceptionExtensions
         params object[] becauseArgs)
         where TException : Exception
     {
-        if (!string.IsNullOrEmpty(messageWithFormatters))
+        if (messageWithFormatters.HasValue())
         {
             var exception = @throw.Subject.Single();
             var expectedFormat = messageWithFormatters.Replace("{", "{{")
@@ -35,7 +35,7 @@ public static class ExceptionExtensions
         params object[] becauseArgs)
         where TException : Exception
     {
-        if (!string.IsNullOrEmpty(messageWithFormatters))
+        if (messageWithFormatters.HasValue())
         {
             var exception = (await @throw).Subject.Single();
             var expectedFormat = messageWithFormatters.Replace("{", "{{")
