@@ -20,6 +20,29 @@ Code that we don't want to see, and instead replaced with other code.
 
 Discussion about Optional versus Nullable
 
+
+
+Common dotnet expressions, that we want replaced in the code:
+
+| Instead of this:                   | Use this:                             | Why?                                                         |
+| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
+| `DateTime.Now`                     | `DateTime.UtcNow`                     | You should never handle local dates and times in the API layer. All dates and times should always be in UTC. Only clients should convert to dates and times to local, based on client settings. |
+| `!string.IsNullOrEmpty(variable)`  | `variable.HasValue()`                 | Easier to read and understand the real intent                |
+| `string.IsNullOrEmpty(variable)`   | `variable.HasNoValue()`               | Easier to read and understand the real intent                |
+| `variable != null`                 | `variable.Exists()`                   | Easier to understand the real intent                         |
+| `variable == null`                 | `variable.NotExists()`                | Easier to understand the real intent                         |
+| `variable == null`                 | `variable.IsNull()`                   | Uncommon, for completeness in these rare cases.              |
+| `variable != null`                 | `variable.IsNotNull`                  | Uncommon, for completeness in these rare cases.              |
+| `string.Format(message, args)`     | `message.Format(args)`                |                                                              |
+| `variable.Equals(value, options)`  | `variable.EqualsIgnoreCase(value)`    |                                                              |
+| `!variable.Equals(value, options)` | `variable.NotEqualsIgnoreCase(value)` |                                                              |
+| `collection.Any()`                 | `collection.HasAny()`                 |                                                              |
+| `!collection.Any()`                | `collection.HasNone()`                |                                                              |
+
+
+
+
+
 ## Breaking changes
 
 General overview of breaking versus non-breaking
