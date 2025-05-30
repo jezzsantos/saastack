@@ -99,7 +99,7 @@ public class EndUserProjection : IReadModelProjection
             }
 
             case MembershipRoleAssigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                return await _memberships.HandleUpdateAsync(e.MembershipId, dto =>
                 {
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Add(e.Role)
@@ -113,7 +113,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case MembershipRoleUnassigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                return await _memberships.HandleUpdateAsync(e.MembershipId, dto =>
                 {
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Remove(e.Role)
@@ -127,7 +127,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case MembershipFeatureAssigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                return await _memberships.HandleUpdateAsync(e.MembershipId, dto =>
                 {
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
@@ -141,7 +141,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case MembershipFeatureUnassigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                return await _memberships.HandleUpdateAsync(e.MembershipId, dto =>
                 {
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Remove(e.Feature)
@@ -155,7 +155,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case MembershipFeaturesReset e:
-                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                return await _memberships.HandleUpdateAsync(e.MembershipId, dto =>
                 {
                     var features = Features.Create(e.Features.ToArray());
                     if (features.IsFailure)
