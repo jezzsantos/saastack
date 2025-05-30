@@ -30,7 +30,7 @@ public abstract class DeliverDomainEventSpecBase<TSetup> : ApiWorkerSpec<TSetup>
         _serviceClientFactory.Reset();
     }
 
-    [Fact]
+    [Fact(Skip = "Testing Azure Functions with Triggers is not possible yet")]
     public async Task WhenMessageQueuedContainingInvalidContent_ThenApiNotCalled()
     {
         await Setup.MessageBusStore.SendAsync(WorkerConstants.MessageBuses.Topics.DomainEvents, "aninvalidmessage",
@@ -46,7 +46,7 @@ public abstract class DeliverDomainEventSpecBase<TSetup> : ApiWorkerSpec<TSetup>
         _serviceClientFactory.LastPostedMessage.Should().BeNone();
     }
 
-    [Fact]
+    [Fact(Skip = "Testing Azure Functions with Triggers is not possible yet")]
     public async Task WhenMessageQueued_ThenApiCalled()
     {
         var message = StringExtensions.ToJson(new DomainEventingMessage

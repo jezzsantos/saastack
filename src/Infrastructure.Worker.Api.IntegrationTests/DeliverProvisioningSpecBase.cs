@@ -27,7 +27,7 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
         _serviceClient.Reset();
     }
 
-    [Fact]
+    [Fact(Skip = "Testing Azure Functions with Triggers is not possible yet")]
     public async Task WhenMessageQueuedContainingInvalidContent_ThenApiNotCalled()
     {
         await Setup.QueueStore.PushAsync(WorkerConstants.Queues.Provisionings, "aninvalidmessage",
@@ -42,7 +42,7 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
-    [Fact]
+    [Fact(Skip = "Testing Azure Functions with Triggers is not possible yet")]
     public async Task WhenMessageQueued_ThenApiCalled()
     {
         var message = StringExtensions.ToJson(new ProvisioningMessage
