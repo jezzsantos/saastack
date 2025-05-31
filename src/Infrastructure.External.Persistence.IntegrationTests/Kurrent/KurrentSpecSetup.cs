@@ -34,6 +34,7 @@ public class KurrentSpecSetup : IAsyncLifetime
         await _eventStoreDb.StartAsync();
 
         var connectionString = _eventStoreDb.GetConnectionString();
-        EventStore = KurrentEventStore.Create(NoOpRecorder.Instance, connectionString);
+        EventStore = KurrentEventStore.Create(NoOpRecorder.Instance,
+            KurrentEventStoreOptions.CustomConnectionString(connectionString));
     }
 }

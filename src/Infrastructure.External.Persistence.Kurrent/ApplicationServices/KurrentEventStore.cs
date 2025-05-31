@@ -1,6 +1,5 @@
 using System.Text;
 using Common;
-using Common.Configuration;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
@@ -16,29 +15,25 @@ namespace Infrastructure.External.Persistence.Kurrent.ApplicationServices;
 ///     e.g. an aggregate domain event at version == 6 will be stored inside a Kurrent event with EventNumber == 5.
 ///     <see href="https://developers.eventstore.com/clients/grpc/getting-started.html" />
 /// </summary>
-public class KurrentEventStore : IEventStore
+public class KurrentEventStore : IEventStore, IDisposable
 {
-    private const string ConnectionStringSettingName = "ApplicationServices:Persistence:Kurrent:ConnectionString";
-    private readonly EventStoreClient _client;
+    private readonly KurrentEventStoreOptions.ConnectionOptions _connectionOptions;
     private readonly IRecorder _recorder;
 
-    public static KurrentEventStore Create(IRecorder recorder, IConfigurationSettings settings)
+    public static KurrentEventStore Create(IRecorder recorder, KurrentEventStoreOptions options)
     {
-        var connectionString = settings.GetString(ConnectionStringSettingName);
-        return Create(recorder, connectionString);
+        return new KurrentEventStore(recorder, options.Connection);
     }
 
-    public static KurrentEventStore Create(IRecorder recorder, string connectionString)
+    private KurrentEventStore(IRecorder recorder, KurrentEventStoreOptions.ConnectionOptions connectionOptions)
     {
-        return new KurrentEventStore(recorder, connectionString);
-    }
-
-    private KurrentEventStore(IRecorder recorder, string connectionString)
-    {
-        var settings = EventStoreClientSettings.Create(connectionString);
-
-        _client = new EventStoreClient(settings);
+        _connectionOptions = connectionOptions;
         _recorder = recorder;
+    }
+
+    public void Dispose()
+    {
+        _connectionOptions.Dispose();
     }
 
     public async Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
@@ -68,7 +63,7 @@ public class KurrentEventStore : IEventStore
 
         try
         {
-            await _client.AppendToStreamAsync(streamName, expectedKurrentRevision, eventData,
+            await _connectionOptions.Client.AppendToStreamAsync(streamName, expectedKurrentRevision, eventData,
                 cancellationToken: cancellationToken);
 
             if (events.Count > 1)
@@ -134,7 +129,8 @@ public class KurrentEventStore : IEventStore
         try
         {
             var allStreams =
-                _client.ReadAllAsync(Direction.Forwards, Position.Start, cancellationToken: cancellationToken);
+                _connectionOptions.Client.ReadAllAsync(Direction.Forwards, Position.Start,
+                    cancellationToken: cancellationToken);
 
             var streamNames = new HashSet<string>();
             await foreach (var resolvedEvent in allStreams)
@@ -147,7 +143,8 @@ public class KurrentEventStore : IEventStore
 
             foreach (var streamName in streamNames)
             {
-                await _client.TombstoneAsync(streamName, StreamState.Any, cancellationToken: cancellationToken);
+                await _connectionOptions.Client.TombstoneAsync(streamName, StreamState.Any,
+                    cancellationToken: cancellationToken);
             }
 
             return Result.Ok;
@@ -172,7 +169,8 @@ public class KurrentEventStore : IEventStore
 
         try
         {
-            var eventStream = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.Start,
+            var eventStream = _connectionOptions.Client.ReadStreamAsync(Direction.Forwards, streamName,
+                StreamPosition.Start,
                 cancellationToken: cancellationToken);
             await foreach (var resolvedEvent in eventStream)
             {
