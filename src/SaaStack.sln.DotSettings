@@ -42,8 +42,8 @@
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="HTML"&amp;gt;&#xD;
-    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Rearrange&amp;gt;true&amp;lt;/Rearrange&amp;gt;&#xD;
+    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="HTTP Request"&amp;gt;&#xD;
@@ -59,8 +59,8 @@
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="JavaScript"&amp;gt;&#xD;
-    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Rearrange&amp;gt;true&amp;lt;/Rearrange&amp;gt;&#xD;
+    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="Markdown"&amp;gt;&#xD;
@@ -88,8 +88,8 @@
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="XML"&amp;gt;&#xD;
-    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Rearrange&amp;gt;true&amp;lt;/Rearrange&amp;gt;&#xD;
+    &amp;lt;OptimizeImports&amp;gt;true&amp;lt;/OptimizeImports&amp;gt;&#xD;
     &amp;lt;Reformat&amp;gt;true&amp;lt;/Reformat&amp;gt;&#xD;
   &amp;lt;/Language&amp;gt;&#xD;
   &amp;lt;Language id="yaml"&amp;gt;&#xD;

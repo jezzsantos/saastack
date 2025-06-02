@@ -44,6 +44,7 @@ public static class HttpConstants
         public const string Referer = "Referer";
         public const string RequestId = "Request-Id";
         public const string SetCookie = "Set-Cookie";
+        public const string Cookie = "Cookie";
         public const string Tenant = "Tenant";
     }
 

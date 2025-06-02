@@ -96,12 +96,18 @@ public sealed class ReverseProxyMiddleware
             message.Content = streamContent;
         }
 
-        foreach (var header in request.Headers)
+        // Remove CSRF cookies and headers
+        var forwardingHeaders = request.Headers
+            .Where(hdr => hdr.Key.NotEqualsIgnoreCase(HttpConstants.Headers.AntiCSRF))
+            .Where(hdr => hdr.Key.NotEqualsIgnoreCase(HttpConstants.Headers.Cookie))
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+        foreach (var header in forwardingHeaders)
         {
             message.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
         }
 
-        foreach (var header in request.Headers)
+        foreach (var header in forwardingHeaders)
         {
             message.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
         }

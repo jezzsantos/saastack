@@ -2,8 +2,8 @@ using System.Collections.Concurrent;
 using Application.Interfaces;
 using Common.Extensions;
 using Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Options;
 using AuthorizeAttribute = Infrastructure.Web.Api.Interfaces.AuthorizeAttribute;
 
@@ -14,12 +14,6 @@ namespace Infrastructure.Web.Hosting.Common.Auth;
 /// </summary>
 public sealed class RolesAndFeaturesAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
 {
-    private static readonly string[] ParticipatingAuthenticationSchemes =
-    {
-        JwtBearerDefaults.AuthenticationScheme,
-        HMACAuthenticationHandler.AuthenticationScheme,
-        APIKeyAuthenticationHandler.AuthenticationScheme
-    };
     private readonly ConcurrentDictionary<string, AuthorizationPolicy> _policyCache = new();
 
     public RolesAndFeaturesAuthorizationPolicyProvider(
@@ -34,7 +28,6 @@ public sealed class RolesAndFeaturesAuthorizationPolicyProvider : DefaultAuthori
             return cachedPolicy;
         }
 
-        // Search for this policy from the static list defined in HostExtensions
         var policy = await base.GetPolicyAsync(policyName);
         if (policy.Exists())
         {
@@ -46,15 +39,18 @@ public sealed class RolesAndFeaturesAuthorizationPolicyProvider : DefaultAuthori
             .Select(rf => new RolesAndFeaturesRequirement(rf.Roles, rf.Features))
             .Cast<IAuthorizationRequirement>().ToArray();
 
-        var builder = new AuthorizationPolicyBuilder()
-            .AddAuthenticationSchemes(ParticipatingAuthenticationSchemes)
-            .RequireAuthenticatedUser()
-            .AddRequirements(requirements)
-            .Build();
+        var builder = new AuthorizationPolicyBuilder();
+        if (requirements.HasAny())
+        {
+            builder.AddRequirements(new DenyAnonymousAuthorizationRequirement());
+            builder.AddRequirements(requirements);
+        }
 
-        _policyCache.TryAdd(policyName, builder);
+        var policies = builder.Build();
 
-        return builder;
+        _policyCache.TryAdd(policyName, policies);
+
+        return policies;
     }
 
 #if TESTINGONLY

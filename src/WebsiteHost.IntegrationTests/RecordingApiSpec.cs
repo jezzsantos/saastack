@@ -4,6 +4,7 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using Common.Recording;
+using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using IntegrationTesting.WebApi.Common;
@@ -126,8 +127,10 @@ public class RecordingApiSpec : WebsiteSpec<Program, ApiHost1.Program>
             (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastMeasureEventName.Should().Be("aneventname");
-        _recorder.LastMeasureAdditional!.Count.Should().Be(6);
+        _recorder.LastMeasureAdditional!.Count.Should().Be(7);
         _recorder.LastMeasureAdditional!["aname"].As<JsonElement>().GetString().Should().Be("avalue");
+        _recorder.LastMeasureAdditional![UsageConstants.Properties.ForId].As<string>().Should()
+            .Be(CallerConstants.AnonymousUserId);
         _recorder.LastMeasureAdditional![UsageConstants.Properties.Timestamp].As<DateTime>().Should()
             .BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         _recorder.LastMeasureAdditional![UsageConstants.Properties.IpAddress].As<string>().Should().Be("unknown");

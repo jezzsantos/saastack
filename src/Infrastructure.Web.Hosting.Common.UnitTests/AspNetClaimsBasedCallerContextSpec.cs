@@ -22,12 +22,13 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests;
 
 [Trait("Category", "Unit")]
-public class AspNetClaimsBasedCallerContextBaseSpec
+public class AspNetClaimsBasedCallerContextSpec
 {
     private readonly Mock<IHostSettings> _hostSettings;
+    private readonly Mock<IHttpContextAccessor> _httpContextAccessor;
     private readonly Mock<ITenancyContext> _tenancyContext;
 
-    public AspNetClaimsBasedCallerContextBaseSpec()
+    public AspNetClaimsBasedCallerContextSpec()
     {
         _hostSettings = new Mock<IHostSettings>();
         _hostSettings.Setup(h => h.GetRegion())
@@ -38,6 +39,67 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         var hostSettings = new Mock<IHostSettings>();
         hostSettings.Setup(h => h.GetRegion())
             .Returns(DatacenterLocations.AustraliaEast);
+        _httpContextAccessor = new Mock<IHttpContextAccessor>();
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Items).Returns(new Dictionary<object, object?>());
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>());
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(new FeatureCollection());
+    }
+
+    [Fact]
+    public void WhenConstructed_ThenDetails()
+    {
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>());
+
+        var result =
+            new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+                _httpContextAccessor.Object);
+
+        result.IsAuthenticated.Should().BeFalse();
+        result.IsServiceAccount.Should().BeFalse();
+        result.CallId.Should().NotBeEmpty();
+        result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
+        result.TenantId.Should().BeSome("atenantid");
+        result.Roles.All.Length.Should().Be(0);
+        result.Features.All.Length.Should().Be(0);
+        result.HostRegion.Should().Be(DatacenterLocations.AustraliaEast);
+    }
+
+    [Fact]
+    public void WhenConstructedAndNoClaims_ThenIsNotAuthenticated()
+    {
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns(new List<Claim>());
+
+        var result =
+            new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+                _httpContextAccessor.Object);
+
+        result.IsAuthenticated.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenConstructedAndUserClaimWithAuthorization_ThenIsAuthenticated()
+    {
+        var authFeature = new Mock<IAuthenticateResultFeature>();
+        var ticket = new AuthenticationTicket(new ClaimsPrincipal(), JwtBearerDefaults.AuthenticationScheme);
+        authFeature.Setup(af => af.AuthenticateResult)
+            .Returns(AuthenticateResult.Success(ticket));
+        var features = new FeatureCollection();
+        features.Set(authFeature.Object);
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
+        {
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
+        });
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns(new List<Claim> { new(AuthenticationConstants.Claims.ForId, "auserid") });
+
+        var result =
+            new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+                _httpContextAccessor.Object);
+
+        result.IsAuthenticated.Should().BeTrue();
     }
 
     [Fact]
@@ -46,28 +108,28 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         _tenancyContext.Setup(tc => tc.Current)
             .Returns(Optional<string>.None);
 
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.TenantId.Should().BeNone();
-        result.CallId.Should().Be("acallid");
+        result.CallId.Should().NotBeEmpty();
     }
 
     [Fact]
     public void WhenConstructedAndTenantId_ThenTenantId()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.TenantId.Should().Be("atenantid");
-        result.CallId.Should().Be("acallid");
+        result.CallId.Should().NotBeEmpty();
     }
 
     [Fact]
     public void WhenConstructedAndNoUserClaim_ThenSetsAnonymousCallerId()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
     }
@@ -75,9 +137,11 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndContainsUserClaim_ThenSetsCallerId()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object,
-            [new Claim(AuthenticationConstants.Claims.ForId, "auserid")],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([new Claim(AuthenticationConstants.Claims.ForId, "auserid")]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.CallerId.Should().Be("auserid");
     }
@@ -85,8 +149,8 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndNoRolesClaim_ThenSetsEmptyRoles()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Roles.All.Should().BeEmpty();
     }
@@ -94,8 +158,8 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndNoFeaturesClaim_ThenSetsEmptyFeatures()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Features.All.Should().BeEmpty();
     }
@@ -103,12 +167,15 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndUnknownRolesClaim_ThenSetsEmptyRoles()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([
                 new Claim(AuthenticationConstants.Claims.ForRole, "arole1"),
                 new Claim(AuthenticationConstants.Claims.ForRole, "arole2"),
                 new Claim(AuthenticationConstants.Claims.ForRole, "arole3")
-            ],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+            ]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Roles.All.Should().BeEmpty();
     }
@@ -116,15 +183,17 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndContainsRolesClaims_ThenSetsRoles()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object,
-            [
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([
                 new Claim(AuthenticationConstants.Claims.ForRole,
                     ClaimExtensions.ToPlatformClaimValue(PlatformRoles.Standard)),
                 new Claim(AuthenticationConstants.Claims.ForRole,
                     ClaimExtensions.ToTenantClaimValue(TenantRoles.Member,
                         "atenantid"))
-            ],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+            ]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Roles.All.Should().ContainInOrder(PlatformRoles.Standard, TenantRoles.Member);
         result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
@@ -134,12 +203,15 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndUnknownFeaturesClaim_ThenSetsEmptyFeatures()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([
                 new Claim(AuthenticationConstants.Claims.ForFeature, "afeature1"),
                 new Claim(AuthenticationConstants.Claims.ForFeature, "afeature2"),
                 new Claim(AuthenticationConstants.Claims.ForFeature, "afeature3")
-            ],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+            ]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Features.All.Should().BeEmpty();
     }
@@ -147,14 +219,17 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndContainsFeaturesClaims_ThenSetsFeatures()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([
                 new Claim(AuthenticationConstants.Claims.ForFeature,
                     ClaimExtensions.ToPlatformClaimValue(PlatformFeatures.Basic)),
                 new Claim(AuthenticationConstants.Claims.ForFeature,
                     ClaimExtensions.ToTenantClaimValue(TenantFeatures.Basic,
                         "atenantid"))
-            ],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+            ]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Features.All.Should().ContainInOrder(PlatformFeatures.Basic);
         result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
@@ -164,8 +239,8 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndHttpRequestHasNoBearerToken_ThenResetsAuthorization()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.Authorization.Should().BeNone();
     }
@@ -173,28 +248,21 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndIsServiceAccountIdentity_ThenIsServiceAccount()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object,
-            [new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.ServiceClientAccountUserId)],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.ServiceClientAccountUserId)]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.IsAuthenticated.Should().BeTrue();
         result.IsServiceAccount.Should().BeTrue();
     }
 
     [Fact]
-    public void WhenConstructedAndNoClaims_ThenIsNotAuthenticated()
-    {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
-
-        result.IsAuthenticated.Should().BeFalse();
-    }
-
-    [Fact]
     public void WhenConstructedAndHasNoAuthorization_ThenIsNotAuthenticated()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            Optional<ICallerContext.CallerAuthorization>.None, "acallid");
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.IsAuthenticated.Should().BeFalse();
         result.Authorization.Should().BeNone();
@@ -203,9 +271,23 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndHasAuthorizationAndNotAnonymous_ThenIsAuthenticated()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object,
-            [new Claim(AuthenticationConstants.Claims.ForId, "auserid")],
-            new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.Token, "atoken"), "acallid");
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([new Claim(AuthenticationConstants.Claims.ForId, "auserid")]);
+
+        var authFeature = new Mock<IAuthenticateResultFeature>();
+        var ticket = new AuthenticationTicket(new ClaimsPrincipal(), JwtBearerDefaults.AuthenticationScheme);
+        authFeature.Setup(af => af.AuthenticateResult)
+            .Returns(AuthenticateResult.Success(ticket));
+        var features = new FeatureCollection();
+        features.Set(authFeature.Object);
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
+        {
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
+        });
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.IsAuthenticated.Should().BeTrue();
         result.Authorization.Should().BeSome(auth =>
@@ -215,8 +297,11 @@ public class AspNetClaimsBasedCallerContextBaseSpec
     [Fact]
     public void WhenConstructedAndHasAuthorizationAndIsAnonymous_ThenIsNotAuthenticated()
     {
-        var result = new TestCallerContext(_tenancyContext.Object, _hostSettings.Object, [],
-            new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.Token, "atoken"), "acallid");
+        _httpContextAccessor.Setup(hc => hc.HttpContext!.User.Claims)
+            .Returns([]);
+
+        var result = new AspNetClaimsBasedCallerContext(_tenancyContext.Object, _hostSettings.Object,
+            _httpContextAccessor.Object);
 
         result.IsAuthenticated.Should().BeFalse();
         result.Authorization.Should().BeNone();
@@ -229,7 +314,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Items)
             .Returns(new Dictionary<object, object?>());
 
-        var result = TestCallerContext.GetCorrelationId(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetCorrelationId(httpContextAccessor.Object);
 
         result.Should().NotBeNullOrEmpty();
     }
@@ -242,7 +327,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
             .Returns(new Dictionary<object, object?>
                 { { RequestCorrelationFilter.CorrelationIdItemName, "acorrelationid" } });
 
-        var result = TestCallerContext.GetCorrelationId(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetCorrelationId(httpContextAccessor.Object);
 
         result.Should().Be("acorrelationid");
     }
@@ -254,7 +339,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(new FeatureCollection());
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeNone();
     }
@@ -269,7 +354,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeNone();
     }
@@ -287,7 +372,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeNone();
     }
@@ -305,7 +390,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeSome(auth =>
             auth.Method == ICallerContext.AuthorizationMethod.HMAC && auth.Value == Optional<string>.None);
@@ -325,7 +410,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         httpContextAccessor.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeSome(auth =>
             auth.Method == ICallerContext.AuthorizationMethod.PrivateInterHost && auth.Value == Optional<string>.None);
@@ -348,7 +433,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         });
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeSome(auth =>
             auth.Method == ICallerContext.AuthorizationMethod.PrivateInterHost && auth.Value == "atoken".ToOptional());
@@ -370,7 +455,7 @@ public class AspNetClaimsBasedCallerContextBaseSpec
         });
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeSome(auth =>
             auth.Method == ICallerContext.AuthorizationMethod.Token && auth.Value == "atoken".ToOptional());
@@ -397,29 +482,9 @@ public class AspNetClaimsBasedCallerContextBaseSpec
             }));
         httpContextAccessor.Setup(hc => hc.HttpContext!.Features).Returns(features);
 
-        var result = TestCallerContext.GetAuthorization(httpContextAccessor.Object);
+        var result = AspNetClaimsBasedCallerContext.GetAuthorization(httpContextAccessor.Object);
 
         result.Should().BeSome(auth =>
             auth.Method == ICallerContext.AuthorizationMethod.APIKey && auth.Value == "anapikey".ToOptional());
-    }
-}
-
-public class TestCallerContext : AspNetClaimsBasedCallerContextBase
-{
-    public TestCallerContext(ITenancyContext tenancyContext, IHostSettings hostSettings, Claim[] claims,
-        Optional<ICallerContext.CallerAuthorization> authorization, string callId)
-        : base(hostSettings, claims, authorization, GetTenantId(tenancyContext), callId)
-    {
-    }
-
-    public new static Optional<ICallerContext.CallerAuthorization> GetAuthorization(
-        IHttpContextAccessor contextAccessor)
-    {
-        return AspNetClaimsBasedCallerContextBase.GetAuthorization(contextAccessor);
-    }
-
-    public new static string GetCorrelationId(IHttpContextAccessor contextAccessor)
-    {
-        return AspNetClaimsBasedCallerContextBase.GetCorrelationId(contextAccessor);
     }
 }

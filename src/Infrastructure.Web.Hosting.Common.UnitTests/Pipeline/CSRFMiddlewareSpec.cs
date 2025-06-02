@@ -6,6 +6,7 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
@@ -15,6 +16,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
+#if TESTINGONLY
+using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd.TestingOnly;
+#endif
 
 namespace Infrastructure.Web.Hosting.Common.UnitTests.Pipeline;
 
@@ -116,6 +120,26 @@ public class CSRFMiddlewareSpec
             _csrfService.Verify(
                 cs => cs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                     It.IsAny<Optional<string>>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task WhenInvokeAsyncAndIsRequestIsIgnoredPath_ThenContinuesPipeline()
+        {
+#if TESTINGONLY
+            var path = WebConstants.BackEndForFrontEndBasePath
+                       + new BeffeHMacDirectTestingOnlyRequest().GetRequestInfo().Route;
+            var context = new DefaultHttpContext
+            {
+                Request = { Method = HttpMethods.Post, Path = path }
+            };
+
+            await _middleware.InvokeAsync(context, _callerContextFactory.Object);
+
+            _next.Verify(n => n.Invoke(context));
+            _csrfService.Verify(
+                cs => cs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
+                    It.IsAny<Optional<string>>()), Times.Never);
+#endif
         }
 
         [Fact]

@@ -20,6 +20,17 @@ public class RequestExtensionsSpec
         "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653";
 
     [Fact]
+    public void WhenSetHMACAuthWithHttpRequestMessage_ThenSetsSignatureHeader()
+    {
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth("asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == EmptyRequestSignature);
+    }
+
+    [Fact]
     public void WhenSetHMACAuthWithEmptyPostRequest_ThenSetsSignatureHeader()
     {
         var request = new TestEmptyPostRequest();

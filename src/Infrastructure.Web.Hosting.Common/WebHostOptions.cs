@@ -15,7 +15,8 @@ public class WebHostOptions : HostOptions
         {
             UsesTokens = true,
             UsesApiKeys = true,
-            UsesHMAC = true
+            UsesHMAC = true,
+            UsesAuthNCookie = false
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = true,
@@ -30,7 +31,8 @@ public class WebHostOptions : HostOptions
         {
             UsesTokens = true,
             UsesApiKeys = true,
-            UsesHMAC = true
+            UsesHMAC = true,
+            UsesAuthNCookie = false
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = true,
@@ -46,7 +48,8 @@ public class WebHostOptions : HostOptions
         {
             UsesTokens = false,
             UsesApiKeys = false,
-            UsesHMAC = false
+            UsesHMAC = true,
+            UsesAuthNCookie = true
         },
         IsBackendForFrontEnd = true,
         UsesNotifications = false,
@@ -62,7 +65,8 @@ public class WebHostOptions : HostOptions
         {
             UsesTokens = false,
             UsesApiKeys = false,
-            UsesHMAC = false
+            UsesHMAC = false,
+            UsesAuthNCookie = false
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = false,
@@ -110,6 +114,8 @@ public class AuthorizationOptions
     public bool HasNone => !UsesApiKeys && !UsesTokens && !UsesHMAC;
 
     public bool UsesApiKeys { get; set; }
+
+    public bool UsesAuthNCookie { get; set; }
 
     public bool UsesHMAC { get; set; }
 

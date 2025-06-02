@@ -50,6 +50,7 @@ using Microsoft.OpenApi.Models;
 using Infrastructure.External.Persistence.Azure.ApplicationServices;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
+
 #elif HOSTEDONAWS
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
@@ -83,7 +84,7 @@ public static class HostExtensions
         RegisterApiDocumentation(hostOptions.HostName, hostOptions.HostVersion, hostOptions.UsesApiDocumentation);
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
-        RegisterApplicationServices(hostOptions.IsBackendForFrontEnd, hostOptions.IsMultiTenanted,
+        RegisterApplicationServices(hostOptions.IsMultiTenanted,
             hostOptions.ReceivesWebhooks);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
         RegisterEventing(hostOptions.Persistence.UsesEventing);
@@ -226,10 +227,16 @@ public static class HostExtensions
                 return;
             }
 
+            // We are either using tokens or cookies, or neither, but never both
             var defaultScheme = string.Empty;
-            if (authentication.UsesTokens)
+            if (authentication is { UsesTokens: true, UsesAuthNCookie: false })
             {
                 defaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+
+            if (authentication is { UsesTokens: false, UsesAuthNCookie: true })
+            {
+                defaultScheme = BeffeCookieAuthenticationHandler.AuthenticationScheme;
             }
 
             var onlyHMAC = authentication is
@@ -266,6 +273,13 @@ public static class HostExtensions
             {
                 authBuilder.AddScheme<APIKeyOptions, APIKeyAuthenticationHandler>(
                     APIKeyAuthenticationHandler.AuthenticationScheme,
+                    _ => { });
+            }
+
+            if (authentication.UsesAuthNCookie)
+            {
+                authBuilder.AddScheme<BeffeCookieOptions, BeffeCookieAuthenticationHandler>(
+                    BeffeCookieAuthenticationHandler.AuthenticationScheme,
                     _ => { });
             }
 
@@ -451,20 +465,20 @@ public static class HostExtensions
             services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
         }
 
-        void RegisterApplicationServices(bool isBeffeHost, bool isMultiTenanted, bool receivesWebhooks)
+        void RegisterApplicationServices(bool isMultiTenanted, bool receivesWebhooks)
         {
             services.AddHttpClient();
             var prefixes = modules.EntityPrefixes;
             prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
             services.AddSingleton<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
 
-            if (isBeffeHost)
+            if (isMultiTenanted)
             {
-                services.AddPerHttpRequest<ICallerContextFactory, AspNetBeffeCallerFactory>();
+                services.AddPerHttpRequest<ICallerContextFactory, AspNetHttpContextCallerFactory>();
             }
             else
             {
-                services.AddPerHttpRequest<ICallerContextFactory, AspNetHttpContextCallerFactory>();
+                services.AddSingleton<ICallerContextFactory, AspNetHttpContextCallerFactory>();
             }
 
             if (isMultiTenanted)

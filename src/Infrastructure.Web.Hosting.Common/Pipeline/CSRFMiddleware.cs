@@ -9,6 +9,9 @@ using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Extensions;
 using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
+#if TESTINGONLY
+using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd.TestingOnly;
+#endif
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
@@ -28,6 +31,13 @@ public sealed class CSRFMiddleware
         HttpMethods.Head,
         HttpMethods.Options
     ];
+    private static readonly string[] IgnoredPaths =
+    [
+#if TESTINGONLY
+        new BeffeHMacDirectTestingOnlyRequest().GetRequestInfo().Route,
+        new BeffeAnonymousDirectTestingOnlyRequest().GetRequestInfo().Route,
+#endif
+    ]; //EXTEND: add ignored API routes
     private readonly ICSRFService _csrfService;
     private readonly IHostSettings _hostSettings;
     private readonly RequestDelegate _next;
@@ -46,7 +56,13 @@ public sealed class CSRFMiddleware
     {
         var caller = callerContextFactory.Create();
         var request = context.Request;
-        if (IgnoredMethods.Contains(request.Method))
+        if (IsIgnoredMethod(request))
+        {
+            await _next(context); //Continue down the pipeline            
+            return;
+        }
+
+        if (IsIgnoredRoute(request))
         {
             await _next(context); //Continue down the pipeline            
             return;
@@ -64,6 +80,19 @@ public sealed class CSRFMiddleware
         }
 
         await _next(context); //Continue down the pipeline  
+        return;
+
+        static bool IsIgnoredMethod(HttpRequest request)
+        {
+            return IgnoredMethods.Contains(request.Method);
+        }
+
+        static bool IsIgnoredRoute(HttpRequest request)
+        {
+            return IgnoredPaths.Any(ignoredPath =>
+                request.Path.StartsWithSegments(WebConstants.BackEndForFrontEndBasePath + ignoredPath,
+                    StringComparison.OrdinalIgnoreCase));
+        }
     }
 
     private Result<Error> VerifyRequest(HttpRequest request)

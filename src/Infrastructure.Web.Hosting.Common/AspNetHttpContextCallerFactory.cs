@@ -21,7 +21,7 @@ public sealed class AspNetHttpContextCallerFactory : ICallerContextFactory
 
     public ICallerContext Create()
     {
-        return new AspNetHttpContextCallerContext(_container.GetRequiredService<ITenancyContext>(),
+        return new AspNetClaimsBasedCallerContext(_container.GetRequiredService<ITenancyContext>(),
             _container.GetRequiredService<IHostSettings>(), _container.GetRequiredService<IHttpContextAccessor>());
     }
 }

@@ -114,6 +114,17 @@ public static class RequestExtensions
     ///     Sets the HMAC signature header on the specified <see cref="message" /> by signing the body of the specified
     ///     <see cref="request" />
     /// </summary>
+    public static void SetHMACAuth(this HttpRequestMessage message, string secret)
+    {
+        var signature = message.CreateHMACSignature(secret);
+
+        message.Headers.Add(HttpConstants.Headers.HMACSignature, signature);
+    }
+
+    /// <summary>
+    ///     Sets the HMAC signature header on the specified <see cref="message" /> by signing the body of the specified
+    ///     <see cref="request" />
+    /// </summary>
     public static void SetPrivateInterHostAuth(this HttpRequestMessage message, IWebRequest request, string secret,
         string? token = null)
     {

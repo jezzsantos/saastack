@@ -10,6 +10,7 @@ using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Auth;
+using Infrastructure.Web.Hosting.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -17,11 +18,22 @@ using Microsoft.AspNetCore.Http;
 namespace Infrastructure.Web.Hosting.Common;
 
 /// <summary>
-///     Provides <see cref="ICallerContext" /> that reads the context of the caller from the claims in ASPNET.
+///     Provides <see cref="ICallerContext" /> that reads the context of the caller from various claims in ASPNET.
+///     This class will be interested in the claims that would have been already set further up in the ASPNET pipeline,
+///     by the ASPNET authentication and authorization middleware
 /// </summary>
-public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
+public sealed class AspNetClaimsBasedCallerContext : ICallerContext
 {
-    protected AspNetClaimsBasedCallerContextBase(IHostSettings hostSettings,
+    public AspNetClaimsBasedCallerContext(ITenancyContext tenancyContext, IHostSettings hostSettings,
+        IHttpContextAccessor httpContextAccessor) : this(hostSettings,
+        GetClaims(httpContextAccessor),
+        GetAuthorization(httpContextAccessor),
+        GetTenantId(tenancyContext),
+        GetCorrelationId(httpContextAccessor))
+    {
+    }
+
+    private AspNetClaimsBasedCallerContext(IHostSettings hostSettings,
         IReadOnlyList<Claim> claims, Optional<ICallerContext.CallerAuthorization> authorization, string tenantId,
         string correlationId)
     {
@@ -59,19 +71,9 @@ public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
     public Optional<string> TenantId { get; }
 
     /// <summary>
-    ///     Extracts the tenant ID from the tenancy context.
-    /// </summary>
-    public static Optional<string> GetTenantId(ITenancyContext? tenancyContext)
-    {
-        return tenancyContext.Exists()
-            ? tenancyContext.Current
-            : null;
-    }
-
-    /// <summary>
     ///     Returns authorization details from ASPNET Authentication adn Authorization configuration
     /// </summary>
-    protected static Optional<ICallerContext.CallerAuthorization> GetAuthorization(IHttpContextAccessor contextAccessor)
+    internal static Optional<ICallerContext.CallerAuthorization> GetAuthorization(IHttpContextAccessor contextAccessor)
     {
         var httpContext = contextAccessor.HttpContext;
         if (httpContext.NotExists())
@@ -101,7 +103,7 @@ public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
     ///     Retrieves the correlation ID from the items collection in the request pipeline,
     ///     that should have been set by the <see cref="RequestCorrelationFilter" />.
     /// </summary>
-    protected static string GetCorrelationId(IHttpContextAccessor contextAccessor)
+    internal static string GetCorrelationId(IHttpContextAccessor contextAccessor)
     {
         var httpContext = contextAccessor.HttpContext;
         if (httpContext.NotExists())
@@ -113,6 +115,30 @@ public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
             out var callId)
             ? callId!.ToString()!
             : Caller.GenerateCallId();
+    }
+
+    /// <summary>
+    ///     Returns any claims that have already been set by the ASPNET AuthZ pipeline
+    /// </summary>
+    private static Claim[] GetClaims(IHttpContextAccessor httpContextAccessor)
+    {
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext.NotExists())
+        {
+            return [];
+        }
+
+        return httpContext.User.Claims.ToArray();
+    }
+
+    /// <summary>
+    ///     Extracts the tenant ID from the tenancy context.
+    /// </summary>
+    private static Optional<string> GetTenantId(ITenancyContext? tenancyContext)
+    {
+        return tenancyContext.Exists()
+            ? tenancyContext.Current
+            : null;
     }
 
     /// <summary>
@@ -158,6 +184,18 @@ public abstract class AspNetClaimsBasedCallerContextBase : ICallerContext
         {
             return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC,
                 Optional<string>.None);
+        }
+
+        if (schemes.ContainsIgnoreCase(BeffeCookieAuthenticationHandler.AuthenticationScheme))
+        {
+            var token = context.Request.TokenFromAuthNCookie();
+            if (!token.HasValue)
+            {
+                return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.AuthNCookie,
+                    Optional<string>.None);
+            }
+
+            return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.AuthNCookie, token);
         }
 
         return Optional<ICallerContext.CallerAuthorization>.None;

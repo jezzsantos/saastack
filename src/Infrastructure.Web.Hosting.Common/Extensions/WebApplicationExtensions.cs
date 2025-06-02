@@ -288,8 +288,9 @@ public static class WebApplicationExtensions
         }
 
         middlewares.Add(new MiddlewareRegistration(50, app => { app.UseAuthentication(); },
-            "Pipeline: Authentication is enabled: HMAC -> {HMAC}, APIKeys -> {APIKeys}, Tokens -> {Tokens}",
-            authorization.UsesHMAC, authorization.UsesApiKeys, authorization.UsesTokens));
+            "Pipeline: Authentication is enabled: HMAC -> {HMAC}, APIKeys -> {APIKeys}, Tokens -> {Tokens}, Cookie -> {Cookie}",
+            authorization.UsesHMAC, authorization.UsesApiKeys, authorization.UsesTokens,
+            authorization.UsesAuthNCookie));
         middlewares.Add(
             new MiddlewareRegistration(54, app => { app.UseAuthorization(); },
                 "Pipeline: Authorization is enabled: Roles -> Enabled, Features -> Enabled"));

@@ -19,60 +19,18 @@ public sealed class InterHostServiceClient : ApiServiceClient
 {
     private const int RetryCount = 2;
     private readonly string _privateInterHostSecret;
+    private readonly string _hmacSecret;
 
     public InterHostServiceClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions, string baseUrl,
-        string privateInterHostSecret) :
+        string privateInterHostSecret, string hmacSecret) :
         base(clientFactory, jsonOptions, baseUrl, RetryCount)
     {
         _privateInterHostSecret = privateInterHostSecret;
-    }
-
-    protected override JsonClient CreateJsonClient(ICallerContext? context,
-        Action<HttpRequestMessage>? inboundRequestFilter,
-        out Action<HttpRequestMessage> modifiedRequestFilter)
-    {
-        var client = new JsonClient(ClientFactory, JsonOptions);
-        client.SetBaseUrl(BaseUrl);
-        if (inboundRequestFilter.Exists())
-        {
-            modifiedRequestFilter = msg =>
-            {
-                inboundRequestFilter(msg);
-                AddCorrelationId(msg, context);
-                AddCallerAuthorization(msg, context, _privateInterHostSecret);
-            };
-        }
-        else
-        {
-            modifiedRequestFilter = msg =>
-            {
-                AddCorrelationId(msg, context);
-                AddCallerAuthorization(msg, context, _privateInterHostSecret);
-            };
-        }
-
-        return client;
-    }
-
-    private static void AddCorrelationId(HttpRequestMessage message, ICallerContext? context)
-    {
-        if (context.Exists())
-        {
-            message.SetRequestId(context.ToCall());
-        }
-    }
-
-    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
-        string privateInterHostSecret)
-    {
-        if (context.Exists())
-        {
-            SetAuthorization(message, context, privateInterHostSecret);
-        }
+        _hmacSecret = hmacSecret;
     }
 
     internal static void SetAuthorization(HttpRequestMessage message, ICallerContext caller,
-        string privateInterHostSecret)
+        string privateInterHostSecret, string hmacSecret)
     {
         var authorization = caller.Authorization;
         if (!authorization.HasValue)
@@ -125,12 +83,70 @@ public sealed class InterHostServiceClient : ApiServiceClient
 
             case ICallerContext.AuthorizationMethod.HMAC:
             {
-                //We don't expect this client to be used to forward maintenance service workloads 
-                throw new NotSupportedException(Resources.RequestExtensions_HMACAuthorization_NotSupported);
+                if (authorizationValue.HasValue())
+                {
+                    var hmacSecret2 = authorization.Value.Value.Value;
+                    message.SetHMACAuth(hmacSecret2);
+                }
+                else
+                {
+                    message.SetHMACAuth(hmacSecret);
+                }
+
+                break;
+            }
+
+            case ICallerContext.AuthorizationMethod.AuthNCookie:
+            {
+                break;
             }
 
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    protected override JsonClient CreateJsonClient(ICallerContext? context,
+        Action<HttpRequestMessage>? inboundRequestFilter,
+        out Action<HttpRequestMessage> modifiedRequestFilter)
+    {
+        var client = new JsonClient(ClientFactory, JsonOptions);
+        client.SetBaseUrl(BaseUrl);
+        if (inboundRequestFilter.Exists())
+        {
+            modifiedRequestFilter = msg =>
+            {
+                inboundRequestFilter(msg);
+                AddCorrelationId(msg, context);
+                AddCallerAuthorization(msg, context, _privateInterHostSecret, _hmacSecret);
+            };
+        }
+        else
+        {
+            modifiedRequestFilter = msg =>
+            {
+                AddCorrelationId(msg, context);
+                AddCallerAuthorization(msg, context, _privateInterHostSecret, _hmacSecret);
+            };
+        }
+
+        return client;
+    }
+
+    private static void AddCorrelationId(HttpRequestMessage message, ICallerContext? context)
+    {
+        if (context.Exists())
+        {
+            message.SetRequestId(context.ToCall());
+        }
+    }
+
+    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context,
+        string privateInterHostSecret, string hmacSecret)
+    {
+        if (context.Exists())
+        {
+            SetAuthorization(message, context, privateInterHostSecret, hmacSecret);
         }
     }
 }

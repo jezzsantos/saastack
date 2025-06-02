@@ -59,6 +59,7 @@ public class BackEndForFrontEndModule : ISubdomainModule
                     new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
                         c.GetRequiredService<JsonSerializerOptions>(),
                         c.GetRequiredService<IHostSettings>().GetApiHost1BaseUrl(),
+                        c.GetRequiredService<IHostSettings>().GetPrivateInterHostHmacAuthSecret(),
                         c.GetRequiredService<IHostSettings>().GetPrivateInterHostHmacAuthSecret()));
                 services.AddSingleton<IEncryptionService>(c =>
                     new AesEncryptionService(c.GetRequiredService<IHostSettings>()

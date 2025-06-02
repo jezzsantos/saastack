@@ -110,7 +110,7 @@ public class AuthNApiSpec : WebsiteSpec<Program, ApiHost1.Program>
 
 #if TESTINGONLY
         var result = await HttpApi.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest().MakeApiRoute(),
-            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService, userId));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         var callerId = (await result.Content.ReadFromJsonAsync<GetCallerTestingOnlyResponse>(JsonOptions))!.CallerId;

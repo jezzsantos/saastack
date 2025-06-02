@@ -15,7 +15,8 @@ public partial interface ICallerContext
         Token = 0,
         APIKey = 1,
         HMAC = 2,
-        PrivateInterHost = 3
+        PrivateInterHost = 3,
+        AuthNCookie = 4
     }
 
     /// <summary>
