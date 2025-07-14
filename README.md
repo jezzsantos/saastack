@@ -6,33 +6,33 @@
 
 # SaaStack
 
-Are you about to build a new SaaS product from scratch? On .NET?
+Are you about to build a new SaaS product from scratch on .NET?
 
-Then, try starting with the SaaStack codebase template instead. If you choose to do it all yourself, it will literally take you months to years to build all the supporting services around your specific SaaS product. Then, in the pursuit of getting your specific product out to market, you are inevitably going to rush past establishing a robust, sustainable and reliable platform that you can extend. Which will be key if you want to scale to a larger market down the road. In SaaS, that is the business you are in. Don't lose your business becuase you can't scale to a larger market in the future. Once you have validated, you have to build right from the get go, there will be no time and money to fix it later! 
+Then start with SaaStack. It’s not just a codebase template—it’s your unfair advantage.
 
-You will always need to authenticate your users, you will always need to establish some kind of authorization scheme, you will always need to support API access to your product, you will always need to integrate with 3rd party products - and NOT have to build all that yourself from scratch. Yes, .NET provides a bunch of these pieces for you out of the box, but .NET is also necessarily a general purpose library & framework that you use to get much of getting this going. YOu still need to know how to compose it into somethign that works, and can be maintained long term as it rapidly expands. 
+SaaStack saves you months (or years) of engineering work by giving you a fully-featured, scalable foundation for real-world SaaS products. It solves the unavoidable: user authentication, API access, authorization schemes, third-party integrations, management API.
 
-Not to mention, that it takes some serious experience with .NET, and some serious experience in building robust distributed platforms and tooling, that you don't inadvertently create a horrible big-ball-of-mud monolith from day one, that simply cannot scale down the road. Most founding engineers/CTOs don't have that kind of deep experience under their belts on day one, and so they are inadvertently going to stick to only what they know, or they get over-confident and reinvent the wheel and do a relatively poor job of it jeopardizing their business down the track at just the wrong time - should they even survive long enough to get to that point. Common startup guidance is "fake it till you make it" or "build what doesn't scale before you build what does scale" (Paul Graham), which sounds great in principle but in practice, that advice is not talking about building robust software, it is talking to finding your customer problems first, before writing any product.
+Yes, .NET offers the building blocks already—but you still need to know how to wire it all up in a way that scales, survives, and adapts. That takes serious architecture skills that most founding engineers or CTOs simply don’t have on day one.
 
-Building robust software for long-lived products is a careful investment in the future, so you don't have to spend millions or more every 3 years to rewrite your software over and over again. You can, of course, get away with it if you are thrown $100M dollars on day one, and you hire a ton of experience and experts you couldn't otherwise afford, but for the rest of us, we simply can't afford to build the big ball of mud that slows us down in 1-3 years time. 
+Skip the startup trap:
 
-SaaStack is a complete codebase template for building real-world, fully-featured SaaS web products. It looks like just another "dreaded" framework at first sight, and yes it is opinionated (as are all templates), but actually, it has very few of the problems general frameworks have, because you own it all from day one, and it is fully documented to extend.
+- ❌ Reinventing the wheel
+- ❌ Rushing a fragile foundation
+- ❌ Building a monolith destined for a rewrite next year
 
-As it is right now, it comes ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.). We have it automatically deployed into Azure in our build pipeline. AWS deployments coming soon.
+SaaStack is opinionated but flexible and extensible. It’s already battle-tested in several live SaaS companies. You just inherited their hard fought lessons. It’s cloud-ready (Azure or AWS), easily extensible, and doesn’t lock you into someone else's framework. You own it from the start—with extensive docs and regression tests to guide your journey.
 
-Don't spend months building all this stuff from scratch. You and your team simply don't need to. We've done all that for you already; just take the time to take a look to see what is already there, and then take it in your direction. There is nothing fancy here, it is all built from first principles as you can see. You can always change it the way you like it as you proceed. You are not locked into anyone else's framework, and if you make changes, we have a vast regression suite to show you what you might have broken.
+This isn’t a NuGet package. It’s not a toy demo. It’s a launchpad for serious builders who want to do it right, from day one.
 
-SaaStack is a "template", not a nuget package. It is also not some basic code sample like those samples you would download to learn a new technology or see in simple demos online. This "template" is far more comprehensive, far more contextualized for SaaS businesses, and far more realistic about the complexities you are going to encounter in reality for your product down the road. It has already been used in anger in several SaaS products, in several early stage companies.
+The codebase demonstrates common architectural styles that you are going to need in your product, in the long run, such as:
 
-The codebase demonstrates common architectural styles that you are going to need in your product in the long run, such as:
-
-* [A Pluggable Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to microservices later if you need to
+* [A Pluggable Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to microservices later when you need to
 * [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) all have the same principles - low-coupling, high-cohesion, a shareable and protected domain at the center
 * Hosted behind a distributed REST API, or in a CLI, (or in another executable).
 * [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (with Aggregates and Domain Events) - modeling actual real-world behaviors, not modeling just anemic data
-* [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later, and when you do, will be stuck, also makes domain events a cinch
-* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled, distributed, and asynchronous from each other, focused on meaningful events across your product
-* [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - decouples you from infrastructure, makes your entire system easy to test, and then upgrades as your business scales later
+* [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later, and when you do, will be stuck, also makes domain events a cinch. Domain events are already built in your aggregates, ES simply persists them as the master record.
+* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled, distributed, and asynchronous from each other, focused on meaningful events and sagas across your product.
+* [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - decouples you from infrastructure, makes your entire system easy to test, and then upgrades as your business scales later. No need to install any database locally, nor docker containers, for debugging and testing.
 * Extensive Test Automation (e.g., Unit, Integration, and E2E) so you can keep moving years into the future
 * B2B or B2C Multitenancy, you choose
 * Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows.
@@ -55,11 +55,13 @@ or, if you prefer hosting on AWS:
 
 ## How is the code structured?
 
-150 projects!!
+150+ projects!!
 
 Yes, 150 projects! Why? because the world has moved on.
 
-If you are used to cramming in all your code into one or three assemblies for your API, then you are not managing dependencies very well at all. Even if you think you are, your favorite IDE makes it far too easy to violate decoupling wishes, just by adding a `using` statement to some type, you are inadvertently adding dangerous coupling. Then, later down the track, when scaling out becomes an issue, how will you factor out that code from that tight set of assemblies into another deployable unit, when the code is all tangled up with all the rest of that code?
+If you are used to cramming in all your code into one or three assemblies for your API, then you are not managing dependencies very well at all.
+
+Even if you think you are, your favorite IDE makes it far too easy to violate decoupling rules, just by adding a `using` statement to some type, you are inadvertently adding dangerous coupling. Then, later down the track, when scaling out becomes an issue, how will you factor out that code from that tight set of assemblies into another deployable unit, when the code is all tangled up with all the rest of that code? You can't. That's why we have automated tests, and a bunch Roslyn rules to stop you accidently creating *accidental complexity* for the sake of expediency.
 
 Instead, what you will want at that time is a codebase structure with a very intentional separation of "modules" and separate deployable units. That are designed to be separated. These "modules" are best contained across assemblies that are explicitly separated in layers, and backed by tooling to enforce that separation, and enforce the decoupling of types - to avoid the spaghetti code that is always ahead of your team today and tomorrow.
 
