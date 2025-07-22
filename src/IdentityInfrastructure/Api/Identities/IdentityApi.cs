@@ -5,7 +5,7 @@ using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 
-namespace IdentityInfrastructure.Api;
+namespace IdentityInfrastructure.Api.Identities;
 
 public class IdentityApi : IWebApiService
 {
@@ -24,7 +24,7 @@ public class IdentityApi : IWebApiService
         var identity = await _identityApplication.GetIdentityAsync(_callerFactory.Create(), cancellationToken);
 
         return () =>
-            identity.HandleApplicationResult<Identity, GetIdentityResponse>(x => new GetIdentityResponse
-                { Identity = x });
+            identity.HandleApplicationResult<Identity, GetIdentityResponse>(id => new GetIdentityResponse
+                { Identity = id });
     }
 }

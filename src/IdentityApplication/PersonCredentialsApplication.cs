@@ -285,7 +285,6 @@ public partial class PersonCredentialsApplication : IPersonCredentialsApplicatio
             Url = _websiteUiService.ConstructPasswordRegistrationConfirmationPageUrl(credential.VerificationKeep.Token)
         };
     }
-
 #endif
 
     public async Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext caller, string token,
