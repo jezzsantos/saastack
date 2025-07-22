@@ -125,4 +125,55 @@
     <data name="ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId" xml:space="preserve">
       <value>The 'AuthenticatorId' is either missing or invalid</value>
     </data>
+    <data name="AuthorizeRequestValidator_InvalidClientId" xml:space="preserve">
+      <value>The 'ClientId' is either missing or invalid</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidRedirectUri" xml:space="preserve">
+      <value>The 'RedirectUri' is either missing or invalid</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidResponseType" xml:space="preserve">
+      <value>The 'ResponseType' must be 'code'</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidScope" xml:space="preserve">
+      <value>The 'Scope' must include 'openid'</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidState" xml:space="preserve">
+      <value>The 'State' parameter is either missing or invalid</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidNonce" xml:space="preserve">
+      <value>The 'Nonce' parameter is either missing or invalid</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidCodeChallenge" xml:space="preserve">
+      <value>The 'CodeChallenge' is invalid</value>
+    </data>
+    <data name="AuthorizeRequestValidator_InvalidCodeChallengeMethod" xml:space="preserve">
+      <value>The 'CodeChallengeMethod' must be 'S256' or 'plain'</value>
+    </data>
+    <data name="AuthorizeRequestValidator_MissingCodeChallengeMethod" xml:space="preserve">
+      <value>The 'CodeChallengeMethod' is required when 'CodeChallenge' is provided</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidGrantType" xml:space="preserve">
+      <value>The 'GrantType' must be 'authorization_code' or 'refresh_token'</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidClientId" xml:space="preserve">
+      <value>The 'ClientId' is either missing or invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidClientSecret" xml:space="preserve">
+      <value>The 'ClientSecret' is either missing or invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidCode" xml:space="preserve">
+      <value>The 'Code' is either missing or invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidRedirectUri" xml:space="preserve">
+      <value>The 'RedirectUri' is either missing or invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidCodeVerifier" xml:space="preserve">
+      <value>The 'CodeVerifier' is invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidRefreshToken" xml:space="preserve">
+      <value>The 'RefreshToken' is either missing or invalid</value>
+    </data>
+    <data name="TokenEndpointRequestValidator_InvalidScope" xml:space="preserve">
+      <value>The 'Scope' contains invalid values</value>
+    </data>
 </root>

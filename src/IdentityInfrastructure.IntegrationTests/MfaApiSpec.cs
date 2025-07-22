@@ -6,7 +6,7 @@ using Application.Services.Shared;
 using Common.Configuration;
 using Domain.Services.Shared;
 using FluentAssertions;
-using IdentityApplication;
+using IdentityApplication.ApplicationServices;
 using IdentityDomain.DomainServices;
 using IdentityInfrastructure.ApplicationServices;
 using IdentityInfrastructure.IntegrationTests.Stubs;
@@ -544,7 +544,7 @@ public class MfaApiSpec
                 Password = PasswordForPerson
             });
 
-            return failedAuth.Content.Error.Extensions![PersonCredentialsApplication.MfaTokenName]
+            return failedAuth.Content.Error.Extensions![NativeIdentityServerCredentialsService.MfaTokenName]
                 .As<JsonElement>().GetString()!;
         }
 

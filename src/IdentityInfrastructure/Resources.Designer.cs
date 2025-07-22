@@ -141,6 +141,87 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidClientId {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeChallenge&apos; is invalid.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidCodeChallenge {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidCodeChallenge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeChallengeMethod&apos; must be &apos;S256&apos; or &apos;plain&apos;.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidCodeChallengeMethod {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidCodeChallengeMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Nonce&apos; parameter is either missing or invalid.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidNonce {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidNonce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RedirectUri&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidRedirectUri {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ResponseType&apos; must be &apos;code&apos;.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidResponseType {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidResponseType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Scope&apos; must include &apos;openid&apos;.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidScope {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;State&apos; parameter is either missing or invalid.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_InvalidState {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeChallengeMethod&apos; is required when &apos;CodeChallenge&apos; is provided.
+        /// </summary>
+        internal static string AuthorizeRequestValidator_MissingCodeChallengeMethod {
+            get {
+                return ResourceManager.GetString("AuthorizeRequestValidator_MissingCodeChallengeMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;AuthenticatorId&apos; is either missing or invalid.
         /// </summary>
         internal static string ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId {
@@ -355,6 +436,78 @@ namespace IdentityInfrastructure {
         internal static string RevokeRefreshTokenRequestValidator_InvalidToken {
             get {
                 return ResourceManager.GetString("RevokeRefreshTokenRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidClientId {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientSecret&apos; is either missing or invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidClientSecret {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Code&apos; is either missing or invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidCode {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeVerifier&apos; is invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidCodeVerifier {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidCodeVerifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;GrantType&apos; must be &apos;authorization_code&apos; or &apos;refresh_token&apos;.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidGrantType {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidGrantType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RedirectUri&apos; is either missing or invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidRedirectUri {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; is either missing or invalid.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidRefreshToken {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidRefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Scope&apos; contains invalid values.
+        /// </summary>
+        internal static string TokenEndpointRequestValidator_InvalidScope {
+            get {
+                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidScope", resourceCulture);
             }
         }
     }

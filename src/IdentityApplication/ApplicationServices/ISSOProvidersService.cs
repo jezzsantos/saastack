@@ -18,11 +18,9 @@ public interface ISSOProvidersService
     Task<Result<Optional<SSOUser>, Error>> FindUserByProviderAsync(ICallerContext caller, string providerName,
         SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
+    Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensForUserAsync(ICallerContext caller,
+        string userId,
         CancellationToken cancellationToken);
-
-    Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(ICallerContext caller,
-        string userId, CancellationToken cancellationToken);
 
     Task<Result<Error>> SaveInfoOnBehalfOfUserAsync(ICallerContext caller, string providerName, string userId,
         SSOAuthUserInfo authUserInfo, CancellationToken cancellationToken);

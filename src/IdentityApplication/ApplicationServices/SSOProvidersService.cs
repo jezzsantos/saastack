@@ -144,14 +144,9 @@ public class SSOProvidersService : ISSOProvidersService
         return user.ToUser().ToOptional();
     }
 
-    public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
+    public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensForUserAsync(
+        ICallerContext caller, string userId,
         CancellationToken cancellationToken)
-    {
-        return await GetProviderTokensInternalAsync(caller.ToCallerId(), cancellationToken);
-    }
-
-    public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(
-        ICallerContext caller, string userId, CancellationToken cancellationToken)
     {
         return await GetProviderTokensInternalAsync(userId.ToId(), cancellationToken);
     }

@@ -53,6 +53,9 @@ public class IdentityModule : ISubdomainModule
         {
             return (_, services) =>
             {
+                //EXTEND: Change the identity server provider and its supporting APIs/Applications/Services
+                services.AddPerHttpRequest<IIdentityServerProvider, NativeIdentityServerProvider>();
+
                 services.AddSingleton<ITokensService, TokensService>();
                 services.AddPerHttpRequest<IEmailAddressService, EmailAddressService>();
                 services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
@@ -75,6 +78,7 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IPersonCredentialsApplication, PersonCredentialsApplication>();
                 services.AddPerHttpRequest<IMachineCredentialsApplication, MachineCredentialsApplication>();
                 services.AddPerHttpRequest<ISingleSignOnApplication, SingleSignOnApplication>();
+                services.AddPerHttpRequest<IOpenIdConnectApplication, OpenIdConnectApplication>();
                 services.AddPerHttpRequest<IPersonCredentialRepository>(c =>
                     new PersonCredentialRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
@@ -113,11 +117,9 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.AddPerHttpRequest<IAPIKeysService, APIKeysService>();
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
-                services.AddPerHttpRequest<IPersonCredentialsService, PersonCredentialsService>();
 
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations
