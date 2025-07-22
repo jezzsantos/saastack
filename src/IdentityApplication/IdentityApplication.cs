@@ -1,17 +1,18 @@
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
-using IdentityApplication.ApplicationServices;
 
 namespace IdentityApplication;
 
 public class IdentityApplication : IIdentityApplication
 {
-    private readonly IPersonCredentialsService _personCredentialsService;
+    private readonly IIdentityServerProvider _identityServerProvider;
 
-    public IdentityApplication(IPersonCredentialsService personCredentialsService)
+    public IdentityApplication(IIdentityServerProvider identityServerProvider)
     {
-        _personCredentialsService = personCredentialsService;
+        _identityServerProvider = identityServerProvider;
     }
 
     public async Task<Result<Identity, Error>> GetIdentityAsync(ICallerContext caller,
@@ -20,7 +21,8 @@ public class IdentityApplication : IIdentityApplication
         var isMfaEnabled = false;
         var hasCredentials = false;
         var receivedCredentials =
-            await _personCredentialsService.GetCredentialsPrivateAsync(caller, cancellationToken);
+            await _identityServerProvider.CredentialsService.GetPersonCredentialForUserAsync(caller,
+                caller.ToCallerId(), cancellationToken);
         if (receivedCredentials.IsFailure)
         {
             if (receivedCredentials.Error.IsNot(ErrorCode.EntityNotFound))

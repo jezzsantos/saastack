@@ -654,7 +654,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenGetTokensOnBehalfOfUserAsyncAndNoTokens_ThenReturnsNone()
+        public async Task WhenGetTokensForUserAsyncAndNoTokens_ThenReturnsNone()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -669,7 +669,7 @@ public class SSOProvidersServiceSpec
                 .ReturnsAsync(Optional<ProviderAuthTokensRoot>.None);
 
             var result =
-                await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
+                await _service.GetTokensForUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Count.Should().Be(0);
@@ -680,7 +680,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenGetTokensOnBehalfOfUserAsync_ThenReturnsError()
+        public async Task WhenGetTokensForUserAsync_ThenReturnsError()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -705,7 +705,7 @@ public class SSOProvidersServiceSpec
                 .ReturnsAsync(providerTokens.ToOptional());
 
             var result =
-                await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
+                await _service.GetTokensForUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Count.Should().Be(1);

@@ -6,7 +6,7 @@ using Application.Services.Shared;
 using Common;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
-using IdentityApplication;
+using IdentityApplication.ApplicationServices;
 using IdentityDomain;
 using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Interfaces;
@@ -183,9 +183,10 @@ public class CredentialsApiSpec : WebApiSpec<Program>
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        result.Content.Error.Title.Should().Be(PersonCredentialsApplication.MfaRequiredCode);
+        result.Content.Error.Title.Should().Be(NativeIdentityServerCredentialsService.MfaRequiredCode);
         result.Content.Error.Extensions!.Count.Should().Be(1);
-        result.Content.Error.Extensions[PersonCredentialsApplication.MfaTokenName].As<JsonElement>().GetString()
+        result.Content.Error.Extensions[NativeIdentityServerCredentialsService.MfaTokenName].As<JsonElement>()
+            .GetString()
             .Should().NotBeEmpty();
     }
 
