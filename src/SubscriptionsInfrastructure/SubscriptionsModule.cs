@@ -44,9 +44,10 @@ public class SubscriptionsModule : ISubdomainModule
         {
             return (_, services) =>
             {
+                //EXTEND: Change the billing provider and supporting APIs/Applications/Services
                 services.AddSingleton<IBillingProvider, SimpleBillingProvider>();
-
                 services.AddPerHttpRequest<IChargebeeApplication, ChargebeeApplication>();
+
                 services
                     .AddPerHttpRequest<ISubscriptionsApplication, SubscriptionsApplication.SubscriptionsApplication>();
                 services.AddPerHttpRequest<ISubscriptionRepository, SubscriptionRepository>();

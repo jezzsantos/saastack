@@ -13,7 +13,7 @@ public interface IBillingProvider
     public IBillingGatewayService GatewayService { get; }
 
     /// <summary>
-    ///     returns the name of the provider
+    ///     Returns the name of the provider
     /// </summary>
     string ProviderName { get; }
 
