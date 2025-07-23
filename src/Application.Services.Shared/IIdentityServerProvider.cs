@@ -1,7 +1,7 @@
 namespace Application.Services.Shared;
 
 /// <summary>
-///     Defines an Identity Server provider, used to authenticate users and manage tokens
+///     Defines an Identity Server provider, used to authenticate and authorize users
 /// </summary>
 public interface IIdentityServerProvider
 {
@@ -9,6 +9,11 @@ public interface IIdentityServerProvider
     ///     Returns the credentials service for the provider
     /// </summary>
     public IIdentityServerCredentialsService CredentialsService { get; }
+
+    /// <summary>
+    ///     Returns the OIDC service for the provider
+    /// </summary>
+    public IIdentityServerOpenIdConnectService OidcService { get; }
 
     /// <summary>
     ///     Returns the name of the provider

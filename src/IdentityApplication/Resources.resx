@@ -63,4 +63,7 @@
     <data name="SSOProvidersService_Authentication_InvalidNames" xml:space="preserve">
       <value>SSO Authentication provider has not provided valid First and Last names for this user</value>
     </data>
+    <data name="OpenIdConnectApplication_UnsupportedGrantType" xml:space="preserve">
+        <value>Unsupported grant type: '{0}'</value>
+    </data>
 </root>

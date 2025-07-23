@@ -78,6 +78,15 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unsupported grant type: &apos;{0}&apos;.
+        /// </summary>
+        internal static string OpenIdConnectApplication_UnsupportedGrantType {
+            get {
+                return ResourceManager.GetString("OpenIdConnectApplication_UnsupportedGrantType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user account is locked out.
         /// </summary>
         internal static string PersonCredentialsApplication_AccountLocked {
