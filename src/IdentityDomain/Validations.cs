@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Domain.Interfaces.Validations;
 
 namespace IdentityDomain;
@@ -54,5 +55,41 @@ public static class Validations
     {
         public static readonly Validation Description = CommonValidations.DescriptiveName();
         public static readonly TimeSpan MinimumExpiryPeriod = TimeSpan.FromHours(1);
+    }
+
+    public static class OpenIdConnect
+    {
+        public static readonly Validation ClientId = CommonValidations.GuidN;
+        public static readonly Validation ClientSecret = CommonValidations.RandomToken();
+        public static readonly Validation Code = new(s => s == OpenIdConnectConstants.ResponseTypes.Code);
+        public static readonly Validation CodeChallenge = new(@"^[a-zA-Z0-9\-._~]{43,128}$", 43, 128);
+        public static readonly Validation CodeChallengeMethod =
+            new(s => OpenIdConnectConstants.CodeChallengeMethods.AllMethods.Contains(s));
+        public static readonly Validation CodeVerifier = new(@"^[A-Za-z0-9\-._~]{43,128}$", 43, 128);
+        public static readonly Validation GrantType = new(s =>
+            s is OpenIdConnectConstants.GrantTypes.AuthorizationCode or OpenIdConnectConstants.GrantTypes.RefreshToken);
+        public static readonly Validation Nonce = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
+        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
+        public static readonly Validation RefreshTokenScope = new(s =>
+        {
+            if (s.HasNoValue())
+            {
+                return true; // Optional for refresh token
+            }
+
+            var requestedScopes = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return requestedScopes.All(scope => OpenIdConnectConstants.Scopes.AllScopes.Contains(scope));
+        });
+        public static readonly Validation Scope = new(s =>
+        {
+            if (s.HasNoValue())
+            {
+                return false;
+            }
+
+            var scopes = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return scopes.Contains(OpenIdConnectConstants.Scopes.OpenId);
+        });
+        public static readonly Validation State = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
     }
 }

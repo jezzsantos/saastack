@@ -80,6 +80,7 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IPersonCredentialsApplication, PersonCredentialsApplication>();
                 services.AddPerHttpRequest<IMachineCredentialsApplication, MachineCredentialsApplication>();
                 services.AddPerHttpRequest<ISingleSignOnApplication, SingleSignOnApplication>();
+                services.AddPerHttpRequest<IOpenIdConnectApplication, OpenIdConnectApplication>();
                 services.AddPerHttpRequest<IPersonCredentialRepository>(c =>
                     new PersonCredentialRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
