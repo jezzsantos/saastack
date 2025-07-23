@@ -2,7 +2,7 @@
 
 The team contributing to this product wish to standardise certain practices, styles, principles and approaches. The document aims to capture most of them.
 
-> At anytime, the team is open to revise anything in this document, but because consistency is the key driver behind this document, when things change, they change right across this whole repo. The last outcome anyone wants is inconsistencies that are hard to understand and draw bounds around.
+> At any time, the team is open to revise anything in this document, but because consistency is the key driver behind this document, when things change, they change right across this whole repo. The last outcome anyone wants is inconsistencies that are hard to understand and draw bounds around.
 
 ## 🏗️ **Architecture & Design Principles**
 
@@ -158,7 +158,7 @@ public sealed class CarsApi : IWebApiService
 
 ### Recording & Logging
 - **Use the Recorder pattern** for capturing usage activity, diagnostics, and audit events
-- **Implement structured logging** for better searchability
+- **Implement structured logging** for better search-ability
 - **Capture domain events** for audit trails
 - **Monitor key business metrics** through domain events
 
@@ -204,62 +204,66 @@ We follow Microsoft's C# coding conventions with specific enhancements for reada
 
 The following table shows code patterns we want to see replaced throughout the codebase for better readability and consistency:
 
-| Instead of this:                   | Use this:                             | Why?                                                         |
-| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
+| Instead of this:                   | Use this:                             | Why?                                                                                                                                                                                            |
+|------------------------------------|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `DateTime.Now`                     | `DateTime.UtcNow`                     | You should never handle local dates and times in the API layer. All dates and times should always be in UTC. Only clients should convert to dates and times to local, based on client settings. |
-| `!string.IsNullOrEmpty(variable)`  | `variable.HasValue()`                 | Easier to read and understand the real intent                |
-| `string.IsNullOrEmpty(variable)`   | `variable.HasNoValue()`               | Easier to read and understand the real intent                |
-| `variable != null`                 | `variable.Exists()`                   | Easier to understand the real intent                         |
-| `variable == null`                 | `variable.NotExists()`                | Easier to understand the real intent                         |
-| `variable == null`                 | `variable.IsNull()`                   | Uncommon, for completeness in these rare cases.              |
-| `variable != null`                 | `variable.IsNotNull`                  | Uncommon, for completeness in these rare cases.              |
-| `string.Format(message, args)`     | `message.Format(args)`                |                                                              |
-| `variable.Equals(value, options)`  | `variable.EqualsIgnoreCase(value)`    | More explicit about the comparison type                      |
-| `!variable.Equals(value, options)` | `variable.NotEqualsIgnoreCase(value)` | More explicit about the comparison type                      |
-| `collection.Any()`                 | `collection.HasAny()`                 | More readable and expresses intent clearly                   |
-| `!collection.Any()`                | `collection.HasNone()`                | More readable and expresses intent clearly                   |
+| `!string.IsNullOrEmpty(variable)`  | `variable.HasValue()`                 | Easier to read and understand the real intent                                                                                                                                                   |
+| `string.IsNullOrEmpty(variable)`   | `variable.HasNoValue()`               | Easier to read and understand the real intent                                                                                                                                                   |
+| `variable != null`                 | `variable.Exists()`                   | Easier to understand the real intent                                                                                                                                                            |
+| `variable == null`                 | `variable.NotExists()`                | Easier to understand the real intent                                                                                                                                                            |
+| `variable == null`                 | `variable.IsNull()`                   | Uncommon, for completeness in these rare cases.                                                                                                                                                 |
+| `variable != null`                 | `variable.IsNotNull`                  | Uncommon, for completeness in these rare cases.                                                                                                                                                 |
+| `string.Format(message, args)`     | `message.Format(args)`                |                                                                                                                                                                                                 |
+| `variable.Equals(value, options)`  | `variable.EqualsIgnoreCase(value)`    | More explicit about the comparison type                                                                                                                                                         |
+| `!variable.Equals(value, options)` | `variable.NotEqualsIgnoreCase(value)` | More explicit about the comparison type                                                                                                                                                         |
+| `collection.Any()`                 | `collection.HasAny()`                 | More readable and expresses intent clearly                                                                                                                                                      |
+| `!collection.Any()`                | `collection.HasNone()`                | More readable and expresses intent clearly                                                                                                                                                      |
 
 ### Validation Patterns
 
-| Instead of this:                   | Use this:                             | Why?                                                         |
-| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| `.Must(x => x == "value")`         | `.Matches(Validations.Domain.Field)`  | Centralized validation logic, reusable across components    |
-| Custom validation logic in validators | Domain-specific `Validations` classes | Consistency and reusability of validation rules            |
-| Throwing exceptions for validation | `Result<T, Error>` return types      | Expected errors should use Result pattern, not exceptions   |
+| Instead of this:                      | Use this:                             | Why?                                                      |
+|---------------------------------------|---------------------------------------|-----------------------------------------------------------|
+| `.Must(x => x == "value")`            | `.Matches(Validations.Domain.Field)`  | Centralized validation logic, reusable across components  |
+| Custom validation logic in validators | Domain-specific `Validations` classes | Consistency and reusability of validation rules           |
+| Throwing exceptions for validation    | `Result<T, Error>` return types       | Expected errors should use Result pattern, not exceptions |
 
 ### Control Flow Patterns
 
-| Instead of this:                   | Use this:                             | Why?                                                         |
-| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| `throw new Exception("error")`     | `return Error.Validation("error")`   | Use Result pattern for expected errors                      |
-| `if (result == null) throw...`     | `if (result.IsFailure) return result.Error` | Consistent error handling with Result pattern        |
-| Catching all exceptions            | Catch specific exceptions only        | Don't catch exceptions you cannot handle                     |
+| Instead of this:               | Use this:                                   | Why?                                          |
+|--------------------------------|---------------------------------------------|-----------------------------------------------|
+| `throw new Exception("error")` | `return Error.Validation("error")`          | Use Result pattern for expected errors        |
+| `if (result == null) throw...` | `if (result.IsFailure) return result.Error` | Consistent error handling with Result pattern |
+| Catching all exceptions        | Catch specific exceptions only              | Don't catch exceptions you cannot handle      |
 
 ### Nullability Patterns
 
-| Instead of this:                   | Use this:                             | Why?                                                         |
-| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| `string? value = null`             | `Optional<string> value = Optional<string>.None` | Explicit optional values, better than nullable reference types |
-| `if (value != null)`               | `if (value.HasValue)`                 | Works with Optional<T> pattern                              |
-| Returning `null` for missing values | `return Optional<T>.None`            | Explicit handling of missing values                         |
+| Instead of this:                    | Use this:                                        | Why?                                                           |
+|-------------------------------------|--------------------------------------------------|----------------------------------------------------------------|
+| `string? value = null`              | `Optional<string> value = Optional<string>.None` | Explicit optional values, better than nullable reference types |
+| `if (value != null)`                | `if (value.HasValue)`                            | Works with Optional<T> pattern                                 |
+| Returning `null` for missing values | `return Optional<T>.None`                        | Explicit handling of missing values                            |
 
 ### Test Naming Patterns
 
-| Instead of this:                   | Use this:                             | Why?                                                         |
-| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| `TestMethod_Fails()`               | `WhenCondition_ThenThrows()`          | Consistent naming that clearly indicates expected behavior   |
-| `TestMethod_Success()`             | `WhenCondition_ThenSucceeds()`        | Consistent naming that clearly indicates expected behavior   |
-| `TestMethod_ReturnsNull()`         | `WhenCondition_ThenReturnsNone()`     | Aligns with Optional<T> pattern usage                      |
+| Instead of this:           | Use this:                         | Why?                                                       |
+|----------------------------|-----------------------------------|------------------------------------------------------------|
+| `TestMethod_Fails()`       | `WhenCondition_ThenThrows()`      | Consistent naming that clearly indicates expected behavior |
+| `TestMethod_Success()`     | `WhenCondition_ThenSucceeds()`    | Consistent naming that clearly indicates expected behavior |
+| `TestMethod_ReturnsNull()` | `WhenCondition_ThenReturnsNone()` | Aligns with Optional<T> pattern usage                      |
 
+### Test Data Patterns
 
-
+Use constants from relevant `Constants.cs` files where available, otherwise use descriptive lowercase alphanumeric strings starting with an article (e.g., "anidtoken", "aclientid", "aredirecturi") that describe the variable's purpose.
+For real URL values, use "http://localhost", instead of others like "http://example.com"
 
 
 ## ⚠️ **Breaking Changes**
 
 ### Understanding Breaking vs Non-Breaking Changes
 
-Breaking changes are modifications that can cause existing functionality to fail or behave differently in production systems. Understanding what constitutes a breaking change is crucial for maintaining system stability.
+Breaking changes are modifications that can cause existing functionality to fail or behave differently in deployed production releases. Understanding what constitutes a breaking change is crucial for maintaining system stability.
+
+Some of these things may corrupt data captured while being deployed. So ensure you have good backups of all data repositories.
 
 ### Things Designed to Change Safely (Non-Breaking)
 
@@ -273,22 +277,28 @@ The following components have been explicitly designed to evolve without breakin
 - **Configuration Settings** - New settings can be added with sensible defaults
 
 
-
-
-
 ### Things You CANNOT Change (Breaking Changes)
 
-The following changes will have **significant and dire consequences** to already deployed and running Production systems:
+The following changes will have **significant and dire consequences** on already deployed and running Production systems:
 
 #### 1. **Domain Events**
-- **Event structure/schema** - Adding required fields, removing fields, changing field types
-- **Event names** - Renaming events breaks event handlers and audit trails
-- **Event semantics** - Changing what an event represents breaks business logic
+- **Event structure/schema** - Adding required fields, removing required fields, changing field types or names. 
+- **Event names** - Renaming event class names will break event handlers when the persisted event is loaded later
 
-#### 2. **ReadModels (in SQL/NoSQL)**
-- **Database schema changes** - Removing columns, changing data types, renaming tables
+Some changes to events are very safe. Consider that the old event was already persisted with data values, and must remain in tack in memory when deserialized later, into your new event class
+
+The event serializer (JSON) will ignore certain fields it cannot match between the old version and the new version. Thus make sure that `required` fields are always satisfied with data values.
+
+If you need to make a breaking change to an event, use the builtin `IEventSourcedChangeEventMigrator` mechanism to map between old and new events classes. You would be expected to add a version number to the new class name to reflect that change. See the migration documentation.
+
+#### 2. **ReadModels (for Event Sourcing)**
+- **Database schema changes** - Removing/renaming tables, columns, changing data types
 - **Query contracts** - Changing expected result structures
 - **Indexes and constraints** - Removing indexes can cause performance degradation
+
+Read Models should be treated as disposable, since the origin data for them is kept in a separate Event Store, and these tables can be rebuilt at any time (with same code) from same events.
+
+You can also create more than one read model at any time, by adding it to the code. This is a better change strategy, that is not possible without read models. So a new version of the code can create a new read model (appropriately named), and that read model may need to be prepopulated with original data before the new code starts using it, while the old table remains in the database. The old table can be removed at a later date (once a rollback is confirmed not to be necessary).
 
 #### 3. **Message Bus & Queue Contracts**
 - **Message formats** - Changing message structure breaks consumers
@@ -299,6 +309,10 @@ The following changes will have **significant and dire consequences** to already
 - **Request/Response DTOs** - Removing fields, changing field types, making optional fields required
 - **HTTP endpoints** - Changing URLs, HTTP methods, or response codes
 - **Authentication/Authorization** - Changing security requirements
+
+Certain kinds of changes will break 3rd party consumers of your API (if you have any that you support), even though it may not break your own clients.
+
+You can handle these kinds of changes with standard API version strategies, and in developer documentation.
 
 #### 5. **Aggregate Identifiers**
 - **ID formats** - Changing identifier structure breaks references
@@ -322,56 +336,3 @@ Before making any change, ask:
 2. **Will this affect persisted data?** - If yes, plan migration strategy
 3. **Will this change event contracts?** - If yes, consider event versioning
 4. **Is this change reversible?** - If no, ensure thorough testing and gradual rollout
-
-## 🛠️ **Tooling to Use**
-
-### Development Tools
-
-These are the essential tools that you should use frequently for effective development in this codebase:
-
-#### IDE & Editor
-- **JetBrains Rider** (preferred) - Configured with project-specific settings
-- **Visual Studio** - Alternative IDE with appropriate extensions
-- **VS Code** - For lightweight editing and specific tasks
-
-#### Code Quality
-- **EditorConfig** - Consistent formatting across the team
-- **Roslyn Analyzers** - Static code analysis and rule enforcement
-- **SonarLint** - Additional code quality checks
-- **FluentValidation** - Request and domain validation
-
-#### Testing
-- **xUnit** - Primary testing framework
-- **FluentAssertions** - More readable test assertions
-- **Moq** - Mocking framework for unit tests
-- **TestContainers** - Integration testing with real dependencies
-
-#### Build & CI/CD
-- **dotnet CLI** - Command-line interface for .NET operations
-- **GitHub Actions** - Continuous integration and deployment
-- **Docker** - Containerization for consistent environments
-
-#### Monitoring & Debugging
-- **Application Insights** - Application performance monitoring
-- **Serilog** - Structured logging framework
-- **Recorder pattern** - Custom usage and audit tracking
-
-### Recommended Extensions
-
-#### For JetBrains Rider
-- **SonarLint** - Code quality analysis
-- **GitToolBox** - Enhanced Git integration
-- **String Manipulation** - Text processing utilities
-
-#### For Visual Studio
-- **SonarLint for Visual Studio** - Code quality analysis
-- **Roslynator** - Additional code analysis rules
-- **GitLens** - Enhanced Git capabilities
-
-### Configuration Files
-
-Ensure these configuration files are properly set up in your development environment:
-- **.editorconfig** - Code formatting rules
-- **Directory.Build.props** - MSBuild properties
-- **global.json** - .NET SDK version pinning
-- **launchSettings.json** - Development server configuration
