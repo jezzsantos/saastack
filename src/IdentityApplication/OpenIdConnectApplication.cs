@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -12,8 +13,7 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
 {
     private readonly IIdentityServerProvider _identityServerProvider;
 
-    public OpenIdConnectApplication(
-        IIdentityServerProvider identityServerProvider)
+    public OpenIdConnectApplication(IIdentityServerProvider identityServerProvider)
     {
         _identityServerProvider = identityServerProvider;
     }
@@ -33,7 +33,7 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
         if (grantType.EqualsIgnoreCase(OpenIdConnectConstants.GrantTypes.AuthorizationCode))
         {
             return await _identityServerProvider.OidcService.ExchangeCodeForTokensAsync(
-                caller, clientId, clientSecret, code, redirectUri, codeVerifier, cancellationToken);
+                caller, clientId, clientSecret, code, codeVerifier, redirectUri, cancellationToken);
         }
 
         if (grantType.EqualsIgnoreCase(OpenIdConnectConstants.GrantTypes.RefreshToken))
@@ -60,6 +60,7 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
     public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoForCallerAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        return await _identityServerProvider.OidcService.GetUserInfoForCallerAsync(caller, cancellationToken);
+        return await _identityServerProvider.OidcService.GetUserInfoAsync(caller, caller.ToCallerId(),
+            cancellationToken);
     }
 }

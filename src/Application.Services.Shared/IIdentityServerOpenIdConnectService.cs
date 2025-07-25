@@ -20,19 +20,8 @@ public interface IIdentityServerOpenIdConnectService
     ///     Exchanges authorization code for tokens or refreshes tokens
     /// </summary>
     Task<Result<OidcTokenResponse, Error>> ExchangeCodeForTokensAsync(ICallerContext caller, string clientId,
-        string clientSecret, string code, string redirectUri, string? codeVerifier,
-        CancellationToken cancellationToken);
-
-    /// <summary>
-    ///     Refreshes access tokens using a refresh token
-    /// </summary>
-    Task<Result<OidcTokenResponse, Error>> RefreshTokenAsync(ICallerContext caller, string clientId,
-        string clientSecret, string refreshToken, string? scope, CancellationToken cancellationToken);
-
-    /// <summary>
-    ///     Gets user information for the authenticated caller
-    /// </summary>
-    Task<Result<OidcUserInfoResponse, Error>> GetUserInfoForCallerAsync(ICallerContext caller,
+        string clientSecret, string code, string? codeVerifier,
+        string redirectUri,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -44,6 +33,18 @@ public interface IIdentityServerOpenIdConnectService
     /// <summary>
     ///     Gets the JSON Web Key Set for token verification
     /// </summary>
-    Task<Result<JsonWebKeySet, Error>> GetJsonWebKeySetAsync(ICallerContext caller,
+    Task<Result<JsonWebKeySet, Error>>
+        GetJsonWebKeySetAsync(ICallerContext caller, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets user information for the user
+    /// </summary>
+    Task<Result<OidcUserInfoResponse, Error>> GetUserInfoAsync(ICallerContext caller, string userId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Refreshes access tokens using a refresh token
+    /// </summary>
+    Task<Result<OidcTokenResponse, Error>> RefreshTokenAsync(ICallerContext caller, string clientId,
+        string clientSecret, string refreshToken, string? scope, CancellationToken cancellationToken);
 }

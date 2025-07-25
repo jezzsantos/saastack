@@ -99,7 +99,7 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
 
     public async Task<Result<OidcTokenResponse, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
         string clientId,
-        string clientSecret, string code, string redirectUri, string? codeVerifier, CancellationToken cancellationToken)
+        string clientSecret, string code, string? codeVerifier, string redirectUri, CancellationToken cancellationToken)
     {
         await Task.CompletedTask; // Placeholder implementation
         return Error.Unexpected("ExchangeCodeForTokensAsync not yet implemented");
@@ -112,7 +112,8 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         return Error.Unexpected("RefreshTokenAsync not yet implemented");
     }
 
-    public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoForCallerAsync(ICallerContext caller,
+    public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoAsync(ICallerContext caller,
+        string userId,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask; // Placeholder implementation

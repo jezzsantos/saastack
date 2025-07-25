@@ -231,9 +231,8 @@ public class OpenIdConnectApplicationSpec
                 "aclientid",
                 "aclientsecret",
                 "anauthorizationcode",
-                "aredirecturi",
                 null,
-                It.IsAny<CancellationToken>()))
+                "aredirecturi", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedTokenResponse);
 
         var result = await _application.CreateTokenAsync(
