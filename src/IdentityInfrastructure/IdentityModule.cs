@@ -18,7 +18,6 @@ using IdentityInfrastructure.Persistence.ReadModels;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Shared.ApplicationServices;
 using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
@@ -55,7 +54,7 @@ public class IdentityModule : ISubdomainModule
             return (_, services) =>
             {
                 //EXTEND: Change the identity server provider and supporting APIs/Applications/Services
-                services.AddSingleton<IIdentityServerProvider, NativeIdentityServerProvider>();
+                services.AddPerHttpRequest<IIdentityServerProvider, NativeIdentityServerProvider>();
 
                 //TODO: update these dependencies
                 services.AddSingleton<ITokensService, TokensService>();

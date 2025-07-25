@@ -45,9 +45,6 @@
     <data name="SingleSignOnApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
-    <data name="APIKeysApplication_AccountSuspended" xml:space="preserve">
-      <value>The user account is suspended</value>
-    </data>
     <data name="AuthTokensApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
@@ -65,5 +62,8 @@
     </data>
     <data name="OpenIdConnectApplication_UnsupportedGrantType" xml:space="preserve">
         <value>Unsupported grant type: '{0}'</value>
+    </data>
+    <data name="NativeIdentityServerApiKeyService_AccountSuspended" xml:space="preserve">
+      <value>The user account is suspended</value>
     </data>
 </root>

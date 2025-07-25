@@ -62,18 +62,18 @@ namespace IdentityApplication {
         /// <summary>
         ///   Looks up a localized string similar to The user account is suspended.
         /// </summary>
-        internal static string APIKeysApplication_AccountSuspended {
+        internal static string AuthTokensApplication_AccountSuspended {
             get {
-                return ResourceManager.GetString("APIKeysApplication_AccountSuspended", resourceCulture);
+                return ResourceManager.GetString("AuthTokensApplication_AccountSuspended", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The user account is suspended.
         /// </summary>
-        internal static string AuthTokensApplication_AccountSuspended {
+        internal static string NativeIdentityServerApiKeyService_AccountSuspended {
             get {
-                return ResourceManager.GetString("AuthTokensApplication_AccountSuspended", resourceCulture);
+                return ResourceManager.GetString("NativeIdentityServerApiKeyService_AccountSuspended", resourceCulture);
             }
         }
         

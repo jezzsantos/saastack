@@ -3,40 +3,10 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 
-namespace Infrastructure.Shared.ApplicationServices;
+namespace IdentityApplication.ApplicationServices;
 
 /// <summary>
-///     Provides a native identity server provider that manages credentials, APIKeys and refresh tokens
-/// </summary>
-public class NativeIdentityServerProvider : IIdentityServerProvider
-{
-    public NativeIdentityServerProvider()
-    {
-        CredentialsService = new NativeIdentityServerCredentialsService();
-        OidcService = new NativeIdentityServerOpenIdConnectService();
-    }
-
-    public IIdentityServerCredentialsService CredentialsService { get; }
-
-    public IIdentityServerOpenIdConnectService OidcService { get; }
-
-    public string ProviderName => Constants.ProviderName;
-
-    public static class Constants
-    {
-        public const string ProviderName = "native_identity_provider";
-    }
-}
-
-/// <summary>
-///     Provides a native credentials service for self-persisting credentials
-/// </summary>
-public class NativeIdentityServerCredentialsService : IIdentityServerCredentialsService
-{
-}
-
-/// <summary>
-///     Provides a native OpenID Connect service for self-persisting tokens following OpenIddict patterns
+///     Provides a native OpenID Connect service for managing and persisting tokens
 /// </summary>
 public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdConnectService
 {
@@ -105,21 +75,6 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         return Error.Unexpected("ExchangeCodeForTokensAsync not yet implemented");
     }
 
-    public async Task<Result<OidcTokenResponse, Error>> RefreshTokenAsync(ICallerContext caller, string clientId,
-        string clientSecret, string refreshToken, string? scope, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask; // Placeholder implementation
-        return Error.Unexpected("RefreshTokenAsync not yet implemented");
-    }
-
-    public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoAsync(ICallerContext caller,
-        string userId,
-        CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask; // Placeholder implementation
-        return Error.Unexpected("GetUserInfoForCallerAsync not yet implemented");
-    }
-
     public async Task<Result<OidcDiscoveryDocument, Error>> GetDiscoveryDocumentAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
@@ -134,7 +89,21 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         return Error.Unexpected("GetJsonWebKeySetAsync not yet implemented");
     }
 
-    // Helper methods (placeholder implementations)
+    public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoAsync(ICallerContext caller,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask; // Placeholder implementation
+        return Error.Unexpected("GetUserInfoForCallerAsync not yet implemented");
+    }
+
+    public async Task<Result<OidcTokenResponse, Error>> RefreshTokenAsync(ICallerContext caller, string clientId,
+        string clientSecret, string refreshToken, string? scope, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask; // Placeholder implementation
+        return Error.Unexpected("RefreshTokenAsync not yet implemented");
+    }
+
     private static Result<Error> ValidateAuthorizationRequest(OidcAuthorizationRequest request)
     {
         // TODO: Implement proper validation
@@ -163,84 +132,50 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         // TODO: Implement authorization code creation
         return Guid.NewGuid().ToString("N")[..16];
     }
-}
 
-/// <summary>
-///     OpenID Connect authorization request
-/// </summary>
-public class OidcAuthorizationRequest
-{
-    public required string ClientId { get; set; }
+    private class OidcAuthorizationRequest
+    {
+        public required string ClientId { get; set; }
 
-    public required string RedirectUri { get; set; }
+        public string? CodeChallenge { get; set; }
 
-    public required string ResponseType { get; set; }
+        public string? CodeChallengeMethod { get; set; }
 
-    public required string Scope { get; set; }
+        public string? Nonce { get; set; }
 
-    public string? State { get; set; }
+        public required string RedirectUri { get; set; }
 
-    public string? Nonce { get; set; }
+        public required string ResponseType { get; set; }
 
-    public string? CodeChallenge { get; set; }
+        public required string Scope { get; set; }
 
-    public string? CodeChallengeMethod { get; set; }
-}
+        public string? State { get; set; }
+    }
 
-/// <summary>
-///     OpenID Connect token request
-/// </summary>
-public class OidcTokenRequest
-{
-    public required string GrantType { get; set; }
+    private class OidcClient
+    {
+        public required string Id { get; set; }
 
-    public required string ClientId { get; set; }
+        public required string Name { get; set; }
+    }
 
-    public string? ClientSecret { get; set; }
+    private class OidcAuthorizationData
+    {
+        public DateTime ExpiresAt { get; set; }
 
-    public string? Code { get; set; }
+        public string? Nonce { get; set; }
 
-    public string? RedirectUri { get; set; }
+        public required List<string> Scopes { get; set; }
 
-    public string? CodeVerifier { get; set; }
+        public required string Subject { get; set; }
+    }
 
-    public string? RefreshToken { get; set; }
+    private class OidcTokenData
+    {
+        public DateTime ExpiresAt { get; set; }
 
-    public string? Scope { get; set; }
-}
+        public required List<string> Scopes { get; set; }
 
-/// <summary>
-///     OpenID Connect client
-/// </summary>
-public class OidcClient
-{
-    public required string Id { get; set; }
-
-    public required string Name { get; set; }
-}
-
-/// <summary>
-///     Authorization data associated with an authorization code
-/// </summary>
-public class OidcAuthorizationData
-{
-    public required string Subject { get; set; }
-
-    public required List<string> Scopes { get; set; }
-
-    public string? Nonce { get; set; }
-
-    public DateTime ExpiresAt { get; set; }
-}
-
-/// <summary>
-///     Token validation data
-/// </summary>
-public class OidcTokenData
-{
-    public required string Subject { get; set; }
-
-    public required List<string> Scopes { get; set; }
-
-    public DateTime ExpiresAt { get; set; }
+        public required string Subject { get; set; }
+    }
 }

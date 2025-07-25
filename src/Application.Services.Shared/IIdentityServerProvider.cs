@@ -6,6 +6,11 @@ namespace Application.Services.Shared;
 public interface IIdentityServerProvider
 {
     /// <summary>
+    ///     Returns the API Keys service for the provider
+    /// </summary>
+    public IIdentityServerApiKeyService ApiKeyService { get; }
+
+    /// <summary>
     ///     Returns the credentials service for the provider
     /// </summary>
     public IIdentityServerCredentialsService CredentialsService { get; }
