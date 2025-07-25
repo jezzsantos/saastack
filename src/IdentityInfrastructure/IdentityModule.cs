@@ -53,10 +53,9 @@ public class IdentityModule : ISubdomainModule
         {
             return (_, services) =>
             {
-                //EXTEND: Change the identity server provider and supporting APIs/Applications/Services
+                //EXTEND: Change the identity server provider and its supporting APIs/Applications/Services
                 services.AddPerHttpRequest<IIdentityServerProvider, NativeIdentityServerProvider>();
 
-                //TODO: update these dependencies
                 services.AddSingleton<ITokensService, TokensService>();
                 services.AddPerHttpRequest<IEmailAddressService, EmailAddressService>();
                 services.AddSingleton<IPasswordHasherService, PasswordHasherService>();

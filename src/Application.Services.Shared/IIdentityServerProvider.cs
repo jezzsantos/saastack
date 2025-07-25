@@ -18,10 +18,15 @@ public interface IIdentityServerProvider
     /// <summary>
     ///     Returns the OIDC service for the provider
     /// </summary>
-    public IIdentityServerOpenIdConnectService OidcService { get; }
+    public IIdentityServerOpenIdConnectService OpenIdConnectService { get; }
 
     /// <summary>
     ///     Returns the name of the provider
     /// </summary>
     string ProviderName { get; }
+
+    /// <summary>
+    ///     Returns the SSO service for the provider
+    /// </summary>
+    public IIdentityServerSingleSignOnService SingleSignOnService { get; }
 }

@@ -24,7 +24,7 @@ public class OpenIdConnectApplicationSpec
 
         _oidcService = new Mock<IIdentityServerOpenIdConnectService>();
         var identityServerProvider = new Mock<IIdentityServerProvider>();
-        identityServerProvider.Setup(p => p.OidcService)
+        identityServerProvider.Setup(p => p.OpenIdConnectService)
             .Returns(_oidcService.Object);
 
         _application = new OpenIdConnectApplication(identityServerProvider.Object);
