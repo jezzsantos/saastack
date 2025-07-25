@@ -47,7 +47,7 @@ public class APIKeysApplicationSpec
     }
 
     [Fact]
-    public async Task WhenCreateAPIKeyForUserAsync_ThenCreatesNew()
+    public async Task WhenCreateAPIKeyForUserAsync_ThenCreates()
     {
         var expiresOn = DateTime.UtcNow.AddHours(1);
         _apiKeyService.Setup(aks => aks.CreateAPIKeyForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),

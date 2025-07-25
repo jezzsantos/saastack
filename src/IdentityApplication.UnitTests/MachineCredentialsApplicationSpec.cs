@@ -3,7 +3,6 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using FluentAssertions;
-using IdentityApplication.ApplicationServices;
 using Moq;
 using Xunit;
 
@@ -12,7 +11,7 @@ namespace IdentityApplication.UnitTests;
 [Trait("Category", "Unit")]
 public class MachineCredentialsApplicationSpec
 {
-    private readonly Mock<IAPIKeysService> _apiKeysService;
+    private readonly Mock<IIdentityServerApiKeyService> _apiKeysService;
     private readonly MachineCredentialsApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEndUsersService> _endUsersService;
@@ -23,10 +22,13 @@ public class MachineCredentialsApplicationSpec
         _caller = new Mock<ICallerContext>();
         _caller.Setup(cc => cc.CallerId)
             .Returns("acallerid");
+        _apiKeysService = new Mock<IIdentityServerApiKeyService>();
+        var identityServerProvider = new Mock<IIdentityServerProvider>();
+        identityServerProvider.Setup(p => p.ApiKeyService)
+            .Returns(_apiKeysService.Object);
         _endUsersService = new Mock<IEndUsersService>();
-        _apiKeysService = new Mock<IAPIKeysService>();
         _application =
-            new MachineCredentialsApplication(recorder.Object, _endUsersService.Object, _apiKeysService.Object);
+            new MachineCredentialsApplication(recorder.Object, _endUsersService.Object, identityServerProvider.Object);
     }
 
     [Fact]
@@ -49,7 +51,7 @@ public class MachineCredentialsApplicationSpec
             Description = "adescription"
         };
         _apiKeysService.Setup(aks =>
-                aks.CreateApiKeyForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                aks.CreateAPIKeyForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime?>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(apiKey);

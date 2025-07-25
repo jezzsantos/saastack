@@ -118,11 +118,9 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.AddPerHttpRequest<IAPIKeysService, APIKeysService>();
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
-                services.AddPerHttpRequest<IPersonCredentialsService, PersonCredentialsService>();
 
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations

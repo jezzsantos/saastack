@@ -3,22 +3,21 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
-using IdentityApplication.ApplicationServices;
 
 namespace IdentityApplication;
 
 public class MachineCredentialsApplication : IMachineCredentialsApplication
 {
-    private readonly IAPIKeysService _apiKeyService;
     private readonly IEndUsersService _endUsersService;
+    private readonly IIdentityServerProvider _identityServerProvider;
     private readonly IRecorder _recorder;
 
     public MachineCredentialsApplication(IRecorder recorder, IEndUsersService endUsersService,
-        IAPIKeysService apiKeyService)
+        IIdentityServerProvider identityServerProvider)
     {
         _recorder = recorder;
         _endUsersService = endUsersService;
-        _apiKeyService = apiKeyService;
+        _identityServerProvider = identityServerProvider;
     }
 
     public async Task<Result<MachineCredential, Error>> RegisterMachineAsync(ICallerContext caller, string name,
@@ -32,7 +31,8 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         }
 
         var machine = registered.Value;
-        var keys = await _apiKeyService.CreateApiKeyForUserAsync(caller, machine.Id, name, apiKeyExpiresOn,
+        var keys = await _identityServerProvider.ApiKeyService.CreateAPIKeyForUserAsync(caller, machine.Id, name,
+            apiKeyExpiresOn,
             cancellationToken);
         if (keys.IsFailure)
         {

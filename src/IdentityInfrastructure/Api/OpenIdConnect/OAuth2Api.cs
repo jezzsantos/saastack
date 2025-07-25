@@ -1,5 +1,5 @@
 using Application.Resources.Shared;
-using IdentityApplication.ApplicationServices;
+using IdentityApplication;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;

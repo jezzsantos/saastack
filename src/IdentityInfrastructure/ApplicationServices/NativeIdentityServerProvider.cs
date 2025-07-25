@@ -1,5 +1,6 @@
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Services.Shared;
 using IdentityApplication.ApplicationServices;
@@ -9,18 +10,25 @@ using IdentityDomain.DomainServices;
 namespace IdentityInfrastructure.ApplicationServices;
 
 /// <summary>
-///     Provides a native identity server provider that manages OIDC, Credentials, and APIKeys
+///     Provides a native identity server provider that manages OIDC, Person Credentials, and APIKeys
 /// </summary>
 public class NativeIdentityServerProvider : IIdentityServerProvider
 {
     public NativeIdentityServerProvider(IRecorder recorder, IIdentifierFactory identifierFactory,
-        ITokensService tokensService, IAPIKeyHasherService apiKeyHasherService, IEndUsersService endUsersService,
-        IUserProfilesService userProfilesService, IAPIKeysRepository repository)
+        IConfigurationSettings settings, ITokensService tokensService, IAPIKeyHasherService apiKeyHasherService,
+        IEndUsersService endUsersService, IUserProfilesService userProfilesService,
+        IUserNotificationsService userNotificationsService, IEmailAddressService emailAddressService,
+        IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService,
+        IAuthTokensService authTokensService, IWebsiteUiService websiteUiService, IAPIKeysRepository apiKeysRepository,
+        IPersonCredentialRepository credentialsRepository)
     {
-        CredentialsService = new NativeIdentityServerCredentialsService();
+        CredentialsService = new NativeIdentityServerCredentialsService(recorder, identifierFactory, endUsersService,
+            userProfilesService, userNotificationsService, settings, emailAddressService, tokensService,
+            encryptionService, passwordHasherService, mfaService, authTokensService, websiteUiService,
+            credentialsRepository);
         OidcService = new NativeIdentityServerOpenIdConnectService();
         ApiKeyService = new NativeIdentityServerApiKeyService(recorder, identifierFactory, tokensService,
-            apiKeyHasherService, endUsersService, userProfilesService, repository);
+            apiKeyHasherService, endUsersService, userProfilesService, apiKeysRepository);
     }
 
     public IIdentityServerApiKeyService ApiKeyService { get; }

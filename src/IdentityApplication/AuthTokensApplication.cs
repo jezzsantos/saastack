@@ -12,12 +12,11 @@ using IdentityDomain;
 
 namespace IdentityApplication;
 
-
 public class AuthTokensApplication : IAuthTokensApplication
 {
+    private readonly IEncryptionService _encryptionService;
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _idFactory;
-    private readonly IEncryptionService _encryptionService;
     private readonly IJWTTokensService _jwtTokensService;
     private readonly IRecorder _recorder;
     private readonly IAuthTokensRepository _repository;
@@ -150,7 +149,7 @@ public class AuthTokensApplication : IAuthTokensApplication
             UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
             new Dictionary<string, object>
             {
-                { UsageConstants.Properties.AuthProvider, PersonCredentialsApplication.ProviderName },
+                { UsageConstants.Properties.AuthProvider, NativeIdentityServerCredentialsService.ProviderName },
                 { UsageConstants.Properties.UserIdOverride, user.Id }
             });
 

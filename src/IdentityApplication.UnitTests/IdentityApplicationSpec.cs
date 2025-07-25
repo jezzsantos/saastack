@@ -1,8 +1,8 @@
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using FluentAssertions;
-using IdentityApplication.ApplicationServices;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
@@ -14,22 +14,26 @@ public class IdentityApplicationSpec
 {
     private readonly IdentityApplication _application;
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<IPersonCredentialsService> _personCredentialsService;
+    private readonly Mock<IIdentityServerCredentialsService> _personCredentialsService;
 
     public IdentityApplicationSpec()
     {
         _caller = new Mock<ICallerContext>();
         _caller.Setup(c => c.CallerId)
             .Returns("acallerid");
-        _personCredentialsService = new Mock<IPersonCredentialsService>();
-        _application = new IdentityApplication(_personCredentialsService.Object);
+        _personCredentialsService = new Mock<IIdentityServerCredentialsService>();
+        var identityServerProvider = new Mock<IIdentityServerProvider>();
+        identityServerProvider.Setup(p => p.CredentialsService)
+            .Returns(_personCredentialsService.Object);
+        _application = new IdentityApplication(identityServerProvider.Object);
     }
 
     [Fact]
     public async Task WhenGetIdentityAsyncAndCredentialNotExist_ThenReturnsIdentity()
     {
         _personCredentialsService.Setup(pcs =>
-                pcs.GetCredentialsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<CancellationToken>()))
+                pcs.GetPersonCredentialForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.EntityNotFound());
 
         var result = await _application.GetIdentityAsync(_caller.Object, CancellationToken.None);
@@ -44,7 +48,8 @@ public class IdentityApplicationSpec
     public async Task WhenGetIdentityAsyncAndCredentialExists_ThenReturnsIdentity()
     {
         _personCredentialsService.Setup(pcs =>
-                pcs.GetCredentialsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<CancellationToken>()))
+                pcs.GetPersonCredentialForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PersonCredential
             {
                 Id = "auserid",
