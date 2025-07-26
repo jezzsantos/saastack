@@ -159,29 +159,29 @@ public class MachineCredential : IIdentifiableResource
 
 public class OidcDiscoveryDocument
 {
-    public required string Issuer { get; set; }
-
     public required string AuthorizationEndpoint { get; set; }
 
-    public required string TokenEndpoint { get; set; }
+    public required List<string> ClaimsSupported { get; set; }
 
-    public required string UserInfoEndpoint { get; set; }
+    public required List<string> CodeChallengeMethodsSupported { get; set; }
+
+    public required List<string> IdTokenSigningAlgValuesSupported { get; set; }
+
+    public required string Issuer { get; set; }
 
     public required string JwksUri { get; set; }
 
     public required List<string> ResponseTypesSupported { get; set; }
 
+    public required List<string> ScopesSupported { get; set; }
+
     public required List<string> SubjectTypesSupported { get; set; }
 
-    public required List<string> IdTokenSigningAlgValuesSupported { get; set; }
-
-    public required List<string> ScopesSupported { get; set; }
+    public required string TokenEndpoint { get; set; }
 
     public required List<string> TokenEndpointAuthMethodsSupported { get; set; }
 
-    public required List<string> ClaimsSupported { get; set; }
-
-    public required List<string> CodeChallengeMethodsSupported { get; set; }
+    public required string UserInfoEndpoint { get; set; }
 }
 
 public class OidcAuthorizationResponse
@@ -195,34 +195,34 @@ public class OidcTokenResponse
 {
     public required string AccessToken { get; set; }
 
-    public required string TokenType { get; set; }
-
     public required int ExpiresIn { get; set; }
-
-    public string? RefreshToken { get; set; }
 
     public string? IdToken { get; set; }
 
+    public string? RefreshToken { get; set; }
+
     public string? Scope { get; set; }
+
+    public required string TokenType { get; set; }
 }
 
 public class OidcUserInfoResponse
 {
-    public required string Sub { get; set; }
-
-    public string? Name { get; set; }
-
-    public string? GivenName { get; set; }
-
-    public string? FamilyName { get; set; }
-
     public string? Email { get; set; }
 
     public bool? EmailVerified { get; set; }
 
-    public string? Picture { get; set; }
+    public string? FamilyName { get; set; }
+
+    public string? GivenName { get; set; }
 
     public string? Locale { get; set; }
+
+    public string? Name { get; set; }
+
+    public string? Picture { get; set; }
+
+    public required string Sub { get; set; }
 
     public string? Zoneinfo { get; set; }
 }
@@ -234,36 +234,52 @@ public class JsonWebKeySet
 
 public class JsonWebKey
 {
-    public required string Kty { get; set; }
-
-    public required string Use { get; set; }
-
-    public required string Kid { get; set; }
-
     public required string Alg { get; set; }
-
-    public string? N { get; set; }
 
     public string? E { get; set; }
 
     public string? K { get; set; }
+
+    public required string Kid { get; set; }
+
+    public required string Kty { get; set; }
+
+    public string? N { get; set; }
+
+    public required string Use { get; set; }
 }
 
 public class OidcClient : IIdentifiableResource
 {
-    public required string Id { get; set; }
-
-    public required string Name { get; set; }
-
-    public required string ClientSecret { get; set; }
-
-    public required List<string> RedirectUris { get; set; }
+    public required List<string> AllowedGrantTypes { get; set; }
 
     public required List<string> AllowedScopes { get; set; }
 
-    public required List<string> AllowedGrantTypes { get; set; }
+    public required string ClientSecret { get; set; }
+
+    public required string Name { get; set; }
+
+    public required List<string> RedirectUris { get; set; }
+
+    public bool RequireClientSecret { get; set; }
 
     public bool RequirePkce { get; set; }
 
-    public bool RequireClientSecret { get; set; }
+    public required string Id { get; set; }
+}
+
+public class OAuth2Client : IIdentifiableResource
+{
+    public required string Name { get; set; }
+
+    public required string Id { get; set; }
+
+    public string? RedirectUri { get; set; }
+}
+
+public class OAuth2ClientWithSecret : OAuth2Client
+{
+    public DateTime? ExpiresOnUtc { get; set; }
+
+    public required string Secret { get; set; }
 }

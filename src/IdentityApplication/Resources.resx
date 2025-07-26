@@ -66,4 +66,13 @@
     <data name="NativeIdentityServerApiKeyService_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
+    <data name="OpenIdConnectValidation_InvalidCodeChallengeMethod" xml:space="preserve">
+        <value>The code challenge method must be 'S256' or 'plain'</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_InvalidClientId" xml:space="preserve">
+        <value>Unknown client</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ClientNotConsented" xml:space="preserve">
+        <value>User is not authorized to use this client</value>
+    </data>
 </root>

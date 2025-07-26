@@ -30,13 +30,13 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
         string clientId, string clientSecret, string code, string? codeVerifier,
         string redirectUri, string refreshToken, string? scope, CancellationToken cancellationToken)
     {
-        if (grantType.EqualsIgnoreCase(OpenIdConnectConstants.GrantTypes.AuthorizationCode))
+        if (grantType.EqualsIgnoreCase(OAuth2Constants.GrantTypes.AuthorizationCode))
         {
             return await _identityServerProvider.OpenIdConnectService.ExchangeCodeForTokensAsync(
                 caller, clientId, clientSecret, code, codeVerifier, redirectUri, cancellationToken);
         }
 
-        if (grantType.EqualsIgnoreCase(OpenIdConnectConstants.GrantTypes.RefreshToken))
+        if (grantType.EqualsIgnoreCase(OAuth2Constants.GrantTypes.RefreshToken))
         {
             return await _identityServerProvider.OpenIdConnectService.RefreshTokenAsync(
                 caller, clientId, clientSecret, refreshToken, scope, cancellationToken);

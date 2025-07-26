@@ -2,21 +2,76 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
+using Domain.Common.Identity;
 
 namespace IdentityApplication.ApplicationServices;
 
 /// <summary>
 ///     Provides a native OpenID Connect service for managing and persisting tokens
+///     OIDC Specification: <see href="https://openid.net/specs/openid-connect-core-1_0.html" />
 /// </summary>
 public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdConnectService
 {
-    private readonly Dictionary<string, OidcAuthorizationData> _authorizationCodes = new();
-    private readonly Dictionary<string, OidcTokenData> _refreshTokens = new();
+    private readonly IIdentifierFactory _identifierFactory;
+    private readonly IOAuth2ClientService _oauth2ClientService;
+    private readonly IRecorder _recorder;
+
+    public NativeIdentityServerOpenIdConnectService(IRecorder recorder, IIdentifierFactory identifierFactory,
+        IOAuth2ClientService oauth2ClientService)
+    {
+        _recorder = recorder;
+        _identifierFactory = identifierFactory;
+        _oauth2ClientService = oauth2ClientService;
+    }
 
     public async Task<Result<OidcAuthorizationResponse, Error>> AuthorizeAsync(ICallerContext caller, string clientId,
         string redirectUri, string responseType, string scope, string? state, string? nonce, string? codeChallenge,
         string? codeChallengeMethod, CancellationToken cancellationToken)
     {
+        if (!caller.IsAuthenticated)
+        {
+            //TODO: if not redirect to login page?
+            return Error.NotAuthenticated();
+        }
+
+        var retrievedClient = await _oauth2ClientService.FindClientByIdAsync(caller, clientId, cancellationToken);
+        if (retrievedClient.IsFailure)
+        {
+            return retrievedClient.Error;
+        }
+
+        if (!retrievedClient.Value.HasValue)
+        {
+            return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_InvalidClientId,
+                new Dictionary<string, object> { { "code", "invalid_client" } });
+        }
+
+        var client = retrievedClient.Value;
+        var userId = caller.CallerId;
+        var consentedClient =
+            await _oauth2ClientService.HasClientConsentedUserAsync(caller, clientId, userId, cancellationToken);
+        if (consentedClient.IsFailure)
+        {
+            return consentedClient.Error;
+        }
+
+        if (!consentedClient.Value)
+        {
+            //TODO: If not consented then redirect to consent page?
+            return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_ClientNotConsented,
+                new Dictionary<string, object> { { "code", "consent_required" } });
+        }
+
+        //Authz code
+        //Do all this in the aggregate
+        //Validate the request parameters (various rules)
+        //Store them as an authorization request (for later).
+        //Create a code and return it.
+        //To make this idempotent, we need some kind of key to store and retrieve them later, or we are updating the same root instance each time
+        //The key would be  shahash256 the following parameters to make this root instance deterministic:
+        //CallerId, ClientId, RedirectUri, Scope, Nonce?, CodeChallenge? State?
+        //We look that up to get our root instance, and then we extract our unique code from that instance.
+
         // Create authorization request following OpenIddict pattern
         var request = new OidcAuthorizationRequest
         {
@@ -36,15 +91,6 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         {
             return validationResult.Error;
         }
-
-        // Retrieve and validate the client application
-        var clientResult = await FindClientByIdAsync(clientId, cancellationToken);
-        if (clientResult.IsFailure)
-        {
-            return Error.Validation("Invalid client identifier");
-        }
-
-        var client = clientResult.Value;
 
         // Validate redirect URI against registered URIs
         var redirectValidation = ValidateRedirectUri(client, redirectUri);
@@ -68,8 +114,8 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
     }
 
     public async Task<Result<OidcTokenResponse, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
-        string clientId,
-        string clientSecret, string code, string? codeVerifier, string redirectUri, CancellationToken cancellationToken)
+        string clientId, string clientSecret, string code, string? codeVerifier, string redirectUri,
+        CancellationToken cancellationToken)
     {
         await Task.CompletedTask; // Placeholder implementation
         return Error.Unexpected("ExchangeCodeForTokensAsync not yet implemented");
@@ -106,27 +152,45 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
 
     private static Result<Error> ValidateAuthorizationRequest(OidcAuthorizationRequest request)
     {
-        // TODO: Implement proper validation
+        //Validate the request parameters (various rules)
+        // // Validate response type
+        // if (request.ResponseType.NotEqualsIgnoreCase(OpenIdConnectConstants.ResponseTypes.Code))
+        // {
+        //     return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_UnsupportedResponseType);
+        // }
+        //
+        // // Validate scope contains openid
+        // var scopes = request.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        // if (scopes.HasNone() || !scopes.Contains(OpenIdConnectConstants.Scopes.OpenId))
+        // {
+        //     return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_OpenIdScopeRequired);
+        // }
+        //
+        // // Validate PKCE if code_challenge is provided
+        // if (request.CodeChallenge.HasValue())
+        // {
+        //     if (request.CodeChallengeMethod.HasNoValue())
+        //     {
+        //         return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_CodeChallengeMethodRequired);
+        //     }
+        //
+        //     if (!OpenIdConnectConstants.CodeChallengeMethods.AllMethods.Contains(request.CodeChallengeMethod))
+        //     {
+        //         return Error.Validation(Resources.NativeIdentityServerOpenIdConnectService_InvalidCodeChallengeMethod);
+        //     }
+        // }
+
         return Result.Ok;
     }
 
-    private static async Task<Result<OidcClient, Error>> FindClientByIdAsync(string clientId,
-        CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        // TODO: Implement client lookup
-        return new OidcClient { Id = clientId, Name = "Default Client" };
-    }
-
-    private static Result<Error> ValidateRedirectUri(OidcClient client, string redirectUri)
+    private static Result<Error> ValidateRedirectUri(OAuth2Client client, string redirectUri)
     {
         // TODO: Implement redirect URI validation
         return Result.Ok;
     }
 
     private static async Task<Result<string, Error>> CreateAuthorizationCodeAsync(ICallerContext caller,
-        OidcClient client,
-        OidcAuthorizationRequest request, CancellationToken cancellationToken)
+        OAuth2Client client, OidcAuthorizationRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         // TODO: Implement authorization code creation
@@ -150,13 +214,6 @@ public class NativeIdentityServerOpenIdConnectService : IIdentityServerOpenIdCon
         public required string Scope { get; set; }
 
         public string? State { get; set; }
-    }
-
-    private class OidcClient
-    {
-        public required string Id { get; set; }
-
-        public required string Name { get; set; }
     }
 
     private class OidcAuthorizationData

@@ -14,7 +14,7 @@ public class TokenEndpointRequestValidator : AbstractValidator<TokenEndpointRequ
     {
         RuleFor(req => req.GrantType)
             .NotEmpty()
-            .Matches(Validations.OpenIdConnect.GrantType)
+            .Matches(Validations.OAuth2.GrantType)
             .WithMessage(Resources.TokenEndpointRequestValidator_InvalidGrantType);
 
         RuleFor(req => req.ClientId)
@@ -25,8 +25,7 @@ public class TokenEndpointRequestValidator : AbstractValidator<TokenEndpointRequ
             .NotEmpty()
             .WithMessage(Resources.TokenEndpointRequestValidator_InvalidClientSecret);
 
-        // Rules for authorization_code grant type
-        When(req => req.GrantType == "authorization_code", () =>
+        When(req => req.GrantType == OAuth2Constants.GrantTypes.AuthorizationCode, () =>
         {
             RuleFor(req => req.Code)
                 .NotEmpty()
@@ -38,20 +37,19 @@ public class TokenEndpointRequestValidator : AbstractValidator<TokenEndpointRequ
                 .WithMessage(Resources.TokenEndpointRequestValidator_InvalidRedirectUri);
 
             RuleFor(req => req.CodeVerifier)
-                .Matches(Validations.OpenIdConnect.CodeVerifier)
+                .Matches(Validations.OAuth2.CodeVerifier)
                 .WithMessage(Resources.TokenEndpointRequestValidator_InvalidCodeVerifier)
                 .When(req => req.CodeVerifier.HasValue());
         });
 
-        // Rules for refresh_token grant type
-        When(req => req.GrantType == "refresh_token", () =>
+        When(req => req.GrantType == OAuth2Constants.GrantTypes.RefreshToken, () =>
         {
             RuleFor(req => req.RefreshToken)
                 .NotEmpty()
                 .WithMessage(Resources.TokenEndpointRequestValidator_InvalidRefreshToken);
 
             RuleFor(req => req.Scope)
-                .Matches(Validations.OpenIdConnect.RefreshTokenScope)
+                .Matches(Validations.OAuth2.RefreshTokenScope)
                 .WithMessage(Resources.TokenEndpointRequestValidator_InvalidScope)
                 .When(req => req.Scope.HasValue());
         });

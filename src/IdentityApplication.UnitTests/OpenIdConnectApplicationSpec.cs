@@ -36,30 +36,30 @@ public class OpenIdConnectApplicationSpec
         var expectedDocument = new OidcDiscoveryDocument
         {
             Issuer = "anissuer",
-            AuthorizationEndpoint = $"anissuer{OpenIdConnectConstants.Endpoints.Authorization}",
-            TokenEndpoint = $"anissuer{OpenIdConnectConstants.Endpoints.Token}",
-            UserInfoEndpoint = $"anissuer{OpenIdConnectConstants.Endpoints.UserInfo}",
+            AuthorizationEndpoint = $"anissuer{OAuth2Constants.Endpoints.Authorization}",
+            TokenEndpoint = $"anissuer{OAuth2Constants.Endpoints.Token}",
+            UserInfoEndpoint = $"anissuer{OAuth2Constants.Endpoints.UserInfo}",
             JwksUri = $"anissuer{OpenIdConnectConstants.Endpoints.Jwks}",
-            ResponseTypesSupported = [OpenIdConnectConstants.ResponseTypes.Code],
+            ResponseTypesSupported = [OAuth2Constants.ResponseTypes.Code],
             ScopesSupported =
             [
-                OpenIdConnectConstants.Scopes.OpenId, OpenIdConnectConstants.Scopes.Profile,
-                OpenIdConnectConstants.Scopes.Email
+                OpenIdConnectConstants.Scopes.OpenId, OAuth2Constants.Scopes.Profile,
+                OAuth2Constants.Scopes.Email
             ],
-            SubjectTypesSupported = [OpenIdConnectConstants.SubjectTypes.Public],
+            SubjectTypesSupported = [OAuth2Constants.SubjectTypes.Public],
             IdTokenSigningAlgValuesSupported =
-                [OpenIdConnectConstants.SigningAlgorithms.Hs256, OpenIdConnectConstants.SigningAlgorithms.Rs256],
+                [OAuth2Constants.SigningAlgorithms.Hs256, OAuth2Constants.SigningAlgorithms.Rs256],
             TokenEndpointAuthMethodsSupported =
             [
-                OpenIdConnectConstants.ClientAuthenticationMethods.ClientSecretBasic,
-                OpenIdConnectConstants.ClientAuthenticationMethods.ClientSecretPost
+                OAuth2Constants.ClientAuthenticationMethods.ClientSecretBasic,
+                OAuth2Constants.ClientAuthenticationMethods.ClientSecretPost
             ],
             ClaimsSupported =
             [
-                OpenIdConnectConstants.StandardClaims.Subject, OpenIdConnectConstants.StandardClaims.Name,
-                OpenIdConnectConstants.StandardClaims.Email, OpenIdConnectConstants.StandardClaims.EmailVerified
+                OAuth2Constants.StandardClaims.Subject, OAuth2Constants.StandardClaims.Name,
+                OAuth2Constants.StandardClaims.Email, OAuth2Constants.StandardClaims.EmailVerified
             ],
-            CodeChallengeMethodsSupported = [OpenIdConnectConstants.CodeChallengeMethods.S256]
+            CodeChallengeMethodsSupported = [OAuth2Constants.CodeChallengeMethods.S256]
         };
 
         _oidcService.Setup(s => s.GetDiscoveryDocumentAsync(_caller.Object, It.IsAny<CancellationToken>()))
@@ -69,14 +69,14 @@ public class OpenIdConnectApplicationSpec
 
         result.Should().BeSuccess();
         result.Value.Issuer.Should().Be("anissuer");
-        result.Value.AuthorizationEndpoint.Should().Be($"anissuer{OpenIdConnectConstants.Endpoints.Authorization}");
-        result.Value.TokenEndpoint.Should().Be($"anissuer{OpenIdConnectConstants.Endpoints.Token}");
-        result.Value.UserInfoEndpoint.Should().Be($"anissuer{OpenIdConnectConstants.Endpoints.UserInfo}");
+        result.Value.AuthorizationEndpoint.Should().Be($"anissuer{OAuth2Constants.Endpoints.Authorization}");
+        result.Value.TokenEndpoint.Should().Be($"anissuer{OAuth2Constants.Endpoints.Token}");
+        result.Value.UserInfoEndpoint.Should().Be($"anissuer{OAuth2Constants.Endpoints.UserInfo}");
         result.Value.JwksUri.Should().Be($"anissuer{OpenIdConnectConstants.Endpoints.Jwks}");
-        result.Value.ResponseTypesSupported.Should().Contain(OpenIdConnectConstants.ResponseTypes.Code);
+        result.Value.ResponseTypesSupported.Should().Contain(OAuth2Constants.ResponseTypes.Code);
         result.Value.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.OpenId);
-        result.Value.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Profile);
-        result.Value.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Email);
+        result.Value.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Profile);
+        result.Value.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Email);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class OpenIdConnectApplicationSpec
                     Kty = "akeytype",
                     Use = "akeyuse",
                     Kid = "akeyid",
-                    Alg = OpenIdConnectConstants.SigningAlgorithms.Hs512
+                    Alg = OAuth2Constants.SigningAlgorithms.Hs512
                 }
             ]
         };
@@ -106,7 +106,7 @@ public class OpenIdConnectApplicationSpec
         result.Value.Keys[0].Kty.Should().Be("akeytype");
         result.Value.Keys[0].Use.Should().Be("akeyuse");
         result.Value.Keys[0].Kid.Should().Be("akeyid");
-        result.Value.Keys[0].Alg.Should().Be(OpenIdConnectConstants.SigningAlgorithms.Hs512);
+        result.Value.Keys[0].Alg.Should().Be(OAuth2Constants.SigningAlgorithms.Hs512);
     }
 
     [Fact]
@@ -122,8 +122,8 @@ public class OpenIdConnectApplicationSpec
                 _caller.Object,
                 "aclientid",
                 "aredirecturi",
-                OpenIdConnectConstants.ResponseTypes.Code,
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+                OAuth2Constants.ResponseTypes.Code,
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
                 "astate",
                 "anonce",
                 null,
@@ -135,8 +135,8 @@ public class OpenIdConnectApplicationSpec
             _caller.Object,
             "aclientid",
             "aredirecturi",
-            OpenIdConnectConstants.ResponseTypes.Code,
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+            OAuth2Constants.ResponseTypes.Code,
+            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
             "astate",
             "anonce",
             null,
@@ -155,8 +155,8 @@ public class OpenIdConnectApplicationSpec
                 _caller.Object,
                 "aclientid",
                 "aredirecturi",
-                OpenIdConnectConstants.ResponseTypes.Token,
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+                OAuth2Constants.ResponseTypes.Token,
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
                 null,
                 null,
                 null,
@@ -168,8 +168,8 @@ public class OpenIdConnectApplicationSpec
             _caller.Object,
             "aclientid",
             "aredirecturi",
-            OpenIdConnectConstants.ResponseTypes.Token, // Invalid response type
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+            OAuth2Constants.ResponseTypes.Token, // Invalid response type
+            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
             null,
             null,
             null,
@@ -187,8 +187,8 @@ public class OpenIdConnectApplicationSpec
                 _caller.Object,
                 "aclientid",
                 "aredirecturi",
-                OpenIdConnectConstants.ResponseTypes.Code,
-                $"{OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}",
+                OAuth2Constants.ResponseTypes.Code,
+                $"{OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
                 null,
                 null,
                 null,
@@ -200,8 +200,8 @@ public class OpenIdConnectApplicationSpec
             _caller.Object,
             "aclientid",
             "aredirecturi",
-            OpenIdConnectConstants.ResponseTypes.Code,
-            $"{OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}", // Missing openid scope
+            OAuth2Constants.ResponseTypes.Code,
+            $"{OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}", // Missing openid scope
             null,
             null,
             null,
@@ -218,12 +218,12 @@ public class OpenIdConnectApplicationSpec
         var expectedTokenResponse = new OidcTokenResponse
         {
             AccessToken = "anaccesstoken",
-            TokenType = OpenIdConnectConstants.TokenTypes.Bearer,
+            TokenType = OAuth2Constants.TokenTypes.Bearer,
             ExpiresIn = 900, // 15 minutes
             RefreshToken = "arefreshtoken",
             IdToken = "anidtoken",
             Scope =
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}"
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}"
         };
 
         _oidcService.Setup(s => s.ExchangeCodeForTokensAsync(
@@ -237,7 +237,7 @@ public class OpenIdConnectApplicationSpec
 
         var result = await _application.CreateTokenAsync(
             _caller.Object,
-            OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+            OAuth2Constants.GrantTypes.AuthorizationCode,
             "aclientid",
             "aclientsecret",
             "anauthorizationcode",
@@ -249,12 +249,12 @@ public class OpenIdConnectApplicationSpec
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.TokenType.Should().Be(OpenIdConnectConstants.TokenTypes.Bearer);
+        result.Value.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
         result.Value.RefreshToken.Should().Be("arefreshtoken");
         result.Value.IdToken.Should().Be("anidtoken");
         result.Value.Scope.Should()
             .Be(
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}");
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}");
     }
 
     [Fact]
@@ -263,11 +263,11 @@ public class OpenIdConnectApplicationSpec
         var expectedTokenResponse = new OidcTokenResponse
         {
             AccessToken = "anewaccesstoken",
-            TokenType = OpenIdConnectConstants.TokenTypes.Bearer,
+            TokenType = OAuth2Constants.TokenTypes.Bearer,
             ExpiresIn = 900, // 15 minutes
             RefreshToken = "anewrefreshtoken",
             IdToken = "anewidtoken",
-            Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}"
+            Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}"
         };
 
         _oidcService.Setup(s => s.RefreshTokenAsync(
@@ -275,28 +275,28 @@ public class OpenIdConnectApplicationSpec
                 "aclientid",
                 "aclientsecret",
                 "anoldrefreshtoken",
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedTokenResponse);
 
         var result = await _application.CreateTokenAsync(
             _caller.Object,
-            OpenIdConnectConstants.GrantTypes.RefreshToken,
+            OAuth2Constants.GrantTypes.RefreshToken,
             "aclientid",
             "aclientsecret",
             "",
             null,
             "",
             "anoldrefreshtoken",
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
+            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
             CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Should().Be("anewaccesstoken");
-        result.Value.TokenType.Should().Be(OpenIdConnectConstants.TokenTypes.Bearer);
+        result.Value.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
         result.Value.RefreshToken.Should().Be("anewrefreshtoken");
         result.Value.Scope.Should()
-            .Be($"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}");
+            .Be($"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}");
     }
 
     [Fact]
@@ -304,7 +304,7 @@ public class OpenIdConnectApplicationSpec
     {
         var result = await _application.CreateTokenAsync(
             _caller.Object,
-            OpenIdConnectConstants.GrantTypes.ClientCredentials, // Unsupported grant type
+            OAuth2Constants.GrantTypes.ClientCredentials, // Unsupported grant type
             "aclientid",
             "aclientsecret",
             "",
@@ -316,6 +316,6 @@ public class OpenIdConnectApplicationSpec
 
         result.Should().BeError(ErrorCode.Validation);
         result.Error.Message.Should()
-            .Contain($"Unsupported grant type: '{OpenIdConnectConstants.GrantTypes.ClientCredentials}'");
+            .Contain($"Unsupported grant type: '{OAuth2Constants.GrantTypes.ClientCredentials}'");
     }
 }

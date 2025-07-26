@@ -78,11 +78,38 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User is not authorized to use this client.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_ClientNotConsented {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ClientNotConsented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown client.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_InvalidClientId {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_InvalidClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unsupported grant type: &apos;{0}&apos;.
         /// </summary>
         internal static string OpenIdConnectApplication_UnsupportedGrantType {
             get {
                 return ResourceManager.GetString("OpenIdConnectApplication_UnsupportedGrantType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The code challenge method must be &apos;S256&apos; or &apos;plain&apos;.
+        /// </summary>
+        internal static string OpenIdConnectValidation_InvalidCodeChallengeMethod {
+            get {
+                return ResourceManager.GetString("OpenIdConnectValidation_InvalidCodeChallengeMethod", resourceCulture);
             }
         }
         

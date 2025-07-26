@@ -1,3 +1,4 @@
+using Domain.Common.Identity;
 using FluentAssertions;
 using FluentValidation;
 using IdentityDomain;
@@ -11,19 +12,19 @@ namespace IdentityInfrastructure.UnitTests.Api.OpenIdConnect;
 [Trait("Category", "Unit")]
 public class AuthorizeRequestValidatorSpec
 {
-    private readonly AuthorizeRequest _request;
+    private readonly OAuth2AuthorizeGetRequest _request;
     private readonly AuthorizeRequestValidator _validator;
 
     public AuthorizeRequestValidatorSpec()
     {
-        _validator = new AuthorizeRequestValidator();
-        _request = new AuthorizeRequest
+        _validator = new AuthorizeRequestValidator(new FixedIdentifierFactory("anid"));
+        _request = new OAuth2AuthorizeGetRequest
         {
-            ClientId = "12345678901234567890123456789012",
+            ClientId = "anid",
             RedirectUri = "https://localhost/callback",
-            ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
+            ResponseType = OAuth2Constants.ResponseTypes.Code,
             Scope =
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}"
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}"
         };
     }
 
@@ -102,7 +103,7 @@ public class AuthorizeRequestValidatorSpec
     [Fact]
     public void WhenScopeDoesNotContainOpenId_ThenThrows()
     {
-        _request.Scope = $"{OpenIdConnectConstants.Scopes.Email} {OpenIdConnectConstants.Scopes.Address}";
+        _request.Scope = $"{OAuth2Constants.Scopes.Email} {OAuth2Constants.Scopes.Address}";
 
         _validator
             .Invoking(x => x.ValidateAndThrow(_request))
@@ -182,7 +183,7 @@ public class AuthorizeRequestValidatorSpec
     public void WhenCodeChallengeAndMethodAreValid_ThenSucceeds()
     {
         _request.CodeChallenge = new string('a', 43);
-        _request.CodeChallengeMethod = OpenIdConnectConstants.CodeChallengeMethods.S256;
+        _request.CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256;
 
         _validator.ValidateAndThrow(_request);
     }
@@ -191,7 +192,7 @@ public class AuthorizeRequestValidatorSpec
     public void WhenCodeChallengeMethodIsPlain_ThenSucceeds()
     {
         _request.CodeChallenge = new string('a', 43);
-        _request.CodeChallengeMethod = OpenIdConnectConstants.CodeChallengeMethods.Plain;
+        _request.CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.Plain;
 
         _validator.ValidateAndThrow(_request);
     }
@@ -222,7 +223,7 @@ public class AuthorizeRequestValidatorSpec
     public void WhenScopeContainsMultipleValidScopes_ThenSucceeds()
     {
         _request.Scope =
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}";
+            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
 
         _validator.ValidateAndThrow(_request);
     }
@@ -279,7 +280,7 @@ public class AuthorizeRequestValidatorSpec
     public void WhenCodeChallengeIsMaxLength_ThenSucceeds()
     {
         _request.CodeChallenge = new string('a', 128);
-        _request.CodeChallengeMethod = OpenIdConnectConstants.CodeChallengeMethods.S256;
+        _request.CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256;
 
         _validator.ValidateAndThrow(_request);
     }

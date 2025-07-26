@@ -21,24 +21,30 @@ public class NativeIdentityServerProvider : IIdentityServerProvider
         IUserNotificationsService userNotificationsService, IEmailAddressService emailAddressService,
         IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService,
         IAuthTokensService authTokensService, ISSOProvidersService ssoProvidersService,
-        IWebsiteUiService websiteUiService, IAPIKeysRepository apiKeysRepository,
-        IPersonCredentialRepository credentialsRepository)
+        IWebsiteUiService websiteUiService, IOAuth2ClientService oauth2ClientService,
+        IAPIKeysRepository apiKeysRepository, IPersonCredentialRepository credentialsRepository,
+        IOAuth2ClientRepository oAuthClientRepository, IOAuth2ClientConsentRepository oAuthClientConsentRepository)
     {
         CredentialsService = new NativeIdentityServerCredentialsService(recorder, identifierFactory, endUsersService,
             userProfilesService, userNotificationsService, settings, emailAddressService, tokensService,
             encryptionService, passwordHasherService, mfaService, authTokensService, websiteUiService,
             credentialsRepository);
-        OpenIdConnectService = new NativeIdentityServerOpenIdConnectService();
+        OpenIdConnectService =
+            new NativeIdentityServerOpenIdConnectService(recorder, identifierFactory, oauth2ClientService);
         ApiKeyService = new NativeIdentityServerApiKeyService(recorder, identifierFactory, tokensService,
             apiKeyHasherService, endUsersService, userProfilesService, apiKeysRepository);
         SingleSignOnService = new NativeIdentityServerSingleSignOnService(recorder, endUsersService,
-            ssoProvidersService,
-            authTokensService);
+            ssoProvidersService, authTokensService);
+        OAuth2ClientService =
+            new NativeIdentityServerOAuth2ClientService(recorder, identifierFactory, tokensService,
+                passwordHasherService, oAuthClientRepository, oAuthClientConsentRepository);
     }
 
     public IIdentityServerApiKeyService ApiKeyService { get; }
 
     public IIdentityServerCredentialsService CredentialsService { get; }
+
+    public IIdentityServerOAuth2ClientService OAuth2ClientService { get; }
 
     public IIdentityServerOpenIdConnectService OpenIdConnectService { get; }
 

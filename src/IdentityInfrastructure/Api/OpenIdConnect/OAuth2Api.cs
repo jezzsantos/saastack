@@ -18,8 +18,8 @@ public class OAuth2Api : IWebApiService
         _openIdConnectApplication = openIdConnectApplication;
     }
 
-    public async Task<ApiGetResult<OidcAuthorizationResponse, AuthorizeResponse>> Authorize(
-        AuthorizeRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<OidcAuthorizationResponse, AuthorizeResponse>> AuthorizeGet(
+        OAuth2AuthorizeGetRequest request, CancellationToken cancellationToken)
     {
         var response = await _openIdConnectApplication.AuthorizeAsync(
             _callerFactory.Create(),
@@ -39,6 +39,29 @@ public class OAuth2Api : IWebApiService
                 Code = auth.Code,
                 State = auth.State
             });
+    }
+
+    public async Task<ApiPostResult<OidcAuthorizationResponse, AuthorizeResponse>> AuthorizePost(
+        OAuth2AuthorizePostRequest request, CancellationToken cancellationToken)
+    {
+        var response = await _openIdConnectApplication.AuthorizeAsync(
+            _callerFactory.Create(),
+            request.ClientId!,
+            request.RedirectUri!,
+            request.ResponseType!,
+            request.Scope!,
+            request.State,
+            request.Nonce,
+            request.CodeChallenge,
+            request.CodeChallengeMethod,
+            cancellationToken);
+
+        return () => response.HandleApplicationResult<OidcAuthorizationResponse, AuthorizeResponse>(auth =>
+            new PostResult<AuthorizeResponse>(new AuthorizeResponse
+            {
+                Code = auth.Code,
+                State = auth.State
+            }, request.RedirectUri!));
     }
 
     public async Task<ApiPostResult<OidcTokenResponse, TokenEndpointResponse>> GetToken(

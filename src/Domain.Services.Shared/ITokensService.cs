@@ -20,4 +20,6 @@ public interface ITokensService
     string GenerateRandomToken();
 
     Optional<APIKeyToken> ParseApiKey(string apiKey);
+
+    string CreateOAuth2ClientSecret();
 }

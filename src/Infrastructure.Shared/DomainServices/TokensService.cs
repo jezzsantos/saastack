@@ -41,6 +41,11 @@ public sealed class TokensService : ITokensService
         return GenerateRandomStringSafeForUrl();
     }
 
+    public string CreateOAuth2ClientSecret()
+    {
+        return GenerateRandomStringSafeForUrl();
+    }
+
     public string CreatePasswordResetToken()
     {
         return GenerateRandomStringSafeForUrl();

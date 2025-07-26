@@ -88,6 +88,20 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[OAuth2Client]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[OAuth2Client]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[OAuth2ClientConsent]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[OAuth2ClientConsent]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[Organization]')
             AND type in (N'U'))
     DROP TABLE [dbo].[Organization]
@@ -393,6 +407,50 @@ CREATE INDEX Id
     ON [dbo].[MfaAuthenticator]
         (
          [Id]
+            );
+
+CREATE TABLE [dbo].[OAuth2Client]
+(
+    [Id]                    [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]    [datetime]      NULL,
+    [IsDeleted]             [bit]           NULL,
+    [Name]                  [nvarchar](max) NULL,
+    [RedirectUri]           [nvarchar](max) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[OAuth2Client]
+        (
+         [Id]
+            );
+
+CREATE TABLE [dbo].[OAuth2ClientConsent]
+(
+    [Id]                    [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]    [datetime]      NULL,
+    [IsDeleted]             [bit]           NULL,
+    [ClientId]              [nvarchar](100) NULL,
+    [IsConsented]           [bit]           NULL,
+    [Scopes]                [nvarchar](max) NULL,
+    [UserId]                [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[OAuth2ClientConsent]
+        (
+         [Id]
+            );
+CREATE INDEX ClientId
+    ON [dbo].[OAuth2ClientConsent]
+        (
+         [ClientId]
+            );
+CREATE INDEX UserId
+    ON [dbo].[OAuth2ClientConsent]
+        (
+         [UserId]
             );
 
 CREATE TABLE [dbo].[Organization]

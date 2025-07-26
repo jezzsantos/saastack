@@ -204,5 +204,10 @@
     <data name="ProviderAuthTokensRoot_NotOwner" xml:space="preserve">
         <value>Only the user can update their own tokens</value>
     </data>
-
+    <data name="OAuth2Scopes_InvalidScope" xml:space="preserve">
+        <value>Scope is unknown</value>
+    </data>
+    <data name="OAuth2ClientConsentRoot_NotOwner" xml:space="preserve">
+        <value>Cannot change the consent for another user</value>
+    </data>
 </root>

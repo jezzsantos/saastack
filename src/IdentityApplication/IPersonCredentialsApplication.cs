@@ -12,9 +12,6 @@ public partial interface IPersonCredentialsApplication
     Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext caller, string token,
         CancellationToken cancellationToken);
 
-    Task<Result<PersonCredential, Error>> GetPersonCredentialAsync(ICallerContext caller,
-        CancellationToken cancellationToken);
-
 #if TESTINGONLY
     Task<Result<PersonCredentialEmailConfirmation, Error>> GetPersonRegistrationConfirmationAsync(ICallerContext caller,
         string userId, CancellationToken cancellationToken);

@@ -10,7 +10,9 @@ namespace Application.Services.Shared;
 public interface IIdentityServerOpenIdConnectService
 {
     /// <summary>
-    ///     Handles the authorization request for the authorization code flow
+    ///     Handles the authorization request for the authorization code flow, and returns an authorization code.
+    ///     If not authenticated yet (via Credentials or SSO), redirect to a login URI.
+    ///     If the user has not been consented to use this client, redirect to a consent URI.
     /// </summary>
     Task<Result<OidcAuthorizationResponse, Error>> AuthorizeAsync(ICallerContext caller, string clientId,
         string redirectUri, string responseType, string scope, string? state, string? nonce, string? codeChallenge,
@@ -20,8 +22,7 @@ public interface IIdentityServerOpenIdConnectService
     ///     Exchanges authorization code for tokens or refreshes tokens
     /// </summary>
     Task<Result<OidcTokenResponse, Error>> ExchangeCodeForTokensAsync(ICallerContext caller, string clientId,
-        string clientSecret, string code, string? codeVerifier,
-        string redirectUri,
+        string clientSecret, string code, string? codeVerifier, string redirectUri,
         CancellationToken cancellationToken);
 
     /// <summary>
