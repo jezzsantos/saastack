@@ -348,6 +348,24 @@ namespace IdentityDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot change the consent for another user.
+        /// </summary>
+        internal static string OAuth2ClientConsentRoot_NotOwner {
+            get {
+                return ResourceManager.GetString("OAuth2ClientConsentRoot_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scope is unknown.
+        /// </summary>
+        internal static string OAuth2Scopes_InvalidScope {
+            get {
+                return ResourceManager.GetString("OAuth2Scopes_InvalidScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password is not valid.
         /// </summary>
         internal static string PasswordKeep_InvalidPassword {

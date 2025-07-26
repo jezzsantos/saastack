@@ -20,10 +20,10 @@ public class TokenEndpointRequestValidatorSpec
         _validator = new TokenEndpointRequestValidator();
         _request = new TokenEndpointRequest
         {
-            GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+            GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
             ClientId = "12345678901234567890123456789012",
             ClientSecret = new TokensService().GenerateRandomToken(),
-            Code = OpenIdConnectConstants.ResponseTypes.Code,
+            Code = OAuth2Constants.ResponseTypes.Code,
             RedirectUri = "https://localhost/callback"
         };
     }
@@ -37,7 +37,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantIsValid_ThenSucceeds()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "arefreshtoken";
         _request.Code = null;
         _request.RedirectUri = null;
@@ -125,7 +125,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndRefreshTokenIsEmpty_ThenThrows()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = string.Empty;
 
         _validator
@@ -137,7 +137,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndScopeIsInvalid_ThenThrows()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "arefreshtoken";
         _request.Scope = "aninvalidscope";
 
@@ -150,10 +150,10 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndScopeIsValid_ThenSucceeds()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "arefreshtoken";
         _request.Scope =
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}";
+            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
 
         _validator.ValidateAndThrow(_request);
     }
@@ -161,7 +161,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndScopeIsEmpty_ThenSucceeds()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "arefreshtoken";
         _request.Scope = string.Empty;
 
@@ -171,7 +171,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndScopeIsNull_ThenSucceeds()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "refresh-token";
         _request.Scope = null;
 
@@ -181,9 +181,9 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantWithOfflineAccess_ThenSucceeds()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = "arefreshtoken";
-        _request.Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.OfflineAccess}";
+        _request.Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.OfflineAccess}";
 
         _validator.ValidateAndThrow(_request);
     }
@@ -278,7 +278,7 @@ public class TokenEndpointRequestValidatorSpec
     [Fact]
     public void WhenRefreshTokenGrantAndRefreshTokenIsNull_ThenFails()
     {
-        _request.GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken;
+        _request.GrantType = OAuth2Constants.GrantTypes.RefreshToken;
         _request.RefreshToken = null;
 
         _validator

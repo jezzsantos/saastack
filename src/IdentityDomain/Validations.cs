@@ -59,36 +59,52 @@ public static class Validations
 
     public static class OpenIdConnect
     {
-        public static readonly Validation ClientId = CommonValidations.GuidN;
-        public static readonly Validation ClientSecret = CommonValidations.RandomToken();
-        public static readonly Validation Code = new(s => s == OpenIdConnectConstants.ResponseTypes.Code);
-        public static readonly Validation CodeChallenge = new(@"^[a-zA-Z0-9\-._~]{43,128}$", 43, 128);
-        public static readonly Validation CodeChallengeMethod =
-            new(s => OpenIdConnectConstants.CodeChallengeMethods.AllMethods.Contains(s));
-        public static readonly Validation CodeVerifier = new(@"^[A-Za-z0-9\-._~]{43,128}$", 43, 128);
-        public static readonly Validation GrantType = new(s =>
-            s is OpenIdConnectConstants.GrantTypes.AuthorizationCode or OpenIdConnectConstants.GrantTypes.RefreshToken);
-        public static readonly Validation Nonce = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
-        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
-        public static readonly Validation RefreshTokenScope = new(s =>
+        private static readonly char[] Delimiters = [' ', ';', ','];
+        public static readonly Validation Scope = new(scope =>
         {
-            if (s.HasNoValue())
-            {
-                return true; // Optional for refresh token
-            }
-
-            var requestedScopes = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return requestedScopes.All(scope => OpenIdConnectConstants.Scopes.AllScopes.Contains(scope));
-        });
-        public static readonly Validation Scope = new(s =>
-        {
-            if (s.HasNoValue())
+            if (scope.HasNoValue())
             {
                 return false;
             }
 
-            var scopes = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
             return scopes.Contains(OpenIdConnectConstants.Scopes.OpenId);
+        });
+    }
+
+    public static class OAuth2
+    {
+        public static readonly Validation ClientName = Domain.Shared.Validations.Names.Name;
+        public static readonly Validation ClientSecret = CommonValidations.RandomToken();
+        public static readonly Validation Code = new(code => code == OAuth2Constants.ResponseTypes.Code);
+        public static readonly Validation CodeChallenge = new(@"^[a-zA-Z0-9\-._~]{43,128}$", 43, 128);
+        public static readonly Validation CodeChallengeMethod =
+            new(method => OAuth2Constants.CodeChallengeMethods.AllMethods.Contains(method));
+        public static readonly Validation CodeVerifier = new(@"^[A-Za-z0-9\-._~]{43,128}$", 43, 128);
+        public static readonly Validation GrantType = new(grant =>
+            grant is OAuth2Constants.GrantTypes.AuthorizationCode or OAuth2Constants.GrantTypes.RefreshToken);
+        public static readonly Validation Nonce = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
+        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
+        public static readonly Validation RefreshTokenScope = new(scope =>
+        {
+            if (scope.HasNoValue())
+            {
+                return true; // Optional for refresh token
+            }
+
+            var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+            return scopes.All(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s));
+        });
+        private static readonly char[] Delimiters = [' ', ';', ','];
+        public static readonly Validation Scope = new(scope =>
+        {
+            if (scope.HasNoValue())
+            {
+                return false;
+            }
+
+            var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+            return scopes.All(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s));
         });
         public static readonly Validation State = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
     }

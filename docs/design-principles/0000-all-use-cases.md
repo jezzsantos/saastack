@@ -170,6 +170,35 @@ Is the way that a user can authenticate with the platform using an external OAut
 
 1. Authenticate and (auto-register) a person from another OAuth2 provider (with an optional invitation)
 
+#### OAuth2 Client Applications
+
+Is the way that a user can register and manage OAuth2 client applications on the platform for OpenIdConnect
+
+1. Create a new OAuth2 client application
+2. Fetch an existing OAuth2 client application
+3. Update an existing OAuth2 client application
+4. Delete an OAuth2 client application
+5. List all OAuth2 client applications <sup>$$$
+6. Generates a new secret for a client application
+7. Consents a user to authorize a client application
+8. Revokes the consent a user gave to access a client application
+9. Whether a user has consented to a client application
+
+#### OAuth2 Authorization
+
+Is the way that a user can authorize access to the platform using OAuth2
+
+1. Authorize a user to access a client application (i.e. the `/oauth2/authorize` endpoint)
+2. Exchange an authorization code for an access token (i.e. the `/oauth2/token` endpoint)
+3. Fetch the user information (i.e. the `/oauth2/userinfo` endpoint)
+
+#### Open ID Connect
+
+Is the way that a user can authorize access to the platform using OpenIdConnect (OIDC)
+
+1. Fetch the discovery document (i.e. the `/.well-known/openid-configuration` endpoint)
+2. Fetch the JSON Web Key Set (i.e. the `/.well-known/jwks.json` endpoint)
+
 ### Images
 
 Provides a simple image service for uploading and downloading images.

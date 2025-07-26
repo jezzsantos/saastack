@@ -16,7 +16,12 @@ public interface IIdentityServerProvider
     public IIdentityServerCredentialsService CredentialsService { get; }
 
     /// <summary>
-    ///     Returns the OIDC service for the provider
+    ///     Returns the OAuth2 client management service for the provider
+    /// </summary>
+    public IIdentityServerOAuth2ClientService OAuth2ClientService { get; }
+
+    /// <summary>
+    ///     Returns the OIDC authorization service for the provider
     /// </summary>
     public IIdentityServerOpenIdConnectService OpenIdConnectService { get; }
 

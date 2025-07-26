@@ -22,3 +22,4 @@
 * [Billing Integration](0180-billing-integration.md) how the integration between the billing management and the product works to enable self-serve plan management 
 * [Testing Strategies](0190-testing-strategies.md) how we test our codebase
 * [Javascript Actions](0200-javascript-actions.md) a concept to enhance common user interface experiences 
+* [Identity Server](0210-identity-server.md) what it is and how to use other providers 

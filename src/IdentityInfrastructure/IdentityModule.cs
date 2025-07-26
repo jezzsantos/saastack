@@ -42,7 +42,9 @@ public class IdentityModule : ISubdomainModule
         { typeof(AuthTokensRoot), "authtok" },
         { typeof(APIKeyRoot), "apikey" },
         { typeof(SSOUserRoot), "ssouser" },
-        { typeof(ProviderAuthTokensRoot), "pvdrauthtok" }
+        { typeof(ProviderAuthTokensRoot), "pvdrauthtok" },
+        { typeof(OAuth2ClientRoot), "oauthclient" },
+        { typeof(OAuth2ClientConsentRoot), "oauthconsent" }
     };
 
     public Assembly InfrastructureAssembly => typeof(CredentialsApi).Assembly;
@@ -79,13 +81,14 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IMachineCredentialsApplication, MachineCredentialsApplication>();
                 services.AddPerHttpRequest<ISingleSignOnApplication, SingleSignOnApplication>();
                 services.AddPerHttpRequest<IOpenIdConnectApplication, OpenIdConnectApplication>();
-                services.AddPerHttpRequest<IPersonCredentialRepository>(c =>
-                    new PersonCredentialRepository(c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IOAuth2ClientApplication, OAuth2ClientApplication>();
+                services.AddPerHttpRequest<IAPIKeysRepository>(c =>
+                    new APIKeysRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcingDddCommandStore<PersonCredentialRoot>>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<APIKeyRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterEventing<PersonCredentialRoot, PersonCredentialProjection>(
-                    c => new PersonCredentialProjection(c.GetRequiredService<IRecorder>(),
+                services.RegisterEventing<APIKeyRoot, APIKeyProjection>(
+                    c => new APIKeyProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.AddPerHttpRequest<IAuthTokensRepository>(c =>
@@ -94,13 +97,13 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredService<ISnapshottingDddCommandStore<AuthTokensRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterEventing<AuthTokensRoot>();
-                services.AddPerHttpRequest<IAPIKeysRepository>(c =>
-                    new APIKeysRepository(c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IPersonCredentialRepository>(c =>
+                    new PersonCredentialRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcingDddCommandStore<APIKeyRoot>>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<PersonCredentialRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterEventing<APIKeyRoot, APIKeyProjection>(
-                    c => new APIKeyProjection(c.GetRequiredService<IRecorder>(),
+                services.RegisterEventing<PersonCredentialRoot, PersonCredentialProjection>(
+                    c => new PersonCredentialProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.AddPerHttpRequest<ISSOUsersRepository>(c =>
@@ -112,6 +115,24 @@ public class IdentityModule : ISubdomainModule
                     c => new SSOUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IOAuth2ClientRepository>(c =>
+                    new OAuth2ClientRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<OAuth2ClientRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<OAuth2ClientRoot, OAuth2ClientProjection>(
+                    c => new OAuth2ClientProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IOAuth2ClientConsentRepository>(c =>
+                    new OAuth2ClientConsentRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<OAuth2ClientConsentRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<OAuth2ClientConsentRoot, OAuth2ClientConsentProjection>(
+                    c => new OAuth2ClientConsentProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterEventing<ProviderAuthTokensRoot, ProviderAuthTokensProjection>(
                     c => new ProviderAuthTokensProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
@@ -119,6 +140,7 @@ public class IdentityModule : ISubdomainModule
 
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
+                services.AddPerHttpRequest<IOAuth2ClientService, NativeOAuth2ClientService>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
 
 #if TESTINGONLY

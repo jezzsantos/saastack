@@ -103,28 +103,4 @@ public class PersonCredentialsApplicationSpec
         _credentialsService.Verify(aks =>
             aks.ConfirmPersonRegistrationAsync(_caller.Object, "atoken", CancellationToken.None));
     }
-
-    [Fact]
-    public async Task WhenGetPersonCredentialAsync_ThenReturnsCredential()
-    {
-        var credential = new PersonCredential
-        {
-            User = new EndUser
-            {
-                Id = "auserid"
-            },
-            Id = "anid"
-        };
-        _credentialsService.Setup(aks =>
-                aks.GetPersonCredentialForUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(credential);
-
-        var result =
-            await _application.GetPersonCredentialAsync(_caller.Object, CancellationToken.None);
-
-        result.Value.Should().Be(credential);
-        _credentialsService.Verify(aks =>
-            aks.GetPersonCredentialForUserAsync(_caller.Object, "acallerid", CancellationToken.None));
-    }
 }

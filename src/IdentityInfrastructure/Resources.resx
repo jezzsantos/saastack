@@ -176,4 +176,34 @@
     <data name="TokenEndpointRequestValidator_InvalidScope" xml:space="preserve">
       <value>The 'Scope' contains invalid values</value>
     </data>
+    <data name="ConsentToOAuth2ClientRequestValidator_InvalidClientId" xml:space="preserve">
+      <value>The 'ClientId' is either missing or invalid</value>
+    </data>
+    <data name="ConsentToOAuth2ClientRequestValidator_InvalidScopes" xml:space="preserve">
+      <value>The 'Scopes' must contain valid OAuth2 scopes</value>
+    </data>
+    <data name="ConsentToOAuth2ClientRequestValidator_InvalidRedirectUri" xml:space="preserve">
+      <value>The 'RedirectUri' is either missing or invalid</value>
+    </data>
+    <data name="ConsentToOAuth2ClientRequestValidator_InvalidState" xml:space="preserve">
+      <value>The 'State' parameter is either missing or invalid</value>
+    </data>
+    <data name="CreateOAuth2ClientRequestValidator_InvalidName" xml:space="preserve">
+      <value>The 'Name' is either missing or invalid</value>
+    </data>
+    <data name="CreateOAuth2ClientRequestValidator_InvalidRedirectUri" xml:space="preserve">
+      <value>The 'RedirectUri' is invalid</value>
+    </data>
+    <data name="UpdateOAuth2ClientRequestValidator_InvalidName" xml:space="preserve">
+      <value>The 'Name' is either missing or invalid</value>
+    </data>
+    <data name="UpdateOAuth2ClientRequestValidator_InvalidRedirectUri" xml:space="preserve">
+      <value>The 'RedirectUri' is invalid</value>
+    </data>
+    <data name="GetOAuth2ConsentRequestValidator_InvalidClientId" xml:space="preserve">
+      <value>The 'ClientId' is either missing or invalid</value>
+    </data>
+    <data name="RevokeOAuth2ConsentRequestValidator_InvalidClientId" xml:space="preserve">
+      <value>The 'ClientId' is either missing or invalid</value>
+    </data>
 </root>

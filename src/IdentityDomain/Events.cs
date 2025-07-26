@@ -2,11 +2,14 @@ using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Events.Shared.Identities.AuthTokens;
+using Domain.Events.Shared.Identities.OAuth2.ClientConsents;
+using Domain.Events.Shared.Identities.OAuth2.Clients;
 using Domain.Events.Shared.Identities.PersonCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
 using Domain.Shared.Identities;
 using Created = Domain.Events.Shared.Identities.AuthTokens.Created;
+using Deleted = Domain.Events.Shared.Identities.APIKeys.Deleted;
 using TokensChanged = Domain.Events.Shared.Identities.AuthTokens.TokensChanged;
 
 namespace IdentityDomain;
@@ -372,6 +375,77 @@ public static class Events
                 Timezone = timezone.Code.ToString(),
                 CountryCode = address.CountryCode.ToString()
             };
+        }
+    }
+
+    public static class OAuth2
+    {
+        public static class Clients
+        {
+            public static Domain.Events.Shared.Identities.OAuth2.Clients.Created Created(Identifier id, Name name)
+            {
+                return new Domain.Events.Shared.Identities.OAuth2.Clients.Created(id)
+                {
+                    Name = name
+                };
+            }
+
+            public static Domain.Events.Shared.Identities.OAuth2.Clients.Deleted Deleted(Identifier id,
+                Identifier deletedById)
+            {
+                return new Domain.Events.Shared.Identities.OAuth2.Clients.Deleted(id, deletedById);
+            }
+
+            public static NameChanged NameChanged(Identifier id, Name name)
+            {
+                return new NameChanged(id)
+                {
+                    Name = name
+                };
+            }
+
+            public static RedirectUriChanged RedirectUriChanged(Identifier id, string redirectUri)
+            {
+                return new RedirectUriChanged(id)
+                {
+                    RedirectUri = redirectUri
+                };
+            }
+
+            public static SecretAdded SecretAdded(Identifier id, string secretHash, Optional<DateTime> expiresOn)
+            {
+                return new SecretAdded(id)
+                {
+                    SecretHash = secretHash,
+                    ExpiresOn = expiresOn.HasValue
+                        ? expiresOn.Value
+                        : null
+                };
+            }
+        }
+
+        public static class ClientConsents
+        {
+            public static ConsentChanged ConsentChanged(Identifier id, bool isConsented, OAuth2Scopes scopes)
+            {
+                return new ConsentChanged(id)
+                {
+                    IsConsented = isConsented,
+                    Scopes = scopes.Items
+                };
+            }
+
+            public static Domain.Events.Shared.Identities.OAuth2.ClientConsents.Created Created(Identifier id,
+                Identifier clientId, Identifier userId)
+            {
+                return new Domain.Events.Shared.Identities.OAuth2.ClientConsents.Created(id)
+                {
+                    ClientId = clientId,
+                    UserId = userId,
+                    IsConsented = false,
+                    Scopes = []
+                };
+            }
         }
     }
 }

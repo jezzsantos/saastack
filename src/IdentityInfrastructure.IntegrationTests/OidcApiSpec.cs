@@ -18,13 +18,6 @@ public class OidcApiSpec
     [Collection("API")]
     public class GivenAnUnauthenticatedUser : WebApiSpec<Program>
     {
-        private const string AClientId = "aclientid12345678901234567890";
-        private const string ARedirectUri = "https://localhost/callback";
-        private const string AState = "astate";
-        private const string ANonce = "anonce";
-        private const string ACodeChallenge = "acodechallenge";
-        private const string ACodeChallengeMethod = OpenIdConnectConstants.CodeChallengeMethods.S256;
-
         public GivenAnUnauthenticatedUser(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
@@ -51,33 +44,33 @@ public class OidcApiSpec
             document.IdTokenSigningAlgValuesSupported.Should().NotBeEmpty();
 
             // OIDC Core 1.0 Section 3 - Verify required response types
-            document.ResponseTypesSupported.Should().Contain(OpenIdConnectConstants.ResponseTypes.Code);
+            document.ResponseTypesSupported.Should().Contain(OAuth2Constants.ResponseTypes.Code);
 
             // OIDC Core 1.0 Section 3 - Verify required scopes
             document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.OpenId);
-            document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Profile);
-            document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Email);
+            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Profile);
+            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Email);
 
             // OIDC Core 1.0 Section 3 - Verify subject types
-            document.SubjectTypesSupported.Should().Contain(OpenIdConnectConstants.SubjectTypes.Public);
+            document.SubjectTypesSupported.Should().Contain(OAuth2Constants.SubjectTypes.Public);
 
             // OIDC Core 1.0 Section 3 - Verify signing algorithms
-            document.IdTokenSigningAlgValuesSupported.Should().Contain(OpenIdConnectConstants.SigningAlgorithms.Rs256);
+            document.IdTokenSigningAlgValuesSupported.Should().Contain(OAuth2Constants.SigningAlgorithms.Rs256);
 
             // OIDC Core 1.0 Section 3 - Verify token endpoint auth methods
             document.TokenEndpointAuthMethodsSupported.Should().NotBeEmpty();
             document.TokenEndpointAuthMethodsSupported.Should()
-                .Contain(OpenIdConnectConstants.ClientAuthenticationMethods.ClientSecretPost);
+                .Contain(OAuth2Constants.ClientAuthenticationMethods.ClientSecretPost);
 
             // OIDC Core 1.0 Section 3 - Verify claims supported
             document.ClaimsSupported.Should().NotBeEmpty();
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Subject);
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Name);
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Email);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Subject);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Name);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Email);
 
             // PKCE support verification
             document.CodeChallengeMethodsSupported.Should().NotBeEmpty();
-            document.CodeChallengeMethodsSupported.Should().Contain(OpenIdConnectConstants.CodeChallengeMethods.S256);
+            document.CodeChallengeMethodsSupported.Should().Contain(OAuth2Constants.CodeChallengeMethods.S256);
         }
 
         [Fact]
@@ -108,48 +101,48 @@ public class OidcApiSpec
         [Fact]
         public async Task WhenAuthorizeWithValidParameters_ThenReturnsAuthorizationCode()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
-                State = AState,
-                Nonce = ANonce
+                ClientId = "aclientid12345678901234567890",
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
+                State = "astate",
+                Nonce = "anonce"
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Content.Value.Code.Should().NotBeNullOrEmpty();
-            result.Content.Value.State.Should().Be(AState);
+            result.Content.Value.State.Should().Be("astate");
         }
 
         [Fact]
         public async Task WhenAuthorizeWithPkce_ThenReturnsAuthorizationCode()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
-                State = AState,
-                Nonce = ANonce,
-                CodeChallenge = ACodeChallenge,
-                CodeChallengeMethod = ACodeChallengeMethod
+                ClientId = "aclientid12345678901234567890",
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
+                State = "astate",
+                Nonce = "anonce",
+                CodeChallenge = "acodechallenge",
+                CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Content.Value.Code.Should().NotBeNullOrEmpty();
-            result.Content.Value.State.Should().Be(AState);
+            result.Content.Value.State.Should().Be("astate");
         }
 
         [Fact]
         public async Task WhenAuthorizeWithMissingClientId_ThenReturnsBadRequest()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
                 Scope = OpenIdConnectConstants.Scopes.OpenId
             });
 
@@ -159,11 +152,11 @@ public class OidcApiSpec
         [Fact]
         public async Task WhenAuthorizeWithInvalidRedirectUri_ThenReturnsBadRequest()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
+                ClientId = "aclientid12345678901234567890",
                 RedirectUri = "aninvaliduri",
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
                 Scope = OpenIdConnectConstants.Scopes.OpenId
             });
 
@@ -173,10 +166,10 @@ public class OidcApiSpec
         [Fact]
         public async Task WhenAuthorizeWithUnsupportedResponseType_ThenReturnsBadRequest()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
+                ClientId = "aclientid12345678901234567890",
+                RedirectUri = "https://localhost/callback",
                 ResponseType = "unsupported_type",
                 Scope = OpenIdConnectConstants.Scopes.OpenId
             });
@@ -188,15 +181,15 @@ public class OidcApiSpec
         public async Task WhenTokenEndpointWithValidAuthorizationCode_ThenReturnsTokens()
         {
             // First get an authorization code
-            var authorizeResult = await Api.GetAsync(new AuthorizeRequest
+            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
+                ClientId = "aclientid12345678901234567890",
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
                 Scope =
-                    $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile} {OpenIdConnectConstants.Scopes.Email}",
-                State = AState,
-                Nonce = ANonce
+                    $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
+                State = "astate",
+                Nonce = "anonce"
             });
 
             authorizeResult.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -205,11 +198,11 @@ public class OidcApiSpec
             // Exchange authorization code for tokens
             var tokenResult = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                ClientId = AClientId,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
+                ClientId = "aclientid12345678901234567890",
                 ClientSecret = "aclientsecret",
                 Code = authorizationCode,
-                RedirectUri = ARedirectUri
+                RedirectUri = "https://localhost/callback"
             });
 
             tokenResult.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -217,7 +210,7 @@ public class OidcApiSpec
             // OIDC Core 1.0 Section 3.1.3.1 - Verify token response
             var tokenResponse = tokenResult.Content.Value;
             tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
-            tokenResponse.TokenType.Should().Be(OpenIdConnectConstants.TokenTypes.Bearer);
+            tokenResponse.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
             tokenResponse.ExpiresIn.Should().BeGreaterThan(0);
             tokenResponse.IdToken.Should().NotBeNullOrEmpty(); // Required for OIDC
             tokenResponse.Scope.Should().NotBeNullOrEmpty();
@@ -227,16 +220,16 @@ public class OidcApiSpec
         public async Task WhenTokenEndpointWithPkce_ThenReturnsTokens()
         {
             // First get an authorization code with PKCE
-            var authorizeResult = await Api.GetAsync(new AuthorizeRequest
+            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.Profile}",
-                State = AState,
-                Nonce = ANonce,
-                CodeChallenge = ACodeChallenge,
-                CodeChallengeMethod = ACodeChallengeMethod
+                ClientId = "aclientid12345678901234567890",
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
+                State = "astate",
+                Nonce = "anonce",
+                CodeChallenge = "acodechallenge",
+                CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256
             });
 
             authorizeResult.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -245,11 +238,11 @@ public class OidcApiSpec
             // Exchange authorization code for tokens with code verifier
             var tokenResult = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                ClientId = AClientId,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
+                ClientId = "aclientid12345678901234567890",
                 ClientSecret = "aclientsecret",
                 Code = authorizationCode,
-                RedirectUri = ARedirectUri,
+                RedirectUri = "https://localhost/callback",
                 CodeVerifier = "acodeverifier" // In real implementation, this should match the challenge
             });
 
@@ -264,10 +257,10 @@ public class OidcApiSpec
             var result = await Api.PostAsync(new TokenEndpointRequest
             {
                 GrantType = "aninvalidgranttype",
-                ClientId = AClientId,
+                ClientId = "aclientid12345678901234567890",
                 ClientSecret = "aclientsecret",
                 Code = "acode",
-                RedirectUri = ARedirectUri
+                RedirectUri = "https://localhost/callback"
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -278,10 +271,10 @@ public class OidcApiSpec
         {
             var result = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
                 ClientSecret = "aclientsecret",
                 Code = "acode",
-                RedirectUri = ARedirectUri
+                RedirectUri = "https://localhost/callback"
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -292,11 +285,11 @@ public class OidcApiSpec
         {
             var result = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
-                ClientId = AClientId,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
+                ClientId = "aclientid12345678901234567890",
                 ClientSecret = "aclientsecret",
                 Code = "aninvalidcode",
-                RedirectUri = ARedirectUri
+                RedirectUri = "https://localhost/callback"
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -391,9 +384,9 @@ public class OidcApiSpec
             var document = result.Content.Value.Document;
 
             // Verify all OIDC endpoints are properly configured
-            document.AuthorizationEndpoint.Should().EndWith(OpenIdConnectConstants.Endpoints.Authorization);
-            document.TokenEndpoint.Should().EndWith(OpenIdConnectConstants.Endpoints.Token);
-            document.UserInfoEndpoint.Should().EndWith(OpenIdConnectConstants.Endpoints.UserInfo);
+            document.AuthorizationEndpoint.Should().EndWith(OAuth2Constants.Endpoints.Authorization);
+            document.TokenEndpoint.Should().EndWith(OAuth2Constants.Endpoints.Token);
+            document.UserInfoEndpoint.Should().EndWith(OAuth2Constants.Endpoints.UserInfo);
             document.JwksUri.Should().EndWith(OpenIdConnectConstants.Endpoints.Jwks);
 
             // Verify issuer is a valid URI
@@ -403,11 +396,11 @@ public class OidcApiSpec
         [Fact]
         public async Task WhenAuthorizeWithInvalidScope_ThenReturnsBadRequest()
         {
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
                 ClientId = AClientId,
                 RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
                 Scope = "aninvalidscope"
             });
 
@@ -418,12 +411,12 @@ public class OidcApiSpec
         public async Task WhenAuthorizeWithoutOpenIdScope_ThenReturnsBadRequest()
         {
             // OIDC Core 1.0 Section 3.1.2.1 - openid scope is required for OIDC requests
-            var result = await Api.GetAsync(new AuthorizeRequest
+            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
                 ClientId = AClientId,
                 RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
-                Scope = OpenIdConnectConstants.Scopes.Profile // Missing openid scope
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
+                Scope = OAuth2Constants.Scopes.Profile // Missing openid scope
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -433,12 +426,12 @@ public class OidcApiSpec
         public async Task WhenTokenEndpointWithRefreshToken_ThenReturnsNewTokens()
         {
             // First get tokens through authorization code flow
-            var authorizeResult = await Api.GetAsync(new AuthorizeRequest
+            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
             {
                 ClientId = AClientId,
                 RedirectUri = ARedirectUri,
-                ResponseType = OpenIdConnectConstants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OpenIdConnectConstants.Scopes.OfflineAccess}",
+                ResponseType = OAuth2Constants.ResponseTypes.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.OfflineAccess}",
                 State = "astate"
             });
 
@@ -447,7 +440,7 @@ public class OidcApiSpec
 
             var initialTokenResult = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.AuthorizationCode,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
                 ClientId = AClientId,
                 ClientSecret = "aclientsecret",
                 Code = authorizationCode,
@@ -461,7 +454,7 @@ public class OidcApiSpec
             // Use refresh token to get new tokens
             var refreshResult = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken,
+                GrantType = OAuth2Constants.GrantTypes.RefreshToken,
                 ClientId = AClientId,
                 ClientSecret = "aclientsecret",
                 RefreshToken = refreshToken
@@ -477,7 +470,7 @@ public class OidcApiSpec
         {
             var result = await Api.PostAsync(new TokenEndpointRequest
             {
-                GrantType = OpenIdConnectConstants.GrantTypes.RefreshToken,
+                GrantType = OAuth2Constants.GrantTypes.RefreshToken,
                 ClientId = AClientId,
                 ClientSecret = "aclientsecret",
                 RefreshToken = "aninvalidrefreshtoken"
@@ -522,22 +515,22 @@ public class OidcApiSpec
             var document = result.Content.Value.Document;
 
             // OIDC Core 1.0 Section 3 - Required features
-            document.ResponseTypesSupported.Should().Contain(OpenIdConnectConstants.ResponseTypes.Code);
-            document.SubjectTypesSupported.Should().Contain(OpenIdConnectConstants.SubjectTypes.Public);
-            document.IdTokenSigningAlgValuesSupported.Should().Contain(OpenIdConnectConstants.SigningAlgorithms.Rs256);
+            document.ResponseTypesSupported.Should().Contain(OAuth2Constants.ResponseTypes.Code);
+            document.SubjectTypesSupported.Should().Contain(OAuth2Constants.SubjectTypes.Public);
+            document.IdTokenSigningAlgValuesSupported.Should().Contain(OAuth2Constants.SigningAlgorithms.Rs256);
 
             // PKCE support (RFC 7636)
-            document.CodeChallengeMethodsSupported.Should().Contain(OpenIdConnectConstants.CodeChallengeMethods.S256);
+            document.CodeChallengeMethodsSupported.Should().Contain(OAuth2Constants.CodeChallengeMethods.S256);
 
             // Standard scopes
             document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.OpenId);
-            document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Profile);
-            document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.Email);
+            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Profile);
+            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Email);
 
             // Standard claims
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Subject);
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Name);
-            document.ClaimsSupported.Should().Contain(OpenIdConnectConstants.StandardClaims.Email);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Subject);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Name);
+            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Email);
         }
 
         private static void OverrideDependencies(IServiceCollection services)
