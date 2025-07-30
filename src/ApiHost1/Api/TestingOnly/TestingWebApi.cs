@@ -1,4 +1,5 @@
 #if TESTINGONLY
+using System.Text;
 using Application.Interfaces;
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
@@ -90,8 +91,16 @@ public sealed class TestingWebApi : IWebApiService
         var repositories = GetRepositories(_serviceProvider, repositoryTypes);
 
         await DestroyAllRepositories(repositories);
-        
+
         return () => new Result<EmptyResponse, Error>();
+    }
+
+    public async Task<ApiStreamResult> DownloadImage(DownloadStreamTestingOnlyRequest request,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes("adownload"));
+        return () => new Result<StreamResult, Error>(new StreamResult(stream, "acontenttype"));
     }
 
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ErrorsError(
@@ -271,6 +280,56 @@ public sealed class TestingWebApi : IWebApiService
         await Task.CompletedTask;
 
         return () => new Result<EmptyResponse, Error>();
+    }
+
+    public async Task<ApiRedirectResult<string, StringMessageTestingOnlyResponse>> RedirectGet(
+        GetWithRedirectTestingOnlyRequest request,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        switch (request.Result)
+        {
+            case "error":
+                return () =>
+                    new Result<RedirectResult<StringMessageTestingOnlyResponse>, Error>(Error.Validation("anerror"));
+
+            case "noredirect":
+            case "redirect":
+                return () => new Result<RedirectResult<StringMessageTestingOnlyResponse>, Error>(
+                    new RedirectResult<StringMessageTestingOnlyResponse>(
+                        new StringMessageTestingOnlyResponse { Message = "amessage" }, request.Result == "redirect"
+                            ? "aurl"
+                            : null));
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(request.Result), request.Result,
+                    @"Invalid value of the result");
+        }
+    }
+
+    public async Task<ApiRedirectResult<string, StringMessageTestingOnlyResponse>> RedirectPost(
+        PostWithRedirectTestingOnlyRequest request,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        switch (request.Result)
+        {
+            case "error":
+                return () =>
+                    new Result<RedirectResult<StringMessageTestingOnlyResponse>, Error>(Error.Validation("anerror"));
+
+            case "noredirect":
+            case "redirect":
+                return () => new Result<RedirectResult<StringMessageTestingOnlyResponse>, Error>(
+                    new RedirectResult<StringMessageTestingOnlyResponse>(
+                        new StringMessageTestingOnlyResponse { Message = "amessage" }, request.Result == "redirect"
+                            ? "aurl"
+                            : null));
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(request.Result), request.Result,
+                    @"Invalid value of the result");
+        }
     }
 
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> RequestCorrelationGet(

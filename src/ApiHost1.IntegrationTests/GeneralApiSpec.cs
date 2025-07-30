@@ -1,8 +1,10 @@
 #if TESTINGONLY
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -162,6 +164,95 @@ public class GeneralApiSpec : WebApiSpec<Program>
         result.Content.Value.Metadata.Offset.Should().Be(1);
         result.Content.Value.Metadata.Limit.Should().Be(50);
         result.Content.Value.Metadata.Total.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithPostAndLocationForError_ThenReturnsError()
+    {
+        var result = await Api.PostAsync(new PostWithRedirectTestingOnlyRequest
+        {
+            Result = "error"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        result.Content.HasValue.Should().BeFalse();
+        result.Headers.Location.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithPostAndLocationForRedirect_ThenReturnsRedirect()
+    {
+        var result = await Api.PostAsync(new PostWithRedirectTestingOnlyRequest
+        {
+            Result = "redirect"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        result.Content.HasValue.Should().BeTrue();
+        result.Headers.Location.Should().Be("aurl");
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithPostAndLocationForNoRedirect_ThenReturnsContent()
+    {
+        var result = await Api.PostAsync(new PostWithRedirectTestingOnlyRequest
+        {
+            Result = "noredirect"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Message.Should().Be("amessage");
+        result.Headers.Location.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithGetAndLocationForError_ThenReturnsError()
+    {
+        var result = await Api.GetAsync(new GetWithRedirectTestingOnlyRequest
+        {
+            Result = "error"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        result.Content.HasValue.Should().BeFalse();
+        result.Headers.Location.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithGetAndLocationForRedirect_ThenReturnsRedirect()
+    {
+        var result = await Api.GetAsync(new GetWithRedirectTestingOnlyRequest
+        {
+            Result = "redirect"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        result.Content.HasValue.Should().BeTrue();
+        result.Headers.Location.Should().Be("aurl");
+    }
+
+    [Fact]
+    public async Task WhenRedirectWithGetAndLocationForNoRedirect_ThenReturnsContent()
+    {
+        var result = await Api.GetAsync(new GetWithRedirectTestingOnlyRequest
+        {
+            Result = "noredirect"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Message.Should().Be("amessage");
+        result.Headers.Location.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task WhenDownloadStream_ThenReturnsStream()
+    {
+        var result = await Api.GetAsync(new DownloadStreamTestingOnlyRequest());
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.HasValue.Should().BeFalse();
+        var raw = await result.RawContent!.ReadFullyAsync(CancellationToken.None);
+        Encoding.UTF8.GetString(raw).Should().Be("adownload");
     }
 }
 #endif

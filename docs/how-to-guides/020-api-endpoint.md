@@ -194,6 +194,8 @@ The return type of all these service operations is an `ApiResult`. There are sev
 >
 > `ApiEmptyResult` - can be used instead of the other kinds to denote an API that does not return any data in the result. (i.e., an `HTTP 204 - No Content`)
 >
+> `ApiRedirectResult` - in rare cases, can be used in place of the others for POST, PUT, PATCH, DELETE or GET methods, for responses that are to redirect.
+>
 > `ApiResult` - can be used in place of the others for PUT, PATCH, DELETE or GET methods, but not POST.
 
 In most cases, these `ApiResult` return values include the type of the resource (i.e., `ApiResult<TResources, TResponse>` that is being returned in a successful call - or an `Error`).

@@ -56,6 +56,17 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
+    public static IResult HandleApiResult<TResource, TResponse>(this ApiRedirectResult<TResource, TResponse> result,
+        OperationMethod method)
+        where TResponse : IWebResponse
+    {
+        return result()
+            .Match(response => response.Value.ToResult(method), error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiPutPatchResult<TResource, TResponse> result,
         OperationMethod method)
         where TResponse : IWebResponse
@@ -99,9 +110,10 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="Result{TResource,Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
     /// </summary>
-    public static Result<EmptyResponse, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result)
+    public static Result<EmptyResponse, Error> HandleApplicationResult<TResource>(
+        this Result<TResource, Error> resource)
     {
-        return result.Match(_ => new Result<EmptyResponse, Error>(new EmptyResponse()),
+        return resource.Match(_ => new Result<EmptyResponse, Error>(new EmptyResponse()),
             error => new Result<EmptyResponse, Error>(error));
     }
 
@@ -111,11 +123,39 @@ public static class HandlerExtensions
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<TResponse, Error> HandleApplicationResult<TResource, TResponse>(
-        this Result<TResource, Error> result, Func<TResource, TResponse> onSuccess)
+        this Result<TResource, Error> resource, Func<TResource, TResponse> onSuccess)
         where TResponse : IWebResponse
     {
-        return result.Match(resource => new Result<TResponse, Error>(onSuccess(resource.Value)),
+        return resource.Match(res => new Result<TResponse, Error>(onSuccess(res.Value)),
             error => new Result<TResponse, Error>(error));
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
+    ///     <see cref="RedirectResult{TResponse,Error}" />
+    ///     using the <see cref="onSuccess" /> callback
+    /// </summary>
+    public static Result<RedirectResult<TResponse>, Error> HandleApplicationResult<TResource, TResponse>(
+        this Result<TResource, Error> resource, Func<TResource, TResponse?> onSuccess, string? redirectUri)
+        where TResponse : IWebResponse
+    {
+        return resource.Match(
+            res => new Result<RedirectResult<TResponse>, Error>(
+                new RedirectResult<TResponse>(onSuccess(res.Value), redirectUri)),
+            error => new Result<RedirectResult<TResponse>, Error>(error));
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
+    ///     <see cref="RedirectResult{TResponse,Error}" />
+    ///     using the <see cref="onSuccess" /> callback
+    /// </summary>
+    public static Result<RedirectResult<TResponse>, Error> HandleApplicationResult<TResource, TResponse>(
+        this Result<TResource, Error> resource, Func<TResource, RedirectResult<TResponse>> onSuccess)
+        where TResponse : IWebResponse
+    {
+        return resource.Match(res => new Result<RedirectResult<TResponse>, Error>(onSuccess(res.Value)),
+            error => new Result<RedirectResult<TResponse>, Error>(error));
     }
 
     /// <summary>
@@ -124,29 +164,29 @@ public static class HandlerExtensions
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResource, TResponse>(
-        this Result<TResource, Error> result, Func<TResource, PostResult<TResponse>> onSuccess)
+        this Result<TResource, Error> resource, Func<TResource, PostResult<TResponse>> onSuccess)
         where TResponse : IWebResponse
     {
-        return result.Match(resource => new Result<PostResult<TResponse>, Error>(onSuccess(resource.Value)),
+        return resource.Match(res => new Result<PostResult<TResponse>, Error>(onSuccess(res.Value)),
             error => new Result<PostResult<TResponse>, Error>(error));
     }
 
     /// <summary>
     ///     Converts the <see cref="Result{Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
     /// </summary>
-    public static Result<EmptyResponse, Error> HandleApplicationResult(this Result<Error> result)
+    public static Result<EmptyResponse, Error> HandleApplicationResult(this Result<Error> resource)
     {
-        return result.Match(() => new Result<EmptyResponse, Error>(new EmptyResponse()),
+        return resource.Match(() => new Result<EmptyResponse, Error>(new EmptyResponse()),
             error => new Result<EmptyResponse, Error>(error));
     }
 
     /// <summary>
     ///     Converts the <see cref="Result{IHasStream,Error}" /> to an <see cref="Result{StreamResult,Error}" />
     /// </summary>
-    public static Result<StreamResult, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result,
+    public static Result<StreamResult, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> resource,
         Func<TResource, StreamResult> onSuccess)
     {
-        return result.Match(stream => new Result<StreamResult, Error>(onSuccess(stream.Value)),
+        return resource.Match(res => new Result<StreamResult, Error>(onSuccess(res.Value)),
             error => new Result<StreamResult, Error>(error));
     }
 
@@ -161,6 +201,26 @@ public static class HandlerExtensions
         var response = postResult.Response;
         var location = postResult.Location;
 
+        return ToResult(response, location, method);
+    }
+
+    private static IResult ToResult<TResponse>(this RedirectResult<TResponse> redirectResult, OperationMethod method)
+        where TResponse : IWebResponse
+    {
+        var response = redirectResult.Response;
+        var redirect = redirectResult.RedirectUri;
+
+        if (redirect.HasValue())
+        {
+            return Results.Redirect(redirect);
+        }
+
+        return ToResult(response, null, method);
+    }
+
+    private static IResult ToResult<TResponse>(TResponse? response, string? location, OperationMethod method)
+        where TResponse : IWebResponse
+    {
         var options =
             new ResponseCodeOptions(response is not EmptyResponse, location.HasValue());
         var statusCode = method.ToHttpMethod().GetDefaultResponseCode(options);

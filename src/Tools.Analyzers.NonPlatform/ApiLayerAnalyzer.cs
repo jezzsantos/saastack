@@ -63,26 +63,35 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
             {
                 {
                     OperationMethod.Post,
-                    [typeof(ApiEmptyResult), typeof(ApiPostResult<,>)]
+                    [typeof(ApiEmptyResult), typeof(ApiPostResult<,>), typeof(ApiRedirectResult<,>)]
                 },
                 {
                     OperationMethod.Get,
-                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiStreamResult)]
+                    [
+                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
+                        typeof(ApiRedirectResult<,>), typeof(ApiStreamResult)
+                    ]
                 },
                 {
                     OperationMethod.Search,
                     [
                         typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
-                        typeof(ApiSearchResult<,>)
+                        typeof(ApiRedirectResult<,>), typeof(ApiSearchResult<,>)
                     ]
                 },
                 {
                     OperationMethod.PutPatch,
-                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>)]
+                    [
+                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>),
+                        typeof(ApiRedirectResult<,>)
+                    ]
                 },
                 {
                     OperationMethod.Delete,
-                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult)]
+                    [
+                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult),
+                        typeof(ApiRedirectResult<,>)
+                    ]
                 }
             };
 
@@ -91,6 +100,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         typeof(ApiEmptyResult),
         typeof(ApiResult<,>),
         typeof(ApiPostResult<,>),
+        typeof(ApiRedirectResult<,>),
         typeof(ApiGetResult<,>),
         typeof(ApiSearchResult<,>),
         typeof(ApiPutPatchResult<,>),

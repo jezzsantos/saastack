@@ -356,6 +356,26 @@ public class AClass : IWebApiService
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
+            
+            [Fact]
+            public async Task WhenHasPublicMethodWithNakedApiRedirectResultReturnType_ThenNoAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{
+        return () => new Result<RedirectResult<TestResponse>, Error>();
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
 
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiGetResultReturnType_ThenNoAlert()
@@ -1525,6 +1545,106 @@ public class AClass : IWebApiService
     public ApiDeleteResult AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
     {{ 
         return () => new Result<EmptyResponse, Error>();
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenPostAndReturnsApiRedirectResult_ThenNotAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
+        return () => new RedirectResult<TestResponse>(new TestResponse(), ""/aurl"");
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAndReturnsApiRedirectResult_ThenNotAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
+        return () => new RedirectResult<TestResponse>(new TestResponse(), ""/aurl"");
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenSearchAndReturnsApiRedirectResult_ThenNotAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
+        return () => new RedirectResult<TestResponse>(new TestResponse(), ""/aurl"");
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenPutPatchAndReturnsApiRedirectResult_ThenNotAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
+        return () => new RedirectResult<TestResponse>(new TestResponse(), ""/aurl"");
+    }}
+}}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenDeleteAndReturnsApiRedirectResult_ThenNotAlert()
+            {
+                const string input = $@"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{{
+    public ApiRedirectResult<TestResource, TestResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
+        return () => new RedirectResult<TestResponse>(new TestResponse(), ""/aurl"");
     }}
 }}";
 

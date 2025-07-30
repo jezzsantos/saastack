@@ -25,6 +25,14 @@ public delegate Result<PostResult<TResponse>, Error> ApiPostResult<TResource, TR
     where TResponse : IWebResponse;
 
 /// <summary>
+///     Defines a callback that returns a <see cref="RedirectResult{TResponse}" /> or <see cref="Error" />.
+///     Supported for all Methods: Post, Get, Search, PutPatch and Delete
+/// </summary>
+// ReSharper disable once UnusedTypeParameter
+public delegate Result<RedirectResult<TResponse>, Error> ApiRedirectResult<TResource, TResponse>()
+    where TResponse : IWebResponse;
+
+/// <summary>
 ///     Defines a callback that returns any <see cref="TResponse" /> or <see cref="Error" />.
 ///     Supported for only Methods: PutPatch
 /// </summary>
@@ -83,6 +91,31 @@ public class PostResult<TResponse>
     public static implicit operator PostResult<TResponse>(TResponse response)
     {
         return new PostResult<TResponse>(response);
+    }
+}
+
+/// <summary>
+///     Provides a container with a <see cref="TResponse" /> describing a Redirect result
+/// </summary>
+public class RedirectResult<TResponse>
+    where TResponse : IWebResponse
+{
+    public RedirectResult(TResponse? response, string? redirectUri = null)
+    {
+        Response = response;
+        RedirectUri = redirectUri;
+    }
+
+    public string? RedirectUri { get; }
+
+    public TResponse? Response { get; }
+
+    /// <summary>
+    ///     Converts the <see cref="response" /> into a <see cref="RedirectResult{TResponse}" />
+    /// </summary>
+    public static implicit operator RedirectResult<TResponse>(TResponse response)
+    {
+        return new RedirectResult<TResponse>(response);
     }
 }
 

@@ -494,6 +494,22 @@ public class JsonClientSpec
         }
 
         [Fact]
+        public async Task WhenGetTypedResponseAsyncAndRedirect_ThenReturnsEmptyResponse()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.Redirect,
+                Headers = { Location = new Uri("http://localhost/aurl") }
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeTrue();
+            result.Value.AStringProperty.Should().BeNull();
+        }
+
+        [Fact]
         public async Task WhenSendRequestAsyncAndGetMethodWithEmptyRequest_ThenContentIsEmpty()
         {
             var response = new HttpResponseMessage();
@@ -747,6 +763,7 @@ public class JsonClientSpec
                     ),
                     ItExpr.IsAny<CancellationToken>());
         }
+        
     }
 
     [Trait("Category", "Unit")]
@@ -1153,6 +1170,22 @@ public class JsonClientSpec
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeFalse();
         }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndRedirect_ThenReturnsEmptyResponse()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.Redirect,
+                Headers = { Location = new Uri("http://localhost/aurl") }
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeTrue();
+            result.HasValue.Should().BeFalse();
+        }
     }
 }
 
@@ -1167,12 +1200,14 @@ public class TestRequest : WebRequest<TestRequest>
 [Interfaces.Route("/test", OperationMethod.Post)]
 public class TestMultiPartFormDataRequest : WebRequest<TestRequest>, IHasMultipartFormData
 {
+    // ReSharper disable once UnusedMember.Global
     public string AProperty { get; set; } = "avalue";
 }
 
 [Interfaces.Route("/test", OperationMethod.Post)]
 public class TestFormUrlEncodedRequest : WebRequest<TestRequest>, IHasFormUrlEncoded
 {
+    // ReSharper disable once UnusedMember.Global
     public string AProperty { get; set; } = "avalue";
 }
 

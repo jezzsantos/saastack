@@ -230,6 +230,12 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
         }
 
+        if (response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.Found or HttpStatusCode.TemporaryRedirect
+            or HttpStatusCode.PermanentRedirect)
+        {
+            return default;
+        }
+
         return await ParseErrorAsync(response, cancellationToken ?? CancellationToken.None);
     }
 
@@ -285,10 +291,16 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 {
                     //Unrecognized content type
                     return HttpStatusCode.UnsupportedMediaType.ToResponseProblem(
-                        string.Format(Resources.JsonClient_GetTypedResponse_UnsupportedMediaType,
-                            contentType.MediaType));
+                        Resources.JsonClient_GetTypedResponse_UnsupportedMediaType.Format(contentType.MediaType
+                            ?? "unknown"));
                 }
             }
+        }
+
+        if (response.StatusCode is HttpStatusCode.Moved or HttpStatusCode.Found or HttpStatusCode.TemporaryRedirect
+            or HttpStatusCode.PermanentRedirect)
+        {
+            return TryCreateEmptyResponse<TResponse>();
         }
 
         return await ParseErrorAsync(response, cancellationToken ?? CancellationToken.None);
@@ -472,8 +484,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         catch (Exception ex)
         {
             return HttpStatusCode.InternalServerError.ToResponseProblem(
-                string.Format(Resources.JsonClient_TryCreateEmptyResponse_NotConstructable, typeof(TResponse),
-                    ex.Message));
+                Resources.JsonClient_TryCreateEmptyResponse_NotConstructable.Format(typeof(TResponse), ex.Message));
         }
     }
 

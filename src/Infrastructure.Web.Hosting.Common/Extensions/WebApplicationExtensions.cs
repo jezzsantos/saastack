@@ -98,6 +98,7 @@ public static class WebApplicationExtensions
                         exceptionStackTrace);
                 }
 
+                //NOTE: Leave a breakpoints here while debugging Integration testing, or running locally
                 await Results.Problem(details)
                     .ExecuteAsync(context);
             }));
