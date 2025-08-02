@@ -82,4 +82,30 @@ public class TokensServiceSpec
         result.Value.Key.Should().Be(keyToken.Key);
         result.Value.ApiKey.Should().Be(keyToken.ApiKey);
     }
+
+    [Fact]
+    public void WhenCreateOAuth2ClientSecret_ThenReturnsNewRandomValue()
+    {
+        var result1 = _service.CreateOAuth2ClientSecret();
+        var result2 = _service.CreateOAuth2ClientSecret();
+        var result3 = _service.CreateOAuth2ClientSecret();
+
+        result1.Should().MatchRegex(CommonValidations.RandomToken().Expression);
+        result1.Should().NotBe(result2);
+        result2.Should().NotBe(result3);
+        result3.Should().NotBe(result1);
+    }
+
+    [Fact]
+    public void WhenCreateOAuthAuthorizationCode_ThenReturnsDeterministicHash()
+    {
+        var result1 = _service.CreateOAuthorizationCodeDigest("avalue");
+        var result2 = _service.CreateOAuthorizationCodeDigest("avalue");
+        var result3 = _service.CreateOAuthorizationCodeDigest("avalue");
+
+        result1.Should().MatchRegex(CommonValidations.RandomToken().Expression);
+        result1.Should().Be(result2);
+        result2.Should().Be(result3);
+        result3.Should().Be(result1);
+    }
 }

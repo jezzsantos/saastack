@@ -4,10 +4,10 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 /// <summary>
-///     Updates an existing OAuth2/OIDC client
+///     Updates an existing OAuth2/Open ID Connect client
 /// </summary>
 [Route("/oauth2/clients/{Id}", OperationMethod.PutPatch, AccessType.Token)]
-[Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
+[Authorize(Roles.Platform_Operations)]
 public class UpdateOAuth2ClientRequest : UnTenantedRequest<UpdateOAuth2ClientRequest, GetOAuth2ClientResponse>
 {
     [Required] public string? Id { get; set; }

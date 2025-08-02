@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;

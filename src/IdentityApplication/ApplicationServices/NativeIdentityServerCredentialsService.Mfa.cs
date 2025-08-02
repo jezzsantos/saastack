@@ -15,7 +15,6 @@ namespace IdentityApplication.ApplicationServices;
 
 public partial class NativeIdentityServerCredentialsService
 {
-    public const string MfaRequiredCode = "mfa_required";
     public const string MfaTokenName = "MfaToken";
 
     public async Task<Result<CredentialMfaAuthenticatorAssociation, Error>> AssociateMfaAuthenticatorForUserAsync(
@@ -287,15 +286,7 @@ public partial class NativeIdentityServerCredentialsService
             };
         }
 
-        var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(caller, credential.UserId, cancellationToken);
-        if (retrievedUser.IsFailure)
-        {
-            return Error.NotAuthenticated();
-        }
-
-        var user = retrievedUser.Value;
-        var tokens = await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+        var tokens = await IssueAuthenticationTokensAsync(caller, credential.UserId, cancellationToken);
         if (tokens.IsFailure)
         {
             return tokens.Error;
@@ -478,15 +469,7 @@ public partial class NativeIdentityServerCredentialsService
                 { UsageConstants.Properties.MfaAuthenticatorType, authenticatorType }
             });
 
-        var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(caller, credential.UserId, cancellationToken);
-        if (retrievedUser.IsFailure)
-        {
-            return Error.NotAuthenticated();
-        }
-
-        var user = retrievedUser.Value;
-        return await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+        return await IssueAuthenticationTokensAsync(caller, credential.UserId, cancellationToken);
     }
 
     private async Task<Result<Error>> NotifyUser(ICallerContext caller, MfaAuthenticator authenticator,

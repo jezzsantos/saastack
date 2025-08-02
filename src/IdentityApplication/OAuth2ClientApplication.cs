@@ -14,7 +14,7 @@ public class OAuth2ClientApplication : IOAuth2ClientApplication
         _identityServerProvider = identityServerProvider;
     }
 
-    public async Task<Result<bool, Error>> ConsentToClientAsync(ICallerContext caller,
+    public async Task<Result<OAuth2ClientConsent, Error>> ConsentToClientAsync(ICallerContext caller,
         string clientId, string? scope, bool consented, CancellationToken cancellationToken)
     {
         var userId = caller.CallerId;
@@ -35,13 +35,13 @@ public class OAuth2ClientApplication : IOAuth2ClientApplication
         return await _identityServerProvider.OAuth2ClientService.DeleteClientAsync(caller, id, cancellationToken);
     }
 
-    public async Task<Result<OAuth2Client, Error>> GetClientAsync(ICallerContext caller, string id,
+    public async Task<Result<OAuth2ClientWithSecrets, Error>> GetClientAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
         return await _identityServerProvider.OAuth2ClientService.GetClientAsync(caller, id, cancellationToken);
     }
 
-    public async Task<Result<bool, Error>> GetConsentAsync(ICallerContext caller, string clientId,
+    public async Task<Result<OAuth2ClientConsent, Error>> GetConsentAsync(ICallerContext caller, string clientId,
         CancellationToken cancellationToken)
     {
         var userId = caller.CallerId;

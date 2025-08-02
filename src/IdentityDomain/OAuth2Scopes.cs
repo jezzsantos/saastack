@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Interfaces.ValueObjects;
 using JetBrains.Annotations;
 
 namespace IdentityDomain;
@@ -9,7 +10,7 @@ namespace IdentityDomain;
 public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<string>>
 {
     public static readonly OAuth2Scopes Empty = new([]);
-    private static readonly char[] ScopeDelimiters = [' ', ';', ','];
+    private static readonly char[] ScopeDelimiters = Validations.OAuth2.Delimiters;
 
     public static Result<OAuth2Scopes, Error> Create(List<string> scopes)
     {
@@ -17,7 +18,7 @@ public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<stri
         {
             foreach (var scope in scopes)
             {
-                if (scope.IsInvalidParameter(s => OAuth2Constants.Scopes.AllScopes.Contains(s), nameof(scopes),
+                if (scope.IsInvalidParameter(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s), nameof(scopes),
                         Resources.OAuth2Scopes_InvalidScope, out var error))
                 {
                     return error;
@@ -32,7 +33,7 @@ public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<stri
     {
         if (scope.HasNoValue())
         {
-            return Create(OpenIdConnectConstants.Scopes.Default.ToList());
+            return Create([]);
         }
 
         var scopes = scope
@@ -44,6 +45,8 @@ public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<stri
     private OAuth2Scopes(List<string> value) : base(value)
     {
     }
+
+    public bool HasNone => Items.Count == 0;
 
     public List<string> Items => Value;
 
@@ -58,5 +61,23 @@ public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<stri
                     .Where(item => item.Exists())
                     .ToList()!);
         };
+    }
+
+    [SkipImmutabilityCheck]
+    public bool Has(string scope)
+    {
+        return Value.Contains(scope);
+    }
+
+    [SkipImmutabilityCheck]
+    public bool HasAll(OAuth2Scopes scopes)
+    {
+        return scopes.Value.All(Has);
+    }
+
+    [SkipImmutabilityCheck]
+    public bool IsSubsetOf(OAuth2Scopes scopes)
+    {
+        return Items.All(scopes.Has);
     }
 }

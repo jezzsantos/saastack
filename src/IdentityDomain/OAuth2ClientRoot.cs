@@ -46,7 +46,7 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
 
     public Optional<string> RedirectUri { get; private set; }
 
-    public List<OAuth2ClientSecret> Secrets { get; } = [];
+    public OAuth2ClientSecrets Secrets { get; } = [];
 
     [UsedImplicitly]
     public static AggregateRootFactory<OAuth2ClientRoot> Rehydrate()
@@ -63,6 +63,12 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
         if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
+        }
+
+        var secrets = Secrets.EnsureInvariants();
+        if (secrets.IsFailure)
+        {
+            return secrets.Error;
         }
 
         return Result.Ok;
@@ -106,7 +112,7 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
 
             case SecretAdded added:
             {
-                var secret = OAuth2ClientSecret.Create(added.SecretHash, added.ExpiresOn.ToOptional());
+                var secret = OAuth2ClientSecret.Create(added.SecretHash, added.FirstFour, added.ExpiresOn.ToOptional());
                 if (secret.IsFailure)
                 {
                     return secret.Error;
@@ -160,15 +166,24 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
         }
 
         var secret = _tokensService.CreateOAuth2ClientSecret();
-        var secretHash = _passwordHasherService.HashPassword(secret);
+        var secret2 = OAuth2ClientSecret.Create(secret, expiresOn, _passwordHasherService);
+        if (secret2.IsFailure)
+        {
+            return secret2.Error;
+        }
 
-        var added = RaiseChangeEvent(IdentityDomain.Events.OAuth2.Clients.SecretAdded(Id, secretHash, expiresOn));
+        var added = RaiseChangeEvent(IdentityDomain.Events.OAuth2.Clients.SecretAdded(Id, secret2.Value, expiresOn));
         if (added.IsFailure)
         {
             return added.Error;
         }
 
         return new GeneratedClientSecret(secret, expiresOn);
+    }
+
+    public Result<Error> VerifySecret(string secret)
+    {
+        return Secrets.Verify(_passwordHasherService, secret);
     }
 }
 

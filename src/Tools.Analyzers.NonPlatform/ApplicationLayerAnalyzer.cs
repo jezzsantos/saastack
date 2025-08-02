@@ -357,7 +357,7 @@ internal static class ApplicationLayerExtensions
                 .ToArray();
 
             _allowableApplicationResourcePropertyReturnTypes = primitiveTypes
-                .Concat(new[] { streamType })
+                .Concat([streamType])
                 .Concat(nullableTypes)
                 .Concat(listTypes)
                 .Concat(stringDictionaryTypes)

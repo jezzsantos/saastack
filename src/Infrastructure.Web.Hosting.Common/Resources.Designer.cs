@@ -285,6 +285,15 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientId&apos; is missing and required for the audience of the IdToken.
+        /// </summary>
+        internal static string JWTTokensService_ClientIdRequired {
+            get {
+                return ResourceManager.GetString("JWTTokensService_ClientIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;OrganizationId&apos; of the request is invalid.
         /// </summary>
         internal static string MultiTenancyMiddleware_InvalidTenantId {

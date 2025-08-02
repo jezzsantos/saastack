@@ -29,14 +29,14 @@ public static class ServiceClientExtensions
         var region = message.OriginHostRegion.HasValue()
             ? DatacenterLocations.FindOrDefault(message.OriginHostRegion)
             : DatacenterLocations.Unknown;
-        var caller = Caller.CreateAsMaintenanceTenant(callId, message.TenantId, region);
+        var maintenance = Caller.CreateAsMaintenanceTenant(callId, message.TenantId, region);
 
         try
         {
-            var posted = await serviceClient.PostAsync(caller, request, req =>
+            var posted = await serviceClient.PostAsync(maintenance, request, req =>
             {
                 req.SetHMACAuth(request, hmacSecret);
-                req.SetRequestId(caller.ToCall());
+                req.SetRequestId(maintenance.ToCall());
             }, cancellationToken);
             if (posted.IsFailure)
             {
@@ -45,13 +45,13 @@ public static class ServiceClientExtensions
         }
         catch (Exception ex)
         {
-            recorder.TraceError(caller.ToCall(),
+            recorder.TraceError(maintenance.ToCall(),
                 ex, "Queued message {Id} (in {Region}) of type {Type} failed delivery to API", messageId, region,
                 messageType);
             throw;
         }
 
-        recorder.TraceInformation(caller.ToCall(), "Relayed message {Id} (in {Region}) of type {Type} to API",
+        recorder.TraceInformation(maintenance.ToCall(), "Relayed message {Id} (in {Region}) of type {Type} to API",
             messageId, region, messageType);
     }
 }

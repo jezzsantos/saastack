@@ -4,6 +4,7 @@ using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Events.Shared.Identities.OAuth2.ClientConsents;
 using Domain.Events.Shared.Identities.OAuth2.Clients;
+using Domain.Events.Shared.Identities.OpenIdConnect.Authorizations;
 using Domain.Events.Shared.Identities.PersonCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
@@ -26,32 +27,45 @@ public static class Events
             };
         }
 
-        public static TokensChanged TokensChanged(Identifier id,
-            Identifier userId, string accessToken,
-            DateTime accessTokenExpiresOn,
-            string refreshToken, DateTime refreshTokenExpiresOn)
+        public static TokensChanged TokensChanged(Identifier id, Identifier userId, AuthToken accessToken,
+            AuthToken refreshToken,
+            Optional<AuthToken> idToken, string refreshTokenDigest)
         {
             return new TokensChanged(id)
             {
                 UserId = userId,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken,
-                AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn
+                AccessToken = accessToken.EncryptedValue,
+                RefreshToken = refreshToken.EncryptedValue,
+                IdToken = idToken.HasValue
+                    ? idToken.Value.EncryptedValue
+                    : null,
+                AccessTokenExpiresOn = accessToken.ExpiresOn,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn,
+                IdTokenExpiresOn = idToken.HasValue
+                    ? idToken.Value.ExpiresOn
+                    : null,
+                RefreshTokenDigest = refreshTokenDigest
             };
         }
 
-        public static TokensRefreshed TokensRefreshed(Identifier id, Identifier userId, string accessToken,
-            DateTime accessTokenExpiresOn,
-            string refreshToken, DateTime refreshTokenExpiresOn)
+        public static TokensRefreshed TokensRefreshed(Identifier id, Identifier userId, AuthToken accessToken,
+            AuthToken refreshToken,
+            Optional<AuthToken> idToken, string refreshTokenDigest)
         {
             return new TokensRefreshed(id)
             {
                 UserId = userId,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken,
-                AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn
+                AccessToken = accessToken.EncryptedValue,
+                RefreshToken = refreshToken.EncryptedValue,
+                IdToken = idToken.HasValue
+                    ? idToken.Value.EncryptedValue
+                    : null,
+                AccessTokenExpiresOn = accessToken.ExpiresOn,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn,
+                IdTokenExpiresOn = idToken.HasValue
+                    ? idToken.Value.ExpiresOn
+                    : null,
+                RefreshTokenDigest = refreshTokenDigest
             };
         }
 
@@ -412,11 +426,13 @@ public static class Events
                 };
             }
 
-            public static SecretAdded SecretAdded(Identifier id, string secretHash, Optional<DateTime> expiresOn)
+            public static SecretAdded SecretAdded(Identifier id, OAuth2ClientSecret secret,
+                Optional<DateTime> expiresOn)
             {
                 return new SecretAdded(id)
                 {
-                    SecretHash = secretHash,
+                    SecretHash = secret.SecretHash,
+                    FirstFour = secret.FirstFour,
                     ExpiresOn = expiresOn.HasValue
                         ? expiresOn.Value
                         : null
@@ -446,6 +462,68 @@ public static class Events
                     Scopes = []
                 };
             }
+        }
+    }
+
+    public static class OpenIdConnect
+    {
+        public static CodeAuthorized CodeAuthorized(Identifier id,
+            Identifier clientId, Identifier userId, OAuth2Scopes scopes, string redirectUri, Optional<string> nonce,
+            Optional<string> codeChallenge, Optional<OpenIdConnectCodeChallengeMethod> codeChallengeMethod, string code,
+            DateTime expiresAt)
+        {
+            return new CodeAuthorized(id)
+            {
+                ClientId = clientId,
+                UserId = userId,
+                Scopes = scopes.Items,
+                RedirectUri = redirectUri,
+                Nonce = nonce,
+                CodeChallenge = codeChallenge,
+                CodeChallengeMethod = codeChallengeMethod,
+                Code = code,
+                ExpiresAt = expiresAt,
+                AuthorizedAt = DateTime.UtcNow
+            };
+        }
+
+        public static CodeExchanged CodeExchanged(Identifier id, OAuth2TokenMemento accessToken,
+            OAuth2TokenMemento refreshToken)
+        {
+            return new CodeExchanged(id)
+            {
+                ExchangedAt = DateTime.UtcNow,
+                AccessTokenDigest = accessToken.DigestValue,
+                AccessTokenExpiresOn = accessToken.ExpiresOn,
+                RefreshTokenDigest = refreshToken.DigestValue,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn
+
+            };
+        }
+
+        public static Domain.Events.Shared.Identities.OpenIdConnect.Authorizations.Created Created(Identifier id,
+            Identifier clientId, Identifier userId)
+        {
+            return new Domain.Events.Shared.Identities.OpenIdConnect.Authorizations.Created(id)
+            {
+                ClientId = clientId,
+                UserId = userId
+            };
+        }
+
+        public static TokenRefreshed TokenRefreshed(Identifier id, OAuth2TokenMemento accessToken,
+            OAuth2TokenMemento refreshToken,
+            OAuth2Scopes refreshedScopes)
+        {
+            return new TokenRefreshed(id)
+            {
+                RefreshedAt = DateTime.UtcNow,
+                AccessTokenDigest = accessToken.DigestValue,
+                AccessTokenExpiresOn = accessToken.ExpiresOn,
+                RefreshTokenDigest = refreshToken.DigestValue,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn,
+                Scopes = refreshedScopes.Items
+            };
         }
     }
 }

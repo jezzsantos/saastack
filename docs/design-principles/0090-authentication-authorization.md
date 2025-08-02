@@ -3,25 +3,31 @@
 ## Design Principles
 
 1. We want a simple authentication and authorization mental model that developers are already familiar with.
-2. For authentication, we want to create and maintain our own JWT tokens (transparent or opaque), irrespective of how the user is actually authenticated, be that through Credentials, HMAC, or even SSO with 3rd parties (e.g., Google, Microsoft etc.). At the end of the day, our token is the authority in the entire system.
-3. We want to store only the bare necessary claims in a JWT token, that have short lifetimes (with longer-lived refresh tokens), to minimize these tokens get out of sync when roles/permissions change for any particular end user of the system.
+2. For authentication, we want to create and maintain our own JWT tokens (transparent or opaque), irrespective of how the user is actually authenticated, be that through Credentials, HMAC, or SSO with 3rd parties (e.g., Google, Microsoft etc.) or even through OAuth2 or Open ID Connect. At the end of the day, our token is the authority across the entire system, and gives access to other 3rd party tokens.
+3. We want to store only the bare necessary claims in a JWT token, that have short lifetimes (with longer-lived refresh tokens), to minimize these tokens getting out of sync when roles/permissions change for any particular end user of the system. Ideally we would not have any volatile data in the token claims at all.
 4. We want Authorization to be discoverable and well-defined (not too many options), but also extensible (add your own options)
 5. We want to layer several authorization schemes overlaid on each other. e.g. Role-based (RBAC), Feature-based and feature flags.
 6. We want it to be declarative and seamlessly integrated (and tooled) along with the other patterns we are introducing, particularly in the API declarations.
-7. Since roles and permissions can quickly get out of hand in many systems, we will want to avoid defining fine-grained permissions that could end up bloating tokens. Initially, we won't be managing tokens centrally, but that can change in the long run.
-8. We are offering credential-based authentication (username + password) as a starting point, and encourage the adoption of 3rd party integrations later as the product finds success (e.g. Auth0, Okta, IdentityServer, etc.).
+7. Since roles and permissions can quickly get out of hand in many systems (as they get more granular), we will want to avoid defining fine-grained permissions that could end up bloating JWT tokens. Initially, we won't be managing tokens centrally, but that can change in the long run.
+8. We are offering credential-based authentication (username + password) as a starting point, and encourage the adoption of 3rd party integrations later as the product finds success (e.g. with Auth0, Okta, IdentityServer, KeyCloak etc.). Thus, swapping out the built-in adapters with others for 3rd parties is essential.
 
 ## Implementation
 
-We are using and configuring standard Microsoft AP.NET authentication and authorization mechanisms to implement both authentication and authorization, and to keep close to that familiar model for most ASPNET developers.
+We are using the standard Microsoft ASPNET authentication and authorization mechanisms to implement both authentication and authorization, and to keep close to that familiar configuration model for most ASPNET developers.
 
-For Authentication schemes, we are initially supporting Password Credentials, HMAC, and API Key. Others can be added as needed. (i.e. to support various webhook callbacks from 3rd party systems).
+For Authentication schemes, we are initially supporting Password Credentials, HMAC, API Key, and SSO with 3rd parties. Others can be added as needed. (i.e. to support various webhook callbacks from 3rd party systems).
 
-For Authorization, we are utilizing the minimal API "authorization policies" mechanism, and also defining dynamic policies based on static declarative configuration of APIs.
+We have provided all the APIs necessary to describe all of these services to all clients, and to external parties wishing to integrate with this API.
 
-In web clients, we will use (HTTPOnly) cookies to store JWT tokens (between the browser and the BEFFE), and will relay those JWTs to backend APIs via a reverse proxy.
+We have natively implemented all of these services out of the box, so that your product can be deployed immediately without having to integrate with any 3rd party providers like: Okta, Auth0, IdentityServer, KeyCloak etc. This has been achieved like all other extensibility in the framework. 
 
-We will prevent those JWT tokens ever being seen by any JavaScript running in a browser, and go to extra lengths to guard against CSRF attacks.
+The `IIdentityServerProvider` port defines all these extensibility points for all these services, and you can see that by default they are implemented by the `NativeIdentityServerProvider` implementation out of the box. This implementation stores all data securely in your local repositories. This port has been designed to make it very easy to plug in and replace any of these service with your own adapter to a preferred service of your choice, e.g., Okta, Auth0, IdentityServer, KeyCloak etc. That switch can be made at any time, as your business grows.
+
+For API-wide Authorization, we are minting our own JWT tokens using asymmetric key pair (RSA 256) digitally signatures. We are not encrypting the claims initially, these do not hold sensitive information at this point. We are storing standard claims like `sub` and `role`, and others specific to supporting tokens minted specifically for Open ID Connect specific flows. 
+
+For Authorization, we are utilizing the ASPNET minimal API "authorization policies" mechanism, and also defining dynamic policies based on static declarative configuration of APIs.
+
+In web clients, we will use (HTTPOnly) cookies to store raw JWT tokens (between the browser and the BEFFE), and will relay those JWTs to backend APIs via a reverse proxy. We will prevent those JWT tokens ever being seen or stored by any JavaScript running in a browser, and go to extra lengths to guard against CSRF attacks, given that we are using cookies.
 
 ![Credential Authentication](../images/Authentication-Credentials.png)
 
@@ -29,13 +35,11 @@ We will prevent those JWT tokens ever being seen by any JavaScript running in a 
 
 ### Password Credential Authentication
 
-Out of the box, we will offer Password-Credential authentication via the `IPersonCredentialsApplication`
+Out of the box, we will offer Password-Credential authentication via the `IIdentityServerCredentialsService`, which is implemented natively.
 
 This will enable quick adoption of the SaaS product, and a foundation to extend out into SSO and 3rd party identity solutions later.
 
-We are providing support for password authentication in a standalone "Identities" subdomain to provide all the services around password management. This whole subdomain/module can then either be extended later, or deleted, and replaced with integration to 3rd parties.
-
-Today it manages these aspects of identity: Authentication via Password, Email Registration Confirmation. Password Reset, 2FA, API key management, etc.
+Today it manages these aspects of identity: Authentication via Password, Email Registration Confirmation. Password Reset, 2FA (Email, SMS or Authenticator App code), API Key management, etc.
 
 #### Passwords
 
@@ -49,7 +53,7 @@ When passwords are verified in a login attempt, the authentication process intro
 
 Since password credentials include email addresses, these emails addresses, and passwords require resetting, it is important to confirm that the email address is accessible by a human end-user to manage future communications.
 
-### Multi-Factor Authentication
+#### Multi-Factor Authentication
 
 MFA or 2FA (Two-Factor Auth) is only applicable to credential based authentication systems (e.g., those that manage usernames and passwords).
 
@@ -69,7 +73,7 @@ There is now good support for 2FA, using the following built-in second factors:
 
 > These second factors are backed up by 16 recovery codes, should the user lose access to their mobile device, access to their authenticator app or access to their email inbox.
 
-#### How it works
+##### How it works
 
 MFA can be enforced, by default, for all new users of the product, or it can be allowed/disallowed to be turned on/off by individual users.
 
@@ -588,31 +592,56 @@ This API call will reset the users account back to the default MFA options that 
 
 ### SSO Authentication
 
-We will offer SSO authentication via the `ISingleSignOnApplication`
+We will offer SSO authentication via the `IIdentityServerSingleSignOnService`, which is implemented natively.
 
-SSO authentication is typically achieved by authenticating with a 3rd party provider (e.g. Google Microsoft, Facebook, etc.) using the [OAuth2](https://oauth.net/2/) "Authorization Code Flow" in the Frontend JS app, and once authenticated and authorized, the user gains access to the whole system.
+SSO authentication is typically achieved by authenticating with a 3rd party provider (e.g. Google Microsoft, Facebook, etc.) using the [OAuth2](https://oauth.net/2/) or [Open ID Connect](https://openid.net/developers/how-connect-works/) "Authorization Code Flow" in the Frontend JS app, and once authenticated and authorized, the user gains access to the whole system.
 
-> Regardless of whether the user is authenticated by the built-in credentials mechanism, or by an SSO integration, access to this system is still governed by the centralized JWT token that this codebase produces. Any tokens obtained from an SSO integration can be stored and used in integrations later, but those tokens are not used to maintain access to this codebase.
+> Regardless of whether the user is authenticated by the built-in credentials mechanism, or by an SSO integration, access to this system is still governed by the centralized JWT token that this codebase produces. Any tokens obtained from an SSO integration will be stored and used in integrations later, but those tokens are not used to access this API.
 
-The OAuth2 "Authorization Code Flow" is usually performed in a browser, that can be redirected to a 3rd party website and back. The flow has several steps where the user signs in and authorizes access to their data provided by the 3rd party.
+The OAuth2/Open ID Connect "Authorization Code Flow" is usually performed in a browser, that can be redirected to a 3rd party website and back. The flow has several steps where the user signs in and authorizes access to their data provided by the 3rd party.
 
-The final step of this specific flow ([Authorization Code Flow](https://aaronparecki.com/oauth-2-simplified/#web-server-apps)) is to exchange a generated code for a set of tokens (typically an `access_token` and in some cases a `refresh_token`). This step often requires a "secret" to be provided that the 3rd party already knows belongs to a specific client (e.g. `client_id` and `client_secret`). Storing these secrets in browsers is problematic and represents security vulnerabilities.
+The final step of this specific flow ([Authorization Code Flow](https://aaronparecki.com/oauth-2-simplified/#web-server-apps)) is to exchange a generated authorization code for a set of tokens (typically an `access_token` and `refresh_token`, and `id_token` if using Open ID Connect). This step often requires a "client_secret" to be provided to the 3rd party that the 3rd party already knows belongs to a specific client (e.g. `client_id` and `client_secret`). Storing these secrets in browsers is problematic and represents security vulnerabilities, when this part of the flow is enacted in the browser.
 
-Managing the first few steps of this flow is typically done by a 3rd party JavaScript library in the browser. However, the last step (exchange code for tokens) can be performed either in the front end browser or in the back end web server.
+Managing the first few steps of this flow is typically done by a 3rd party JavaScript library in the browser. However, the last step (exchange code for tokens) is performed in the back end web server, where security secrets are better stored and accessed.
 
 There are two reasons that this step is performed in the backend API (in the `Identities` subdomain).
 
 1. The `client_secret` (if any) cannot be accessible to any JavaScript, nor stored anywhere in the browser where it is possible to be accessed by any XSS vulnerability.
-2. The backend can trust and verify the OAuth2 "code", as being from a trusted 3rd party by performing the exchange itself. The returned tokens are proof of that.
-3. The returned tokens (i.e., `access_token`,  `refresh_token` and possibly `id_token`) can be used to identify the user in the 3rd party system, and link them to a user in this system. (e.g., find the `EndUser` with the same email address as found in the claims of the 3rd party tokens)
-4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` , `refresh_token` and possibly `id_token`), can be stored for future use, and can be used to perform activities with the 3rd party system when necessary.
+2. The backend can trust and verify the OAuth2/OpenIdConnect "code", as being from a trusted 3rd party by performing the exchange itself. The returned tokens are proof of that.
+3. The returned tokens (i.e., `access_token`,  `refresh_token` and `id_token`) can be used to identify the user in the 3rd party system, and then this information is used link them to a user in this system. (e.g., find the `EndUser` with the same "email address" as found in the claims of the 3rd party tokens). We can also use this information to auto-register the user in this system, should they not exist yet. This makes onboarding one automatic step and seamless from the user's perspective.
+4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` , `refresh_token` and  `id_token`), can then be stored for future use, and can be used later to perform activities with the 3rd party system when necessary.
 5. The API has full encapsulated control of what the user can and cannot do with 3rd party systems, as opposed to having that code deployed or duplicated to the Frontend JavaScript application.
+
+### API Key Authorization
+
+We will offer API Key authorization via the `IIdentityServerApiKeyService`, which is implemented natively.
+
+API key authorization is provided as a convenient alternative to Token based authorization, primarily for use in long-lived machine-to-machine interactions. API Key authorization is provided by the `APIKeyAuthenticationHandler`
+
+API keys can be issued for accessing the system by both `machine` and `person` end-users.
+
+API keys can be included in any HTTP request as either the
+`username` component of a "Basic Authentication" request, or as a `&apikey=` parameter in the query string of a request.
+
+They have expiry dates and can be more tightly controlled (in terms of validity) by the API, since they themselves do not contain any claims.
+
+#### Inter-service Communication
+
+When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), the incoming API key, used to access one service can be relayed to access other services. This is achieved using the `ICallerContext` and the `InterHostServiceClient` that know collaborate to relay calls between services.
+
+#### Refresh Tokens
+
+API keys do not support refreshing issued API keys. When issuing the API key the client gets to define the expiry date, and should acquire a new API key before that expiry date themselves.
 
 ### HMAC Authentication/Authorization
 
-HMAC authentication is a legacy hybrid, authentication authorization system. HMAC authentication and authorization is performed as a single interaction between client and the API, by the `HMACAuthenticationHandler`
+HMAC authentication is a legacy hybrid, authentication authorization system, implemented internally only for restricted access to certain APIs. 
+
+HMAC authentication and authorization is performed as a single interaction between client and the API, by the `HMACAuthenticationHandler`
 
 HMAC authentication is primarily used by trusted external services within the infrastructure of the architecture. (i.e. Azure Functions/AWS Lambdas), that share a secret. In this case its using a symmetrical encryption algorithm (e.g. HMAC-SHA256) to sign the body of the request.
+
+#### How it works
 
 HMAC authentication is performed by the client signing the body of an inbound HTTP request with a signing key (that the client and server both knows). The signature that is calculated is then send with the request in a `X-HMAC-Signature` header in the HTTP request.
 
@@ -628,40 +657,29 @@ When the signature check is confirmed, the API then assigns claims to the HTTP r
 
 HMAC authentication is never used for inter-service communication, only for direct communication with a service.
 
-### Declarative Authentication Syntax
+### Open ID Connect Authorization
 
-When describing your API's, each API defines a single `IWebRequest` request type and associated `IWebResponse` type.
+We will offer Open ID Connect (OIDC) authorization via the `IIdentityServerOpenIdConnectService`, which is implemented natively.
 
-For example,
+This is a minimally compliant OIDC authorization server that acts like other OIDC servers on the internet, such as: Google, Microsoft, Facebook, etc.
 
-```c#
-    public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
-    {
-        var car = await _carsApplication.GetCarAsync(_callerFactory.Create(),
-            MultiTenancyConstants.DefaultOrganizationId, request.Id,
-            cancellationToken);
+The primarily purpose of having this minimal implementation is to support integrating with 3rd party services in this API, that wish to connect using OAuth2 integration.
 
-        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
-    }
-```
+This service implements a standard OIDC protocol, but only for the "Authorization Code Flow", that also requires the use of OAuth2 clients.
 
-In the API layer, authentication is declarative, using the `[Route]` attribute, and the `AccessType` enumeration which defines whether it should be authenticated or not and by what provider. The choices are:
+#### How it works
 
-* Token authentication (`AccessType.Token`)
-* HMAC authentication (`AccessType.HMAC`)
-* Private InterHost API authentication (`AccessType.PrivateInterHost`) for calling private API's between subdomains
-* No authentication (`AccessType.Anonymous`) this is the default, if none is specified.
+To access the `oauth2/authorize` endpoint and be authorized, the user with need to be authenticated with one of the other authentication schemes (e.g., Credentials, SSO, API KEY, etc.)
 
-For example,
+For a 3rd party to integrate with this API, and gain access to it, a new OAuth2 client must be created first. Then a client secret must be generated, and then the `client_id` and `client_secret` must be used to complete the "Authorization Code Flow" on behalf of a future existing user, who then needs to consent to the 3rd party accessing their data, in order to issue access tokens. This is a standard OAuth2 flow that is common on the internet today.
 
-```c#
-[Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
-[Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
-public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
-{
-    public string? Id { get; set; }
-}
-```
+The access tokens that are issued form this OIDC server are in fact the same tokens issued when authenticating with Credentials, SSO or API KEYs. These tokens however, include additional OIDC claims necessary to be compliant with OIDC flows.
+
+These tokens MUST be used to gain access the "UserInfo" (`GET /oauth2/userinfo`) endpoint that is also part of the OIDC compliance.
+
+> Ordinary `access_token` (issued by the Credentials and SSO and API KEY authentication flows) will not work to access the `/oauth2/userinfo` endpoint of OIDC. Those ordinary tokens can access the same kind of information from the `/profiles/me` endpoint instead.
+>
+> The OIDC specific `access_token` (issued by the OIDC server) can be used for this `GET /profiles/me` endpoint, and all other endpoints in the API.
 
 ### Token Authorization
 
@@ -675,7 +693,7 @@ Token authorization is provided by the `JwtBearerHandler`, that produces JWT `ac
 
 The primary form of performing authorization, used in this system, are to verify "claims". As opposed to proprietary forms of authorization in the past (i.e. cookies, and opaque tokens etc.).
 
-> Note: ASP.NET still supports and uses older forms of authorization is legacy libraries. These are to be avoided if possible.
+> Note: ASPNET still supports and uses older forms of authorization is legacy libraries. These are to be avoided if possible.
 
 Every end-user must have a set of "claims" that represent who the end-user is (authenticity) and what they are entitled to do (Access).
 
@@ -719,24 +737,40 @@ The `refresh_-token` can then be stored and used later to re-issue another `acce
 
 When the `refresh_token` finally expires (e.g. after 7 days). The end-user will be forced to authenticate again, to obtain access to the system.
 
-### API Key Authorization
+### Declarative Authentication Syntax
 
-API key authorization is provided as a convenient alternative to Token based authorization, primarily for use in long-lived machine-to-machine interactions. API Key authorization is provided by the `APIKeyAuthenticationHandler`
+When describing your API's, each API defines a single `IWebRequest` request type and associated `IWebResponse` type.
 
-API keys can be issued for accessing the system by both `machine` and `person` end-users.
+For example,
 
-API keys can be included in any HTTP request as either the
-`username` component of a "Basic Authentication" request, or as a `&apikey=` parameter in the query string of a request.
+```c#
+    public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
+    {
+        var car = await _carsApplication.GetCarAsync(_callerFactory.Create(),
+            MultiTenancyConstants.DefaultOrganizationId, request.Id,
+            cancellationToken);
 
-They have expiry dates and can be more tightly controlled (in terms of validity) by the API, since they themselves do not contain any claims.
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
+    }
+```
 
-#### Inter-service Communication
+In the API layer, authentication is declarative, using the `[Route]` attribute, and the `AccessType` enumeration which defines whether it should be authenticated or not and by what provider. The choices are:
 
-When the system is split into individual services each containing one or more subdomains (a.k.a. microservices), the incoming API key, used to access one service can be relayed to access other services. This is achieved using the `ICallerContext` and the `InterHostServiceClient` that know collaborate to relay calls between services.
+* Token authentication (`AccessType.Token`)
+* HMAC authentication (`AccessType.HMAC`)
+* Private InterHost API authentication (`AccessType.PrivateInterHost`) for calling private API's between subdomains
+* No authentication (`AccessType.Anonymous`) this is the default, if none is specified.
 
-#### Refresh Tokens
+For example,
 
-API keys do not support refreshing issued API keys. When issuing the API key the client gets to define the expiry date, and should acquire a new API key before that expiry date themselves.
+```c#
+[Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
+{
+    public string? Id { get; set; }
+}
+```
 
 ### Declarative Authorization Syntax
 

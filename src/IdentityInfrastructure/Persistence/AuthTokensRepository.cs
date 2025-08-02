@@ -33,11 +33,11 @@ public class AuthTokensRepository : IAuthTokensRepository
     }
 #endif
 
-    public async Task<Result<Optional<AuthTokensRoot>, Error>> FindByRefreshTokenAsync(string refreshToken,
+    public async Task<Result<Optional<AuthTokensRoot>, Error>> FindByRefreshTokenDigestAsync(string refreshTokenDigest,
         CancellationToken cancellationToken)
     {
         var query = Query.From<AuthToken>()
-            .Where<string>(at => at.RefreshToken, ConditionOperator.EqualTo, refreshToken);
+            .Where<string>(at => at.RefreshTokenDigest, ConditionOperator.EqualTo, refreshTokenDigest);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 

@@ -425,7 +425,7 @@ public class SSOProvidersServiceSpec
                 {
                     ExpiresOn = datum,
                     Type = TokenType.AccessToken,
-                    Value = "anaccesstoken"
+                    Value = "eyJanaccesstoken"
                 },
                 RefreshToken = new AuthenticationToken
                 {
@@ -439,7 +439,7 @@ public class SSOProvidersServiceSpec
                     {
                         ExpiresOn = datum,
                         Type = TokenType.OtherToken,
-                        Value = "anothertoken"
+                        Value = "eyJanidtoken"
                     }
                 ]
             };
@@ -490,7 +490,7 @@ public class SSOProvidersServiceSpec
                 {
                     ExpiresOn = datum,
                     Type = TokenType.AccessToken,
-                    Value = "anaccesstoken"
+                    Value = "eyJanaccesstoken"
                 },
                 RefreshToken = new AuthenticationToken
                 {
@@ -504,7 +504,7 @@ public class SSOProvidersServiceSpec
                     {
                         ExpiresOn = datum,
                         Type = TokenType.OtherToken,
-                        Value = "anothertoken"
+                        Value = "eyJanidtoken"
                     }
                 ]
             };
@@ -562,7 +562,7 @@ public class SSOProvidersServiceSpec
                 {
                     ExpiresOn = datum,
                     Type = TokenType.AccessToken,
-                    Value = "anaccesstoken"
+                    Value = "eyJanaccesstoken"
                 },
                 RefreshToken = new AuthenticationToken
                 {
@@ -576,7 +576,7 @@ public class SSOProvidersServiceSpec
                     {
                         ExpiresOn = datum,
                         Type = TokenType.OtherToken,
-                        Value = "anothertoken"
+                        Value = "eyJanidtoken"
                     }
                 ]
             };

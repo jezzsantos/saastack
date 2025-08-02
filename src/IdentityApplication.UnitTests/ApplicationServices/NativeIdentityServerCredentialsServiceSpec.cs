@@ -352,16 +352,31 @@ public class NativeIdentityServerCredentialsServiceSpec
             });
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.ForbiddenAccess, Resources.PersonCredentialsApplication_MfaRequired,
-            error => error.AdditionalCode == NativeIdentityServerCredentialsService.MfaRequiredCode
+            error => error.AdditionalCode == AuthenticationConstants.ErrorCodes.MfaRequired
                      && error.AdditionalData!.Count == 1
                      && (string)error.AdditionalData[NativeIdentityServerCredentialsService.MfaTokenName]
                      == "anmfatoken");
@@ -375,7 +390,8 @@ public class NativeIdentityServerCredentialsServiceSpec
             It.IsAny<object[]>()));
         _tokensService.Verify(ts => ts.CreateMfaAuthenticationToken());
         _authTokensService.Verify(jts =>
-            jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+            jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                It.IsAny<Dictionary<string, object>?>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -424,10 +440,25 @@ public class NativeIdentityServerCredentialsServiceSpec
             });
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
@@ -447,7 +478,7 @@ public class NativeIdentityServerCredentialsServiceSpec
             Audits.PersonCredentialsApplication_Authenticate_Succeeded, It.IsAny<string>(),
             It.IsAny<object[]>()));
         _authTokensService.Verify(jts =>
-            jts.IssueTokensAsync(It.IsAny<ICallerContext>(), user, It.IsAny<CancellationToken>()));
+            jts.IssueTokensAsync(_caller.Object, "auserid", null, null, It.IsAny<CancellationToken>()));
     }
 
     [Fact]

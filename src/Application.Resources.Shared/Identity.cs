@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Application.Interfaces.Resources;
 
 namespace Application.Resources.Shared;
@@ -14,6 +15,8 @@ public class Identity : IIdentifiableResource
 public class AuthenticateTokens
 {
     public required AuthenticationToken AccessToken { get; set; }
+
+    public AuthenticationToken? IdToken { get; set; }
 
     public required AuthenticationToken RefreshToken { get; set; }
 
@@ -157,7 +160,7 @@ public class MachineCredential : IIdentifiableResource
     public required string Id { get; set; }
 }
 
-public class OidcDiscoveryDocument
+public class OpenIdConnectDiscoveryDocument
 {
     public required string AuthorizationEndpoint { get; set; }
 
@@ -165,11 +168,15 @@ public class OidcDiscoveryDocument
 
     public required List<string> CodeChallengeMethodsSupported { get; set; }
 
+    public required List<string> IdTokenEncryptionAlgValuesSupported { get; set; }
+
     public required List<string> IdTokenSigningAlgValuesSupported { get; set; }
 
     public required string Issuer { get; set; }
 
     public required string JwksUri { get; set; }
+
+    public required string RegistrationEndPoint { get; set; }
 
     public required List<string> ResponseTypesSupported { get; set; }
 
@@ -181,17 +188,30 @@ public class OidcDiscoveryDocument
 
     public required List<string> TokenEndpointAuthMethodsSupported { get; set; }
 
+    public required List<string> TokenEndpointAuthSigningAlgValuesSupported { get; set; }
+
+    public required List<string> UserInfoEncryptionAlgValuesSupported { get; set; }
+
     public required string UserInfoEndpoint { get; set; }
+
+    public required List<string> UserInfoSigningAlgValuesSupported { get; set; }
 }
 
-public class OidcAuthorizationResponse
+public class OpenIdConnectAuthorizationCode
 {
     public required string Code { get; set; }
 
     public string? State { get; set; }
 }
 
-public class OidcTokenResponse
+public class OpenIdConnectAuthorization
+{
+    public OpenIdConnectAuthorizationCode? Code { get; set; }
+
+    public string? RawRedirectUri { get; set; }
+}
+
+public class OpenIdConnectTokens
 {
     public required string AccessToken { get; set; }
 
@@ -201,30 +221,35 @@ public class OidcTokenResponse
 
     public string? RefreshToken { get; set; }
 
-    public string? Scope { get; set; }
-
-    public required string TokenType { get; set; }
+    public required OAuth2TokenType TokenType { get; set; }
 }
 
-public class OidcUserInfoResponse
+public class OpenIdConnectUserInfo
 {
+    public ProfileAddress? Address { get; set; }
+
     public string? Email { get; set; }
 
-    public bool? EmailVerified { get; set; }
+    [JsonPropertyName("email_verified")] public bool? EmailVerified { get; set; }
 
-    public string? FamilyName { get; set; }
+    [JsonPropertyName("family_name")] public string? FamilyName { get; set; }
 
-    public string? GivenName { get; set; }
+    [JsonPropertyName("given_name")] public string? GivenName { get; set; }
 
     public string? Locale { get; set; }
 
     public string? Name { get; set; }
 
+    [JsonPropertyName("phone_number")] public string? PhoneNumber { get; set; }
+
+    [JsonPropertyName("phone_number_verified")]
+    public bool? PhoneNumberVerified { get; set; }
+
     public string? Picture { get; set; }
 
     public required string Sub { get; set; }
 
-    public string? Zoneinfo { get; set; }
+    [JsonPropertyName("zoneinfo")] public string? ZoneInfo { get; set; }
 }
 
 public class JsonWebKeySet
@@ -249,32 +274,13 @@ public class JsonWebKey
     public required string Use { get; set; }
 }
 
-public class OidcClient : IIdentifiableResource
-{
-    public required List<string> AllowedGrantTypes { get; set; }
-
-    public required List<string> AllowedScopes { get; set; }
-
-    public required string ClientSecret { get; set; }
-
-    public required string Name { get; set; }
-
-    public required List<string> RedirectUris { get; set; }
-
-    public bool RequireClientSecret { get; set; }
-
-    public bool RequirePkce { get; set; }
-
-    public required string Id { get; set; }
-}
-
 public class OAuth2Client : IIdentifiableResource
 {
     public required string Name { get; set; }
 
-    public required string Id { get; set; }
-
     public string? RedirectUri { get; set; }
+
+    public required string Id { get; set; }
 }
 
 public class OAuth2ClientWithSecret : OAuth2Client
@@ -282,4 +288,56 @@ public class OAuth2ClientWithSecret : OAuth2Client
     public DateTime? ExpiresOnUtc { get; set; }
 
     public required string Secret { get; set; }
+}
+
+public class OAuth2ClientWithSecrets : OAuth2Client
+{
+    public required List<OAuthClientSecret> Secrets { get; set; }
+}
+
+public class OAuthClientSecret
+{
+    public DateTime? ExpiresOnUtc { get; set; }
+
+    public required string Reference { get; set; }
+}
+
+public class OAuth2ClientConsent : IIdentifiableResource
+{
+    public required string ClientId { get; set; }
+
+    public required bool IsConsented { get; set; }
+
+    public required List<string> Scopes { get; set; }
+
+    public required string UserId { get; set; }
+
+    public required string Id { get; set; }
+}
+
+public enum OpenIdConnectCodeChallengeMethod
+{
+    Plain = 0, // OAuth2Constants.CodeChallengeMethods.Plain
+    S256 = 1 // OAuth2Constants.CodeChallengeMethods.S256
+}
+
+public enum OAuth2ResponseType
+{
+    Code = 0, // OAuth2Constants.ResponseTypes.Code
+    Id_Token = 1, // OAuth2Constants.ResponseTypes.IdToken
+    Token = 2 // OAuth2Constants.ResponseTypes.Token
+}
+
+public enum OAuth2TokenType
+{
+    Bearer = 0 // OAuth2Constants.TokenTypes.Bearer
+}
+
+public enum OAuth2GrantType
+{
+    Authorization_Code = 0, // OAuth2Constants.GrantTypes.AuthorizationCode
+    Refresh_Token = 1, // OAuth2Constants.GrantTypes.RefreshToken
+    Client_Credentials = 2, // OAuth2Constants.GrantTypes.ClientCredentials
+    Password = 3, // OAuth2Constants.GrantTypes.Password
+    Implicit = 4 // OAuth2Constants.GrantTypes.Implicit
 }

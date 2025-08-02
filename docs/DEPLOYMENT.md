@@ -99,7 +99,7 @@ If they decide that this setting is "required" to be replaced in a specific "pro
       {
         "Description": "General settings from this appsettings.json",
         "Keys": [
-          "ApplicationServices:Persistence:Kurrent:Connection-String1",
+          "ApplicationServices:Persistence:Kurrent:Connection-String1"
         ]
       }
     ]
@@ -203,9 +203,10 @@ This is a symmetrical crypto secret used to encrypt the values of persisted SSO 
 
 #### JWT signing key
 
-This is a symmetrical crypto secret used to sign the JWT authorization tokens (produced by this API) and passed between all API hosts and all HTTP clients. 
+This is an asymmetrical crypto secret used to sign (and verify) the JWT authorization tokens (produced by this API) and then passed between all API hosts and all HTTP clients. Tokens are signed with RSA256 asymmetric algorithm, so that we can support OpenIdConnect, where some of those issued tokens may need to be verified by 3rd parties.
 
-* sec: `HOSTS_IDENTITYAPI_JWT_SIGNINGSECRET` Generate a new random value using the [JwtTokenService.GenerateSigningKey()](https://github.com/jezzsantos/saastack/blob/main/src/IdentityInfrastructure/ApplicationServices/JWTTokensService.cs) method.
+* sec: `HOSTS_IDENTITYAPI_JWT_PUBLICKEY` Generate a new random value using the [JwtTokenService.GenerateSigningKey()](https://github.com/jezzsantos/saastack/blob/main/src/Infrastructure.Web.Hosting.Common/JWTTokensService.cs) method.
+* sec: `HOSTS_IDENTITYAPI_JWT_PRIVATEKEY` Generate a new random value using the [JwtTokenService.GenerateSigningKey()](https://github.com/jezzsantos/saastack/blob/main/src/Infrastructure.Web.Hosting.Common/JWTTokensService.cs) method.
 
 > Note: You can run the unit tests for this class and copy the value of the generated key in the first test.
 

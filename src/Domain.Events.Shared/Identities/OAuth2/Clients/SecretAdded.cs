@@ -15,7 +15,9 @@ public sealed class SecretAdded : DomainEvent
     {
     }
 
-    public required string SecretHash { get; set; }
-
     public DateTime? ExpiresOn { get; set; }
+
+    public required string FirstFour { get; set; }
+
+    public required string SecretHash { get; set; }
 }

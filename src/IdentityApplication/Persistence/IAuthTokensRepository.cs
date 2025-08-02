@@ -7,7 +7,7 @@ namespace IdentityApplication.Persistence;
 
 public interface IAuthTokensRepository : IApplicationRepository
 {
-    Task<Result<Optional<AuthTokensRoot>, Error>> FindByRefreshTokenAsync(string refreshToken,
+    Task<Result<Optional<AuthTokensRoot>, Error>> FindByRefreshTokenDigestAsync(string refreshTokenDigest,
         CancellationToken cancellationToken);
 
     Task<Result<Optional<AuthTokensRoot>, Error>> FindByUserIdAsync(Identifier userId,

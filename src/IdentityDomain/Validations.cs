@@ -1,4 +1,5 @@
 using Common.Extensions;
+using Domain.Interfaces;
 using Domain.Interfaces.Validations;
 
 namespace IdentityDomain;
@@ -59,7 +60,6 @@ public static class Validations
 
     public static class OpenIdConnect
     {
-        private static readonly char[] Delimiters = [' ', ';', ','];
         public static readonly Validation Scope = new(scope =>
         {
             if (scope.HasNoValue())
@@ -67,36 +67,23 @@ public static class Validations
                 return false;
             }
 
-            var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
-            return scopes.Contains(OpenIdConnectConstants.Scopes.OpenId);
+            var scopes = scope.Split(OAuth2.Delimiters, StringSplitOptions.RemoveEmptyEntries);
+            return scopes.All(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s));
         });
     }
 
     public static class OAuth2
     {
+        public static readonly Validation AuthorizationCode = new(@"^[a-zA-Z0-9_\+\-\:]{1,300}$", 1, 300);
         public static readonly Validation ClientName = Domain.Shared.Validations.Names.Name;
         public static readonly Validation ClientSecret = CommonValidations.RandomToken();
-        public static readonly Validation Code = new(code => code == OAuth2Constants.ResponseTypes.Code);
-        public static readonly Validation CodeChallenge = new(@"^[a-zA-Z0-9\-._~]{43,128}$", 43, 128);
-        public static readonly Validation CodeChallengeMethod =
-            new(method => OAuth2Constants.CodeChallengeMethods.AllMethods.Contains(method));
-        public static readonly Validation CodeVerifier = new(@"^[A-Za-z0-9\-._~]{43,128}$", 43, 128);
-        public static readonly Validation GrantType = new(grant =>
-            grant is OAuth2Constants.GrantTypes.AuthorizationCode or OAuth2Constants.GrantTypes.RefreshToken);
-        public static readonly Validation Nonce = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
-        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
+        public static readonly Validation ClientSecretFirstFour = new(@"^[a-zA-Z0-9_\+\-]{4}$", 4, 4);
+        public static readonly Validation
+            CodeChallenge =
+                new(@"^[A-Za-z0-9_\-\.\~\+\/\=]{1,500}$", 1,
+                    500); // Is either the same as the codeverifier,or a base64 encoded hashed version of it
+        public static readonly Validation CodeVerifier = new(@"^[A-Za-z0-9_\-\.\~]{43,128}$", 43, 128);
         public static readonly Validation RefreshTokenScope = new(scope =>
-        {
-            if (scope.HasNoValue())
-            {
-                return true; // Optional for refresh token
-            }
-
-            var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
-            return scopes.All(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s));
-        });
-        private static readonly char[] Delimiters = [' ', ';', ','];
-        public static readonly Validation Scope = new(scope =>
         {
             if (scope.HasNoValue())
             {
@@ -106,6 +93,10 @@ public static class Validations
             var scopes = scope.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
             return scopes.All(s => OpenIdConnectConstants.Scopes.AllScopes.Contains(s));
         });
-        public static readonly Validation State = new(@"^[a-zA-Z0-9\-._~]{1,500}$", 1, 500);
+        public static readonly char[] Delimiters = [' ', ';', ','];
+        public static readonly Validation Nonce = new(@"^[a-zA-Z0-9_\-\.\~]{1,500}$", 1, 500);
+        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
+
+        public static readonly Validation State = new(@"^[a-zA-Z0-9_\-\.\~]{1,500}$", 1, 500);
     }
 }

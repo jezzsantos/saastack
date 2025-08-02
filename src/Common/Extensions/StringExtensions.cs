@@ -239,6 +239,22 @@ public static class StringExtensions
     }
 
     /// <summary>
+    ///     Converts the <see cref="value" /> to base64
+    /// </summary>
+    public static string ToBase64(this string value)
+    {
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> from base64
+    /// </summary>
+    public static string FromBase64(this string value)
+    {
+        return Encoding.UTF8.GetString(Convert.FromBase64String(value));
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to a boolean value
     /// </summary>
     public static bool ToBool(this string? value)

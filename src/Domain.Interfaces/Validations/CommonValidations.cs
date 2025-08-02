@@ -39,6 +39,15 @@ public static class CommonValidations
     }
 
     /// <summary>
+    ///     Any Base64 string
+    /// </summary>
+    public static Validation Base64(int minLength = 1, int maxLength = 100)
+    {
+        return new Validation(
+            $"^(?:[A-Za-z0-9+\\/]{{4}})*(?:[A-Za-z0-9+\\/]{{4}}|[A-Za-z0-9+\\/]{{3}}=|[A-Za-z0-9+\\/]{{2}}={{2}})${{{minLength},{maxLength}}}");
+    }
+
+    /// <summary>
     ///     Validation for any written descriptive name
     /// </summary>
     public static Validation DescriptiveName(int min = 1, int max = 100)
@@ -89,6 +98,7 @@ public static class CommonValidations
 
     /// <summary>
     ///     Validation for a random token (as created by the TokensService)
+    ///     Note: this token is safe for URLs so it contains none of the URL unsafe characters.
     /// </summary>
     public static Validation RandomToken(int keySize = 41)
     {

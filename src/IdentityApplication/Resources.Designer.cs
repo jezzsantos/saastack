@@ -78,6 +78,60 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user account is suspended.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_AccountSuspended {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RedirectUri &apos;{0}&apos; does not match the client value.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_Authorize_MismatchedRequestUri {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorize_MismatchedRequestUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CodeChallengeMethod must be defined when CodeChallenge is provided.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_Authorize_MissingCodeChallengeMethod {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorize_MissingCodeChallengeMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scope must include &apos;openid&apos;.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_Authorize_MissingOpenIdScope {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorize_MissingOpenIdScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown client.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_Authorize_UnknownClient {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorize_UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported authorization response type &apos;{0}&apos;.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_Authorize_UnsupportedResponseType {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorize_UnsupportedResponseType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User is not authorized to use this client.
         /// </summary>
         internal static string NativeIdentityServerOpenIdConnectService_ClientNotConsented {
@@ -87,11 +141,67 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown user.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUser {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing user profile.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUserProfile {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUserProfile" +
+                        "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown authorization code.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownAuthorizationCode {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownAuthorizati" +
+                        "onCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown client.
         /// </summary>
-        internal static string NativeIdentityServerOpenIdConnectService_InvalidClientId {
+        internal static string NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownClient {
             get {
-                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_InvalidClientId", resourceCulture);
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown user.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_GetUserInfo_MissingUser {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_GetUserInfo_MissingUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown client.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownClient {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown refresh token.
+        /// </summary>
+        internal static string NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownRefreshToken {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownRefreshToken", resourceCulture);
             }
         }
         

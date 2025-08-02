@@ -125,62 +125,62 @@
     <data name="ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId" xml:space="preserve">
       <value>The 'AuthenticatorId' is either missing or invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidClientId" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidClientId" xml:space="preserve">
       <value>The 'ClientId' is either missing or invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidRedirectUri" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidRedirectUri" xml:space="preserve">
       <value>The 'RedirectUri' is either missing or invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidResponseType" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidResponseType" xml:space="preserve">
       <value>The 'ResponseType' must be 'code'</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidScope" xml:space="preserve">
-      <value>The 'Scope' must include 'openid'</value>
+    <data name="AuthorizeOAuth2RequestValidator_InvalidScope" xml:space="preserve">
+      <value>The 'Scope' must only contain allowable scopes</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidState" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidState" xml:space="preserve">
       <value>The 'State' parameter is either missing or invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidNonce" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidNonce" xml:space="preserve">
       <value>The 'Nonce' parameter is either missing or invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidCodeChallenge" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidCodeChallenge" xml:space="preserve">
       <value>The 'CodeChallenge' is invalid</value>
     </data>
-    <data name="AuthorizeRequestValidator_InvalidCodeChallengeMethod" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_InvalidCodeChallengeMethod" xml:space="preserve">
       <value>The 'CodeChallengeMethod' must be 'S256' or 'plain'</value>
     </data>
-    <data name="AuthorizeRequestValidator_MissingCodeChallengeMethod" xml:space="preserve">
+    <data name="AuthorizeOAuth2RequestValidator_MissingCodeChallengeMethod" xml:space="preserve">
       <value>The 'CodeChallengeMethod' is required when 'CodeChallenge' is provided</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidGrantType" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidGrantType" xml:space="preserve">
       <value>The 'GrantType' must be 'authorization_code' or 'refresh_token'</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidClientId" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidClientId" xml:space="preserve">
       <value>The 'ClientId' is either missing or invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidClientSecret" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidClientSecret" xml:space="preserve">
       <value>The 'ClientSecret' is either missing or invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidCode" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidCode" xml:space="preserve">
       <value>The 'Code' is either missing or invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidRedirectUri" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidRedirectUri" xml:space="preserve">
       <value>The 'RedirectUri' is either missing or invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidCodeVerifier" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidCodeVerifier" xml:space="preserve">
       <value>The 'CodeVerifier' is invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidRefreshToken" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidRefreshToken" xml:space="preserve">
       <value>The 'RefreshToken' is either missing or invalid</value>
     </data>
-    <data name="TokenEndpointRequestValidator_InvalidScope" xml:space="preserve">
+    <data name="ExchangeOAuth2ForTokensRequestValidator_InvalidScope" xml:space="preserve">
       <value>The 'Scope' contains invalid values</value>
     </data>
     <data name="ConsentToOAuth2ClientRequestValidator_InvalidClientId" xml:space="preserve">
       <value>The 'ClientId' is either missing or invalid</value>
     </data>
-    <data name="ConsentToOAuth2ClientRequestValidator_InvalidScopes" xml:space="preserve">
-      <value>The 'Scopes' must contain valid OAuth2 scopes</value>
+    <data name="ConsentToOAuth2ClientRequestValidator_InvalidScope" xml:space="preserve">
+      <value>The 'Scope' must only contain allowable scopes</value>
     </data>
     <data name="ConsentToOAuth2ClientRequestValidator_InvalidRedirectUri" xml:space="preserve">
       <value>The 'RedirectUri' is either missing or invalid</value>
@@ -193,6 +193,21 @@
     </data>
     <data name="CreateOAuth2ClientRequestValidator_InvalidRedirectUri" xml:space="preserve">
       <value>The 'RedirectUri' is invalid</value>
+    </data>
+    <data name="ExchangeOAuth2ForTokensRequestValidator_ScopeMustBeNull" xml:space="preserve">
+      <value>The 'Scope' must not be included in this grant type</value>
+    </data>
+    <data name="ExchangeOAuth2ForTokensRequestValidator_RedirectUriMustBeNull" xml:space="preserve">
+      <value>The 'RedirectUri' must not be included in this grant type</value>
+    </data>
+    <data name="ExchangeOAuth2ForTokensRequestValidator_CodeVerifierMustBeNull" xml:space="preserve">
+      <value>The 'CodeVerifier' must not be included in this grant type</value>
+    </data>
+    <data name="ExchangeOAuth2ForTokensRequestValidator_RefreshTokenMustBeNull" xml:space="preserve">
+      <value>The 'RefreshToken' must not be included in this grant type</value>
+    </data>
+    <data name="ExchangeOAuth2ForTokensRequestValidator_CodeMustBeNull" xml:space="preserve">
+      <value>The 'Code' must not be included in this grant type</value>
     </data>
     <data name="UpdateOAuth2ClientRequestValidator_InvalidName" xml:space="preserve">
       <value>The 'Name' is either missing or invalid</value>

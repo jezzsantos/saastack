@@ -57,7 +57,7 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
 
         AuthenticationTicket IssueTicket()
         {
-            var principal = new ClaimsPrincipal(new ClaimsIdentity(user.ToClaims(), Scheme.Name));
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(user.ToClaims(null, null), Scheme.Name));
             return new AuthenticationTicket(principal, Scheme.Name)
             {
                 Properties =

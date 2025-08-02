@@ -1,7 +1,7 @@
 using System.Net;
 using ApiHost1;
+using Application.Interfaces;
 using FluentAssertions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;

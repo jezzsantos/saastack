@@ -17,11 +17,17 @@ public sealed class TokensRefreshed : DomainEvent
 
     public required string AccessToken { get; set; }
 
-    public required DateTime AccessTokenExpiresOn { get; set; }
+    public DateTime? AccessTokenExpiresOn { get; set; }
+
+    public string? IdToken { get; set; }
+
+    public DateTime? IdTokenExpiresOn { get; set; }
 
     public required string RefreshToken { get; set; }
 
-    public required DateTime RefreshTokenExpiresOn { get; set; }
+    public required string RefreshTokenDigest { get; set; }
+
+    public DateTime? RefreshTokenExpiresOn { get; set; }
 
     public required string UserId { get; set; }
 }

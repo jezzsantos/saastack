@@ -6,9 +6,9 @@ using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Services.Shared;
 using FluentAssertions;
-using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Hosting.Common;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 
@@ -41,7 +41,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
     public async Task WhenAuthorizeByNothingAndNoRolesOrFeatures_ThenReturns200()
     {
         var token = CreateJwtToken(_settings, _tokensService,
-            new List<RoleLevel>(), new List<FeatureLevel>());
+            [], []);
 
         var result = await Api.GetAsync(new AuthorizeByNothingTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -54,7 +54,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
     public async Task WhenAuthorizeByNothingAndAnyRoles_ThenReturns200()
     {
         var token = CreateJwtToken(_settings, _tokensService,
-            new List<RoleLevel> { PlatformRoles.Standard, PlatformRoles.Operations }, new List<FeatureLevel>());
+            [PlatformRoles.Standard, PlatformRoles.Operations], []);
 
         var result = await Api.GetAsync(new AuthorizeByNothingTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -67,8 +67,8 @@ public class AuthZApiSpec : WebApiSpec<Program>
     public async Task WhenAuthorizeByNothingAndAnyFeatures_ThenReturns200()
     {
         var token = CreateJwtToken(_settings, _tokensService,
-            new List<RoleLevel>(),
-            new List<FeatureLevel> { PlatformFeatures.PaidTrial, PlatformFeatures.Basic });
+            [],
+            [PlatformFeatures.PaidTrial, PlatformFeatures.Basic]);
 
         var result = await Api.GetAsync(new AuthorizeByNothingTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -89,7 +89,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenAuthorizeByRoleRequestWithNoRole_ThenReturns403()
     {
-        var token = CreateJwtToken(_settings, _tokensService, new List<RoleLevel>(), new List<FeatureLevel>());
+        var token = CreateJwtToken(_settings, _tokensService, [], []);
 
         var result = await Api.GetAsync(new AuthorizeByRoleTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -101,8 +101,8 @@ public class AuthZApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenAuthorizeByRoleRequestWithWrongRole_ThenReturns403()
     {
-        var token = CreateJwtToken(_settings, _tokensService, new List<RoleLevel> { new("awrongrole") },
-            new List<FeatureLevel>());
+        var token = CreateJwtToken(_settings, _tokensService, [new RoleLevel("awrongrole")],
+            []);
 
         var result = await Api.GetAsync(new AuthorizeByRoleTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -115,10 +115,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
     public async Task WhenAuthorizeByRoleRequestIncludingCorrectRole_ThenReturns200()
     {
         var token = CreateJwtToken(_settings, _tokensService,
-            new List<RoleLevel> { PlatformRoles.Standard, PlatformRoles.Operations }, new List<FeatureLevel>
-            {
-                PlatformFeatures.Basic // Must have at least this feature by default
-            });
+            [PlatformRoles.Standard, PlatformRoles.Operations], [PlatformFeatures.Basic]);
 
         var result = await Api.GetAsync(new AuthorizeByRoleTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -139,7 +136,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenAuthorizeByFeatureRequestWithNoFeature_ThenReturns403()
     {
-        var token = CreateJwtToken(_settings, _tokensService, new List<RoleLevel>(), new List<FeatureLevel>());
+        var token = CreateJwtToken(_settings, _tokensService, [], []);
 
         var result = await Api.GetAsync(new AuthorizeByFeatureTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -151,11 +148,8 @@ public class AuthZApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenAuthorizeByFeatureRequestWithWrongFeature_ThenReturns403()
     {
-        var token = CreateJwtToken(_settings, _tokensService, new List<RoleLevel>
-            {
-                PlatformRoles.Standard
-            },
-            new List<FeatureLevel> { new("awrongfeature") });
+        var token = CreateJwtToken(_settings, _tokensService, [PlatformRoles.Standard],
+            [new FeatureLevel("awrongfeature")]);
 
         var result = await Api.GetAsync(new AuthorizeByFeatureTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -167,14 +161,8 @@ public class AuthZApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenAuthorizeByFeatureRequestIncludingCorrectFeature_ThenReturns200()
     {
-        var token = CreateJwtToken(_settings, _tokensService, new List<RoleLevel>
-            {
-                PlatformRoles.Standard
-            },
-            new List<FeatureLevel>
-            {
-                PlatformFeatures.PaidTrial
-            });
+        var token = CreateJwtToken(_settings, _tokensService, [PlatformRoles.Standard],
+            [PlatformFeatures.PaidTrial]);
 
         var result = await Api.GetAsync(new AuthorizeByFeatureTestingOnlyRequest(),
             req => req.SetJWTBearerToken(token));
@@ -192,7 +180,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
                 Id = "auserid",
                 Roles = platFormRoles.Select(rol => rol.Name).ToList(),
                 Features = platformFeatures.Select(rol => rol.Name).ToList()
-            }).GetAwaiter().GetResult().Value.AccessToken;
+            }, null, null, null).GetAwaiter().GetResult().Value.AccessToken;
     }
 }
 #endif

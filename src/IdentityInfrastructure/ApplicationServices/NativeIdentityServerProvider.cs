@@ -23,14 +23,17 @@ public class NativeIdentityServerProvider : IIdentityServerProvider
         IAuthTokensService authTokensService, ISSOProvidersService ssoProvidersService,
         IWebsiteUiService websiteUiService, IOAuth2ClientService oauth2ClientService,
         IAPIKeysRepository apiKeysRepository, IPersonCredentialRepository credentialsRepository,
-        IOAuth2ClientRepository oAuthClientRepository, IOAuth2ClientConsentRepository oAuthClientConsentRepository)
+        IOAuth2ClientRepository oAuthClientRepository, IOAuth2ClientConsentRepository oAuthClientConsentRepository,
+        IOpenIdConnectAuthorizationRepository oidcAuthorizationRepository)
     {
         CredentialsService = new NativeIdentityServerCredentialsService(recorder, identifierFactory, endUsersService,
             userProfilesService, userNotificationsService, settings, emailAddressService, tokensService,
             encryptionService, passwordHasherService, mfaService, authTokensService, websiteUiService,
             credentialsRepository);
         OpenIdConnectService =
-            new NativeIdentityServerOpenIdConnectService(recorder, identifierFactory, oauth2ClientService);
+            new NativeIdentityServerOpenIdConnectService(recorder, identifierFactory, settings, encryptionService,
+                tokensService, websiteUiService, oauth2ClientService, authTokensService, endUsersService,
+                userProfilesService, oidcAuthorizationRepository);
         ApiKeyService = new NativeIdentityServerApiKeyService(recorder, identifierFactory, tokensService,
             apiKeyHasherService, endUsersService, userProfilesService, apiKeysRepository);
         SingleSignOnService = new NativeIdentityServerSingleSignOnService(recorder, endUsersService,

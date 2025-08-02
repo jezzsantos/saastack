@@ -4,7 +4,6 @@ using Application.Resources.Shared;
 using Common;
 using FluentAssertions;
 using IdentityInfrastructure.ApplicationServices;
-using Infrastructure.Interfaces;
 using Moq;
 using UnitTesting.Common;
 using UnitTesting.Common.Validation;

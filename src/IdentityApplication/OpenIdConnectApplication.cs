@@ -4,7 +4,8 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
-using IdentityDomain;
+using OAuth2GrantType = Application.Resources.Shared.OAuth2GrantType;
+using OAuth2ResponseType = Application.Resources.Shared.OAuth2ResponseType;
 
 namespace IdentityApplication;
 
@@ -17,26 +18,27 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
         _identityServerProvider = identityServerProvider;
     }
 
-    public async Task<Result<OidcAuthorizationResponse, Error>> AuthorizeAsync(ICallerContext caller, string clientId,
-        string redirectUri, string responseType, string scope, string? state, string? nonce, string? codeChallenge,
-        string? codeChallengeMethod, CancellationToken cancellationToken)
+    public async Task<Result<OpenIdConnectAuthorization, Error>> AuthorizeAsync(ICallerContext caller, string clientId,
+        string redirectUri, OAuth2ResponseType responseType, string scope, string? state, string? nonce,
+        string? codeChallenge, OpenIdConnectCodeChallengeMethod? codeChallengeMethod,
+        CancellationToken cancellationToken)
     {
-        return await _identityServerProvider.OpenIdConnectService.AuthorizeAsync(caller, clientId, redirectUri,
-            responseType,
-            scope, state, nonce, codeChallenge, codeChallengeMethod, cancellationToken);
+        var userId = caller.CallerId;
+        return await _identityServerProvider.OpenIdConnectService.AuthorizeAsync(caller, clientId, userId, redirectUri,
+            responseType, scope, state, nonce, codeChallenge, codeChallengeMethod, cancellationToken);
     }
 
-    public async Task<Result<OidcTokenResponse, Error>> CreateTokenAsync(ICallerContext caller, string grantType,
-        string clientId, string clientSecret, string code, string? codeVerifier,
-        string redirectUri, string refreshToken, string? scope, CancellationToken cancellationToken)
+    public async Task<Result<OpenIdConnectTokens, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
+        OAuth2GrantType grantType, string clientId, string clientSecret, string code, string redirectUri,
+        string? codeVerifier, string refreshToken, string? scope, CancellationToken cancellationToken)
     {
-        if (grantType.EqualsIgnoreCase(OAuth2Constants.GrantTypes.AuthorizationCode))
+        if (grantType == OAuth2GrantType.Authorization_Code)
         {
             return await _identityServerProvider.OpenIdConnectService.ExchangeCodeForTokensAsync(
-                caller, clientId, clientSecret, code, codeVerifier, redirectUri, cancellationToken);
+                caller, clientId, clientSecret, code, redirectUri, codeVerifier, cancellationToken);
         }
 
-        if (grantType.EqualsIgnoreCase(OAuth2Constants.GrantTypes.RefreshToken))
+        if (grantType == OAuth2GrantType.Refresh_Token)
         {
             return await _identityServerProvider.OpenIdConnectService.RefreshTokenAsync(
                 caller, clientId, clientSecret, refreshToken, scope, cancellationToken);
@@ -45,7 +47,7 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
         return Error.Validation(Resources.OpenIdConnectApplication_UnsupportedGrantType.Format(grantType));
     }
 
-    public async Task<Result<OidcDiscoveryDocument, Error>> GetDiscoveryDocumentAsync(ICallerContext caller,
+    public async Task<Result<OpenIdConnectDiscoveryDocument, Error>> GetDiscoveryDocumentAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
         return await _identityServerProvider.OpenIdConnectService.GetDiscoveryDocumentAsync(caller, cancellationToken);
@@ -57,7 +59,7 @@ public class OpenIdConnectApplication : IOpenIdConnectApplication
         return await _identityServerProvider.OpenIdConnectService.GetJsonWebKeySetAsync(caller, cancellationToken);
     }
 
-    public async Task<Result<OidcUserInfoResponse, Error>> GetUserInfoForCallerAsync(ICallerContext caller,
+    public async Task<Result<OpenIdConnectUserInfo, Error>> GetUserInfoForCallerAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
         return await _identityServerProvider.OpenIdConnectService.GetUserInfoAsync(caller, caller.ToCallerId(),

@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 using Common;
 using Domain.Interfaces.Validations;
 using Domain.Services.Shared;
@@ -46,6 +47,16 @@ public sealed class TokensService : ITokensService
         return GenerateRandomStringSafeForUrl();
     }
 
+    /// <summary>
+    ///     Creates a deterministic digest of the specified Open ID Connect authorization code
+    /// </summary>
+    public string CreateOAuthorizationCodeDigest(string authorizationCode)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(authorizationCode));
+        var code = Convert.ToBase64String(hash);
+        return MakeSafeForUrls(code);
+    }
+
     public string CreatePasswordResetToken()
     {
         return GenerateRandomStringSafeForUrl();
@@ -84,6 +95,16 @@ public sealed class TokensService : ITokensService
             Key = key,
             ApiKey = apiKey
         };
+    }
+
+    /// <summary>
+    ///     Creates a deterministic digest of the specified token
+    /// </summary>
+    public string CreateTokenDigest(string token)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        var code = Convert.ToBase64String(hash);
+        return MakeSafeForUrls(code);
     }
 
     private static string GenerateRandomStringSafeForUrl(int keySize = DefaultTokenSizeInBytes,

@@ -12,4 +12,8 @@ public interface IWebsiteUiService
     string ConstructPasswordResetConfirmationPageUrl(string token);
 
     string CreateRegistrationPageUrl(string token);
+
+    string ConstructOAuth2ConsentPageUrl(string clientId, string scope);
+
+    string ConstructLoginPageUrl();
 }

@@ -66,16 +66,27 @@ public static class ClaimExtensions
     /// <summary>
     ///     Returns the claims for the specified <see cref="user" />
     /// </summary>
-    public static IReadOnlyList<Claim> ToClaims(this EndUserWithMemberships user,
+    public static IReadOnlyList<Claim> ToClaims(this EndUserWithMemberships user, IReadOnlyList<string>? scopes,
         Dictionary<string, object>? additionalData)
     {
         var additionalClaims = additionalData ?? new Dictionary<string, object>();
+        var authScopes = scopes ?? new List<string>();
         var now = DateTime.UtcNow.ToNearestSecond();
         var claims = new List<Claim>
         {
             new(AuthenticationConstants.Claims.ForId, user.Id),
             new(AuthenticationConstants.Claims.ForIssuedAt, new DateTimeOffset(now).ToUnixTimeSeconds().ToString())
         };
+
+        // Add scope for OIDC access token validation,
+        if (authScopes.HasAny())
+        {
+            var scopeList = authScopes
+                .Distinct()
+                .JoinAsOredChoices(string.Empty);
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForScope, scopeList));
+        }
+
         user.Roles
             .ForEach(rol =>
             {
@@ -120,7 +131,7 @@ public static class ClaimExtensions
                 });
         });
 
-        // Add at_hash for implicit flow,
+        // Add at_hash for OIDC implicit flow,
         // see https://openid.net/specs/openid-connect-core-1_0.html#TokenSubstitution
         if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForAtHash, out var value2))
         {
@@ -131,7 +142,7 @@ public static class ClaimExtensions
             }
         }
 
-        // Add c_hash for hybrid flow,
+        // Add c_hash for OIDC hybrid flow,
         // see https://openid.net/specs/openid-connect-core-1_0.html#CodeValidation
         if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForCHash, out var value3))
         {
@@ -159,6 +170,14 @@ public static class ClaimExtensions
             new(AuthenticationConstants.Claims.ForId, profile.UserId),
             new(AuthenticationConstants.Claims.ForIssuedAt, new DateTimeOffset(now).ToUnixTimeSeconds().ToString())
         };
+
+        if (authScopes.HasAny())
+        {
+            var scopeList = authScopes
+                .Distinct()
+                .JoinAsOredChoices(string.Empty);
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForScope, scopeList));
+        }
 
         if (authScopes.ContainsIgnoreCase(OAuth2Constants.Scopes.Email))
         {

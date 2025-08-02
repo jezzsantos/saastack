@@ -117,4 +117,25 @@
     <data name="ChargebeeApi_WebhookAuthentication_Failed" xml:space="preserve">
         <value>Chargebee.Authentication.Failed</value>
     </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_AuthorizeCode" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Prepared</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_ExchangedCode" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Passed</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_RefreshToken" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Refreshed.Passed</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_Failed" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Failed</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ExchangeCodeForToken_AccountSuspended" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Exchange.Failed.AccountSuspended</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_RefreshToken_AccountSuspended" xml:space="preserve">
+        <value>Authorization.OpenIdConnect.Refreshed.Failed.AccountSuspended</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_UserInfo_AccountSuspended" xml:space="preserve">
+        <value>UserInfo.OpenIdConnect.UserInfo.Failed.AccountSuspended</value>
+    </data>
 </root>

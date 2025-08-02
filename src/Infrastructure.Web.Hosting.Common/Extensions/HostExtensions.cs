@@ -1,8 +1,8 @@
 #define USEDATABASEEVENTSTORE //EXTEND: Set this to true if you are using a database event store in production
 
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
@@ -43,7 +43,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -302,20 +301,7 @@ public static class HostExtensions
                 {
                     jwtOptions.MapInboundClaims = false;
                     jwtOptions.RequireHttpsMetadata = true;
-                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        RoleClaimType = AuthenticationConstants.Claims.ForRole,
-                        NameClaimType = AuthenticationConstants.Claims.ForId,
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidAudience = configuration["Hosts:IdentityApi:BaseUrl"],
-                        ValidIssuer = configuration["Hosts:IdentityApi:BaseUrl"],
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(configuration["Hosts:IdentityApi:JWT:SigningSecret"]!))
-                    };
+                    jwtOptions.TokenValidationParameters = JWTTokensService.GetTokenValidationParameters(configuration);
                 });
             }
 

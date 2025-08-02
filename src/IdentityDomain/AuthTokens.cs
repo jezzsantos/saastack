@@ -49,6 +49,15 @@ public sealed class AuthTokens : SingleValueObjectBase<AuthTokens, List<AuthToke
     }
 
     [SkipImmutabilityCheck]
+    public Optional<AuthToken> GetToken(AuthTokenType tokenType)
+    {
+        var token = Value.SingleOrDefault(tok => tok.Type == tokenType);
+        return token.NotExists()
+            ? Optional<AuthToken>.None
+            : token;
+    }
+
+    [SkipImmutabilityCheck]
     public List<AuthToken> ToList()
     {
         return Value;

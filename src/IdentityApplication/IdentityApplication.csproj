@@ -9,6 +9,11 @@
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>IdentityInfrastructure.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
@@ -19,6 +24,7 @@
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
         <ProjectReference Include="..\IdentityDomain\IdentityDomain.csproj" />
+        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

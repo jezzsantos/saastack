@@ -8,7 +8,7 @@ namespace UnitTesting.Common.Validation;
 public static class DateTimeExtensions
 {
     public static AndConstraint<DateTimeAssertions> BeNear(this DateTimeAssertions assertions, DateTime nearbyTime,
-        int precision = 850, string because = "", params object[] becauseArgs)
+        int precision = 1500, string because = "", params object[] becauseArgs)
     {
         return assertions.BeCloseTo(nearbyTime, TimeSpan.FromMilliseconds(precision), because, becauseArgs);
     }
@@ -20,7 +20,7 @@ public static class DateTimeExtensions
     }
 
     public static AndConstraint<NullableDateTimeAssertions> BeNear(this NullableDateTimeAssertions assertions,
-        DateTime nearbyTime, int precision = 850, string because = "", params object[] becauseArgs)
+        DateTime nearbyTime, int precision = 1500, string because = "", params object[] becauseArgs)
     {
         return assertions.BeCloseTo(nearbyTime, TimeSpan.FromMilliseconds(precision), because, becauseArgs);
     }

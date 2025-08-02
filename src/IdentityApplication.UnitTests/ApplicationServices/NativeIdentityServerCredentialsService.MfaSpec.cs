@@ -724,30 +724,26 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
         _repository.Setup(s =>
                 s.FindCredentialByMfaAuthenticationTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
-        var user = new EndUserWithMemberships
-        {
-            Id = "auserid",
-            Memberships =
-            [
-                new Membership
-                {
-                    Id = "amembershipid",
-                    IsDefault = true,
-                    OrganizationId = "anorganizationid",
-                    UserId = "auserid"
-                }
-            ]
-        };
-        _endUsersService.Setup(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.ConfirmMfaAuthenticatorAssociationForUserAsync(_caller.Object, "auserid", "anmfatoken",
@@ -767,9 +763,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             && cred.MfaAuthenticators[1].VerifiedState == "1"
             && cred.MfaAuthenticators[1].IsActive == true
         ), It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.GetMembershipsPrivateAsync(_caller.Object, "auserid",
-                It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -809,10 +802,25 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.ConfirmMfaAuthenticatorAssociationForUserAsync(_caller.Object, "auserid", null,
@@ -875,10 +883,25 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.ConfirmMfaAuthenticatorAssociationForUserAsync(_caller.Object, "auserid", null,
@@ -941,10 +964,25 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.ConfirmMfaAuthenticatorAssociationForUserAsync(_caller.Object, "auserid", null,
@@ -1157,30 +1195,27 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
         _repository.Setup(s =>
                 s.FindCredentialByMfaAuthenticationTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
-        var user = new EndUserWithMemberships
-        {
-            Id = "auserid",
-            Memberships =
-            [
-                new Membership
-                {
-                    Id = "amembershipid",
-                    IsDefault = true,
-                    OrganizationId = "anorganizationid",
-                    UserId = "auserid"
-                }
-            ]
-        };
-        _endUsersService.Setup(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
         var recoveryCode = credential.MfaAuthenticators.ToRecoveryCodes(_encryptionService.Object)[0];
 
         var result =
@@ -1198,9 +1233,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             && cred.MfaAuthenticators[0].VerifiedState == recoveryCode
             && cred.MfaAuthenticators[1].VerifiedState == "1"
         ), It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.GetMembershipsPrivateAsync(_caller.Object, "auserid",
-                It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -1222,30 +1254,27 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
         _repository.Setup(s =>
                 s.FindCredentialByMfaAuthenticationTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
-        var user = new EndUserWithMemberships
-        {
-            Id = "auserid",
-            Memberships =
-            [
-                new Membership
-                {
-                    Id = "amembershipid",
-                    IsDefault = true,
-                    OrganizationId = "anorganizationid",
-                    UserId = "auserid"
-                }
-            ]
-        };
-        _endUsersService.Setup(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.VerifyMfaAuthenticatorForUserAsync(_caller.Object, "auserid", "anmfatoken",
@@ -1263,9 +1292,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             && cred.MfaAuthenticators[0].VerifiedState == Optional<string>.None
             && cred.MfaAuthenticators[1].VerifiedState == "1"
         ), It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.GetMembershipsPrivateAsync(_caller.Object, "auserid",
-                It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -1287,30 +1313,27 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
         _repository.Setup(s =>
                 s.FindCredentialByMfaAuthenticationTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
-        var user = new EndUserWithMemberships
-        {
-            Id = "auserid",
-            Memberships =
-            [
-                new Membership
-                {
-                    Id = "amembershipid",
-                    IsDefault = true,
-                    OrganizationId = "anorganizationid",
-                    UserId = "auserid"
-                }
-            ]
-        };
-        _endUsersService.Setup(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.VerifyMfaAuthenticatorForUserAsync(_caller.Object, "auserid", "anmfatoken",
@@ -1327,9 +1350,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             && cred.MfaAuthenticators[0].VerifiedState == Optional<string>.None
             && cred.MfaAuthenticators[1].VerifiedState == Optional<string>.None
         ), It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.GetMembershipsPrivateAsync(_caller.Object, "auserid",
-                It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -1352,30 +1372,27 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
         _repository.Setup(s =>
                 s.FindCredentialByMfaAuthenticationTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
-        var user = new EndUserWithMemberships
-        {
-            Id = "auserid",
-            Memberships =
-            [
-                new Membership
-                {
-                    Id = "amembershipid",
-                    IsDefault = true,
-                    OrganizationId = "anorganizationid",
-                    UserId = "auserid"
-                }
-            ]
-        };
-        _endUsersService.Setup(eus =>
-                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<Dictionary<string, object>?>(),
                     It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
-                "arefreshtoken", expiresOn));
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result =
             await _service.VerifyMfaAuthenticatorForUserAsync(_caller.Object, "auserid", "anmfatoken",
@@ -1392,9 +1409,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             && cred.MfaAuthenticators[0].VerifiedState == Optional<string>.None
             && cred.MfaAuthenticators[1].VerifiedState == Optional<string>.None
         ), It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.GetMembershipsPrivateAsync(_caller.Object, "auserid",
-                It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -1408,9 +1422,6 @@ public class NativeIdentityServerCredentialsMfaServiceSpec
             await _service.ResetPasswordMfaForUserAsync(_caller.Object, "auserid", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
-        _endUsersService.Verify(eus =>
-            eus.GetUserPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(s => s.SaveAsync(It.IsAny<PersonCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }

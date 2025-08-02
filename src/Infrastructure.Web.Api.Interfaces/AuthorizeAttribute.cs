@@ -2,7 +2,6 @@ using System.Text;
 using Application.Interfaces;
 using Common.Extensions;
 using Domain.Interfaces.Authorization;
-using Infrastructure.Interfaces;
 #if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
 using System.Runtime.Serialization;
 #endif
@@ -111,7 +110,7 @@ public class AuthorizeAttribute : Attribute
         }
 
         var policies = policyName
-            .Split(new[] { PolicyHeader }, StringSplitOptions.RemoveEmptyEntries)
+            .Split([PolicyHeader], StringSplitOptions.RemoveEmptyEntries)
             .Select(item => item.Trim().Replace(DoubleQuoteReplacementChar, '"'))
             .Select(item => item.FromJson<PolicyName>())
             .Where(policy => policy is not null)
@@ -183,7 +182,7 @@ public class AuthorizeAttribute : Attribute
         var tenantFeatures = new List<FeatureLevel>();
         foreach (var roleOrFeature in rolesOrFeatures)
         {
-            var parts = roleOrFeature.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = roleOrFeature.Split(['.'], StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
             {
                 continue;
@@ -280,7 +279,7 @@ public class AuthorizeAttribute : Attribute
         var tenant = ToTenant(allFeatures);
         if (platform.HasNone() && tenant.HasNone())
         {
-            platform = new[] { PlatformFeatures.Basic };
+            platform = [PlatformFeatures.Basic];
         }
 
         return new ICallerContext.CallerFeatures(platform, tenant);
@@ -293,7 +292,7 @@ public class AuthorizeAttribute : Attribute
         var tenant = ToTenant(allRoles);
         if (platform.HasNone() && tenant.HasNone())
         {
-            platform = new[] { PlatformRoles.Standard };
+            platform = [PlatformRoles.Standard];
         }
 
         return new ICallerContext.CallerRoles(platform, tenant);
@@ -305,11 +304,11 @@ public class AuthorizeAttribute : Attribute
         var values = flags.ToString() ?? string.Empty;
         if (values.HasNoValue())
         {
-            return Enumerable.Empty<TFlagEnum>();
+            return [];
         }
 
         return values
-            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Split([','], StringSplitOptions.RemoveEmptyEntries)
             .Select(item => item.Trim())
             .Where(item => item.ToString().StartsWith(prefix))
             .Select(item => (TFlagEnum)Enum.Parse(typeof(TFlagEnum), item, true))

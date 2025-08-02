@@ -19,8 +19,8 @@ public class ClientsApi : IWebApiService
         _oauth2ClientApplication = oauth2ClientApplication;
     }
 
-    public async Task<ApiPostResult<bool, GetOAuth2ClientConsentResponse>> ConsentClientForCaller(
-        ConsentToOAuth2ClientForCallerRequest request, CancellationToken cancellationToken)
+    public async Task<ApiPostResult<OAuth2ClientConsent, GetOAuth2ClientConsentResponse>> ConsentClientForCaller(
+        ConsentOAuth2ClientForCallerRequest request, CancellationToken cancellationToken)
     {
         var consented = await _oauth2ClientApplication.ConsentToClientAsync(
             _callerFactory.Create(),
@@ -29,8 +29,8 @@ public class ClientsApi : IWebApiService
             request.Consented,
             cancellationToken);
 
-        return () => consented.HandleApplicationResult<bool, GetOAuth2ClientConsentResponse>(con =>
-            new PostResult<GetOAuth2ClientConsentResponse>(new GetOAuth2ClientConsentResponse { Consented = con }));
+        return () => consented.HandleApplicationResult<OAuth2ClientConsent, GetOAuth2ClientConsentResponse>(c =>
+            new PostResult<GetOAuth2ClientConsentResponse>(new GetOAuth2ClientConsentResponse { Consent = c }));
     }
 
     public async Task<ApiPostResult<OAuth2Client, GetOAuth2ClientResponse>> CreateClient(
@@ -55,19 +55,17 @@ public class ClientsApi : IWebApiService
         return () => deleted.HandleApplicationResult();
     }
 
-    public async Task<ApiGetResult<OAuth2Client, GetOAuth2ClientResponse>> GetClient(
+    public async Task<ApiGetResult<OAuth2ClientWithSecrets, GetOAuth2ClientWithSecretsResponse>> GetClient(
         GetOAuth2ClientRequest request, CancellationToken cancellationToken)
     {
         var client = await _oauth2ClientApplication.GetClientAsync(
-            _callerFactory.Create(),
-            request.Id!,
-            cancellationToken);
+            _callerFactory.Create(), request.Id!, cancellationToken);
 
-        return () => client.HandleApplicationResult<OAuth2Client, GetOAuth2ClientResponse>(c =>
-            new GetOAuth2ClientResponse { Client = c });
+        return () => client.HandleApplicationResult<OAuth2ClientWithSecrets, GetOAuth2ClientWithSecretsResponse>(c =>
+            new GetOAuth2ClientWithSecretsResponse { Client = c });
     }
 
-    public async Task<ApiGetResult<bool, GetOAuth2ClientConsentResponse>> GetClientConsentForCaller(
+    public async Task<ApiGetResult<OAuth2ClientConsent, GetOAuth2ClientConsentResponse>> GetClientConsentForCaller(
         GetOAuth2ClientConsentForCallerRequest request, CancellationToken cancellationToken)
     {
         var consent = await _oauth2ClientApplication.GetConsentAsync(
@@ -76,9 +74,9 @@ public class ClientsApi : IWebApiService
             cancellationToken);
 
         return () =>
-            consent.HandleApplicationResult<bool, GetOAuth2ClientConsentResponse>(c =>
+            consent.HandleApplicationResult<OAuth2ClientConsent, GetOAuth2ClientConsentResponse>(c =>
                 new GetOAuth2ClientConsentResponse
-                    { Consented = c });
+                    { Consent = c });
     }
 
     public async Task<ApiPostResult<OAuth2ClientWithSecret, RegenerateOAuth2ClientSecretResponse>>

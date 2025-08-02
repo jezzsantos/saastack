@@ -83,11 +83,14 @@
         <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
             <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Interfaces\AuthenticationConstants.cs">
-            <Link>Reference\Infrastructure.Interfaces\AuthenticationConstants.cs</Link>
+        <Compile Include="..\Application.Interfaces\AuthenticationConstants.cs">
+            <Link>Reference\Application.Interfaces\AuthenticationConstants.cs</Link>
         </Compile>
         <Compile Include="..\Application.Interfaces\ICallerContext.RolesAndFeatures.cs">
             <Link>Reference\Application.Interfaces\ICallerContext.RolesAndFeatures.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\OAuth2Constants.cs">
+            <Link>Reference\Domain.Interfaces\OAuth2Constants.cs</Link>
         </Compile>
         <Compile Include="..\Domain.Interfaces\Authorization\IHierarchicalLevel.cs">
             <Link>Reference\Domain.Interfaces\Authorization\IHierarchicalLevel.cs</Link>

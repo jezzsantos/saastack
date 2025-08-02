@@ -1,17 +1,16 @@
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
-using IdentityApplication.ApplicationServices;
 
 namespace IdentityApplication;
 
 public interface IAuthTokensApplication
 {
-    Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext caller, EndUserWithMemberships user,
-        CancellationToken cancellationToken);
+    Task<Result<AuthenticateTokens, Error>> IssueTokensAsync(ICallerContext caller, string userId,
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData, CancellationToken cancellationToken);
 
     Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext caller, string refreshToken,
-        CancellationToken cancellationToken);
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData, CancellationToken cancellationToken);
 
     Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken);

@@ -86,9 +86,25 @@ public class NativeIdentityServerSingleSignOnServiceSpec
                 Access = EndUserAccess.Enabled
             });
         var expiresOn = DateTime.UtcNow;
-        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),
-                It.IsAny<EndUserWithMemberships>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
+        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
             "anauthcode", null, null, CancellationToken.None);
@@ -107,7 +123,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
         _endUsersService.Verify(eus =>
             eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(
-            ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+            ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -141,9 +158,25 @@ public class NativeIdentityServerSingleSignOnServiceSpec
                 Access = EndUserAccess.Suspended
             });
         var expiresOn = DateTime.UtcNow;
-        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),
-                It.IsAny<EndUserWithMemberships>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
+        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
             "anauthcode", null, null, CancellationToken.None);
@@ -162,7 +195,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
         _endUsersService.Verify(eus =>
             eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(
-            ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+            ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -208,9 +242,25 @@ public class NativeIdentityServerSingleSignOnServiceSpec
                 ]
             });
         var expiresOn = DateTime.UtcNow;
-        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),
-                It.IsAny<EndUserWithMemberships>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
+        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
             "anauthcode", null, null, CancellationToken.None);
@@ -230,9 +280,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             It.Is<SSOAuthUserInfo>(ui => ui == authUserInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
             eus.GetMembershipsPrivateAsync(_caller.Object, "aregistereduserid", It.IsAny<CancellationToken>()));
-        _authTokensService.Verify(ats => ats.IssueTokensAsync(_caller.Object, It.Is<EndUserWithMemberships>(eu =>
-            eu.Id == "amembershipsuserid"
-        ), It.IsAny<CancellationToken>()));
+        _authTokensService.Verify(ats =>
+            ats.IssueTokensAsync(_caller.Object, "amembershipsuserid", null, null, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -275,9 +324,25 @@ public class NativeIdentityServerSingleSignOnServiceSpec
                 ]
             });
         var expiresOn = DateTime.UtcNow;
-        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),
-                It.IsAny<EndUserWithMemberships>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
+        _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticateTokens
+            {
+                UserId = "auserid",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = expiresOn,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                }
+            });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
             "anauthcode", null, null, CancellationToken.None);
@@ -298,9 +363,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             It.Is<SSOAuthUserInfo>(ui => ui == authUserInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
             eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
-        _authTokensService.Verify(ats => ats.IssueTokensAsync(_caller.Object, It.Is<EndUserWithMemberships>(eu =>
-            eu.Id == "amembershipsuserid"
-        ), It.IsAny<CancellationToken>()));
+        _authTokensService.Verify(ats =>
+            ats.IssueTokensAsync(_caller.Object, "amembershipsuserid", null, null, It.IsAny<CancellationToken>()));
     }
 
     [Fact]

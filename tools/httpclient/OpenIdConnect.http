@@ -1,0 +1,89 @@
+### Register and authenticate
+run ./CreateUser.http
+
+
+### Create a new client
+
+@redirect_uri = https://psteniusubi.github.io/oidc-tester/authorization-code-flow.html
+@scopes = openid profile email phone address
+
+POST {{apihost1}}/oauth2/clients
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Name": "aclientname",
+  "RedirectUri": "{{redirect_uri}}"
+}
+
+> {%
+    client.global.set("client_id", response.body.client.id);
+%}
+
+### Generate a client secret
+
+POST {{apihost1}}/oauth2/clients/{{client_id}}/secret
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+}
+
+> {%
+    client.global.set("client_secret", response.body.client.secret);
+%}
+
+### Consent the client
+
+POST {{apihost1}}/oauth2/clients/{{client_id}}/consent
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Consented": true,
+  "Scope": "{{scopes}}"
+}
+
+### Authorize the user
+
+// @no-redirect
+GET {{apihost1}}/oauth2/authorize?client_id={{client_id}}&response_type=code&redirect_uri={{redirect_uri}}&
+    scope={{scopes}}&state=astate&nonce=anonce
+Authorization: Bearer {{access_token}}
+
+> {%
+    const location = response.headers.valueOf("location");
+    const queryChar = location.indexOf("?");
+    const query = location.substring(queryChar + 1);
+    const params = new URLSearchParams(query);
+    const code = params.get("code");
+
+    client.global.set("authorization_code", code);
+%}
+
+### Exchange the code for tokens
+
+POST {{apihost1}}/oauth2/token
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = authorization_code &
+code = {{authorization_code}} &
+redirect_uri = {{redirect_uri}} &
+client_id = {{client_id}} &
+client_secret = {{client_secret}}
+
+> {%
+    client.global.set("oidc_access_token", response.body.access_token);
+    client.global.set("oidc_request_token", response.body.refresh_token);
+    client.global.set("oidc_id_token", response.body.id_token);
+%}
+
+### Get UserInfo
+
+GET {{apihost1}}/oauth2/userinfo
+Accept: application/json
+Authorization: Bearer {{oidc_access_token}}

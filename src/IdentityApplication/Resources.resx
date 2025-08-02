@@ -69,10 +69,47 @@
     <data name="OpenIdConnectValidation_InvalidCodeChallengeMethod" xml:space="preserve">
         <value>The code challenge method must be 'S256' or 'plain'</value>
     </data>
-    <data name="NativeIdentityServerOpenIdConnectService_InvalidClientId" xml:space="preserve">
+    <data name="NativeIdentityServerOpenIdConnectService_Authorize_UnknownClient" xml:space="preserve">
         <value>Unknown client</value>
     </data>
     <data name="NativeIdentityServerOpenIdConnectService_ClientNotConsented" xml:space="preserve">
         <value>User is not authorized to use this client</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorize_MissingOpenIdScope" xml:space="preserve">
+        <value>Scope must include 'openid'</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorize_MissingCodeChallengeMethod" xml:space="preserve">
+        <value>CodeChallengeMethod must be defined when CodeChallenge is provided</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorize_UnsupportedResponseType" xml:space="preserve">
+        <value>Unsupported authorization response type '{0}'</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorize_MismatchedRequestUri" xml:space="preserve">
+        <value>RedirectUri '{0}' does not match the client value</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownAuthorizationCode"
+          xml:space="preserve">
+        <value>Unknown authorization code</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownClient" xml:space="preserve">
+        <value>Unknown client</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUser" xml:space="preserve">
+        <value>Unknown user</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_MissingUserProfile" xml:space="preserve">
+        <value>Missing user profile</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownClient" xml:space="preserve">
+        <value>Unknown client</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_RefreshToken_UnknownRefreshToken" xml:space="preserve">
+        <value>Unknown refresh token</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_AccountSuspended" xml:space="preserve">
+        <value>The user account is suspended</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_GetUserInfo_MissingUser" xml:space="preserve">
+        <value>Unknown user</value>
     </data>
 </root>

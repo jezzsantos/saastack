@@ -30,7 +30,7 @@ public class OAuth2ClientRootSpec
             .Returns("anid".ToId());
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateOAuth2ClientSecret())
-            .Returns("aclientsecret");
+            .Returns("1234567890123456789012345678901234567890123");
         _passwordHasherService = new Mock<IPasswordHasherService>();
         _passwordHasherService.Setup(phs => phs.HashPassword(It.IsAny<string>()))
             .Returns("asecrethash");
@@ -123,7 +123,7 @@ public class OAuth2ClientRootSpec
         var result = client.GenerateSecret(Optional<TimeSpan>.None);
 
         result.Should().BeSuccess();
-        result.Value.PlainSecret.Should().Be("aclientsecret");
+        result.Value.PlainSecret.Should().Be("1234567890123456789012345678901234567890123");
         result.Value.ExpiresOn.Should().BeNone();
         client.Secrets.Should().HaveCount(1);
         client.Secrets[0].SecretHash.Should().Be("asecrethash");
@@ -141,7 +141,7 @@ public class OAuth2ClientRootSpec
         var result = client.GenerateSecret(duration);
 
         result.Should().BeSuccess();
-        result.Value.PlainSecret.Should().Be("aclientsecret");
+        result.Value.PlainSecret.Should().Be("1234567890123456789012345678901234567890123");
         result.Value.ExpiresOn.Value.Should().BeNear(DateTime.UtcNow.Add(duration), TimeSpan.FromMinutes(1));
         client.Secrets.Should().HaveCount(1);
         client.Secrets[0].SecretHash.Should().Be("asecrethash");

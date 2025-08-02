@@ -4,7 +4,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 /// <summary>
-///     Revokes the user's consent for an OAuth2/OIDC client
+///     Revokes the user's consent for an OAuth2/Open ID Connect client
 /// </summary>
 [Route("/oauth2/clients/{Id}/consent/revoke", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]

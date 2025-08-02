@@ -32,8 +32,15 @@ public class NativeOAuth2ClientService : IOAuth2ClientService
     }
 
     public async Task<Result<bool, Error>> HasClientConsentedUserAsync(ICallerContext caller, string clientId,
-        string userId, CancellationToken cancellationToken)
+        string userId, string scope, CancellationToken cancellationToken)
     {
-        return await _service.GetConsentAsync(caller, clientId, userId, cancellationToken);
+        return await _service.HasClientConsentedUserAsync(caller, clientId, userId, scope, cancellationToken);
+    }
+
+    public async Task<Result<OAuth2Client, Error>> VerifyClientAsync(ICallerContext caller, string clientId,
+        string clientSecret,
+        CancellationToken cancellationToken)
+    {
+        return await _service.VerifyClientAsync(caller, clientId, clientSecret, cancellationToken);
     }
 }

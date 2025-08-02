@@ -200,14 +200,15 @@ public partial class NativeIdentityServerCredentialsService : IIdentityServerCre
                 return saved.Error;
             }
 
-            return Error.ForbiddenAccess(Resources.PersonCredentialsApplication_MfaRequired, MfaRequiredCode,
+            return Error.ForbiddenAccess(Resources.PersonCredentialsApplication_MfaRequired,
+                AuthenticationConstants.ErrorCodes.MfaRequired,
                 new Dictionary<string, object>
                 {
                     { MfaTokenName, mfaToken }
                 });
         }
 
-        return await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+        return await IssueAuthenticationTokensAsync(caller, user.Id, cancellationToken);
     }
 
     public async Task<Result<PersonCredential, Error>> RegisterPersonAsync(ICallerContext caller,
@@ -421,31 +422,16 @@ public partial class NativeIdentityServerCredentialsService : IIdentityServerCre
     }
 
     private async Task<Result<AuthenticateTokens, Error>> IssueAuthenticationTokensAsync(ICallerContext caller,
-        EndUserWithMemberships user, CancellationToken cancellationToken)
+        string userId, CancellationToken cancellationToken)
     {
-        var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
+        var issued = await _authTokensService.IssueTokensAsync(caller, userId, null, null, cancellationToken);
         if (issued.IsFailure)
         {
             return issued.Error;
         }
 
         var tokens = issued.Value;
-        return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
-        {
-            AccessToken = new AuthenticationToken
-            {
-                Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn,
-                Type = TokenType.AccessToken
-            },
-            RefreshToken = new AuthenticationToken
-            {
-                Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn,
-                Type = TokenType.RefreshToken
-            },
-            UserId = user.Id
-        });
+        return tokens;
     }
 
     /// <summary>

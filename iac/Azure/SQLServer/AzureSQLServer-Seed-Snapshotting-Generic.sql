@@ -42,6 +42,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[OpenIdConnectAuthorization]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[OpenIdConnectAuthorization]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[ProjectionCheckpoints]')
             AND type in (N'U'))
     DROP TABLE [dbo].[ProjectionCheckpoints]
@@ -78,7 +85,10 @@ CREATE TABLE [dbo].[AuthToken]
     [LastModifiedAtUtc]     [datetime]       NULL,
     [AccessToken]           [nvarchar](4000) NULL,
     [AccessTokenExpiresOn]  [datetime]       NULL,
+    [IdToken]               [nvarchar](4000) NULL,
+    [IdTokenExpiresOn]      [datetime]       NULL,
     [RefreshToken]          [nvarchar](4000) NULL,
+    [RefreshTokenDigest]    [nvarchar](900)  NULL,
     [RefreshTokenExpiresOn] [datetime]       NULL,
     [UserId]                [nvarchar](100)  NULL,
 ) ON [PRIMARY]
@@ -93,6 +103,11 @@ CREATE INDEX UserId
     ON [dbo].[AuthToken]
         (
          [UserId]
+            );
+CREATE INDEX RefreshTokenDigest
+    ON [dbo].[AuthToken]
+        (
+         [RefreshTokenDigest]
             );
 
 CREATE TABLE [dbo].[EventNotification]
@@ -114,6 +129,56 @@ CREATE INDEX Id
     ON [dbo].[EventNotification]
         (
          [Id]
+            );
+
+CREATE TABLE [dbo].[OpenIdConnectAuthorization]
+(
+    [Id]                      [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]      [datetime]      NULL,
+    [IsDeleted]               [bit]           NULL,
+    [AccessTokenDigest]       [nvarchar](900) NULL,
+    [AccessTokenExpiresAt]    [datetime]      NULL,
+    [AuthorizationCode]       [nvarchar](max) NULL,
+    [AuthorizationExpiresAt]  [datetime]      NULL,
+    [AuthorizedAt]            [datetime]      NULL,
+    [ClientId]                [nvarchar](100) NULL,
+    [CodeChallenge]           [nvarchar](max) NULL,
+    [CodeChallengeMethod]     [nvarchar](max) NULL,
+    [CodeExchangedAt]         [datetime]      NULL,
+    [LastRefreshedAt]         [datetime]      NULL,
+    [Nonce]                   [nvarchar](max) NULL,
+    [RedirectUri]             [nvarchar](max) NULL,
+    [RefreshTokenDigest]      [nvarchar](900) NULL,
+    [RefreshTokenExpiresAt]   [datetime]      NULL,
+    [Scopes]                  [nvarchar](max) NULL,
+    [UserId]                  [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[OpenIdConnectAuthorization]
+        (
+         [Id]
+            );
+CREATE INDEX ClientId
+    ON [dbo].[OpenIdConnectAuthorization]
+        (
+         [ClientId]
+            );
+CREATE INDEX UserId
+    ON [dbo].[OpenIdConnectAuthorization]
+        (
+         [UserId]
+            );
+CREATE INDEX AccessTokenDigest
+    ON [dbo].[OpenIdConnectAuthorization]
+        (
+         [AccessTokenDigest]
+            );
+CREATE INDEX RefreshTokenDigest
+    ON [dbo].[OpenIdConnectAuthorization]
+        (
+         [RefreshTokenDigest]
             );
 
 CREATE TABLE [dbo].[ProjectionCheckpoints]

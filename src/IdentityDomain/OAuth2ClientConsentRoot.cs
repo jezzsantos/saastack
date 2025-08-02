@@ -43,7 +43,7 @@ public sealed class OAuth2ClientConsentRoot : AggregateRootBase
     [UsedImplicitly]
     public static AggregateRootFactory<OAuth2ClientConsentRoot> Rehydrate()
     {
-        return (identifier, container, properties) => new OAuth2ClientConsentRoot(
+        return (identifier, container, _) => new OAuth2ClientConsentRoot(
             container.GetRequiredService<IRecorder>(),
             container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
@@ -100,6 +100,12 @@ public sealed class OAuth2ClientConsentRoot : AggregateRootBase
             return Error.PreconditionViolation(Resources.OAuth2ClientConsentRoot_NotOwner);
         }
 
+        if (!scopes.Has(OpenIdConnectConstants.Scopes.OpenId))
+        {
+            return Error.Validation(Resources.OAuth2ClientConsentRoot_MissingOpenIdScope,
+                OAuth2Constants.ErrorCodes.InvalidScope);
+        }
+
         var nothingHasChanged = isConsented == IsConsented && scopes == Scopes;
         if (nothingHasChanged)
         {
@@ -134,5 +140,15 @@ public sealed class OAuth2ClientConsentRoot : AggregateRootBase
     private bool IsOwner(Identifier userId)
     {
         return userId == UserId;
+    }
+
+    public Result<bool, Error> HasConsentedTo(OAuth2Scopes scopes)
+    {
+        if (!IsConsented)
+        {
+            return false;
+        }
+
+        return Scopes.HasAll(scopes);
     }
 }

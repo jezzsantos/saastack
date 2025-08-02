@@ -27,7 +27,7 @@ public class ProviderAuthTokensRootSpec
             .Returns("anid".ToId());
         _encryptionService = new Mock<IEncryptionService>();
         _encryptionService.Setup(es => es.Encrypt(It.IsAny<string>()))
-            .Returns((string value) => value);
+            .Returns("anencryptedvalue");
         _encryptionService.Setup(es => es.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
 
@@ -52,7 +52,7 @@ public class ProviderAuthTokensRootSpec
     {
         var expiresOn = DateTime.UtcNow;
         var token = AuthToken
-            .Create(AuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
+            .Create(AuthTokenType.AccessToken, "eyJanaccesstoken", expiresOn, _encryptionService.Object)
             .Value;
         var tokens = AuthTokens.Create([token]).Value;
 
@@ -69,7 +69,7 @@ public class ProviderAuthTokensRootSpec
     {
         var expiresOn = DateTime.UtcNow;
         var token = AuthToken
-            .Create(AuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
+            .Create(AuthTokenType.AccessToken, "eyJanaccesstoken", expiresOn, _encryptionService.Object)
             .Value;
         var tokens = AuthTokens.Create([token]).Value;
         _tokens.ChangeTokens("anotheruserid".ToId(), tokens);
@@ -84,7 +84,7 @@ public class ProviderAuthTokensRootSpec
     {
         var expiresOn = DateTime.UtcNow;
         var token = AuthToken
-            .Create(AuthTokenType.AccessToken, "anaccesstoken", expiresOn, _encryptionService.Object)
+            .Create(AuthTokenType.AccessToken, "eyJanaccesstoken", expiresOn, _encryptionService.Object)
             .Value;
         var tokens = AuthTokens.Create([token]).Value;
 

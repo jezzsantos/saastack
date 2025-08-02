@@ -6,11 +6,11 @@ using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Services.Shared;
 using FluentAssertions;
-using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Hosting.Common;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 
@@ -165,9 +165,9 @@ public class AuthNApiSpec : WebApiSpec<Program>
             .IssueTokensAsync(new EndUserWithMemberships
             {
                 Id = "auserid",
-                Roles = new List<string> { PlatformRoles.Standard.Name },
-                Features = new List<string> { PlatformFeatures.Basic.Name }
-            }).GetAwaiter().GetResult().Value.AccessToken;
+                Roles = [PlatformRoles.Standard.Name],
+                Features = [PlatformFeatures.Basic.Name]
+            }, null, null, null).GetAwaiter().GetResult().Value.AccessToken;
     }
 }
 #endif

@@ -82,7 +82,7 @@
         <value>These tokens have already expired</value>
     </data>
     <data name="AuthTokensRoot_RefreshTokenNotMatched" xml:space="preserve">
-        <value>This refresh token is unknown or for another user</value>
+        <value>This refresh token is unknown</value>
     </data>
     <data name="AuthTokensRoot_TokensRevoked" xml:space="preserve">
         <value>This refresh token has been revoked</value>
@@ -209,5 +209,86 @@
     </data>
     <data name="OAuth2ClientConsentRoot_NotOwner" xml:space="preserve">
         <value>Cannot change the consent for another user</value>
+    </data>
+    <data name="OAuth2ClientConsentRoot_MissingOpenIdScope" xml:space="preserve">
+        <value>You must consent to the 'openid' scope</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootNotConfigured" xml:space="preserve">
+        <value>Authorization has not been configured</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootMissingUserId" xml:space="preserve">
+        <value>Authorization is missing a 'UserId'</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootMissingClientId" xml:space="preserve">
+        <value>Authorization is missing a 'ClientId'</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootMissingRedirectUri" xml:space="preserve">
+        <value>Authorization is missing a 'RedirectUri'</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootMissingScopes" xml:space="preserve">
+        <value>Authorization is missing a 'Scopes'</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootGenerateCode_MissingClientRedirectUri" xml:space="preserve">
+        <value>Redirect URI is missing for the client</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootGenerateCode_MismatchedClientRedirectUri" xml:space="preserve">
+        <value>Redirect URI does not match the client</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootMissingOpenIdScope" xml:space="preserve">
+        <value>Scope is missing the 'openid' scope</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootGenerateCode_CodeChallengeMissingMethod" xml:space="preserve">
+        <value>CodeChallenge has not defined a method</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyCode_NotConfigured" xml:space="preserve">
+        <value>Authorization has not been configured</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyCode_ExpiredAuthorizationCode" xml:space="preserve">
+        <value>Authorization code has expired</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyCode_MismatchedRedirectUri" xml:space="preserve">
+        <value>Redirect URI does not match</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyPkce_MissingCodeChallenge" xml:space="preserve">
+        <value>Code Challenge was required when authorized</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyPkce_MissingCodeVerifier" xml:space="preserve">
+        <value>Code verifier is required to verify code</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootVerifyPkce_InvalidCodeVerifier" xml:space="preserve">
+        <value>Code verifier is invalid</value>
+    </data>
+    <data name="OAuth2ClientSecrets_UnknownSecret" xml:space="preserve">
+        <value>Secret does not exist for this client</value>
+    </data>
+    <data name="OAuth2ClientSecrets_SecretExpired" xml:space="preserve">
+        <value>Secret has expired</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootRefreshToken_ScopesNotSubset" xml:space="preserve">
+        <value>Requested Refresh token scopes must be a subset of the authorized scopes</value>
+    </data>
+    <data name="OpenIdConnectAuthorizationRootRefreshToken_RefreshForbidden" xml:space="preserve">
+        <value>Requested Refresh token is expired</value>
+    </data>
+    <data name="AuthToken_InvalidPlainValue" xml:space="preserve">
+        <value>This token value is not unencrypted</value>
+    </data>
+    <data name="AuthToken_InvalidEncryptedValue" xml:space="preserve">
+        <value>This token is not an encrypted value</value>
+    </data>
+    <data name="OAuth2TokenMemento_InvalidPlainValue" xml:space="preserve">
+        <value>This token value is not undigested</value>
+    </data>
+    <data name="OAuth2TokenMemento_InvalidDigestValue" xml:space="preserve">
+        <value>This token is not a digested value</value>
+    </data>
+    <data name="OAuth2ClientSecret_InvalidSecret" xml:space="preserve">
+        <value>This secret is not valid</value>
+    </data>
+    <data name="OAuth2ClientSecret_InvalidSecretHash" xml:space="preserve">
+        <value>This secret hash is not valid</value>
+    </data>
+    <data name="OAuth2ClientSecret_InvalidFirstFour" xml:space="preserve">
+        <value>This first four of the secret is not valid</value>
     </data>
 </root>

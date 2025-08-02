@@ -1,0 +1,17 @@
+
+### Authenticate
+
+POST {{apihost1}}/credentials/auth
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Username": "{{username}}",
+  "Password": "{{password}}",
+  "Provider" : "credentials"
+}
+
+> {%
+    client.global.set("access_token", response.body.tokens.accessToken.value);
+    client.global.set("user_id", response.body.tokens.userId.value);
+%}

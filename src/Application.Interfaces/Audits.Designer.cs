@@ -204,6 +204,69 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Prepared.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_AuthorizeCode {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_AuthorizeCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Passed.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_ExchangedCode {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_ExchangedCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Failed.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_Failed {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Refreshed.Passed.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_RefreshToken {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_RefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Exchange.Failed.AccountSuspended.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_ExchangeCodeForToken_AccountSuspended {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_ExchangeCodeForToken_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OpenIdConnect.Refreshed.Failed.AccountSuspended.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_RefreshToken_AccountSuspended {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_RefreshToken_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UserInfo.OpenIdConnect.UserInfo.Failed.AccountSuspended.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_UserInfo_AccountSuspended {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_UserInfo_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Organization.Deleted.
         /// </summary>
         public static string OrganizationsApplication_OrganizationDeleted {

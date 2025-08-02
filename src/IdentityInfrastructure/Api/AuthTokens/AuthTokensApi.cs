@@ -23,7 +23,7 @@ public class AuthTokensApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var tokens =
-            await _authTokensApplication.RefreshTokenAsync(_callerFactory.Create(), request.RefreshToken!,
+            await _authTokensApplication.RefreshTokenAsync(_callerFactory.Create(), request.RefreshToken!, null, null,
                 cancellationToken);
 
         return () => tokens.HandleApplicationResult<AuthenticateTokens, RefreshTokenResponse>(tok =>

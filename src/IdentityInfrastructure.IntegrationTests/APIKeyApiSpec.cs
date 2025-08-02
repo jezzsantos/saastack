@@ -107,11 +107,11 @@ public class APIKeyApiSpec : WebApiSpec<Program>
         var keys = (await Api.GetAsync(new SearchAllAPIKeysForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Keys;
 
-        var operations = await LoginUserAsync(LoginUser.Operator);
+        var @operator = await LoginUserAsync(LoginUser.Operator);
         await Api.DeleteAsync(new RevokeAPIKeyRequest
         {
             Id = keys[0].Id
-        }, req => req.SetJWTBearerToken(operations.AccessToken));
+        }, req => req.SetJWTBearerToken(@operator.AccessToken));
 
 #if TESTINGONLY
         var authenticate1 = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),

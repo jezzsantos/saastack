@@ -40,7 +40,8 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
         _clientConsentRepository = clientConsentRepository;
     }
 
-    public async Task<Result<bool, Error>> ConsentToClientAsync(ICallerContext caller, string clientId, string userId,
+    public async Task<Result<OAuth2ClientConsent, Error>> ConsentToClientAsync(ICallerContext caller, string clientId,
+        string userId,
         string? scope, bool isConsented, CancellationToken cancellationToken)
     {
         var retrievedClient = await _clientRepository.LoadAsync(clientId.ToId(), cancellationToken);
@@ -73,7 +74,7 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
 
         if (consent.IsConsented)
         {
-            return true;
+            return consent.ToConsent();
         }
 
         var consentedScopes = OAuth2Scopes.Create(scope);
@@ -99,7 +100,7 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
             ? "Client {Id} was consented to by user {UserId}"
             : "Client {Id} was un-consented from by user {UserId}", consent.ClientId, consent.UserId);
 
-        return consent.IsConsented;
+        return consent.ToConsent();
     }
 
     public async Task<Result<OAuth2Client, Error>> CreateClientAsync(ICallerContext caller, string name,
@@ -185,7 +186,7 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
         return client.Value.ToClient().ToOptional();
     }
 
-    public async Task<Result<OAuth2Client, Error>> GetClientAsync(ICallerContext caller, string id,
+    public async Task<Result<OAuth2ClientWithSecrets, Error>> GetClientAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
         var retrieved = await _clientRepository.LoadAsync(id.ToId(), cancellationToken);
@@ -197,11 +198,38 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
         var client = retrieved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Client {Id} was fetched", client.Id);
 
-        return client.ToClient();
+        return client.ToClientWithSecrets();
     }
 
-    public async Task<Result<bool, Error>> GetConsentAsync(ICallerContext caller, string clientId, string userId,
-        CancellationToken cancellationToken)
+    public async Task<Result<OAuth2ClientConsent, Error>> GetConsentAsync(ICallerContext caller, string clientId,
+        string userId, CancellationToken cancellationToken)
+    {
+        var retrievedClient = await _clientRepository.LoadAsync(clientId.ToId(), cancellationToken);
+        if (retrievedClient.IsFailure)
+        {
+            return retrievedClient.Error;
+        }
+
+        var retrieved = await _clientConsentRepository.FindByUserId(clientId.ToId(), userId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var consent = retrieved.Value.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Consent for client {ClientId} and user {UserId} was retrieved",
+            consent.ClientId, consent.UserId);
+
+        return consent.ToConsent();
+    }
+
+    public async Task<Result<bool, Error>> HasClientConsentedUserAsync(ICallerContext caller, string clientId,
+        string userId, string scope, CancellationToken cancellationToken)
     {
         var retrievedClient = await _clientRepository.LoadAsync(clientId.ToId(), cancellationToken);
         if (retrievedClient.IsFailure)
@@ -221,10 +249,13 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
         }
 
         var consent = retrieved.Value.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Consent for client {ClientId} and user {UserId} was retrieved",
-            consent.ClientId, consent.UserId);
+        var scopes = OAuth2Scopes.Create(scope);
+        if (scopes.IsFailure)
+        {
+            return scopes.Error;
+        }
 
-        return consent.IsConsented;
+        return consent.HasConsentedTo(scopes.Value);
     }
 
     public async Task<Result<OAuth2ClientWithSecret, Error>> RegenerateClientSecretAsync(ICallerContext caller,
@@ -359,6 +390,27 @@ public class NativeIdentityServerOAuth2ClientService : IIdentityServerOAuth2Clie
 
         return client.ToClient();
     }
+
+    public async Task<Result<OAuth2Client, Error>> VerifyClientAsync(ICallerContext caller, string id,
+        string clientSecret, CancellationToken cancellationToken)
+    {
+        var retrieved = await _clientRepository.LoadAsync(id.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var client = retrieved.Value;
+        var verified = client.VerifySecret(clientSecret);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Client {Id} verified", client.Id);
+
+        return client.ToClient();
+    }
 }
 
 public static class NativeIdentityServerOAuth2ClientServiceConversionExtensions
@@ -394,6 +446,35 @@ public static class NativeIdentityServerOAuth2ClientServiceConversionExtensions
             ExpiresOnUtc = secret.ExpiresOn.HasValue
                 ? secret.ExpiresOn.Value
                 : null
+        };
+    }
+
+    public static OAuth2ClientWithSecrets ToClientWithSecrets(this OAuth2ClientRoot client)
+    {
+        return new OAuth2ClientWithSecrets
+        {
+            Id = client.Id,
+            Name = client.Name.ValueOrDefault!,
+            RedirectUri = client.RedirectUri,
+            Secrets = client.Secrets.Select(sec => new OAuthClientSecret
+            {
+                ExpiresOnUtc = sec.ExpiresOn.HasValue
+                    ? sec.ExpiresOn.Value
+                    : null,
+                Reference = $"{sec.FirstFour}********************"
+            }).ToList()
+        };
+    }
+
+    public static OAuth2ClientConsent ToConsent(this OAuth2ClientConsentRoot consent)
+    {
+        return new OAuth2ClientConsent
+        {
+            Id = consent.Id,
+            ClientId = consent.ClientId,
+            IsConsented = consent.IsConsented,
+            Scopes = consent.Scopes.Items,
+            UserId = consent.UserId
         };
     }
 }

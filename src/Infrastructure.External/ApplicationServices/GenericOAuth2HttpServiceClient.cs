@@ -4,9 +4,9 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
+using Domain.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
-using Infrastructure.Web.Interfaces.Auth;
 
 namespace Infrastructure.External.ApplicationServices;
 
@@ -40,7 +40,7 @@ public class GenericOAuth2HttpServiceClient : IOAuth2Service
             //We want you to be able to override this and use any IOAuth2GrantAuthorizationRequest
             var response = await _serviceClient.PostAsync(caller, new GenericOAuth2GrantAuthorizationRequest
             {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCodeFlow,
+                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
                 Code = options.Code,
                 ClientId = _clientId,
                 ClientSecret = _clientSecret,
@@ -71,7 +71,7 @@ public class GenericOAuth2HttpServiceClient : IOAuth2Service
         {
             var response = await _serviceClient.PostAsync(caller, new GenericOAuth2GrantAuthorizationRequest
             {
-                GrantType = OAuth2Constants.GrantTypes.RefreshFlow,
+                GrantType = OAuth2Constants.GrantTypes.RefreshToken,
                 ClientId = _clientId,
                 ClientSecret = _clientSecret,
                 RefreshToken = options.RefreshToken

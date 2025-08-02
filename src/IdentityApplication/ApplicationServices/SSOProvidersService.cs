@@ -424,15 +424,10 @@ internal static class SSOProvidersServiceConversionExtensions
     public static ProviderAuthenticationTokens ToProviderAuthenticationTokens(
         this ProviderAuthTokensRoot providerTokens, IEncryptionService encryptionService)
     {
-        var authTokens = providerTokens.Tokens.Value.ToList();
-        var accessToken = authTokens
-            .Single(tok => tok.Type == AuthTokenType.AccessToken);
-        var refreshToken = authTokens
-            .ToList()
-            .FirstOrDefault(tok => tok.Type == AuthTokenType.RefreshToken);
-        var otherTokens = authTokens
-            .Where(tok => tok.Type == AuthTokenType.OtherToken)
-            .ToList();
+        var authTokens = providerTokens.Tokens.Value;
+        var accessToken = authTokens.GetToken(AuthTokenType.AccessToken).Value;
+        var refreshToken = authTokens.GetToken(AuthTokenType.RefreshToken).Value;
+        var otherToken = authTokens.GetToken(AuthTokenType.OtherToken);
 
         var authenticationTokens = new ProviderAuthenticationTokens
         {
@@ -441,23 +436,26 @@ internal static class SSOProvidersServiceConversionExtensions
             {
                 ExpiresOn = accessToken.ExpiresOn,
                 Type = TokenType.AccessToken,
-                Value = encryptionService.Decrypt(accessToken.EncryptedValue)
+                Value = accessToken.GetDecryptedValue(encryptionService)
             },
             RefreshToken = refreshToken.Exists()
                 ? new AuthenticationToken
                 {
                     ExpiresOn = refreshToken.ExpiresOn,
                     Type = TokenType.RefreshToken,
-                    Value = encryptionService.Decrypt(refreshToken.EncryptedValue)
+                    Value = refreshToken.GetDecryptedValue(encryptionService)
                 }
                 : null,
-            OtherTokens = otherTokens.HasAny()
-                ? otherTokens.Select(otherToken => new AuthenticationToken
-                {
-                    ExpiresOn = otherToken.ExpiresOn,
-                    Type = TokenType.OtherToken,
-                    Value = encryptionService.Decrypt(otherToken.EncryptedValue)
-                }).ToList()
+            OtherTokens = otherToken.HasValue
+                ?
+                [
+                    new AuthenticationToken
+                    {
+                        ExpiresOn = otherToken.Value.ExpiresOn,
+                        Type = TokenType.OtherToken,
+                        Value = otherToken.Value.GetDecryptedValue(encryptionService)
+                    }
+                ]
                 : []
         };
 

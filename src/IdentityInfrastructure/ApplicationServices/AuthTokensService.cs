@@ -15,9 +15,16 @@ public class AuthTokensService : IAuthTokensService
         _authTokensApplication = authTokensApplication;
     }
 
-    public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext caller, EndUserWithMemberships user,
-        CancellationToken cancellationToken)
+    public async Task<Result<AuthenticateTokens, Error>> IssueTokensAsync(ICallerContext caller, string userId,
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData, CancellationToken cancellationToken)
     {
-        return await _authTokensApplication.IssueTokensAsync(caller, user, cancellationToken);
+        return await _authTokensApplication.IssueTokensAsync(caller, userId, scopes, additionalData, cancellationToken);
+    }
+
+    public async Task<Result<AuthenticateTokens, Error>> RefreshTokensAsync(ICallerContext caller, string refreshToken,
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData, CancellationToken cancellationToken)
+    {
+        return await _authTokensApplication.RefreshTokenAsync(caller, refreshToken, scopes, additionalData,
+            cancellationToken);
     }
 }

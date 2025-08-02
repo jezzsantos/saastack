@@ -1,6 +1,6 @@
 using System.Text;
+using Application.Interfaces;
 using Domain.Interfaces.Authorization;
-using Infrastructure.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
