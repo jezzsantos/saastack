@@ -554,9 +554,21 @@ public static class RequestExtensions
         static string GetPropertyName(PropertyInfo propInfo, bool lowercaseNames)
         {
             var jsonPropertyName = propInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
-            return jsonPropertyName.Exists()
-                ? jsonPropertyName.Name
-                : lowercaseNames
+            if (jsonPropertyName.Exists())
+            {
+                return jsonPropertyName.Name;
+            }
+
+            var fromQueryName = propInfo.GetCustomAttribute<FromQueryAttribute>();
+            if (fromQueryName.Exists())
+            {
+                if (fromQueryName.Name.HasValue())
+                {
+                    return fromQueryName.Name;
+                }
+            }
+
+            return lowercaseNames
                     ? propInfo.Name.ToLowerInvariant()
                     : propInfo.Name;
         }

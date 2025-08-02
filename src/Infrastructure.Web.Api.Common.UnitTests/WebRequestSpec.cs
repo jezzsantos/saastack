@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Interfaces;
@@ -39,7 +40,7 @@ public class WebRequestSpec
                 RequestServices = _serviceProvider.Object
             };
 
-            var result = await TestRequest.BindAsync(context, null!);
+            var result = await TestJsonRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().BeNull();
@@ -58,15 +59,42 @@ public class WebRequestSpec
                     Body = new MemoryStream("{}"u8.ToArray()),
                     Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestJsonRequest.Id), "anid" },
+                        { nameof(TestJsonRequest.ANumberProperty), "999" },
+                        { nameof(TestJsonRequest.AStringProperty), "avalue" }
                     })
                 },
                 RequestServices = _serviceProvider.Object
             };
 
-            var result = await TestRequest.BindAsync(context, null!);
+            var result = await TestJsonRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInQueryString_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.Json,
+                    Body = new MemoryStream("{}"u8.ToArray()),
+                    Query = new QueryCollection(new Dictionary<string, StringValues>
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    })
+                },
+                RequestServices = _serviceProvider.Object
+            };
+
+            var result = await TestAliasedJsonRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -85,15 +113,42 @@ public class WebRequestSpec
                     Body = new MemoryStream("{}"u8.ToArray()),
                     RouteValues = new RouteValueDictionary
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestJsonRequest.Id), "anid" },
+                        { nameof(TestJsonRequest.ANumberProperty), "999" },
+                        { nameof(TestJsonRequest.AStringProperty), "avalue" }
                     }
                 },
                 RequestServices = _serviceProvider.Object
             };
 
-            var result = await TestRequest.BindAsync(context, null!);
+            var result = await TestJsonRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInRouteValues_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.Json,
+                    Body = new MemoryStream("{}"u8.ToArray()),
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    }
+                },
+                RequestServices = _serviceProvider.Object
+            };
+
+            var result = await TestAliasedJsonRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -116,7 +171,7 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
+            var result = await TestMultipartFormDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().BeNull();
@@ -135,14 +190,40 @@ public class WebRequestSpec
                     Form = new FormCollection(new Dictionary<string, StringValues>()),
                     Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestMultipartFormDataRequest.Id), "anid" },
+                        { nameof(TestMultipartFormDataRequest.ANumberProperty), "999" },
+                        { nameof(TestMultipartFormDataRequest.AStringProperty), "avalue" }
                     })
                 }
             };
 
-            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
+            var result = await TestMultipartFormDataRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInQueryString_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.MultiPartFormData + "; boundary=boundary",
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    Query = new QueryCollection(new Dictionary<string, StringValues>
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestAliasedMultipartFormDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -161,14 +242,40 @@ public class WebRequestSpec
                     Form = new FormCollection(new Dictionary<string, StringValues>()),
                     RouteValues = new RouteValueDictionary
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestMultipartFormDataRequest.Id), "anid" },
+                        { nameof(TestMultipartFormDataRequest.ANumberProperty), "999" },
+                        { nameof(TestMultipartFormDataRequest.AStringProperty), "avalue" }
                     }
                 }
             };
 
-            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
+            var result = await TestMultipartFormDataRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInRouteValues_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.MultiPartFormData + "; boundary=boundary",
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    }
+                }
+            };
+
+            var result = await TestAliasedMultipartFormDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -186,14 +293,39 @@ public class WebRequestSpec
                     ContentType = HttpConstants.ContentTypes.MultiPartFormData + "; boundary=boundary",
                     Form = new FormCollection(new Dictionary<string, StringValues>
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestMultipartFormDataRequest.Id), "anid" },
+                        { nameof(TestMultipartFormDataRequest.ANumberProperty), "999" },
+                        { nameof(TestMultipartFormDataRequest.AStringProperty), "avalue" }
                     })
                 }
             };
 
-            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
+            var result = await TestMultipartFormDataRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInForm_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.MultiPartFormData + "; boundary=boundary",
+                    Form = new FormCollection(new Dictionary<string, StringValues>
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestAliasedMultipartFormDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -203,7 +335,7 @@ public class WebRequestSpec
     }
 
     [Trait("Category", "Unit")]
-    public class GivenAMultiPartFormUrlEncodedRequest
+    public class GivenAFormUrlEncodedRequest
     {
         [Fact]
         public async Task WhenBindAsyncAndEmptyHttpRequest_ThenReturnsInstance()
@@ -216,7 +348,7 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+            var result = await TestFormUrlEncodedRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().BeNull();
@@ -235,14 +367,40 @@ public class WebRequestSpec
                     Form = new FormCollection(new Dictionary<string, StringValues>()),
                     Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestFormUrlEncodedRequest.Id), "anid" },
+                        { nameof(TestFormUrlEncodedRequest.ANumberProperty), "999" },
+                        { nameof(TestFormUrlEncodedRequest.AStringProperty), "avalue" }
                     })
                 }
             };
 
-            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+            var result = await TestFormUrlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInQueryString_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    Query = new QueryCollection(new Dictionary<string, StringValues>
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestAliasedFormUrlEncodedRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -261,14 +419,40 @@ public class WebRequestSpec
                     Form = new FormCollection(new Dictionary<string, StringValues>()),
                     RouteValues = new RouteValueDictionary
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestFormUrlEncodedRequest.Id), "anid" },
+                        { nameof(TestFormUrlEncodedRequest.ANumberProperty), "999" },
+                        { nameof(TestFormUrlEncodedRequest.AStringProperty), "avalue" }
                     }
                 }
             };
 
-            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+            var result = await TestFormUrlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInRouteValues_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    }
+                }
+            };
+
+            var result = await TestAliasedFormUrlEncodedRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -286,14 +470,39 @@ public class WebRequestSpec
                     ContentType = HttpConstants.ContentTypes.MultiPartFormData,
                     Form = new FormCollection(new Dictionary<string, StringValues>
                     {
-                        { nameof(TestRequest.Id), "anid" },
-                        { nameof(TestRequest.ANumberProperty), "999" },
-                        { nameof(TestRequest.AStringProperty), "avalue" }
+                        { nameof(TestFormUrlEncodedRequest.Id), "anid" },
+                        { nameof(TestFormUrlEncodedRequest.ANumberProperty), "999" },
+                        { nameof(TestFormUrlEncodedRequest.AStringProperty), "avalue" }
                     })
                 }
             };
 
-            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+            var result = await TestFormUrlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndAliasedPropertiesInForm_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.MultiPartFormData,
+                    Form = new FormCollection(new Dictionary<string, StringValues>
+                    {
+                        { "id", "anid" },
+                        { "a_number_property", "999" },
+                        { "a_string_property", "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestAliasedFormUrlEncodedRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -303,9 +512,33 @@ public class WebRequestSpec
     }
 }
 
+[Route("/aroute", OperationMethod.Get)]
+[UsedImplicitly]
+public class TestJsonRequest : WebRequest<TestJsonRequest, TestResponse>
+{
+    public int ANumberProperty { get; set; }
+
+    public string? AStringProperty { get; set; }
+
+    public string? Id { get; set; }
+}
+
+[Route("/aroute", OperationMethod.Get)]
+[UsedImplicitly]
+public class TestAliasedJsonRequest : WebRequest<TestAliasedJsonRequest, TestResponse>
+{
+    [JsonPropertyName("a_number_property")]
+    public int ANumberProperty { get; set; }
+
+    [JsonPropertyName("a_string_property")]
+    public string? AStringProperty { get; set; }
+
+    [JsonPropertyName("id")] public string? Id { get; set; }
+}
+
 [Route("/aroute", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestMultiPartFormDataDataRequest : WebRequest<TestMultiPartFormDataDataRequest, TestResponse>,
+public class TestMultipartFormDataRequest : WebRequest<TestMultipartFormDataRequest, TestResponse>,
     IHasMultipartFormData
 {
     public int ANumberProperty { get; set; }
@@ -317,7 +550,21 @@ public class TestMultiPartFormDataDataRequest : WebRequest<TestMultiPartFormData
 
 [Route("/aroute", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestMultiPartUlEncodedRequest : WebRequest<TestMultiPartUlEncodedRequest, TestResponse>,
+public class TestAliasedMultipartFormDataRequest : WebRequest<TestAliasedMultipartFormDataRequest, TestResponse>,
+    IHasMultipartFormData
+{
+    [JsonPropertyName("a_number_property")]
+    public int ANumberProperty { get; set; }
+
+    [JsonPropertyName("a_string_property")]
+    public string? AStringProperty { get; set; }
+
+    [JsonPropertyName("id")] public string? Id { get; set; }
+}
+
+[Route("/aroute", OperationMethod.Post)]
+[UsedImplicitly]
+public class TestFormUrlEncodedRequest : WebRequest<TestFormUrlEncodedRequest, TestResponse>,
     IHasFormUrlEncoded
 {
     public int ANumberProperty { get; set; }
@@ -325,4 +572,18 @@ public class TestMultiPartUlEncodedRequest : WebRequest<TestMultiPartUlEncodedRe
     public string? AStringProperty { get; set; }
 
     public string? Id { get; set; }
+}
+
+[Route("/aroute", OperationMethod.Post)]
+[UsedImplicitly]
+public class TestAliasedFormUrlEncodedRequest : WebRequest<TestAliasedFormUrlEncodedRequest, TestResponse>,
+    IHasFormUrlEncoded
+{
+    [JsonPropertyName("a_number_property")]
+    public int ANumberProperty { get; set; }
+
+    [JsonPropertyName("a_string_property")]
+    public string? AStringProperty { get; set; }
+
+    [JsonPropertyName("id")] public string? Id { get; set; }
 }
