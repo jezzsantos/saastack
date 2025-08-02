@@ -122,98 +122,109 @@ public readonly struct Error
     /// <summary>
     ///     Creates a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static Error Validation(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error Validation(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Validation, message, additionalData: additionalData);
+        return new Error(ErrorCode.Validation, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.RuleViolation" /> error
     /// </summary>
-    public static Error RuleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error RuleViolation(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RuleViolation, message, additionalData: additionalData);
+        return new Error(ErrorCode.RuleViolation, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.RoleViolation" /> error
     /// </summary>
-    public static Error RoleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error RoleViolation(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RoleViolation, message, additionalData: additionalData);
+        return new Error(ErrorCode.RoleViolation, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.PreconditionViolation" /> error
     /// </summary>
-    public static Error PreconditionViolation(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error PreconditionViolation(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.PreconditionViolation, message, additionalData: additionalData);
+        return new Error(ErrorCode.PreconditionViolation, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityNotFound" /> error
     /// </summary>
-    public static Error EntityNotFound(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error EntityNotFound(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityNotFound, message, additionalData: additionalData);
+        return new Error(ErrorCode.EntityNotFound, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityExists" /> error
     /// </summary>
-    public static Error EntityExists(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error EntityExists(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityExists, message, additionalData: additionalData);
+        return new Error(ErrorCode.EntityExists, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityLocked" /> error
     /// </summary>
-    public static Error EntityLocked(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error EntityLocked(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityLocked, message, additionalData: additionalData);
+        return new Error(ErrorCode.EntityLocked, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.NotAuthenticated" /> error
     /// </summary>
-    public static Error NotAuthenticated(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error NotAuthenticated(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.NotAuthenticated, message, additionalData: additionalData);
+        return new Error(ErrorCode.NotAuthenticated, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.ForbiddenAccess" /> error
     /// </summary>
-    public static Error ForbiddenAccess(string? message = null, string? forbiddenCode = null,
+    public static Error ForbiddenAccess(string? message = null, string? additionalCode = null,
         Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.ForbiddenAccess, message, forbiddenCode, additionalData);
+        return new Error(ErrorCode.ForbiddenAccess, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.FeatureViolation" /> error
     /// </summary>
-    public static Error FeatureViolation(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error FeatureViolation(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.FeatureViolation, message, additionalData: additionalData);
+        return new Error(ErrorCode.FeatureViolation, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.Unexpected" /> error
     /// </summary>
-    public static Error Unexpected(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error Unexpected(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Unexpected, message, additionalData: additionalData);
+        return new Error(ErrorCode.Unexpected, message, additionalCode, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityDeleted" /> error
     /// </summary>
-    public static Error EntityDeleted(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error EntityDeleted(string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityDeleted, message, additionalData: additionalData);
+        return new Error(ErrorCode.EntityDeleted, message, additionalCode, additionalData);
     }
 
     public override string ToString()
