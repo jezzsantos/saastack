@@ -348,6 +348,15 @@ namespace IdentityDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must consent to the &apos;openid&apos; scope.
+        /// </summary>
+        internal static string OAuth2ClientConsentRoot_MissingOpenIdScope {
+            get {
+                return ResourceManager.GetString("OAuth2ClientConsentRoot_MissingOpenIdScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot change the consent for another user.
         /// </summary>
         internal static string OAuth2ClientConsentRoot_NotOwner {
@@ -357,11 +366,164 @@ namespace IdentityDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Secret has expired.
+        /// </summary>
+        internal static string OAuth2ClientSecrets_SecretExpired {
+            get {
+                return ResourceManager.GetString("OAuth2ClientSecrets_SecretExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Secret does not exist for this client.
+        /// </summary>
+        internal static string OAuth2ClientSecrets_UnknownSecret {
+            get {
+                return ResourceManager.GetString("OAuth2ClientSecrets_UnknownSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Scope is unknown.
         /// </summary>
         internal static string OAuth2Scopes_InvalidScope {
             get {
                 return ResourceManager.GetString("OAuth2Scopes_InvalidScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CodeChallenge has not defined a method.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_GenerateCode_CodeChallengeMissingMethod {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_GenerateCode_CodeChallengeMissingMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect URI does not match the client.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_GenerateCode_MismatchedClientRedirectUri {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_GenerateCode_MismatchedClientRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect URI is missing for the client.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_GenerateCode_MissingClientRedirectUri {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_GenerateCode_MissingClientRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scope is missing the &apos;openid&apos; scope.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_GenerateCode_MissingOpenIdScope {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_GenerateCode_MissingOpenIdScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization is missing a &apos;ClientId&apos;.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_MissingClientId {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_MissingClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization is missing a &apos;RedirectUri&apos;.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_MissingRedirectUri {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_MissingRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization is missing a &apos;Scopes&apos;.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_MissingScopes {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_MissingScopes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization is missing a &apos;UserId&apos;.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_MissingUserId {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_MissingUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization has not been configured.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_NotConfigured {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_NotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization code has expired.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyCode_ExpiredAuthorizationCode {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyCode_ExpiredAuthorizationCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect URI does not match.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyCode_MismatchedRedirectUri {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyCode_MismatchedRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization has not been configured.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyCode_NotConfigured {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyCode_NotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code verifier is invalid.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyPkce_InvalidCodeVerifier {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyPkce_InvalidCodeVerifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code Challenge was required when authorized.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyPkce_MissingCodeChallenge {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyPkce_MissingCodeChallenge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code verifier is required to verify code.
+        /// </summary>
+        internal static string OidcAuthorizationRoot_VerifyPkce_MissingCodeVerifier {
+            get {
+                return ResourceManager.GetString("OidcAuthorizationRoot_VerifyPkce_MissingCodeVerifier", resourceCulture);
             }
         }
         

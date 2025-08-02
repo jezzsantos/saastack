@@ -2,6 +2,8 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Interfaces.ValueObjects;
+using IdentityDomain.DomainServices;
 using JetBrains.Annotations;
 
 namespace IdentityDomain;
@@ -28,6 +30,8 @@ public sealed class OAuth2ClientSecret : ValueObjectBase<OAuth2ClientSecret>
 
     public string SecretHash { get; }
 
+    public bool IsExpired => ExpiresOn.HasValue && ExpiresOn.Value < DateTime.UtcNow;
+
     [UsedImplicitly]
     public static ValueObjectFactory<OAuth2ClientSecret> Rehydrate()
     {
@@ -41,5 +45,11 @@ public sealed class OAuth2ClientSecret : ValueObjectBase<OAuth2ClientSecret>
     protected override IEnumerable<object?> GetAtomicValues()
     {
         return new object[] { SecretHash, ExpiresOn };
+    }
+
+    [SkipImmutabilityCheck]
+    public bool IsMatch(IPasswordHasherService passwordHasherService, string secret)
+    {
+        return passwordHasherService.VerifyPassword(secret, SecretHash);
     }
 }

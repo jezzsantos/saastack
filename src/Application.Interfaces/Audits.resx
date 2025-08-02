@@ -117,4 +117,13 @@
     <data name="ChargebeeApi_WebhookAuthentication_Failed" xml:space="preserve">
         <value>Chargebee.Authentication.Failed</value>
     </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_Prepared" xml:space="preserve">
+        <value>Authorization.OIDC.Prepared</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_Passed" xml:space="preserve">
+        <value>Authorization.OIDC.Passed</value>
+    </data>
+    <data name="NativeIdentityServerOpenIdConnectService_Authorization_Failed" xml:space="preserve">
+        <value>Authorization.OIDC.Failed</value>
+    </data>
 </root>

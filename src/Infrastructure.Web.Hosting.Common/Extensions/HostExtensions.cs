@@ -3,6 +3,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Services.Shared;

@@ -22,4 +22,6 @@ public interface ITokensService
     Optional<APIKeyToken> ParseApiKey(string apiKey);
 
     string CreateOAuth2ClientSecret();
+
+    string CreateOAuthAuthorizationCode(string value);
 }

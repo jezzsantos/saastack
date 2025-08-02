@@ -13,5 +13,9 @@ public interface IOAuth2ClientService
         CancellationToken cancellationToken);
 
     Task<Result<bool, Error>> HasClientConsentedUserAsync(ICallerContext caller, string clientId, string userId,
+        string scope,
+        CancellationToken cancellationToken);
+
+    Task<Result<OAuth2Client, Error>> VerifyClientAsync(ICallerContext caller, string clientId, string clientSecret,
         CancellationToken cancellationToken);
 }

@@ -3,8 +3,8 @@ using System.Text;
 using Application.Interfaces;
 using Common;
 using Common.Extensions;
+using Domain.Interfaces;
 using Infrastructure.Web.Interfaces;
-using Infrastructure.Web.Interfaces.Auth;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Common.Extensions;
@@ -148,13 +148,13 @@ public static class HttRequestExtensions
         }
 
         var value = authorization.FirstOrDefault(val =>
-            val.HasValue() && val.StartsWith(OAuth2Constants.BearerTokenPrefix));
+            val.HasValue() && val.StartsWith(OAuth2Constants.TokenTypes.Bearer));
         if (value.HasNoValue())
         {
             return Optional<string>.None;
         }
 
-        var indexOfToken = OAuth2Constants.BearerTokenPrefix.Length + 1;
+        var indexOfToken = OAuth2Constants.TokenTypes.Bearer.Length + 1;
         var token = value.Substring(indexOfToken);
 
         return token.HasValue()
@@ -195,7 +195,6 @@ public static class HttRequestExtensions
         message.SetBasicAuth(apiKey);
     }
 
-
     /// <summary>
     ///     Sets the <see cref="ICallerContext.Authorization" /> to Basic with <see cref="username" />, and
     ///     <see cref="password" />
@@ -222,7 +221,7 @@ public static class HttRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpConstants.Headers.Authorization, $"{OAuth2Constants.BearerTokenPrefix} {token}");
+        message.Headers.Add(HttpConstants.Headers.Authorization, $"{OAuth2Constants.TokenTypes.Bearer} {token}");
     }
 
     /// <summary>

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using Application.Interfaces;
 using FluentAssertions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;

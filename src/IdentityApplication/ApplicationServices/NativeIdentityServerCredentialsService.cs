@@ -200,7 +200,8 @@ public partial class NativeIdentityServerCredentialsService : IIdentityServerCre
                 return saved.Error;
             }
 
-            return Error.ForbiddenAccess(Resources.PersonCredentialsApplication_MfaRequired, MfaRequiredCode,
+            return Error.ForbiddenAccess(Resources.PersonCredentialsApplication_MfaRequired,
+                AuthenticationConstants.ErrorCodes.MfaRequired,
                 new Dictionary<string, object>
                 {
                     { MfaTokenName, mfaToken }

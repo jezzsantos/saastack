@@ -6,7 +6,7 @@ namespace IdentityApplication;
 
 public interface IOAuth2ClientApplication
 {
-    Task<Result<bool, Error>> ConsentToClientAsync(ICallerContext caller, string clientId,
+    Task<Result<OAuth2ClientConsent, Error>> ConsentToClientAsync(ICallerContext caller, string clientId,
         string? scope, bool consented, CancellationToken cancellationToken);
 
     Task<Result<OAuth2Client, Error>> CreateClientAsync(ICallerContext caller, string name, string? redirectUri,
@@ -18,7 +18,7 @@ public interface IOAuth2ClientApplication
     Task<Result<OAuth2Client, Error>> GetClientAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
 
-    Task<Result<bool, Error>> GetConsentAsync(ICallerContext caller, string clientId,
+    Task<Result<OAuth2ClientConsent, Error>> GetConsentAsync(ICallerContext caller, string clientId,
         CancellationToken cancellationToken);
 
     Task<Result<OAuth2ClientWithSecret, Error>> RegenerateClientSecretAsync(ICallerContext caller, string id,

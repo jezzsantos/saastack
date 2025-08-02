@@ -2,11 +2,16 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
+using Common.Extensions;
+using Domain.Interfaces;
 using FluentAssertions;
-using IdentityDomain;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
+using OAuth2CodeChallengeMethod = Application.Resources.Shared.OAuth2CodeChallengeMethod;
+using OAuth2GrantType = Application.Resources.Shared.OAuth2GrantType;
+using OAuth2ResponseType = Application.Resources.Shared.OAuth2ResponseType;
+using OAuth2TokenType = Application.Resources.Shared.OAuth2TokenType;
 
 namespace IdentityApplication.UnitTests;
 
@@ -20,7 +25,8 @@ public class OpenIdConnectApplicationSpec
     public OpenIdConnectApplicationSpec()
     {
         _caller = new Mock<ICallerContext>();
-        _caller.Setup(c => c.CallerId).Returns("acallerid");
+        _caller.Setup(c => c.CallerId)
+            .Returns("acallerid");
 
         _oidcService = new Mock<IIdentityServerOpenIdConnectService>();
         var identityServerProvider = new Mock<IIdentityServerProvider>();
@@ -33,7 +39,7 @@ public class OpenIdConnectApplicationSpec
     [Fact]
     public async Task WhenGetDiscoveryDocumentAsync_ThenReturnsDiscoveryDocument()
     {
-        var expectedDocument = new OidcDiscoveryDocument
+        var expectedDocument = new OpenIdConnectDiscoveryDocument
         {
             Issuer = "anissuer",
             AuthorizationEndpoint = $"anissuer{OAuth2Constants.Endpoints.Authorization}",
@@ -110,212 +116,106 @@ public class OpenIdConnectApplicationSpec
     }
 
     [Fact]
-    public async Task WhenAuthorizeAsyncWithValidRequest_ThenReturnsAuthorizationCode()
+    public async Task WhenAuthorizeAsyncWith_ThenReturnsAuthorizationCode()
     {
-        var expectedResponse = new OidcAuthorizationResponse
-        {
-            Code = "anauthorizationcode",
-            State = "astate"
-        };
+        _oidcService.Setup(s => s.AuthorizeAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<OAuth2ResponseType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<OAuth2CodeChallengeMethod>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new OpenIdConnectAuthorization
+            {
+                Code = new OpenIdConnectAuthorizationCode
+                {
+                    Code = "anauthorizationcode",
+                    State = "astate"
+                }
+            });
 
-        _oidcService.Setup(s => s.AuthorizeAsync(
-                _caller.Object,
-                "aclientid",
-                "aredirecturi",
-                OAuth2Constants.ResponseTypes.Code,
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-                "astate",
-                "anonce",
-                null,
-                null,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedResponse);
-
-        var result = await _application.AuthorizeAsync(
-            _caller.Object,
-            "aclientid",
-            "aredirecturi",
-            OAuth2Constants.ResponseTypes.Code,
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-            "astate",
-            "anonce",
-            null,
-            null,
+        var result = await _application.AuthorizeAsync(_caller.Object, "aclientid", "aredirecturi",
+            OAuth2ResponseType.Code, "ascope", "astate", "anonce", "acodechallenge", OAuth2CodeChallengeMethod.Plain,
             CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.Code.Should().NotBeEmpty();
-        result.Value.State.Should().Be("astate");
-    }
-
-    [Fact]
-    public async Task WhenAuthorizeAsyncWithInvalidResponseType_ThenReturnsError()
-    {
-        _oidcService.Setup(s => s.AuthorizeAsync(
-                _caller.Object,
-                "aclientid",
-                "aredirecturi",
-                OAuth2Constants.ResponseTypes.Token,
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-                null,
-                null,
-                null,
-                null,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Error.Validation("avalidationmessage"));
-
-        var result = await _application.AuthorizeAsync(
-            _caller.Object,
-            "aclientid",
-            "aredirecturi",
-            OAuth2Constants.ResponseTypes.Token, // Invalid response type
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-            null,
-            null,
-            null,
-            null,
-            CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.Validation);
-        result.Error.Message.Should().Contain("avalidationmessage");
-    }
-
-    [Fact]
-    public async Task WhenAuthorizeAsyncWithoutOpenIdScope_ThenReturnsError()
-    {
-        _oidcService.Setup(s => s.AuthorizeAsync(
-                _caller.Object,
-                "aclientid",
-                "aredirecturi",
-                OAuth2Constants.ResponseTypes.Code,
-                $"{OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
-                null,
-                null,
-                null,
-                null,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Error.Validation("avalidationmessage"));
-
-        var result = await _application.AuthorizeAsync(
-            _caller.Object,
-            "aclientid",
-            "aredirecturi",
-            OAuth2Constants.ResponseTypes.Code,
-            $"{OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}", // Missing openid scope
-            null,
-            null,
-            null,
-            null,
-            CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.Validation);
-        result.Error.Message.Should().Contain("avalidationmessage");
+        result.Value.Code!.Code.Should().Be("anauthorizationcode");
+        result.Value.Code.State.Should().Be("astate");
+        _oidcService.Verify(s => s.AuthorizeAsync(_caller.Object, "aclientid", "acallerid", "aredirecturi",
+            OAuth2ResponseType.Code, "ascope", "astate", "anonce", "acodechallenge", OAuth2CodeChallengeMethod.Plain,
+            It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task WhenCreateTokenAsyncWithAuthorizationCode_ThenReturnsTokens()
     {
-        var expectedTokenResponse = new OidcTokenResponse
-        {
-            AccessToken = "anaccesstoken",
-            TokenType = OAuth2Constants.TokenTypes.Bearer,
-            ExpiresIn = 900, // 15 minutes
-            RefreshToken = "arefreshtoken",
-            IdToken = "anidtoken",
-            Scope =
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}"
-        };
+        _oidcService.Setup(s => s.ExchangeCodeForTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new OpenIdConnectTokens
+            {
+                AccessToken = "anaccesstoken",
+                TokenType = OAuth2TokenType.Bearer,
+                ExpiresIn = 1,
+                RefreshToken = "arefreshtoken",
+                IdToken = "anidtoken"
+            });
 
-        _oidcService.Setup(s => s.ExchangeCodeForTokensAsync(
-                _caller.Object,
-                "aclientid",
-                "aclientsecret",
-                "anauthorizationcode",
-                null,
-                "aredirecturi", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedTokenResponse);
-
-        var result = await _application.CreateTokenAsync(
-            _caller.Object,
-            OAuth2Constants.GrantTypes.AuthorizationCode,
-            "aclientid",
-            "aclientsecret",
-            "anauthorizationcode",
-            null,
-            "aredirecturi",
-            "",
-            null,
-            CancellationToken.None);
+        var result = await _application.CreateTokenAsync(_caller.Object, OAuth2GrantType.Authorization_Code,
+            "aclientid", "aclientsecret", "acode", "aredirecturi", "acodeverifier", "arefreshtoken",
+            "ascope", CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
+        result.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+        result.Value.ExpiresIn.Should().Be(1);
         result.Value.RefreshToken.Should().Be("arefreshtoken");
         result.Value.IdToken.Should().Be("anidtoken");
-        result.Value.Scope.Should()
-            .Be(
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}");
+        _oidcService.Verify(s => s.ExchangeCodeForTokensAsync(_caller.Object, "aclientid", "aclientsecret", "acode",
+            "aredirecturi", "acodeverifier", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task WhenCreateTokenAsyncWithRefreshToken_ThenReturnsNewTokens()
     {
-        var expectedTokenResponse = new OidcTokenResponse
-        {
-            AccessToken = "anewaccesstoken",
-            TokenType = OAuth2Constants.TokenTypes.Bearer,
-            ExpiresIn = 900, // 15 minutes
-            RefreshToken = "anewrefreshtoken",
-            IdToken = "anewidtoken",
-            Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}"
-        };
+        _oidcService.Setup(s => s.RefreshTokenAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new OpenIdConnectTokens
+            {
+                AccessToken = "anaccesstoken",
+                TokenType = OAuth2TokenType.Bearer,
+                ExpiresIn = 1,
+                RefreshToken = "arefreshtoken",
+                IdToken = "anidtoken"
+            });
 
-        _oidcService.Setup(s => s.RefreshTokenAsync(
-                _caller.Object,
-                "aclientid",
-                "aclientsecret",
-                "anoldrefreshtoken",
-                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedTokenResponse);
-
-        var result = await _application.CreateTokenAsync(
-            _caller.Object,
-            OAuth2Constants.GrantTypes.RefreshToken,
-            "aclientid",
-            "aclientsecret",
-            "",
-            null,
-            "",
-            "anoldrefreshtoken",
-            $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-            CancellationToken.None);
+        var result = await _application.CreateTokenAsync(_caller.Object, OAuth2GrantType.Refresh_Token,
+            "aclientid", "aclientsecret", "acode", "aredirecturi", "acodeverifier", "arefreshtoken",
+            "ascope", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.AccessToken.Should().Be("anewaccesstoken");
-        result.Value.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
-        result.Value.RefreshToken.Should().Be("anewrefreshtoken");
-        result.Value.Scope.Should()
-            .Be($"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}");
+        result.Value.AccessToken.Should().Be("anaccesstoken");
+        result.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+        result.Value.ExpiresIn.Should().Be(1);
+        result.Value.RefreshToken.Should().Be("arefreshtoken");
+        result.Value.IdToken.Should().Be("anidtoken");
+        _oidcService.Verify(s => s.RefreshTokenAsync(_caller.Object, "aclientid", "aclientsecret", "arefreshtoken",
+            "ascope", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task WhenCreateTokenAsyncWithUnsupportedGrantType_ThenReturnsError()
     {
-        var result = await _application.CreateTokenAsync(
-            _caller.Object,
-            OAuth2Constants.GrantTypes.ClientCredentials, // Unsupported grant type
-            "aclientid",
-            "aclientsecret",
-            "",
-            null,
-            "",
-            "",
-            null,
-            CancellationToken.None);
+        var result = await _application.CreateTokenAsync(_caller.Object, OAuth2GrantType.Password,
+            "aclientid", "aclientsecret", "acode", "aredirecturi", "acodeverifier", "arefreshtoken",
+            "ascope", CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.Validation);
-        result.Error.Message.Should()
-            .Contain($"Unsupported grant type: '{OAuth2Constants.GrantTypes.ClientCredentials}'");
+        result.Should().BeError(ErrorCode.Validation,
+            Resources.OpenIdConnectApplication_UnsupportedGrantType.Format(OAuth2GrantType.Password));
+        _oidcService.Verify(
+            s => s.ExchangeCodeForTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _oidcService.Verify(
+            s => s.RefreshTokenAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

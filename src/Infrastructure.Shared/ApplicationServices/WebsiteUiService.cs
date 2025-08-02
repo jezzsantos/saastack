@@ -8,15 +8,27 @@ namespace Infrastructure.Shared.ApplicationServices;
 public sealed class WebsiteUiService : IWebsiteUiService
 {
     //EXTEND: these URLs must reflect those used by the website that handles UI 
-    private const string PasswordMfaOobConfirmation = "/confirm-password-mfaoob";
-    private const string PasswordRegistrationConfirmationPageRoute = "/confirm-password-registration";
-    private const string PasswordResetConfirmationPageRoute = "/confirm-password-reset";
-    private const string RegistrationPageRoute = "/register";
+    public const string LoginPageRoute = "/login";
+    public const string OAuth2ConsentPageRoute = "/oauth2/authorize/consent";
+    public const string PasswordMfaOobConfirmationPageRoute = "/confirm-password-mfaoob";
+    public const string PasswordRegistrationConfirmationPageRoute = "/confirm-password-registration";
+    public const string PasswordResetConfirmationPageRoute = "/confirm-password-reset";
+    public const string RegistrationPageRoute = "/register";
+
+    public string ConstructLoginPageUrl()
+    {
+        return LoginPageRoute;
+    }
+
+    public string ConstructOAuth2ConsentPageUrl()
+    {
+        return OAuth2ConsentPageRoute;
+    }
 
     public string ConstructPasswordMfaOobConfirmationPageUrl(string code)
     {
         var escapedCode = Uri.EscapeDataString(code);
-        return $"{PasswordMfaOobConfirmation}?code={escapedCode}";
+        return $"{PasswordMfaOobConfirmationPageRoute}?code={escapedCode}";
     }
 
     public string ConstructPasswordRegistrationConfirmationPageUrl(string token)

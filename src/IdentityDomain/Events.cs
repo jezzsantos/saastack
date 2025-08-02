@@ -4,6 +4,7 @@ using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Events.Shared.Identities.OAuth2.ClientConsents;
 using Domain.Events.Shared.Identities.OAuth2.Clients;
+using Domain.Events.Shared.Identities.OpenIdConnect.Authorizations;
 using Domain.Events.Shared.Identities.PersonCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
@@ -444,6 +445,58 @@ public static class Events
                     UserId = userId,
                     IsConsented = false,
                     Scopes = []
+                };
+            }
+        }
+    }
+
+    public static class OpenIdConnect
+    {
+        public static class Authorizations
+        {
+            public static CodeAuthorized CodeAuthorized(Identifier id,
+                Identifier clientId, Identifier userId, OAuth2Scopes scopes, string redirectUri, Optional<string> nonce,
+                Optional<string> codeChallenge, Optional<OAuth2CodeChallengeMethod> codeChallengeMethod, string code,
+                DateTime expiresAt)
+            {
+                return new CodeAuthorized(id)
+                {
+                    ClientId = clientId,
+                    UserId = userId,
+                    Scopes = scopes.Items,
+                    RedirectUri = redirectUri,
+                    Nonce = nonce,
+                    CodeChallenge = codeChallenge,
+                    CodeChallengeMethod = codeChallengeMethod,
+                    Code = code,
+                    ExpiresAt = expiresAt,
+                    AuthorizedAt = DateTime.UtcNow
+                };
+            }
+
+            public static CodeExchanged CodeExchanged(Identifier id)
+            {
+                return new CodeExchanged(id)
+                {
+                    ExchangedAt = DateTime.UtcNow
+                };
+            }
+
+            public static TokenRefreshed TokenRefreshed(Identifier id)
+            {
+                return new TokenRefreshed(id)
+                {
+                    RefreshedAt = DateTime.UtcNow
+                };
+            }
+
+            public static Domain.Events.Shared.Identities.OpenIdConnect.Authorizations.Created Created(Identifier id,
+                Identifier clientId, Identifier userId)
+            {
+                return new Domain.Events.Shared.Identities.OpenIdConnect.Authorizations.Created(id)
+                {
+                    ClientId = clientId,
+                    UserId = userId
                 };
             }
         }

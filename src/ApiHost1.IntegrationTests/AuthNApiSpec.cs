@@ -165,9 +165,9 @@ public class AuthNApiSpec : WebApiSpec<Program>
             .IssueTokensAsync(new EndUserWithMemberships
             {
                 Id = "auserid",
-                Roles = new List<string> { PlatformRoles.Standard.Name },
-                Features = new List<string> { PlatformFeatures.Basic.Name }
-            }).GetAwaiter().GetResult().Value.AccessToken;
+                Roles = [PlatformRoles.Standard.Name],
+                Features = [PlatformFeatures.Basic.Name]
+            }, null, null, null).GetAwaiter().GetResult().Value.AccessToken;
     }
 }
 #endif

@@ -1,5 +1,6 @@
 using System.Net;
 using ApiHost1;
+using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Common.Extensions;
@@ -33,6 +34,7 @@ public class OAuth2ClientsApiSpec : WebApiSpec<Program>
     public async Task WhenCreateClientAndAuthenticated_ThenCreatesClient()
     {
         var login = await LoginUserAsync();
+
         var result = await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname",
@@ -154,38 +156,19 @@ public class OAuth2ClientsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenConsentClientForCaller_ThenConsentsToClient()
-    {
-        var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
-        {
-            Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
-
-        var result = await Api.PostAsync(new ConsentToOAuth2ClientForCallerRequest
-        {
-            Id = created.Content.Value.Client.Id,
-            Scope = "profile email",
-            Consented = true
-        }, req => req.SetJWTBearerToken(login.AccessToken));
-
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Value.Consented.Should().BeTrue();
-    }
-
-    [Fact]
     public async Task WhenConsentClientForCallerAndUnauthenticated_ThenReturnsUnauthorized()
     {
         var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
 
-        var result = await Api.PostAsync(new ConsentToOAuth2ClientForCallerRequest
+        var result = await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
         {
-            Id = created.Content.Value.Client.Id,
-            Scope = "profile email",
+            Id = client.Id,
+            Scope =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
             Consented = true
         });
 
@@ -193,44 +176,100 @@ public class OAuth2ClientsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenGetClientConsentForCaller_ThenReturnsConsentStatus()
+    public async Task WhenConsentClientForCallerWithoutOpenIdScope_ThenReturnsBadRequest()
     {
         var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
 
-        // First consent to the client
-        await Api.PostAsync(new ConsentToOAuth2ClientForCallerRequest
+        var result = await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
         {
-            Id = created.Content.Value.Client.Id,
-            Scope = "profile email",
+            Id = client.Id,
+            Scope = $"{OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
             Consented = true
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        // Then get the consent status
-        var result = await Api.GetAsync(new GetOAuth2ClientConsentForCallerRequest
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidScope);
+    }
+
+    [Fact]
+    public async Task WhenConsentClientForCaller_ThenConsentsToClient()
+    {
+        var login = await LoginUserAsync();
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
-            Id = created.Content.Value.Client.Id
+            Name = "aclientname"
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
+
+        var result = await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
+        {
+            Id = client.Id,
+            Scope =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
+            Consented = true
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Value.Consented.Should().BeTrue();
+        result.Content.Value.Consent.ClientId.Should().Be(client.Id);
+        result.Content.Value.Consent.UserId.Should().Be(login.User.Id);
+        result.Content.Value.Consent.IsConsented.Should().BeTrue();
+        result.Content.Value.Consent.Scopes.Should().BeEquivalentTo(new List<string>
+        {
+            OpenIdConnectConstants.Scopes.OpenId,
+            OAuth2Constants.Scopes.Profile,
+            OAuth2Constants.Scopes.Email
+        });
+    }
+
+    [Fact]
+    public async Task WhenGetClientConsentForCaller_ThenReturnsConsentStatus()
+    {
+        var login = await LoginUserAsync();
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
+        {
+            Name = "aclientname"
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
+
+        await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
+        {
+            Id = client.Id,
+            Scope =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
+            Consented = true
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        var result = await Api.GetAsync(new GetOAuth2ClientConsentForCallerRequest
+        {
+            Id = client.Id
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Consent.ClientId.Should().Be(client.Id);
+        result.Content.Value.Consent.UserId.Should().Be(login.User.Id);
+        result.Content.Value.Consent.IsConsented.Should().BeTrue();
+        result.Content.Value.Consent.Scopes.Should().BeEquivalentTo(new List<string>
+        {
+            OpenIdConnectConstants.Scopes.OpenId,
+            OAuth2Constants.Scopes.Profile,
+            OAuth2Constants.Scopes.Email
+        });
     }
 
     [Fact]
     public async Task WhenGetClientConsentForCallerAndUnauthenticated_ThenReturnsUnauthorized()
     {
         var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
 
         var result = await Api.GetAsync(new GetOAuth2ClientConsentForCallerRequest
         {
-            Id = created.Content.Value.Client.Id
+            Id = client.Id
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -240,48 +279,49 @@ public class OAuth2ClientsApiSpec : WebApiSpec<Program>
     public async Task WhenRevokeClientConsentForCaller_ThenRevokesConsent()
     {
         var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
 
-        // First consent to the client
-        await Api.PostAsync(new ConsentToOAuth2ClientForCallerRequest
+        await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
         {
-            Id = created.Content.Value.Client.Id,
-            Scope = "profile email",
+            Id = client.Id,
+            Scope =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
             Consented = true
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        // Then revoke the consent
         var result = await Api.DeleteAsync(new RevokeOAuth2ClientConsentForCallerRequest
         {
-            Id = created.Content.Value.Client.Id
+            Id = client.Id
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // Verify consent is revoked
-        var consentResult = await Api.GetAsync(new GetOAuth2ClientConsentForCallerRequest
+        var consent = await Api.GetAsync(new GetOAuth2ClientConsentForCallerRequest
         {
-            Id = created.Content.Value.Client.Id
+            Id = client.Id
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        consentResult.Content.Value.Consented.Should().BeFalse();
+        consent.Content.Value.Consent.ClientId.Should().Be(client.Id);
+        consent.Content.Value.Consent.UserId.Should().Be(login.User.Id);
+        consent.Content.Value.Consent.IsConsented.Should().BeFalse();
+        consent.Content.Value.Consent.Scopes.Should().BeEmpty();
     }
 
     [Fact]
     public async Task WhenRevokeClientConsentForCallerAndUnauthenticated_ThenReturnsUnauthorized()
     {
         var login = await LoginUserAsync();
-        var created = await Api.PostAsync(new CreateOAuth2ClientRequest
+        var client = (await Api.PostAsync(new CreateOAuth2ClientRequest
         {
             Name = "aclientname"
-        }, req => req.SetJWTBearerToken(login.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
 
         var result = await Api.DeleteAsync(new RevokeOAuth2ClientConsentForCallerRequest
         {
-            Id = created.Content.Value.Client.Id
+            Id = client.Id
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

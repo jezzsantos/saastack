@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using ApiHost1;
+using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common.Configuration;
@@ -11,7 +12,6 @@ using IdentityDomain.DomainServices;
 using IdentityInfrastructure.ApplicationServices;
 using IdentityInfrastructure.IntegrationTests.Stubs;
 using Infrastructure.Hosting.Common.Extensions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;

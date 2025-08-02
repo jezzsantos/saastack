@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 using Common;
 using Domain.Interfaces.Validations;
 using Domain.Services.Shared;
@@ -44,6 +45,16 @@ public sealed class TokensService : ITokensService
     public string CreateOAuth2ClientSecret()
     {
         return GenerateRandomStringSafeForUrl();
+    }
+
+    /// <summary>
+    ///     Creates a deterministic hash for the specified <see cref="value" />
+    /// </summary>
+    public string CreateOAuthAuthorizationCode(string value)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+        var code = Convert.ToBase64String(hash);
+        return MakeSafeForUrls(code);
     }
 
     public string CreatePasswordResetToken()

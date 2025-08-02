@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using FluentAssertions;
 using FluentValidation;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using JetBrains.Annotations;
 using UnitTesting.Common.Validation;

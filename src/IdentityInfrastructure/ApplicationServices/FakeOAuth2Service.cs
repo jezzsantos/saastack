@@ -8,7 +8,6 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using IdentityApplication.ApplicationServices;
-using Infrastructure.Interfaces;
 
 namespace IdentityInfrastructure.ApplicationServices;
 

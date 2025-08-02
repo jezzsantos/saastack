@@ -204,6 +204,33 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorization.OIDC.Failed.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_Failed {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OIDC.Passed.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_Passed {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_Passed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization.OIDC.Prepared.
+        /// </summary>
+        public static string NativeIdentityServerOpenIdConnectService_Authorization_Prepared {
+            get {
+                return ResourceManager.GetString("NativeIdentityServerOpenIdConnectService_Authorization_Prepared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Organization.Deleted.
         /// </summary>
         public static string OrganizationsApplication_OrganizationDeleted {

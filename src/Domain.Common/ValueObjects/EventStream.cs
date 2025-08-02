@@ -65,7 +65,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { FirstEventVersion, LastEventVersion };
+        return [FirstEventVersion, LastEventVersion];
     }
 
     public Result<EventStream, Error> Next()

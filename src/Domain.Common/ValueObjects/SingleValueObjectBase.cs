@@ -24,7 +24,7 @@ public abstract partial class SingleValueObjectBase<TValueObject, TValue> : Valu
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[] { Value };
+        return [Value];
     }
 
     TValue ISingleValueObject<TValue>.Value => Value;

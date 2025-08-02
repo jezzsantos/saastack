@@ -44,7 +44,8 @@ public class IdentityModule : ISubdomainModule
         { typeof(SSOUserRoot), "ssouser" },
         { typeof(ProviderAuthTokensRoot), "pvdrauthtok" },
         { typeof(OAuth2ClientRoot), "oauthclient" },
-        { typeof(OAuth2ClientConsentRoot), "oauthconsent" }
+        { typeof(OAuth2ClientConsentRoot), "oauthconsent" },
+        { typeof(OidcAuthorizationRoot), "oidcauthz" }
     };
 
     public Assembly InfrastructureAssembly => typeof(CredentialsApi).Assembly;
@@ -131,6 +132,15 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterEventing<OAuth2ClientConsentRoot, OAuth2ClientConsentProjection>(
                     c => new OAuth2ClientConsentProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IOidcAuthorizationRepository>(c =>
+                    new OidcAuthorizationRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<OidcAuthorizationRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<OidcAuthorizationRoot, OidcAuthorizationProjection>(
+                    c => new OidcAuthorizationProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterEventing<ProviderAuthTokensRoot, ProviderAuthTokensProjection>(

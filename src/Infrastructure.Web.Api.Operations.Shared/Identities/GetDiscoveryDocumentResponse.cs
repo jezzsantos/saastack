@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class GetDiscoveryDocumentResponse : IWebResponse
 {
-    public required OidcDiscoveryDocument Document { get; set; }
+    public required OpenIdConnectDiscoveryDocument Document { get; set; }
 }

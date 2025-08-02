@@ -62,18 +62,21 @@ public class AuthTokensApplicationSpec
             Id = "anid"
         };
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
-        _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
+        _jwtTokensService.Setup(jts =>
+                jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()))
             .ReturnsAsync(
                 new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<AuthTokensRoot>.None);
 
-        var result = await _application.IssueTokensAsync(_caller.Object, user, CancellationToken.None);
+        var result =
+            await _application.IssueTokensAsync(_caller.Object, user, null, null, null, CancellationToken.None);
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
         result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
+        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user, null, null, null));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
@@ -93,18 +96,21 @@ public class AuthTokensApplicationSpec
         var authTokens = AuthTokensRoot
             .Create(_recorder.Object, _idFactory.Object, _encryptionService.Object, "auserid".ToId()).Value;
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
-        _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
+        _jwtTokensService.Setup(jts =>
+                jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()))
             .ReturnsAsync(
                 new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authTokens.ToOptional());
 
-        var result = await _application.IssueTokensAsync(_caller.Object, user, CancellationToken.None);
+        var result =
+            await _application.IssueTokensAsync(_caller.Object, user, null, null, null, CancellationToken.None);
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
         result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
+        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user, null, null, null));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
@@ -123,7 +129,9 @@ public class AuthTokensApplicationSpec
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()), Times.Never);
+        _jwtTokensService.Verify(
+            jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()), Times.Never);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
@@ -150,7 +158,9 @@ public class AuthTokensApplicationSpec
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()), Times.Never);
+        _jwtTokensService.Verify(
+            jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()), Times.Never);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
@@ -178,7 +188,9 @@ public class AuthTokensApplicationSpec
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityLocked, Resources.AuthTokensApplication_AccountSuspended);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()), Times.Never);
+        _jwtTokensService.Verify(
+            jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()), Times.Never);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
@@ -201,7 +213,9 @@ public class AuthTokensApplicationSpec
                 eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
-        _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
+        _jwtTokensService.Setup(jts =>
+                jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>(), It.IsAny<UserProfile?>(),
+                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<Dictionary<string, object>?>()))
             .ReturnsAsync(
                 new AccessTokens("anaccesstoken2", expiresOn2, "arefreshtoken2", expiresOn2));
 
@@ -211,7 +225,7 @@ public class AuthTokensApplicationSpec
         result.Value.AccessToken.ExpiresOn.Should().Be(expiresOn2);
         result.Value.RefreshToken.Value.Should().Be("arefreshtoken2");
         result.Value.RefreshToken.ExpiresOn.Should().Be(expiresOn2);
-        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
+        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user, null, null, null));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken2"

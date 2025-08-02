@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using ApiHost1;
+using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -9,7 +10,6 @@ using FluentAssertions;
 using IdentityApplication.ApplicationServices;
 using IdentityDomain;
 using IdentityInfrastructure.ApplicationServices;
-using Infrastructure.Interfaces;
 using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -130,7 +130,7 @@ public class CredentialsApiSpec : WebApiSpec<Program>
             Password = "Password1!"
         });
 
-        result.Content.Error.Status.Should().Be((int)HttpStatusCode.Unauthorized);
+        result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class CredentialsApiSpec : WebApiSpec<Program>
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        result.Content.Error.Title.Should().Be(NativeIdentityServerCredentialsService.MfaRequiredCode);
+        result.Content.Error.Title.Should().Be(AuthenticationConstants.ErrorCodes.MfaRequired);
         result.Content.Error.Extensions!.Count.Should().Be(1);
         result.Content.Error.Extensions[NativeIdentityServerCredentialsService.MfaTokenName].As<JsonElement>()
             .GetString()

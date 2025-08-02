@@ -210,4 +210,58 @@
     <data name="OAuth2ClientConsentRoot_NotOwner" xml:space="preserve">
         <value>Cannot change the consent for another user</value>
     </data>
+    <data name="OAuth2ClientConsentRoot_MissingOpenIdScope" xml:space="preserve">
+        <value>You must consent to the 'openid' scope</value>
+    </data>
+    <data name="OidcAuthorizationRoot_NotConfigured" xml:space="preserve">
+        <value>Authorization has not been configured</value>
+    </data>
+    <data name="OidcAuthorizationRoot_MissingUserId" xml:space="preserve">
+        <value>Authorization is missing a 'UserId'</value>
+    </data>
+    <data name="OidcAuthorizationRoot_MissingClientId" xml:space="preserve">
+        <value>Authorization is missing a 'ClientId'</value>
+    </data>
+    <data name="OidcAuthorizationRoot_MissingRedirectUri" xml:space="preserve">
+        <value>Authorization is missing a 'RedirectUri'</value>
+    </data>
+    <data name="OidcAuthorizationRoot_MissingScopes" xml:space="preserve">
+        <value>Authorization is missing a 'Scopes'</value>
+    </data>
+    <data name="OidcAuthorizationRoot_GenerateCode_MissingClientRedirectUri" xml:space="preserve">
+        <value>Redirect URI is missing for the client</value>
+    </data>
+    <data name="OidcAuthorizationRoot_GenerateCode_MismatchedClientRedirectUri" xml:space="preserve">
+        <value>Redirect URI does not match the client</value>
+    </data>
+    <data name="OidcAuthorizationRoot_GenerateCode_MissingOpenIdScope" xml:space="preserve">
+        <value>Scope is missing the 'openid' scope</value>
+    </data>
+    <data name="OidcAuthorizationRoot_GenerateCode_CodeChallengeMissingMethod" xml:space="preserve">
+        <value>CodeChallenge has not defined a method</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyCode_NotConfigured" xml:space="preserve">
+        <value>Authorization has not been configured</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyCode_ExpiredAuthorizationCode" xml:space="preserve">
+        <value>Authorization code has expired</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyCode_MismatchedRedirectUri" xml:space="preserve">
+        <value>Redirect URI does not match</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyPkce_MissingCodeChallenge" xml:space="preserve">
+        <value>Code Challenge was required when authorized</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyPkce_MissingCodeVerifier" xml:space="preserve">
+        <value>Code verifier is required to verify code</value>
+    </data>
+    <data name="OidcAuthorizationRoot_VerifyPkce_InvalidCodeVerifier" xml:space="preserve">
+        <value>Code verifier is invalid</value>
+    </data>
+    <data name="OAuth2ClientSecrets_UnknownSecret" xml:space="preserve">
+        <value>Secret does not exist for this client</value>
+    </data>
+    <data name="OAuth2ClientSecrets_SecretExpired" xml:space="preserve">
+        <value>Secret has expired</value>
+    </data>
 </root>

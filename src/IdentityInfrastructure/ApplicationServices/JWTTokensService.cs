@@ -1,13 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using Common.Configuration;
+using Common.Extensions;
 using Domain.Services.Shared;
 using IdentityApplication.ApplicationServices;
 using Infrastructure.Common.Extensions;
-using Infrastructure.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityInfrastructure.ApplicationServices;
@@ -32,9 +33,10 @@ public class JWTTokensService : IJWTTokensService
                 AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalMinutes));
     }
 
-    public Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUserWithMemberships user)
+    public Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUserWithMemberships user, UserProfile? profile,
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData)
     {
-        var tokens = IssueTokens(user);
+        var tokens = IssueTokens(user, profile, scopes, additionalData);
 
         return Task.FromResult(tokens);
     }
@@ -46,26 +48,43 @@ public class JWTTokensService : IJWTTokensService
     }
 #endif
 
-    private Result<AccessTokens, Error> IssueTokens(EndUserWithMemberships user)
+    private Result<AccessTokens, Error> IssueTokens(EndUserWithMemberships user, UserProfile? profile,
+        IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData)
     {
-        var accessTokenExpiresOn = DateTime.UtcNow.Add(_accessTokenExpiresAfter);
-        var refreshTokenExpiresOn = DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var accessTokenExpiresOn = now.Add(_accessTokenExpiresAfter);
+        var refreshTokenExpiresOn = now.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_signingSecret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        var refreshToken = _tokensService.CreateJWTRefreshToken();
 
-        var claims = user.ToClaims();
-
-        var token = new JwtSecurityToken(
-            claims: claims,
+        var accessTokenClaims = user.ToClaims(additionalData);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
+            claims: accessTokenClaims,
             expires: accessTokenExpiresOn,
             signingCredentials: credentials,
             issuer: _baseUrl,
             audience: _baseUrl
-        );
+        ));
 
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var refreshToken = _tokensService.CreateJWTRefreshToken();
+        string? idToken = null;
+        DateTime? idTokenExpiresOn = null;
+        if (profile.Exists())
+        {
+            idTokenExpiresOn = now.Add(AuthenticationConstants.Tokens.DefaultIdTokenExpiry);
+            var idTokenClaims = profile.ToClaims(scopes, additionalData);
+            idToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
+                claims: idTokenClaims,
+                expires: idTokenExpiresOn,
+                signingCredentials: credentials,
+                issuer: _baseUrl,
+                audience: _baseUrl
+            ));
+        }
 
-        return new AccessTokens(accessToken, accessTokenExpiresOn, refreshToken, refreshTokenExpiresOn);
+        return new AccessTokens(
+            accessToken, accessTokenExpiresOn,
+            refreshToken, refreshTokenExpiresOn,
+            idToken, idTokenExpiresOn);
     }
 }

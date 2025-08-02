@@ -361,7 +361,7 @@ public class NativeIdentityServerCredentialsServiceSpec
             await _service.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.ForbiddenAccess, Resources.PersonCredentialsApplication_MfaRequired,
-            error => error.AdditionalCode == NativeIdentityServerCredentialsService.MfaRequiredCode
+            error => error.AdditionalCode == AuthenticationConstants.ErrorCodes.MfaRequired
                      && error.AdditionalData!.Count == 1
                      && (string)error.AdditionalData[NativeIdentityServerCredentialsService.MfaTokenName]
                      == "anmfatoken");

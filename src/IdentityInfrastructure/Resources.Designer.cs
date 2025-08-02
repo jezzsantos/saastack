@@ -143,81 +143,81 @@ namespace IdentityInfrastructure {
         /// <summary>
         ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidClientId {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidClientId {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidClientId", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidClientId", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;CodeChallenge&apos; is invalid.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidCodeChallenge {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidCodeChallenge {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidCodeChallenge", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidCodeChallenge", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;CodeChallengeMethod&apos; must be &apos;S256&apos; or &apos;plain&apos;.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidCodeChallengeMethod {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidCodeChallengeMethod {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidCodeChallengeMethod", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidCodeChallengeMethod", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;Nonce&apos; parameter is either missing or invalid.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidNonce {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidNonce {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidNonce", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidNonce", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;RedirectUri&apos; is either missing or invalid.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidRedirectUri {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidRedirectUri {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidRedirectUri", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidRedirectUri", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;ResponseType&apos; must be &apos;code&apos;.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidResponseType {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidResponseType {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidResponseType", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidResponseType", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;Scope&apos; must include &apos;openid&apos;.
+        ///   Looks up a localized string similar to The &apos;Scope&apos; must only contain allowable scopes.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidScope {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidScope {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidScope", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidScope", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;State&apos; parameter is either missing or invalid.
         /// </summary>
-        internal static string AuthorizeRequestValidator_InvalidState {
+        internal static string AuthorizeOAuth2RequestValidator_InvalidState {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_InvalidState", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_InvalidState", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;CodeChallengeMethod&apos; is required when &apos;CodeChallenge&apos; is provided.
         /// </summary>
-        internal static string AuthorizeRequestValidator_MissingCodeChallengeMethod {
+        internal static string AuthorizeOAuth2RequestValidator_MissingCodeChallengeMethod {
             get {
-                return ResourceManager.GetString("AuthorizeRequestValidator_MissingCodeChallengeMethod", resourceCulture);
+                return ResourceManager.GetString("AuthorizeOAuth2RequestValidator_MissingCodeChallengeMethod", resourceCulture);
             }
         }
         
@@ -305,11 +305,11 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;Scopes&apos; must contain valid OAuth2 scopes.
+        ///   Looks up a localized string similar to The &apos;Scope&apos; must only contain allowable scopes.
         /// </summary>
-        internal static string ConsentToOAuth2ClientRequestValidator_InvalidScopes {
+        internal static string ConsentToOAuth2ClientRequestValidator_InvalidScope {
             get {
-                return ResourceManager.GetString("ConsentToOAuth2ClientRequestValidator_InvalidScopes", resourceCulture);
+                return ResourceManager.GetString("ConsentToOAuth2ClientRequestValidator_InvalidScope", resourceCulture);
             }
         }
         
@@ -346,6 +346,123 @@ namespace IdentityInfrastructure {
         internal static string CreateOAuth2ClientRequestValidator_InvalidRedirectUri {
             get {
                 return ResourceManager.GetString("CreateOAuth2ClientRequestValidator_InvalidRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Code&apos; must not be included in this grant type.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_CodeMustBeNull {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_CodeMustBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeVerifier&apos; must not be included in this grant type.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_CodeVerifierMustBeNull {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_CodeVerifierMustBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidClientId {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ClientSecret&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidClientSecret {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Code&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidCode {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeVerifier&apos; is invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidCodeVerifier {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidCodeVerifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;GrantType&apos; must be &apos;authorization_code&apos; or &apos;refresh_token&apos;.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidGrantType {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidGrantType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RedirectUri&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidRedirectUri {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidRefreshToken {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidRefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Scope&apos; contains invalid values.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_InvalidScope {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_InvalidScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RedirectUri&apos; must not be included in this grant type.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_RedirectUriMustBeNull {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_RedirectUriMustBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; must not be included in this grant type.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_RefreshTokenMustBeNull {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_RefreshTokenMustBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Scope&apos; must not be included in this grant type.
+        /// </summary>
+        internal static string CreateOAuth2TokenRequestValidator_ScopeMustBeNull {
+            get {
+                return ResourceManager.GetString("CreateOAuth2TokenRequestValidator_ScopeMustBeNull", resourceCulture);
             }
         }
         
@@ -508,78 +625,6 @@ namespace IdentityInfrastructure {
         internal static string RevokeRefreshTokenRequestValidator_InvalidToken {
             get {
                 return ResourceManager.GetString("RevokeRefreshTokenRequestValidator_InvalidToken", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidClientId {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidClientId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;ClientSecret&apos; is either missing or invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidClientSecret {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidClientSecret", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;Code&apos; is either missing or invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidCode {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;CodeVerifier&apos; is invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidCodeVerifier {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidCodeVerifier", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;GrantType&apos; must be &apos;authorization_code&apos; or &apos;refresh_token&apos;.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidGrantType {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidGrantType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;RedirectUri&apos; is either missing or invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidRedirectUri {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidRedirectUri", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; is either missing or invalid.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidRefreshToken {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidRefreshToken", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;Scope&apos; contains invalid values.
-        /// </summary>
-        internal static string TokenEndpointRequestValidator_InvalidScope {
-            get {
-                return ResourceManager.GetString("TokenEndpointRequestValidator_InvalidScope", resourceCulture);
             }
         }
         

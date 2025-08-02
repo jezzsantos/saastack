@@ -42,6 +42,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[OidcAuthorization]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[OidcAuthorization]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[ProjectionCheckpoints]')
             AND type in (N'U'))
     DROP TABLE [dbo].[ProjectionCheckpoints]
@@ -114,6 +121,40 @@ CREATE INDEX Id
     ON [dbo].[EventNotification]
         (
          [Id]
+            );
+
+CREATE TABLE [dbo].[OidcAuthorization]
+(
+    [Id]                      [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]      [datetime]      NULL,
+    [IsDeleted]               [bit]           NULL,
+    [AuthorizationCode]       [nvarchar](max) NULL,
+    [AuthorizationExpiresAt]  [datetime] NULL,
+    [AuthorizedAt]            [datetime] NULL,
+    [ClientId]                [nvarchar](100) NULL,
+    [CodeChallenge]           [nvarchar](max) NULL,
+    [CodeChallengeMethod]     [nvarchar](max) NULL,
+    [Nonce]                   [nvarchar](max) NULL,
+    [RedirectUri]             [nvarchar](max) NULL,
+    [Scopes]                  [nvarchar](max) NULL,
+    [UserId]                  [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[OidcAuthorization]
+        (
+         [Id]
+            );
+CREATE INDEX ClientId
+    ON [dbo].[OidcAuthorization]
+        (
+         [ClientId]
+            );
+CREATE INDEX UserId
+    ON [dbo].[OidcAuthorization]
+        (
+         [UserId]
             );
 
 CREATE TABLE [dbo].[ProjectionCheckpoints]

@@ -15,7 +15,6 @@ namespace IdentityApplication.ApplicationServices;
 
 public partial class NativeIdentityServerCredentialsService
 {
-    public const string MfaRequiredCode = "mfa_required";
     public const string MfaTokenName = "MfaToken";
 
     public async Task<Result<CredentialMfaAuthenticatorAssociation, Error>> AssociateMfaAuthenticatorForUserAsync(

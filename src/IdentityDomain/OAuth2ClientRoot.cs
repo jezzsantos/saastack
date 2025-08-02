@@ -46,7 +46,7 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
 
     public Optional<string> RedirectUri { get; private set; }
 
-    public List<OAuth2ClientSecret> Secrets { get; } = [];
+    public OAuth2ClientSecrets Secrets { get; } = [];
 
     [UsedImplicitly]
     public static AggregateRootFactory<OAuth2ClientRoot> Rehydrate()
@@ -63,6 +63,12 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
         if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
+        }
+
+        var secrets = Secrets.EnsureInvariants();
+        if (secrets.IsFailure)
+        {
+            return secrets.Error;
         }
 
         return Result.Ok;
@@ -169,6 +175,11 @@ public sealed class OAuth2ClientRoot : AggregateRootBase
         }
 
         return new GeneratedClientSecret(secret, expiresOn);
+    }
+
+    public Result<Error> VerifySecret(string secret)
+    {
+        return Secrets.Verify(_passwordHasherService, secret);
     }
 }
 

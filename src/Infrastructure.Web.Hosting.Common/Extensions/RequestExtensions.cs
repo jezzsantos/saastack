@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Application.Interfaces;
 using Common;
 using Common.Extensions;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Hosting.Common.Extensions;

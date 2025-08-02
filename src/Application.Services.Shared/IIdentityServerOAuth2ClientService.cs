@@ -45,6 +45,12 @@ public interface IIdentityServerOAuth2ClientService
         CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Whether the user has consented to the OAuth2 client for the specified scope
+    /// </summary>
+    Task<Result<bool, Error>> HasClientConsentedUserAsync(ICallerContext caller, string clientId, string userId,
+        string scope, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Regenerates a client secret for the OAuth2 client
     /// </summary>
     Task<Result<OAuth2ClientWithSecret, Error>> RegenerateClientSecretAsync(ICallerContext caller, string id,
@@ -70,8 +76,8 @@ public interface IIdentityServerOAuth2ClientService
         string? redirectUri, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Whether the user has consented to the OAuth2 client for the specified scope
+    ///     Verifies the specified client credentials
     /// </summary>
-    Task<Result<bool, Error>> HasClientConsentedUserAsync(ICallerContext caller, string clientId, string userId,
-        string scope, CancellationToken cancellationToken);
+    Task<Result<OAuth2Client, Error>> VerifyClientAsync(ICallerContext caller, string id, string clientSecret,
+        CancellationToken cancellationToken);
 }

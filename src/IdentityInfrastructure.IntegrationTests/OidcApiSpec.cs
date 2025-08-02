@@ -1,13 +1,25 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
+using System.Web;
 using ApiHost1;
+using Application.Interfaces;
+using Application.Resources.Shared;
+using Common.Extensions;
+using Domain.Interfaces;
 using FluentAssertions;
-using IdentityDomain;
+using Infrastructure.Shared.ApplicationServices;
+using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using OAuth2CodeChallengeMethod = Application.Resources.Shared.OAuth2CodeChallengeMethod;
+using OAuth2GrantType = Application.Resources.Shared.OAuth2GrantType;
+using OAuth2ResponseType = Application.Resources.Shared.OAuth2ResponseType;
 
 namespace IdentityInfrastructure.IntegrationTests;
 
@@ -21,6 +33,332 @@ public class OidcApiSpec
         public GivenAnUnauthenticatedUser(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
+        }
+
+        [Fact]
+        public async Task WhenGetAuthorize_ThenRedirectsToLogin()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.GetAsync(new AuthorizeOAuth2GetRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+            result.Headers.Location.Should().Be(WebsiteUiService.LoginPageRoute);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorize_ThenRedirectsToLogin()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+            result.Headers.Location.Should().Be(WebsiteUiService.LoginPageRoute);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenAndUnknownClient_ThenReturnsError()
+        {
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = "oauthclient_1234567890123456789012",
+                ClientSecret = "aclientsecret",
+                Code = "anauthorizationcode",
+                RedirectUri = "https://localhost/callback"
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidClient);
+            result.Content.Error.Detail.Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownClient);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenAndUnknownClientSecret_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = "aclientsecret",
+                Code = "anauthorizationcode",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidClient);
+            result.Content.Error.Detail.Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownClient);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenAndUnknownCode_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = "anauthorizationcode",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidGrant);
+            result.Content.Error.Detail.Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_ExchangeCodeForTokens_UnknownAuthorizationCode);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenAndDifferentClientRedirectUri_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = null,
+                RedirectUri = "https://localhost/another"
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidGrant);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithPkceButMissingCodeVerifier_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes, OAuth2CodeChallengeMethod.Plain);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = null,
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidRequest);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithPkceButDifferentCodeVerifier_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes, OAuth2CodeChallengeMethod.Plain);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = "9994567890123456789012345678901234567890999",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidGrant);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithoutPkceButWithCodeVerifier_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = "1234567890123456789012345678901234567890123",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Content.Error.Title.Should().Be(OAuth2Constants.ErrorCodes.InvalidRequest);
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithoutPkce_ThenReturnsToken()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = null,
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Content.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+            result.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.ExpiresIn.Should()
+                .BeLessThanOrEqualTo((int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds);
+            result.Content.Value.RefreshToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.IdToken.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithPkcePlain_ThenReturnsToken()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes, OAuth2CodeChallengeMethod.Plain);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = "1234567890123456789012345678901234567890123",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Content.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+            result.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.ExpiresIn.Should()
+                .BeLessThanOrEqualTo((int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds);
+            result.Content.Value.RefreshToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.IdToken.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task WhenCreateTokenWithPkceHash_ThenReturnsToken()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes, OAuth2CodeChallengeMethod.S256);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = "1234567890123456789012345678901234567890123",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Content.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+            result.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.ExpiresIn.Should()
+                .BeLessThanOrEqualTo((int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds);
+            result.Content.Value.RefreshToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.IdToken.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task WhenCreateToken_ThenReturnsTokens()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            var scopes =
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}";
+            var clientSecret = await GenerateClientSecretAsync(login, client);
+            await ConsentClientAsync(login, client, scopes);
+            var authorizationCode = await AuthorizeAsync(login, client, scopes, OAuth2CodeChallengeMethod.S256);
+
+            var result = await Api.PostAsync(new CreateOAuth2TokenRequest
+            {
+                GrantType = OAuth2GrantType.Authorization_Code,
+                ClientId = client.Id,
+                ClientSecret = clientSecret,
+                Code = authorizationCode,
+                CodeVerifier = "1234567890123456789012345678901234567890123",
+                RedirectUri = client.RedirectUri
+            });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Content.Value.TokenType.Should().Be(OAuth2TokenType.Bearer);
+            result.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.ExpiresIn.Should()
+                .BeLessThanOrEqualTo((int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds);
+            result.Content.Value.RefreshToken.Should().NotBeNullOrEmpty();
+            result.Content.Value.IdToken.Should().NotBeNullOrEmpty();
+
+            var idToken = result.Content.Value.IdToken;
+            var idTokenClaims = ReadTokenClaims(idToken);
+            var nonce = idTokenClaims.Single(c => c.Type == AuthenticationConstants.Claims.ForNonce).Value;
+            nonce.Should().Be("anonce");
+            var email = idTokenClaims.Single(c => c.Type == AuthenticationConstants.Claims.ForEmail).Value;
+            email.Should().Be(login.Profile!.EmailAddress);
+            var name = idTokenClaims.Single(c => c.Type == AuthenticationConstants.Claims.ForFullName).Value;
+            name.Should().Be($"{login.Profile!.Name.FirstName} {login.Profile!.Name.LastName}");
         }
 
         [Fact]
@@ -82,7 +420,7 @@ public class OidcApiSpec
             result.Content.Value.Keys.Should().NotBeNull();
             result.Content.Value.Keys.Keys.Should().NotBeEmpty();
 
-            var firstKey = result.Content.Value.Keys.Keys.First();
+            var firstKey = Enumerable.First(result.Content.Value.Keys.Keys);
 
             // RFC 7517 Section 4 - Required JWK parameters
             firstKey.Kty.Should().NotBeNullOrEmpty(); // Key Type
@@ -98,201 +436,70 @@ public class OidcApiSpec
             }
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithValidParameters_ThenReturnsAuthorizationCode()
+        private static List<Claim> ReadTokenClaims(string? idToken)
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
-            {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "https://localhost/callback",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-                State = "astate",
-                Nonce = "anonce"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Content.Value.Code.Should().NotBeNullOrEmpty();
-            result.Content.Value.State.Should().Be("astate");
+            return new JwtSecurityTokenHandler().ReadJwtToken(idToken).Claims.ToList();
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithPkce_ThenReturnsAuthorizationCode()
+        private async Task<string> AuthorizeAsync(LoginDetails login, OAuth2Client client, string scopes,
+            OAuth2CodeChallengeMethod? codeChallengeMethod = null)
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            var codeChallenge = codeChallengeMethod switch
             {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "https://localhost/callback",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
+                OAuth2CodeChallengeMethod.Plain => "1234567890123456789012345678901234567890123",
+                OAuth2CodeChallengeMethod.S256 => "WWHTYIjNclXxS69q1gerQ+eTlW5ab1YCpKTorurQ3zw=",
+                _ => null
+            };
+            var response = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = scopes,
                 State = "astate",
                 Nonce = "anonce",
-                CodeChallenge = "acodechallenge",
-                CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256
-            });
+                CodeChallenge = codeChallenge,
+                CodeChallengeMethod = codeChallengeMethod
+            }, req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Content.Value.Code.Should().NotBeNullOrEmpty();
-            result.Content.Value.State.Should().Be("astate");
+            return ParseLocation(response, "code");
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithMissingClientId_ThenReturnsBadRequest()
+        private static string ParseLocation<TResponse>(JsonResponse<TResponse> response, string parameterName)
+            where TResponse : IWebResponse
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
-            {
-                RedirectUri = "https://localhost/callback",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = OpenIdConnectConstants.Scopes.OpenId
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            return HttpUtility.ParseQueryString(response.Headers.Location!.Query)[parameterName]!;
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithInvalidRedirectUri_ThenReturnsBadRequest()
+        private async Task<OAuth2Client> CreateClientAsync(LoginDetails login, string name = "aclientname",
+            string? redirectUri = null)
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            return (await Api.PostAsync(new CreateOAuth2ClientRequest
             {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "aninvaliduri",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = OpenIdConnectConstants.Scopes.OpenId
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                Name = name,
+                RedirectUri = redirectUri
+            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithUnsupportedResponseType_ThenReturnsBadRequest()
+        private async Task ConsentClientAsync(LoginDetails login, OAuth2Client client,
+            string scopes)
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
             {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "https://localhost/callback",
-                ResponseType = "unsupported_type",
-                Scope = OpenIdConnectConstants.Scopes.OpenId
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                Id = client.Id,
+                Scope = scopes,
+                Consented = true
+            }, req => req.SetJWTBearerToken(login.AccessToken));
         }
 
-        [Fact]
-        public async Task WhenTokenEndpointWithValidAuthorizationCode_ThenReturnsTokens()
+        private async Task<string> GenerateClientSecretAsync(LoginDetails login, OAuth2Client client)
         {
-            // First get an authorization code
-            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            var secret = (await Api.PostAsync(new RegenerateOAuth2ClientSecretRequest
             {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "https://localhost/callback",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope =
-                    $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile} {OAuth2Constants.Scopes.Email}",
-                State = "astate",
-                Nonce = "anonce"
-            });
+                Id = client.Id
+            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client!.Secret;
 
-            authorizeResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            var authorizationCode = authorizeResult.Content.Value.Code;
-
-            // Exchange authorization code for tokens
-            var tokenResult = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
-                ClientId = "aclientid12345678901234567890",
-                ClientSecret = "aclientsecret",
-                Code = authorizationCode,
-                RedirectUri = "https://localhost/callback"
-            });
-
-            tokenResult.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            // OIDC Core 1.0 Section 3.1.3.1 - Verify token response
-            var tokenResponse = tokenResult.Content.Value;
-            tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
-            tokenResponse.TokenType.Should().Be(OAuth2Constants.TokenTypes.Bearer);
-            tokenResponse.ExpiresIn.Should().BeGreaterThan(0);
-            tokenResponse.IdToken.Should().NotBeNullOrEmpty(); // Required for OIDC
-            tokenResponse.Scope.Should().NotBeNullOrEmpty();
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithPkce_ThenReturnsTokens()
-        {
-            // First get an authorization code with PKCE
-            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
-            {
-                ClientId = "aclientid12345678901234567890",
-                RedirectUri = "https://localhost/callback",
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}",
-                State = "astate",
-                Nonce = "anonce",
-                CodeChallenge = "acodechallenge",
-                CodeChallengeMethod = OAuth2Constants.CodeChallengeMethods.S256
-            });
-
-            authorizeResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            var authorizationCode = authorizeResult.Content.Value.Code;
-
-            // Exchange authorization code for tokens with code verifier
-            var tokenResult = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
-                ClientId = "aclientid12345678901234567890",
-                ClientSecret = "aclientsecret",
-                Code = authorizationCode,
-                RedirectUri = "https://localhost/callback",
-                CodeVerifier = "acodeverifier" // In real implementation, this should match the challenge
-            });
-
-            tokenResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            tokenResult.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
-            tokenResult.Content.Value.IdToken.Should().NotBeNullOrEmpty();
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithInvalidGrantType_ThenReturnsBadRequest()
-        {
-            var result = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = "aninvalidgranttype",
-                ClientId = "aclientid12345678901234567890",
-                ClientSecret = "aclientsecret",
-                Code = "acode",
-                RedirectUri = "https://localhost/callback"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithMissingClientId_ThenReturnsBadRequest()
-        {
-            var result = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
-                ClientSecret = "aclientsecret",
-                Code = "acode",
-                RedirectUri = "https://localhost/callback"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithInvalidCode_ThenReturnsUnauthorized()
-        {
-            var result = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
-                ClientId = "aclientid12345678901234567890",
-                ClientSecret = "aclientsecret",
-                Code = "aninvalidcode",
-                RedirectUri = "https://localhost/callback"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            return secret;
         }
 
         private static void OverrideDependencies(IServiceCollection services)
@@ -310,6 +517,200 @@ public class OidcApiSpec
         }
 
         [Fact]
+        public async Task WhenPostAuthorizeAndWrongCode_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Token,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be(client.RedirectUri);
+            ParseLocationParameter(result, "error").Should().Be(OAuth2Constants.ErrorCodes.UnsupportedResponseType);
+            ParseLocationParameter(result, "error_description").Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_Authorize_UnsupportedResponseType
+                .Format(OAuth2ResponseType.Token));
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndMissingOpenIdScope_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OAuth2Constants.Scopes.Profile}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be(client.RedirectUri);
+            ParseLocationParameter(result, "error").Should().Be(OAuth2Constants.ErrorCodes.InvalidScope);
+            ParseLocationParameter(result, "error_description").Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_Authorize_MissingOpenIdScope);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndMissingCodeChallengeMethod_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}",
+                CodeChallenge = "1234567890123456789012345678901234567890123",
+                CodeChallengeMethod = null
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be(client.RedirectUri);
+            ParseLocationParameter(result, "error").Should().Be(OAuth2Constants.ErrorCodes.InvalidRequest);
+            ParseLocationParameter(result, "error_description").Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_Authorize_MissingCodeChallengeMethod);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndUnknownClientId_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = "oauthclient_1234567890123456789012",
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be("https://localhost/callback");
+            ParseLocationParameter(result, "error").Should().Be(OAuth2Constants.ErrorCodes.InvalidClient);
+            ParseLocationParameter(result, "error_description").Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_Authorize_UnknownClient);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndClientWithoutRedirectUri_ThenReturnsError()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login);
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = "https://localhost/callback",
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be("https://localhost/callback");
+            ParseLocationParameter(result, "error").Should().Be(OAuth2Constants.ErrorCodes.InvalidRequest);
+            ParseLocationParameter(result, "error_description").Should().Be(IdentityApplication.Resources
+                .NativeIdentityServerOpenIdConnectService_Authorize_MismatchedRequestUri
+                .Format("https://localhost/callback"));
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndClientIsUnconsented_ThenRedirectsToConsentPage()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+            result.Headers.Location.Should().Be(WebsiteUiService.OAuth2ConsentPageRoute);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndClientIsConsentedToDifferentScopes_ThenRedirectsToConsentPage()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            await ConsentClientAsync(login, client,
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}  {OAuth2Constants.Scopes.Email}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Redirect);
+            result.Headers.Location.Should().Be(WebsiteUiService.OAuth2ConsentPageRoute);
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndClientIsConsented_ThenReturnsCode()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            await ConsentClientAsync(login, client,
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}  {OAuth2Constants.Scopes.Profile}"
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be(client.RedirectUri);
+            ParseLocationParameter(result, "code").Should().NotBeNullOrEmpty();
+            ParseLocationParameter(result, "state").Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenPostAuthorizeAndClientIsConsentedWithAllSecurity_ThenReturnsCode()
+        {
+            var login = await LoginUserAsync();
+            var client = await CreateClientAsync(login, redirectUri: "https://localhost/callback");
+            await ConsentClientAsync(login, client,
+                $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.Profile}");
+
+            var result = await Api.PostAsync(new AuthorizeOAuth2PostRequest
+            {
+                ClientId = client.Id,
+                RedirectUri = client.RedirectUri,
+                ResponseType = OAuth2ResponseType.Code,
+                Scope = $"{OpenIdConnectConstants.Scopes.OpenId}  {OAuth2Constants.Scopes.Profile}",
+                State = "astate",
+                Nonce = "anonce",
+                CodeChallenge = "1234567890123456789012345678901234567890123",
+                CodeChallengeMethod = OAuth2CodeChallengeMethod.S256
+            }, req => req.SetJWTBearerToken(login.AccessToken));
+
+            result.StatusCode.Should().Be(HttpStatusCode.Found);
+            ParseLocationRedirectUri(result).Should().Be(client.RedirectUri);
+            ParseLocationParameter(result, "code").Should().NotBeNullOrEmpty();
+            ParseLocationParameter(result, "state").Should().Be("astate");
+        }
+
+        [Fact]
         public async Task WhenGetUserInfo_ThenReturnsOidcCompliantUserInfo()
         {
             var login = await LoginUserAsync();
@@ -318,9 +719,9 @@ public class OidcApiSpec
                 req => req.SetJWTBearerToken(login.AccessToken));
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Content.Value.OidcUserInfo.Should().NotBeNull();
+            result.Content.Value.User.Should().NotBeNull();
 
-            var userInfo = result.Content.Value.OidcUserInfo;
+            var userInfo = result.Content.Value.User;
 
             // OIDC Core 1.0 Section 5.1 - Required claims
             userInfo.Sub.Should().NotBeNullOrEmpty(); // Subject identifier - required
@@ -358,179 +759,37 @@ public class OidcApiSpec
             result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        private static void OverrideDependencies(IServiceCollection services)
+        private static string ParseLocationRedirectUri<TResponse>(JsonResponse<TResponse> response)
+            where TResponse : IWebResponse
         {
-        }
-    }
-
-    [Trait("Category", "Integration.API")]
-    [Collection("API")]
-    public class GivenOidcComplianceTests : WebApiSpec<Program>
-    {
-        private const string AClientId = "aclientid12345678901234567890";
-        private const string ARedirectUri = "https://localhost/callback";
-
-        public GivenOidcComplianceTests(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
-        {
-            EmptyAllRepositories();
+            return response.Headers.Location!.GetLeftPart(UriPartial.Path);
         }
 
-        [Fact]
-        public async Task WhenDiscoveryDocument_ThenContainsAllRequiredOidcEndpoints()
+        private static string ParseLocationParameter<TResponse>(JsonResponse<TResponse> response, string parameterName)
+            where TResponse : IWebResponse
         {
-            var result = await Api.GetAsync(new GetDiscoveryDocumentRequest());
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            var document = result.Content.Value.Document;
-
-            // Verify all OIDC endpoints are properly configured
-            document.AuthorizationEndpoint.Should().EndWith(OAuth2Constants.Endpoints.Authorization);
-            document.TokenEndpoint.Should().EndWith(OAuth2Constants.Endpoints.Token);
-            document.UserInfoEndpoint.Should().EndWith(OAuth2Constants.Endpoints.UserInfo);
-            document.JwksUri.Should().EndWith(OpenIdConnectConstants.Endpoints.Jwks);
-
-            // Verify issuer is a valid URI
-            Uri.TryCreate(document.Issuer, UriKind.Absolute, out _).Should().BeTrue();
+            return HttpUtility.ParseQueryString(response.Headers.Location!.Query)[parameterName]!;
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithInvalidScope_ThenReturnsBadRequest()
+        private async Task ConsentClientAsync(LoginDetails login, OAuth2Client client,
+            string scopes)
         {
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            await Api.PostAsync(new ConsentOAuth2ClientForCallerRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = "aninvalidscope"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                Id = client.Id,
+                Scope = scopes,
+                Consented = true
+            }, req => req.SetJWTBearerToken(login.AccessToken));
         }
 
-        [Fact]
-        public async Task WhenAuthorizeWithoutOpenIdScope_ThenReturnsBadRequest()
+        private async Task<OAuth2Client> CreateClientAsync(LoginDetails login, string name = "aclientname",
+            string? redirectUri = null)
         {
-            // OIDC Core 1.0 Section 3.1.2.1 - openid scope is required for OIDC requests
-            var result = await Api.GetAsync(new OAuth2AuthorizeGetRequest
+            return (await Api.PostAsync(new CreateOAuth2ClientRequest
             {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = OAuth2Constants.Scopes.Profile // Missing openid scope
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithRefreshToken_ThenReturnsNewTokens()
-        {
-            // First get tokens through authorization code flow
-            var authorizeResult = await Api.GetAsync(new OAuth2AuthorizeGetRequest
-            {
-                ClientId = AClientId,
-                RedirectUri = ARedirectUri,
-                ResponseType = OAuth2Constants.ResponseTypes.Code,
-                Scope = $"{OpenIdConnectConstants.Scopes.OpenId} {OAuth2Constants.Scopes.OfflineAccess}",
-                State = "astate"
-            });
-
-            authorizeResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            var authorizationCode = authorizeResult.Content.Value.Code;
-
-            var initialTokenResult = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.AuthorizationCode,
-                ClientId = AClientId,
-                ClientSecret = "aclientsecret",
-                Code = authorizationCode,
-                RedirectUri = ARedirectUri
-            });
-
-            initialTokenResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            var refreshToken = initialTokenResult.Content.Value.RefreshToken;
-            refreshToken.Should().NotBeNullOrEmpty();
-
-            // Use refresh token to get new tokens
-            var refreshResult = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.RefreshToken,
-                ClientId = AClientId,
-                ClientSecret = "aclientsecret",
-                RefreshToken = refreshToken
-            });
-
-            refreshResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            refreshResult.Content.Value.AccessToken.Should().NotBeNullOrEmpty();
-            refreshResult.Content.Value.AccessToken.Should().NotBe(initialTokenResult.Content.Value.AccessToken);
-        }
-
-        [Fact]
-        public async Task WhenTokenEndpointWithInvalidRefreshToken_ThenReturnsUnauthorized()
-        {
-            var result = await Api.PostAsync(new TokenEndpointRequest
-            {
-                GrantType = OAuth2Constants.GrantTypes.RefreshToken,
-                ClientId = AClientId,
-                ClientSecret = "aclientsecret",
-                RefreshToken = "aninvalidrefreshtoken"
-            });
-
-            result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        }
-
-        [Fact]
-        public async Task WhenJwksEndpoint_ThenReturnsValidKeySetForTokenVerification()
-        {
-            var result = await Api.GetAsync(new GetJsonWebKeySetRequest());
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            var keySet = result.Content.Value.Keys;
-
-            keySet.Keys.Should().NotBeEmpty();
-
-            // Verify each key has required properties for token verification
-            foreach (var key in keySet.Keys)
-            {
-                key.Kty.Should().NotBeNullOrEmpty();
-                key.Use.Should().Be("sig"); // For signature verification
-                key.Kid.Should().NotBeNullOrEmpty();
-                key.Alg.Should().NotBeNullOrEmpty();
-
-                // For RSA keys used in JWT signing
-                if (key.Kty == "RSA")
-                {
-                    key.N.Should().NotBeNullOrEmpty();
-                    key.E.Should().NotBeNullOrEmpty();
-                }
-            }
-        }
-
-        [Fact]
-        public async Task WhenDiscoveryDocument_ThenSupportsRequiredOidcFeatures()
-        {
-            var result = await Api.GetAsync(new GetDiscoveryDocumentRequest());
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            var document = result.Content.Value.Document;
-
-            // OIDC Core 1.0 Section 3 - Required features
-            document.ResponseTypesSupported.Should().Contain(OAuth2Constants.ResponseTypes.Code);
-            document.SubjectTypesSupported.Should().Contain(OAuth2Constants.SubjectTypes.Public);
-            document.IdTokenSigningAlgValuesSupported.Should().Contain(OAuth2Constants.SigningAlgorithms.Rs256);
-
-            // PKCE support (RFC 7636)
-            document.CodeChallengeMethodsSupported.Should().Contain(OAuth2Constants.CodeChallengeMethods.S256);
-
-            // Standard scopes
-            document.ScopesSupported.Should().Contain(OpenIdConnectConstants.Scopes.OpenId);
-            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Profile);
-            document.ScopesSupported.Should().Contain(OAuth2Constants.Scopes.Email);
-
-            // Standard claims
-            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Subject);
-            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Name);
-            document.ClaimsSupported.Should().Contain(OAuth2Constants.StandardClaims.Email);
+                Name = name,
+                RedirectUri = redirectUri
+            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Client;
         }
 
         private static void OverrideDependencies(IServiceCollection services)

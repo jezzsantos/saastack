@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common.Extensions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;

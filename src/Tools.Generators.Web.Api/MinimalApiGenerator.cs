@@ -1,6 +1,6 @@
 using System.Text;
+using Application.Interfaces;
 using Common.Extensions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common;

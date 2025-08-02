@@ -2,7 +2,6 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using FluentAssertions;
-using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Moq;

@@ -106,12 +106,12 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
 
             if (hydratedValue.NotExists())
             {
-                return new List<string?>();
+                return [];
             }
 
             return hydratedValue.Equals(NullValue)
-                ? new List<string?> { null }
-                : new List<string?> { hydratedValue };
+                ? [null]
+                : [hydratedValue];
         }
 
         return Rehydrate<Dictionary<string, object>>(hydratedValue)

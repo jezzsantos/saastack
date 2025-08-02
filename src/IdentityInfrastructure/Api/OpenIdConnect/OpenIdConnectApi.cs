@@ -18,13 +18,13 @@ public class OpenIdConnectApi : IWebApiService
         _openIdConnectApplication = openIdConnectApplication;
     }
 
-    public async Task<ApiGetResult<OidcDiscoveryDocument, GetDiscoveryDocumentResponse>> GetDiscoveryDocument(
+    public async Task<ApiGetResult<OpenIdConnectDiscoveryDocument, GetDiscoveryDocumentResponse>> GetDiscoveryDocument(
         GetDiscoveryDocumentRequest _, CancellationToken cancellationToken)
     {
         var result =
             await _openIdConnectApplication.GetDiscoveryDocumentAsync(_callerFactory.Create(), cancellationToken);
 
-        return () => result.HandleApplicationResult<OidcDiscoveryDocument, GetDiscoveryDocumentResponse>(doc =>
+        return () => result.HandleApplicationResult<OpenIdConnectDiscoveryDocument, GetDiscoveryDocumentResponse>(doc =>
             new GetDiscoveryDocumentResponse { Document = doc });
     }
 

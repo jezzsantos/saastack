@@ -1,12 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Application.Interfaces;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Infrastructure.Interfaces;
+using Domain.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
-using Infrastructure.Web.Interfaces.Auth;
 
 namespace TestingStubApiHost.Api;
 
@@ -29,7 +29,7 @@ public class StubMicrosoftIdentityApi : StubApiBase
             request.Scope ?? "none", request.ClientId ?? "none", request.ClientSecret ?? "none",
             request.RedirectUri ?? "none");
 
-        if (request.GrantType == OAuth2Constants.GrantTypes.AuthorizationCodeFlow)
+        if (request.GrantType == OAuth2Constants.GrantTypes.AuthorizationCode)
         {
             if (request.Code.HasNoValue())
             {
@@ -47,11 +47,11 @@ public class StubMicrosoftIdentityApi : StubApiBase
                     ExpiresIn = (int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds,
                     Scope = request.Scope,
                     IdToken = null,
-                    TokenType = OAuth2Constants.BearerTokenPrefix
+                    TokenType = OAuth2Constants.TokenTypes.Bearer
                 });
         }
 
-        if (request.GrantType == OAuth2Constants.GrantTypes.RefreshFlow)
+        if (request.GrantType == OAuth2Constants.GrantTypes.RefreshToken)
         {
             if (request.RefreshToken.HasNoValue())
             {
@@ -74,7 +74,7 @@ public class StubMicrosoftIdentityApi : StubApiBase
                     ExpiresIn = (int)AuthenticationConstants.Tokens.DefaultAccessTokenExpiry.TotalSeconds,
                     Scope = request.Scope,
                     IdToken = null,
-                    TokenType = OAuth2Constants.BearerTokenPrefix
+                    TokenType = OAuth2Constants.TokenTypes.Bearer
                 });
         }
 

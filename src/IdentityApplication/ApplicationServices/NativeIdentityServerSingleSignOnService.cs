@@ -113,35 +113,23 @@ public class NativeIdentityServerSingleSignOnService : IIdentityServerSingleSign
             return saved.Error;
         }
 
-        _recorder.AuditAgainst(caller.ToCall(), user.Id,
-            Audits.SingleSignOnApplication_Authenticate_Succeeded,
-            "User {Id} succeeded to authenticate with SSO {Provider}", user.Id, providerName);
-        _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
-            user.ToLoginUserUsage(providerName, authUserInfo));
-
         var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
         if (issued.IsFailure)
         {
             return issued.Error;
         }
 
+        _recorder.TraceInformation(caller.ToCall(), "Authentication granted for {UserId} from {Provider}",
+            user.Id, providerName);
+        _recorder.AuditAgainst(caller.ToCall(), user.Id,
+            Audits.SingleSignOnApplication_Authenticate_Succeeded,
+            "User {Id} succeeded to authenticate with SSO {Provider}", user.Id, providerName);
+        _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
+            user.ToLoginUserUsage(providerName, authUserInfo));
+
         var tokens = issued.Value;
-        return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
-        {
-            AccessToken = new AuthenticationToken
-            {
-                Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn,
-                Type = TokenType.AccessToken
-            },
-            RefreshToken = new AuthenticationToken
-            {
-                Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn,
-                Type = TokenType.RefreshToken
-            },
-            UserId = user.Id
-        });
+        return tokens.ToAuthenticateTokens(user.Id);
+
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensForUserAsync(
@@ -242,5 +230,25 @@ internal static class NativeIdentityServerSingleSignOnServiceConversionExtension
         }
 
         return context;
+    }
+
+    public static AuthenticateTokens ToAuthenticateTokens(this AccessTokens tokens, string userId)
+    {
+        return new AuthenticateTokens
+        {
+            AccessToken = new AuthenticationToken
+            {
+                Value = tokens.AccessToken,
+                ExpiresOn = tokens.AccessTokenExpiresOn,
+                Type = TokenType.AccessToken
+            },
+            RefreshToken = new AuthenticationToken
+            {
+                Value = tokens.RefreshToken,
+                ExpiresOn = tokens.RefreshTokenExpiresOn,
+                Type = TokenType.RefreshToken
+            },
+            UserId = userId
+        };
     }
 }

@@ -112,8 +112,8 @@
         <Compile Include="..\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs">
             <Link>Reference\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Interfaces\AuthenticationConstants.cs">
-            <Link>Reference\Infrastructure.Interfaces\AuthenticationConstants.cs</Link>
+        <Compile Include="..\Application.Interfaces\AuthenticationConstants.cs">
+            <Link>Reference\Application.Interfaces\AuthenticationConstants.cs</Link>
         </Compile>
         <Compile Include="..\Application.Interfaces\SearchResultMetadata.cs">
             <Link>Reference\Application.Interfaces\SearchResultMetadata.cs</Link>

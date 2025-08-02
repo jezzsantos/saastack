@@ -2,6 +2,7 @@ using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.OAuth2.ClientConsents;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using FluentAssertions;
 using Moq;
@@ -13,6 +14,7 @@ namespace IdentityDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class OAuth2ClientConsentRootSpec
 {
+    private readonly OAuth2ClientConsentRoot _consent;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
 
@@ -22,6 +24,9 @@ public class OAuth2ClientConsentRootSpec
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
+
+        _consent = OAuth2ClientConsentRoot
+            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
     }
 
     [Fact]
@@ -40,71 +45,71 @@ public class OAuth2ClientConsentRootSpec
     }
 
     [Fact]
-    public void WhenChangeConsentToTrue_ThenConsentChanged()
-    {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile])
-            .Value;
-
-        var result = consent.ChangeConsent("auserid".ToId(), true, scopes);
-
-        result.Should().BeSuccess();
-        consent.IsConsented.Should().BeTrue();
-        consent.Events.Last().Should().BeOfType<ConsentChanged>();
-    }
-
-    [Fact]
     public void WhenChangeConsentByAnotherUser_ThenReturnsError()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile])
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId])
             .Value;
 
-        var result = consent.ChangeConsent("anotherid".ToId(), true, scopes);
+        var result = _consent.ChangeConsent("anotherid".ToId(), true, scopes);
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.OAuth2ClientConsentRoot_NotOwner);
     }
 
     [Fact]
-    public void WhenChangeConsentToFalse_ThenConsentChanged()
+    public void WhenChangeConsentWithoutOpenIdScope_ThenReturnsError()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value;
-        consent.ChangeConsent("auserid".ToId(), true, scopes);
+        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile])
+            .Value;
 
-        var result = consent.ChangeConsent("auserid".ToId(), false, OAuth2Scopes.Empty);
+        var result = _consent.ChangeConsent("anotherid".ToId(), true, scopes);
+
+        result.Should().BeError(ErrorCode.PreconditionViolation, Resources.OAuth2ClientConsentRoot_NotOwner);
+    }
+
+    [Fact]
+    public void WhenChangeConsentToTrue_ThenConsentChanged()
+    {
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId])
+            .Value;
+
+        var result = _consent.ChangeConsent("auserid".ToId(), true, scopes);
 
         result.Should().BeSuccess();
-        consent.IsConsented.Should().BeFalse();
-        consent.Events.Last().Should().BeOfType<ConsentChanged>();
+        _consent.IsConsented.Should().BeTrue();
+        _consent.Events.Last().Should().BeOfType<ConsentChanged>();
+    }
+
+    [Fact]
+    public void WhenChangeConsentToFalse_ThenConsentChanged()
+    {
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId]).Value;
+        _consent.ChangeConsent("auserid".ToId(), true, scopes);
+
+        var result = _consent.ChangeConsent("auserid".ToId(), false, scopes);
+
+        result.Should().BeSuccess();
+        _consent.IsConsented.Should().BeFalse();
+        _consent.Events.Last().Should().BeOfType<ConsentChanged>();
     }
 
     [Fact]
     public void WhenChangeConsentWithSameValues_ThenDoesNothing()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value;
-        consent.ChangeConsent("auserid".ToId(), true, scopes);
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId]).Value;
+        _consent.ChangeConsent("auserid".ToId(), true, scopes);
 
-        var result = consent.ChangeConsent("auserid".ToId(), true, scopes);
+        var result = _consent.ChangeConsent("auserid".ToId(), true, scopes);
 
         result.Should().BeSuccess();
-        consent.IsConsented.Should().BeTrue();
-        consent.Events.Count.Should().Be(2);
-        consent.Events.Last().Should().BeOfType<ConsentChanged>();
+        _consent.IsConsented.Should().BeTrue();
+        _consent.Events.Count.Should().Be(2);
+        _consent.Events.Last().Should().BeOfType<ConsentChanged>();
     }
 
     [Fact]
     public void WhenEnsureInvariants_ThenReturnsOk()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-
-        var result = consent.EnsureInvariants();
+        var result = _consent.EnsureInvariants();
 
         result.Should().BeSuccess();
     }
@@ -112,10 +117,7 @@ public class OAuth2ClientConsentRootSpec
     [Fact]
     public void WhenRevokeByAnotherUser_ThenReturnsError()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-
-        var result = consent.Revoke("anotherid".ToId());
+        var result = _consent.Revoke("anotherid".ToId());
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.OAuth2ClientConsentRoot_NotOwner);
     }
@@ -123,31 +125,62 @@ public class OAuth2ClientConsentRootSpec
     [Fact]
     public void WhenRevokeAndAlreadyRevoked_ThenDoesNothing()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value;
-        consent.ChangeConsent("auserid".ToId(), false, scopes);
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId]).Value;
+        _consent.ChangeConsent("auserid".ToId(), false, scopes);
 
-        var result = consent.Revoke("auserid".ToId());
+        var result = _consent.Revoke("auserid".ToId());
 
         result.Should().BeSuccess();
         result.Value.Should().BeFalse();
-        consent.Events.Count.Should().Be(2);
-        consent.Events.Last().Should().BeOfType<ConsentChanged>();
+        _consent.Events.Count.Should().Be(2);
+        _consent.Events.Last().Should().BeOfType<ConsentChanged>();
     }
 
     [Fact]
     public void WhenRevokeAndConsented_ThenRevoked()
     {
-        var consent = OAuth2ClientConsentRoot
-            .Create(_recorder.Object, _idFactory.Object, "aclientid".ToId(), "auserid".ToId()).Value;
-        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value;
-        consent.ChangeConsent("auserid".ToId(), true, scopes);
+        var scopes = OAuth2Scopes.Create([OpenIdConnectConstants.Scopes.OpenId]).Value;
+        _consent.ChangeConsent("auserid".ToId(), true, scopes);
 
-        var result = consent.Revoke("auserid".ToId());
+        var result = _consent.Revoke("auserid".ToId());
 
         result.Should().BeSuccess();
         result.Value.Should().BeTrue();
-        consent.Events.Last().Should().BeOfType<ConsentChanged>();
+        _consent.Events.Last().Should().BeOfType<ConsentChanged>();
+    }
+
+    [Fact]
+    public void WhenHasConsentedToAndNotConsentedToAnything_ThenReturnsFalse()
+    {
+        var result = _consent.HasConsentedTo(OAuth2Scopes.Empty);
+
+        result.Should().BeSuccess();
+        result.Value.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenHasConsentedToAndDifferentScopes_ThenReturnsFalse()
+    {
+        var scopes = OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value;
+        _consent.ChangeConsent("auserid".ToId(), true, scopes);
+
+        var result = _consent.HasConsentedTo(OAuth2Scopes.Create([OAuth2Constants.Scopes.Email]).Value);
+
+        result.Should().BeSuccess();
+        result.Value.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenHasConsentedToAndMatchingScopes_ThenReturnsTrue()
+    {
+        var scopes = OAuth2Scopes.Create([
+            OpenIdConnectConstants.Scopes.OpenId, OAuth2Constants.Scopes.Profile, OAuth2Constants.Scopes.Email
+        ]).Value;
+        _consent.ChangeConsent("auserid".ToId(), true, scopes);
+
+        var result = _consent.HasConsentedTo(OAuth2Scopes.Create([OAuth2Constants.Scopes.Profile]).Value);
+
+        result.Should().BeSuccess();
+        result.Value.Should().BeTrue();
     }
 }

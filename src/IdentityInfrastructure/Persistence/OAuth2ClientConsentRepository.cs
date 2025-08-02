@@ -46,25 +46,25 @@ public class OAuth2ClientConsentRepository : IOAuth2ClientConsentRepository
     public async Task<Result<OAuth2ClientConsentRoot, Error>> LoadAsync(Identifier id,
         CancellationToken cancellationToken)
     {
-        var client = await _consents.LoadAsync(id, cancellationToken);
-        if (client.IsFailure)
+        var consent = await _consents.LoadAsync(id, cancellationToken);
+        if (consent.IsFailure)
         {
-            return client.Error;
+            return consent.Error;
         }
 
-        return client;
+        return consent;
     }
 
-    public async Task<Result<OAuth2ClientConsentRoot, Error>> SaveAsync(OAuth2ClientConsentRoot client,
+    public async Task<Result<OAuth2ClientConsentRoot, Error>> SaveAsync(OAuth2ClientConsentRoot consent,
         CancellationToken cancellationToken)
     {
-        var saved = await _consents.SaveAsync(client, cancellationToken);
+        var saved = await _consents.SaveAsync(consent, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        return client;
+        return consent;
     }
 
     private async Task<Result<Optional<OAuth2ClientConsentRoot>, Error>> FindFirstByQueryAsync(
@@ -83,12 +83,12 @@ public class OAuth2ClientConsentRepository : IOAuth2ClientConsentRepository
             return Optional<OAuth2ClientConsentRoot>.None;
         }
 
-        var clients = await _consents.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (clients.IsFailure)
+        var consents = await _consents.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (consents.IsFailure)
         {
-            return clients.Error;
+            return consents.Error;
         }
 
-        return clients.Value.ToOptional();
+        return consents.Value.ToOptional();
     }
 }

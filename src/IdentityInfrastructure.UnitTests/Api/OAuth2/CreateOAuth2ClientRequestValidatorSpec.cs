@@ -30,17 +30,6 @@ public class CreateOAuth2ClientRequestValidatorSpec
     }
 
     [Fact]
-    public void WhenNameIsEmpty_ThenThrows()
-    {
-        _request.Name = string.Empty;
-
-        _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.CreateOAuth2ClientRequestValidator_InvalidName);
-    }
-
-    [Fact]
     public void WhenNameIsNull_ThenThrows()
     {
         _request.Name = null;

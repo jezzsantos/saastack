@@ -34,9 +34,10 @@ public class AuthTokensApplication : IAuthTokensApplication
     }
 
     public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext caller, EndUserWithMemberships user,
+        UserProfile? profile, IReadOnlyList<string>? scopes, Dictionary<string, object>? additionalData,
         CancellationToken cancellationToken)
     {
-        var issued = await _jwtTokensService.IssueTokensAsync(user);
+        var issued = await _jwtTokensService.IssueTokensAsync(user, profile, scopes, additionalData);
         if (issued.IsFailure)
         {
             return issued.Error;
@@ -120,7 +121,7 @@ public class AuthTokensApplication : IAuthTokensApplication
             return Error.EntityLocked(Resources.AuthTokensApplication_AccountSuspended);
         }
 
-        var issued = await _jwtTokensService.IssueTokensAsync(user);
+        var issued = await _jwtTokensService.IssueTokensAsync(user, null, null, null);
         if (issued.IsFailure)
         {
             return issued.Error;
