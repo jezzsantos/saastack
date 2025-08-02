@@ -1,9 +1,10 @@
 using System.Security.Claims;
+using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Resources.Shared.Extensions;
 using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
-using Infrastructure.Interfaces;
 
 namespace Infrastructure.Common.Extensions;
 
@@ -65,11 +66,15 @@ public static class ClaimExtensions
     /// <summary>
     ///     Returns the claims for the specified <see cref="user" />
     /// </summary>
-    public static IReadOnlyList<Claim> ToClaims(this EndUserWithMemberships user)
+    public static IReadOnlyList<Claim> ToClaims(this EndUserWithMemberships user,
+        Dictionary<string, object>? additionalData)
     {
+        var additionalClaims = additionalData ?? new Dictionary<string, object>();
+        var now = DateTime.UtcNow.ToNearestSecond();
         var claims = new List<Claim>
         {
-            new(AuthenticationConstants.Claims.ForId, user.Id)
+            new(AuthenticationConstants.Claims.ForId, user.Id),
+            new(AuthenticationConstants.Claims.ForIssuedAt, new DateTimeOffset(now).ToUnixTimeSeconds().ToString())
         };
         user.Roles
             .ForEach(rol =>
@@ -115,7 +120,134 @@ public static class ClaimExtensions
                 });
         });
 
+        // Add at_hash for implicit flow,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#TokenSubstitution
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForAtHash, out var value2))
+        {
+            if (value2.ToString().HasValue())
+            {
+                var atHash = value2.ToString()!;
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForAtHash, atHash));
+            }
+        }
+
+        // Add c_hash for hybrid flow,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#CodeValidation
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForCHash, out var value3))
+        {
+            if (value3.ToString().HasValue())
+            {
+                var nonce = value3.ToString()!;
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForCHash, nonce));
+            }
+        }
+
         return claims;
+    }
+
+    /// <summary>
+    ///     Returns the claims for the specified <see cref="profile" />
+    /// </summary>
+    public static IReadOnlyList<Claim> ToClaims(this UserProfile profile, IReadOnlyList<string>? scopes,
+        Dictionary<string, object>? additionalData)
+    {
+        var additionalClaims = additionalData ?? new Dictionary<string, object>();
+        var authScopes = scopes ?? new List<string>();
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var claims = new List<Claim>
+        {
+            new(AuthenticationConstants.Claims.ForId, profile.UserId),
+            new(AuthenticationConstants.Claims.ForIssuedAt, new DateTimeOffset(now).ToUnixTimeSeconds().ToString())
+        };
+
+        if (authScopes.ContainsIgnoreCase(OAuth2Constants.Scopes.Email))
+        {
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForGivenName, profile.Name.FirstName));
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForFamilyName, profile.Name.LastName ?? ""));
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForFullName, profile.Name.FullName()));
+            claims.Add(new Claim(AuthenticationConstants.Claims.ForNickName, profile.DisplayName));
+
+            if (profile.PhoneNumber.HasValue())
+            {
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForPhoneNumber, profile.PhoneNumber));
+            }
+
+            if (profile.Timezone.HasValue())
+            {
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForTimezone, profile.Timezone));
+            }
+
+            if (profile.AvatarUrl.HasValue())
+            {
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForPicture, profile.AvatarUrl));
+            }
+        }
+
+        if (authScopes.ContainsIgnoreCase(OAuth2Constants.Scopes.Email))
+        {
+            if (profile.EmailAddress.HasValue())
+            {
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForEmail, profile.EmailAddress));
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForEmailVerified, true.ToString()));
+            }
+        }
+
+        // Add nonce for replay attack prevention,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForNonce, out var value1))
+        {
+            if (value1.ToString().HasValue())
+            {
+                var nonce = value1.ToString()!;
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForNonce, nonce));
+            }
+        }
+
+        // Add at_hash for implicit flow,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#TokenSubstitution
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForAtHash, out var value2))
+        {
+            if (value2.ToString().HasValue())
+            {
+                var atHash = value2.ToString()!;
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForAtHash, atHash));
+            }
+        }
+
+        // Add c_hash for hybrid flow,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#CodeValidation
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForCHash, out var value3))
+        {
+            if (value3.ToString().HasValue())
+            {
+                var nonce = value3.ToString()!;
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForCHash, nonce));
+            }
+        }
+
+        // Add auth_time for refresh token rotation,
+        // see https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+        if (additionalClaims.TryGetValue(AuthenticationConstants.Claims.ForAuthTime, out var value4))
+        {
+            if (value4 is DateTime dateTime)
+            {
+                var authTime = new DateTimeOffset(dateTime).ToUnixTimeSeconds().ToString();
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForAuthTime, authTime));
+            }
+        }
+
+        return claims;
+    }
+
+    /// <summary>
+    ///     Returns the claims for the anonymous user
+    /// </summary>
+    public static IReadOnlyList<Claim> ToClaimsForAnonymousUser()
+    {
+        return
+        [
+            new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.AnonymousUserId)
+        ];
     }
 
     /// <summary>
@@ -129,17 +261,6 @@ public static class ClaimExtensions
             new Claim(AuthenticationConstants.Claims.ForRole,
                 ToPlatformClaimValue(PlatformRoles.ServiceAccount)),
             new Claim(AuthenticationConstants.Claims.ForFeature, ToPlatformClaimValue(PlatformFeatures.Basic))
-        ];
-    }
-
-    /// <summary>
-    ///     Returns the claims for the anonymous user
-    /// </summary>
-    public static IReadOnlyList<Claim> ToClaimsForAnonymousUser()
-    {
-        return
-        [
-            new Claim(AuthenticationConstants.Claims.ForId, CallerConstants.AnonymousUserId)
         ];
     }
 
