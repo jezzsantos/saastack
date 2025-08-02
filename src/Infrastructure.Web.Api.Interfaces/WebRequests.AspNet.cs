@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,9 +13,12 @@ public abstract partial class WebRequest<TRequest>
 {
     /// <summary>
     ///     Provides custom binding that populates the request DTO from the request query, route values,
-    ///     and body for <see cref="IsMultiPartFormData" /> requests
+    ///     and form values for <see cref="IsMultiPartFormData" /> or <see cref="IsFormUrlEncoded" /> requests.
+    ///     This method is automatically defined in all typed request types. See
+    ///     <see
+    ///         href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-9.0#custom-binding" />
     /// </summary>
-    public static async ValueTask<TRequest?> BindAsync(HttpContext context, ParameterInfo parameter)
+    public static async ValueTask<TRequest?> BindAsync(HttpContext context, ParameterInfo _)
     {
         var request = context.Request;
         if (IsMultiPartFormData())
@@ -64,11 +68,25 @@ public abstract partial class WebRequest<TRequest>
     /// </summary>
     private static void PopulateFromFormValues(HttpRequest request, TRequest requestDto)
     {
+        if (request.Form.HasNone())
+        {
+            return;
+        }
+
+        if (requestDto.NotExists())
+        {
+            return;
+        }
+
+        var allProperties = BuildRequestProperties(typeof(TRequest));
+        if (allProperties.HasNone())
+        {
+            return;
+        }
+
         foreach (var (key, stringValues) in request.Form)
         {
-            var prop = typeof(TRequest).GetProperty(key,
-                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (prop.Exists())
+            if (allProperties.TryGetValue(key, out var prop))
             {
                 var rawValue = stringValues.Count > 1
                     ? stringValues.ToArray() as object
@@ -87,11 +105,25 @@ public abstract partial class WebRequest<TRequest>
     /// </summary>
     private static void PopulateFromRouteValues(HttpRequest request, TRequest? requestDto)
     {
+        if (request.RouteValues.HasNone())
+        {
+            return;
+        }
+
+        if (requestDto.NotExists())
+        {
+            return;
+        }
+
+        var allProperties = BuildRequestProperties(typeof(TRequest));
+        if (allProperties.HasNone())
+        {
+            return;
+        }
+
         foreach (var (key, rawValue) in request.RouteValues)
         {
-            var prop = typeof(TRequest).GetProperty(key,
-                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (prop.Exists())
+            if (allProperties.TryGetValue(key, out var prop))
             {
                 if (rawValue.Exists())
                 {
@@ -107,11 +139,25 @@ public abstract partial class WebRequest<TRequest>
     /// </summary>
     private static void PopulateFromQueryStringValues(HttpRequest request, TRequest? requestDto)
     {
+        if (request.Query.HasNone())
+        {
+            return;
+        }
+
+        if (requestDto.NotExists())
+        {
+            return;
+        }
+
+        var allProperties = BuildRequestProperties(typeof(TRequest));
+        if (allProperties.HasNone())
+        {
+            return;
+        }
+
         foreach (var (key, stringValues) in request.Query)
         {
-            var prop = typeof(TRequest).GetProperty(key,
-                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (prop.Exists())
+            if (allProperties.TryGetValue(key, out var prop))
             {
                 var rawValue = stringValues.Count > 1
                     ? stringValues.ToArray() as object
@@ -133,5 +179,33 @@ public abstract partial class WebRequest<TRequest>
     private static bool IsFormUrlEncoded()
     {
         return typeof(TRequest).IsAssignableTo(typeof(IHasFormUrlEncoded));
+    }
+
+    /// <summary>
+    ///     Adds all properties of the request type to a dictionary, including any properties that are defined with the
+    ///     <see cref="JsonPropertyNameAttribute" />
+    ///     None: The entries with the name of the <see cref="JsonPropertyNameAttribute" /> have used the
+    ///     same <see cref="PropertyInfo" /> as the original property name
+    /// </summary>
+    private static Dictionary<string, PropertyInfo> BuildRequestProperties(Type requestType)
+    {
+        var allProperties = new Dictionary<string, PropertyInfo>(StringComparer.InvariantCultureIgnoreCase);
+        var classProperties = requestType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        if (classProperties.HasNone())
+        {
+            return new Dictionary<string, PropertyInfo>();
+        }
+
+        foreach (var propertyInfo in classProperties)
+        {
+            allProperties.Add(propertyInfo.Name, propertyInfo);
+            var attribute = propertyInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
+            if (attribute.Exists() && attribute.Name.HasValue())
+            {
+                allProperties.TryAdd(attribute.Name, propertyInfo);
+            }
+        }
+
+        return allProperties;
     }
 }

@@ -42,15 +42,13 @@ public class ARequest : TenantedRequest<ARequest, AResponse>
 }
 ```
 
-Where all request data is expected by the API as in either: `application/json` or in `multipart/form-data`.
+Where all request data is expected by the API as in either: `application/json` or `multipart/form-data` or in `application/x-www-form-urlencoded`.
 
 In this form, [traditional model binding for minimal APIs](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) of individual properties in the `ARequest` type is tedious for developers.
 
 The use of attributes like `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]` get confusing fast, and create dependencies on ASPNET in the assemblies where the types are shared.
 
 For all `GET` and `DELETE` APIs, we are generating those using the `[AsParameters]` but not for `POST`, `PUT`, `PATCH` requests.
-
-We assume that only `GET` and `DELETE` requests, will utilize query strings.
 
 It is possible to provide our own customer binding, by providing a `BindAsync` method on all request types.
 
