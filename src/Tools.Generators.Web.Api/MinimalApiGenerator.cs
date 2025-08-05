@@ -1,7 +1,6 @@
 using System.Text;
 using Application.Interfaces;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.CodeAnalysis;
@@ -123,10 +122,8 @@ namespace {assemblyNamespace}
                 var methodBody = BuildHandlerBody(registration);
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
-                endpointRegistrations.AppendLine(registration.OperationMethod.CanHaveBody()
-                    ? $"                async (global::System.IServiceProvider serviceProvider, global::{registration.RequestDto.FullName} request) =>"
-                    : $"                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
-
+                endpointRegistrations.AppendLine(
+                    $"                async (global::System.IServiceProvider serviceProvider, global::{registration.RequestDto.FullName} request) =>");
                 endpointRegistrations.AppendLine(
                     $"                {methodBody})");
 

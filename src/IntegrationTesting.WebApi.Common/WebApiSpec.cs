@@ -215,6 +215,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         }
     }
 
+    protected JsonSerializerOptions SerializerOptions => _setup.Services.GetRequiredService<JsonSerializerOptions>();
+
     public void ShutdownAllAdditionalServers()
     {
         _additionalServerProcesses.ForEach(processId =>
@@ -309,7 +311,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             var request = new DrainAllEventNotificationsRequest();
             await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
         }, (int)rounds);
-        
+
 #endif
     }
 

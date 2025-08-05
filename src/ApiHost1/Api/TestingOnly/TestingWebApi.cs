@@ -180,13 +180,49 @@ public sealed class TestingWebApi : IWebApiService
                 "alocation");
     }
 
-    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEnumPost(
-        PostWithEnumTestingOnlyRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<string, GeneralTestingOnlyResponse>> GeneralGet(
+        GetTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new PostResult<StringMessageTestingOnlyResponse>(
-                new StringMessageTestingOnlyResponse { Message = $"amessage{request.AnEnum}" },
+            new GeneralTestingOnlyResponse
+            {
+                ACamelEnumProperty = request.ACamelEnumProperty,
+                ACamelIntProperty = request.ACamelIntProperty,
+                ACamelStringProperty = request.ACamelStringProperty,
+                AnEnumProperty = request.AnEnumProperty,
+                AnEnumQueryProperty = request.AnEnumQueryProperty,
+                AnEnumRouteProperty = request.AnEnumRouteProperty,
+                AnIntProperty = request.AnIntProperty,
+                AnIntQueryProperty = request.AnIntQueryProperty,
+                AnIntRouteProperty = request.AnIntRouteProperty,
+                AStringProperty = request.AStringProperty,
+                AStringQueryProperty = request.AStringQueryProperty,
+                AStringRouteProperty = request.AStringRouteProperty
+            };
+    }
+
+    public async Task<ApiPostResult<string, GeneralTestingOnlyResponse>> GeneralPost(
+        PostTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<GeneralTestingOnlyResponse>(
+                new GeneralTestingOnlyResponse
+                {
+                    ACamelEnumProperty = request.ACamelEnumProperty,
+                    ACamelIntProperty = request.ACamelIntProperty,
+                    ACamelStringProperty = request.ACamelStringProperty,
+                    AnEnumProperty = request.AnEnumProperty,
+                    AnEnumQueryProperty = request.AnEnumQueryProperty,
+                    AnEnumRouteProperty = request.AnEnumRouteProperty,
+                    AnIntProperty = request.AnIntProperty,
+                    AnIntQueryProperty = request.AnIntQueryProperty,
+                    AnIntRouteProperty = request.AnIntRouteProperty,
+                    AStringProperty = request.AStringProperty,
+                    AStringQueryProperty = request.AStringQueryProperty,
+                    AStringRouteProperty = request.AStringRouteProperty
+                },
                 "alocation");
     }
 
@@ -216,7 +252,19 @@ public sealed class TestingWebApi : IWebApiService
             new Result<SearchTestingOnlyResponse, Error>(new SearchTestingOnlyResponse
             {
                 Items = results.Results,
-                Metadata = results.Metadata
+                Metadata = results.Metadata,
+                ACamelEnumProperty = request.ACamelEnumProperty,
+                ACamelIntProperty = request.ACamelIntProperty,
+                ACamelStringProperty = request.ACamelStringProperty,
+                AnEnumProperty = request.AnEnumProperty,
+                AnEnumQueryProperty = request.AnEnumQueryProperty,
+                AnEnumRouteProperty = request.AnEnumRouteProperty,
+                AnIntProperty = request.AnIntProperty,
+                AnIntQueryProperty = request.AnIntQueryProperty,
+                AnIntRouteProperty = request.AnIntRouteProperty,
+                AStringProperty = request.AStringProperty,
+                AStringQueryProperty = request.AStringQueryProperty,
+                AStringRouteProperty = request.AStringRouteProperty
             });
     }
 

@@ -15,8 +15,6 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class RequestExtensions
 {
-    public const string EmptyRequestJson = "{}";
-    private const char RouteSegmentDelimiter = '/';
     private static readonly RecyclableMemoryStreamManager MemoryManager = new();
 
     /// <summary>
@@ -71,6 +69,7 @@ public static class RequestExtensions
 
         return fields
             .Where(field => placeholders.Any(ph => ph.Key.EqualsIgnoreCase(field.Key)))
+            .DistinctBy(field => field.Key)
             .ToDictionary(field => field.Key, field => field.Value);
     }
 
@@ -93,7 +92,7 @@ public static class RequestExtensions
     {
         if (request.NotExists())
         {
-            return EmptyRequestJson;
+            return HttpConstants.EmptyRequestJson;
         }
 
         return request.ToJson()!;
@@ -165,7 +164,7 @@ public static class RequestExtensions
     {
         if (fields.HasNone())
         {
-            return EmptyRequestJson;
+            return HttpConstants.EmptyRequestJson;
         }
 
         return fields.ToJson()!;
@@ -176,13 +175,13 @@ public static class RequestExtensions
     ///     Note: We define the data to be hashed with HMAC as: {body}
     ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
     ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
-    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="EmptyRequestJson" />
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="HttpConstants.EmptyRequestJson" />
     /// </summary>
     private static string CreateHMACSignature(this IWebRequest request, string secret)
     {
         var body = request.CanHaveBody()
             ? GetSerializedBody(request)
-            : EmptyRequestJson;
+            : HttpConstants.EmptyRequestJson;
 
         var data = HMACSigner.SignatureEncoding.GetBytes(body);
         var signer = new HMACSigner(data, secret);
@@ -228,13 +227,13 @@ public static class RequestExtensions
     ///     Note: We define the data to be hashed with HMAC as: {body}
     ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
     ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
-    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="EmptyRequestJson" />
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="HttpConstants.EmptyRequestJson" />
     /// </summary>
     private static string CreateHMACSignature(this HttpRequestMessage message, string secret)
     {
         var bytes = message.Method.CanHaveBody()
             ? GetSerializedBody(message)
-            : [..HMACSigner.SignatureEncoding.GetBytes(EmptyRequestJson)];
+            : [..HMACSigner.SignatureEncoding.GetBytes(HttpConstants.EmptyRequestJson)];
 
         var data = bytes.ToArray();
         var signer = new HMACSigner(data, secret);
@@ -243,7 +242,7 @@ public static class RequestExtensions
 
         static List<byte> GetSerializedBody(HttpRequestMessage message)
         {
-            var emptyBody = new List<byte>(HMACSigner.SignatureEncoding.GetBytes(EmptyRequestJson));
+            var emptyBody = new List<byte>(HMACSigner.SignatureEncoding.GetBytes(HttpConstants.EmptyRequestJson));
             if (message.Content.NotExists())
             {
                 return emptyBody;
@@ -397,15 +396,15 @@ public static class RequestExtensions
 
         static void PruneEmptySegments(List<string> routeSegments, string append)
         {
-            if (!append.StartsWith(RouteSegmentDelimiter))
+            if (!append.StartsWith(HttpConstants.RouteSegmentDelimiter))
             {
                 return;
             }
 
             if (routeSegments.Count > 0
-                && routeSegments[^1].EndsWith(RouteSegmentDelimiter))
+                && routeSegments[^1].EndsWith(HttpConstants.RouteSegmentDelimiter))
             {
-                routeSegments[^1] = routeSegments[^1].TrimEnd(RouteSegmentDelimiter);
+                routeSegments[^1] = routeSegments[^1].TrimEnd(HttpConstants.RouteSegmentDelimiter);
             }
         }
     }

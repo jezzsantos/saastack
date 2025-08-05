@@ -476,20 +476,20 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;ClientId&apos; is either missing or invalid.
-        /// </summary>
-        internal static string GetOAuth2ConsentRequestValidator_InvalidClientId {
-            get {
-                return ResourceManager.GetString("GetOAuth2ConsentRequestValidator_InvalidClientId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;EmailAddress&apos; is either missing or invalid.
         /// </summary>
         internal static string InitiatePasswordResetRequestValidator_InvalidEmailAddress {
             get {
                 return ResourceManager.GetString("InitiatePasswordResetRequestValidator_InvalidEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;RedirectUri&apos; is missing.
+        /// </summary>
+        internal static string OAuth2Api_AuthorizeGet_RedirectUriMIssing {
+            get {
+                return ResourceManager.GetString("OAuth2Api_AuthorizeGet_RedirectUriMIssing", resourceCulture);
             }
         }
         

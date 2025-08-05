@@ -1,6 +1,7 @@
 using System.Text;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -26,7 +27,7 @@ public class HttpRequestExtensionsSpec
     [Fact]
     public async Task WhenVerifyHMACSignatureAsyncAndEmptyJson_ThenReturnsTrue()
     {
-        var body = Encoding.UTF8.GetBytes(RequestExtensions.EmptyRequestJson);
+        var body = Encoding.UTF8.GetBytes(HttpConstants.EmptyRequestJson);
         var signature = new HMACSigner(body, "asecret").Sign();
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(hr => hr.Body)

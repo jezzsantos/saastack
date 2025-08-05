@@ -44,21 +44,23 @@ public class ARequest : TenantedRequest<ARequest, AResponse>
 
 Where all request data is expected by the API as in either: `application/json` or `multipart/form-data` or in `application/x-www-form-urlencoded`.
 
-In this form, [traditional model binding for minimal APIs](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) of individual properties in the `ARequest` type is tedious for developers.
+In this form, [traditional model binding for minimal APIs](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) of individual properties on the `ARequest` type is very tedious for developers. Sure, it gives more control, but in most cases, it is extra work for no benefit.
 
-The use of attributes like `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]` get confusing fast, and create dependencies on ASPNET in the assemblies where the types are shared.
+The use of attributes like `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]` get confusing fast, and also create dependencies to ASPNET in the assemblies where the types are shared. Which increases coupling and limits their reusability for other purposes.
 
-For all `GET` and `DELETE` APIs, we are generating those using the `[AsParameters]` but not for `POST`, `PUT`, `PATCH` requests.
+It is possible to provide our own customer binding, by providing a `BindAsync` method on all request types. Which we must do to support `multipart/form-data` and `application/x-www-form-urlencoded` content types if we want to avoid using most of the binding attributes.
 
-It is possible to provide our own customer binding, by providing a `BindAsync` method on all request types.
+There exist some issues with binding Enum types and case-sensitivity, and with translating camel-cased inbound JSON values using the `[JsonPropertyName("aname")]`.
+
+There are other, separate challenges with tailoring our OpenAPI data also for readability and tooling that consumes that.
 
 ## Decision Outcome
 
 `Custom Binding`
 
-- We would prefer is developers did not have to use binding attributes like  `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]`.
+- We would prefer is developers did not have to use binding attributes like  `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]`, except in exception cases.
 - We want to support both `application/json`, and `multipart/form-data` and `application/form-urlencoded`.
-- We can make this easier for the developer
+- We can make this easier for the developer using source generation.
 
 ### Pros and Cons of the Options
 

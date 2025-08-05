@@ -1,3 +1,4 @@
+using Application.Resources.Shared;
 using Common.Extensions;
 using Domain.Common.Identity;
 using FluentValidation;
@@ -25,7 +26,6 @@ public class AuthorizeOAuth2GetRequestValidator : AbstractValidator<AuthorizeOAu
 
         RuleFor(req => req.ResponseType)
             .NotNull()
-            //HACK: As we cannot define the property as an enum, see AuthorizeOAuth2GetRequest
             .Must(rt => Enum.TryParse(rt, true, out OAuth2ResponseType _))
             .WithMessage(Resources.AuthorizeOAuth2RequestValidator_InvalidResponseType);
 
@@ -49,9 +49,8 @@ public class AuthorizeOAuth2GetRequestValidator : AbstractValidator<AuthorizeOAu
             .When(req => req.CodeChallenge.HasValue());
 
         RuleFor(req => req.CodeChallengeMethod)
-            .IsInEnum()
-            .NotNull()
+            .Must(rt => Enum.TryParse(rt, true, out OpenIdConnectCodeChallengeMethod _))
             .WithMessage(Resources.AuthorizeOAuth2RequestValidator_InvalidCodeChallengeMethod)
-            .When(req => req.CodeChallengeMethod.HasValue);
+            .When(req => req.CodeChallengeMethod.HasValue());
     }
 }

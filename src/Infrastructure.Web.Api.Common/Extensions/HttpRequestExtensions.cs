@@ -4,6 +4,7 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
@@ -47,7 +48,7 @@ public static class HttpRequestExtensions
 
         if (body.Length == 0)
         {
-            body = Encoding.UTF8.GetBytes(RequestExtensions
+            body = Encoding.UTF8.GetBytes(HttpConstants
                 .EmptyRequestJson); //HACK: we assume that an empty JSON request was signed
         }
 

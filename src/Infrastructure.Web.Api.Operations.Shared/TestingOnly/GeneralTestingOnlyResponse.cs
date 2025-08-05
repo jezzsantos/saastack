@@ -1,15 +1,11 @@
-#if TESTINGONLY
 using System.Text.Json.Serialization;
 using Infrastructure.Web.Api.Interfaces;
 
+#if TESTINGONLY
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
-/// <summary>
-///     Tests the use of reference types, values types, and enums anywhere in a SEARCH request
-/// </summary>
-[Route("/testingonly/general/search/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
-    OperationMethod.Search, isTestingOnly: true)]
-public class SearchTestingOnlyRequest : UnTenantedSearchRequest<SearchTestingOnlyRequest, SearchTestingOnlyResponse>
+public class
+    GeneralTestingOnlyResponse : IWebResponse
 {
     [JsonPropertyName("a_camel_enum")] public TestingOnlyEnum? ACamelEnumProperty { get; set; }
 

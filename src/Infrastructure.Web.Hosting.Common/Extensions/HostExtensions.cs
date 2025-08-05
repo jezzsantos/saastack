@@ -351,8 +351,7 @@ public static class HostExtensions
             {
                 options.ParameterFilter<DataAnnotationsParameterFilter>();
                 options.SchemaFilter<AllSchemaFilter>();
-                options.OperationFilter<BugFixParameterOperationFilter>(options);
-                options.OperationFilter<RouteTemplateParameterFilter>();
+                options.OperationFilter<ParameterFilter>();
                 options.OperationFilter<DefaultBodyFilter>();
                 options
                     .OperationFilter<

@@ -178,6 +178,24 @@ public class DefaultResponsesFilterSpec
     }
 
     [Fact]
+    public void WhenApplyAndExistingAndNonDefault3XXResponsesDescription_ThenAddsErrorResponse()
+    {
+        var request = (object _, TestPostRequestTypedResponse req) => { };
+        _methodInfo.Setup(mi => mi.GetParameters())
+            .Returns(request.GetMethodInfo().GetParameters);
+        _schemaGenerator.Setup(sg => sg.GenerateSchema(typeof(TestResponse), It.IsAny<SchemaRepository>(),
+                It.IsAny<MemberInfo>(), It.IsAny<ParameterInfo>(), It.IsAny<ApiParameterRouteInfo>()))
+            .Returns(new OpenApiSchema { Type = "TestResponse" });
+        _operation.Responses.Add("302", new OpenApiResponse { Description = "adescription" });
+
+        _filter.Apply(_operation, _context);
+
+        _operation.Responses.Count.Should().Be(HttpConstants.StatusCodes.SupportedErrorStatuses.Count + 2 + 1);
+        _operation.Responses["200"].Description.Should().Be("OK");
+        _operation.Responses["302"].Description.Should().Be("adescription");
+    }
+    
+    [Fact]
     public void WhenApplyAndExistingAndNonDefault4XXResponsesDescription_ThenAddsErrorResponse()
     {
         var request = (object _, TestPostRequestTypedResponse req) => { };

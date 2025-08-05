@@ -1192,7 +1192,7 @@ public class JsonClientSpec
 [Interfaces.Route("/test", OperationMethod.Get)]
 public class TestRequest : WebRequest<TestRequest>
 {
-    [FromQuery] public string[]? AnArrayProperty { get; set; }
+    public string[]? AnArrayProperty { get; set; }
 
     public string AProperty { get; set; } = "avalue";
 }

@@ -141,7 +141,7 @@ public sealed class DefaultResponsesFilter : IOperationFilter
 
         var existingErrorResponses = existingResponses
             .Where(res => res.Key != StatusCode.BadRequest.Numeric.ToString())
-            .Where(res => res.Key.StartsWith("4") || res.Key.StartsWith("5"));
+            .Where(res => res.Key.StartsWith("3") || res.Key.StartsWith("4") || res.Key.StartsWith("5"));
         foreach (var existingResponse in existingErrorResponses)
         {
             if (generalErrors.TryGetValue(existingResponse.Key, out var error))

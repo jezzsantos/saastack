@@ -50,8 +50,18 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAnyRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAnyRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
@@ -73,18 +83,13 @@ public class ApiDocSpec
             var title = doc.DocumentNode.SelectSingleNode("//title");
 
             title.Should().NotBeNull();
-            title!.InnerText.Should().Be(HostOptions.BackEndAncillaryApiHost.HostName);
+            title.InnerText.Should().Be(HostOptions.BackEndAncillaryApiHost.HostName);
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenHasXmlSummary()
+        public void WhenFetchOpenApi_ThenHasXmlSummary()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiGetTestingOnly");
             operation.Summary.Should()
@@ -92,14 +97,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenHasXmlSpecialResponses()
+        public void WhenFetchOpenApi_ThenHasXmlSpecialResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiPostTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPostTestingOnly");
             operation.Summary.Should().Be("Tests OpenAPI swagger for POST requests");
@@ -109,18 +109,13 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenHasNullableResponseFields()
+        public void WhenFetchOpenApi_ThenHasNullableResponseFields()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiGetTestingOnly");
 
-            var responseType = openApi.Components.Schemas[nameof(OpenApiTestingOnlyResponse)];
+            var responseType = _document.Components.Schemas[nameof(OpenApiTestingOnlyResponse)];
             responseType.Required.Count.Should().Be(5);
             responseType.Required.Should().ContainInOrder("anAnnotatedRequiredField", "anInitializedField",
                 "aRequiredField", "aValueTypeField", "message");
@@ -133,7 +128,7 @@ public class ApiDocSpec
             responseType.Properties["message"].Nullable.Should().BeFalse();
             responseType.Properties["anNullableObject"].Nullable.Should().BeFalse();
 
-            var nestedType = openApi.Components.Schemas[nameof(OpenApiResponseObject)];
+            var nestedType = _document.Components.Schemas[nameof(OpenApiResponseObject)];
             nestedType.Required.Count.Should().Be(4);
             nestedType.Required.Should().ContainInOrder("anAnnotatedRequiredField", "anInitializedField",
                 "aRequiredField", "aValueTypeField");
@@ -146,28 +141,18 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForNonSecuredEndpoint_ThenAnonymousAuthorizationHasNoSecurityScheme()
+        public void WhenFetchOpenApiForNonSecuredEndpoint_ThenAnonymousAuthorizationHasNoSecurityScheme()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/security/none"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/security/none"].Operations[OperationType.Get];
             operation.Description.Should().Be($"(request type: {nameof(GetInsecureTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetInsecureTestingOnly");
             operation.Security.Should().HaveCount(0);
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForTokenSecuredEndpoint_ThenTokenAuthorizationHasSecurityScheme()
+        public void WhenFetchOpenApiForTokenSecuredEndpoint_ThenTokenAuthorizationHasSecurityScheme()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/authn/token/get"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/authn/token/get"].Operations[OperationType.Get];
             operation.Description.Should()
                 .Be($"(request type: {nameof(GetCallerWithTokenOrAPIKeyTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetCallerWithTokenOrAPIKeyTestingOnly");
@@ -182,14 +167,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForSecureHMACEndpoint_ThenHMACAuthorizationHasSecurityScheme()
+        public void WhenFetchOpenApiForSecureHMACEndpoint_ThenHMACAuthorizationHasSecurityScheme()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/authn/hmac/get"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/authn/hmac/get"].Operations[OperationType.Get];
             operation.Description.Should().Be($"(request type: {nameof(GetCallerWithHMACTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetCallerWithHMACTestingOnly");
             operation.Security.Should().HaveCount(1);
@@ -199,14 +179,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForSecurePrivateInterHostEndpoint_ThenShouldNotExist()
+        public void WhenFetchOpenApiForSecurePrivateInterHostEndpoint_ThenShouldNotExist()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths.ContainsKey("/testingonly/authn/interhost/get");
+            var operation = _document!.Paths.ContainsKey("/testingonly/authn/interhost/get");
             operation.Should().BeFalse();
         }
     }
@@ -215,19 +190,24 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAGetRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAGetRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenParametersHaveDescriptions()
+        public void WhenFetchOpenApi_ThenParametersHaveDescriptions()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiGetTestingOnly");
             operation.Parameters.Should().HaveCount(3);
@@ -243,14 +223,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHas200Response()
+        public void WhenFetchOpenApi_ThenResponseHas200Response()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
             operation.Responses["200"].Description.Should().Be("OK");
             operation.Responses["200"].Content.Count.Should().Be(2);
             operation.Responses["200"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -260,14 +235,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
+        public void WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
             operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }
@@ -277,22 +247,27 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAPostRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAPostRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenFieldsHaveDescriptions()
+        public void WhenFetchOpenApi_ThenFieldsHaveDescriptions()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiPostTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPostTestingOnly");
-            var schema = openApi.Components.Schemas[nameof(OpenApiPostTestingOnlyRequest)];
+            var schema = _document.Components.Schemas[nameof(OpenApiPostTestingOnlyRequest)];
             schema.Description.Should().BeNull();
             schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
@@ -302,14 +277,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHas201Response()
+        public void WhenFetchOpenApi_ThenResponseHas201Response()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -319,14 +289,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
+        public void WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(11);
             VerifyGeneralErrorResponses(operation.Responses,
                 "a custom conflict response which spills over to the next line");
@@ -337,22 +302,27 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAPutRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAPutRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenFieldsHaveDescriptions()
+        public void WhenFetchOpenApi_ThenFieldsHaveDescriptions()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
             operation.Description.Should().Be($"(request type: {nameof(OpenApiPutTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPutTestingOnly (Put)");
-            var schema = openApi.Components.Schemas[nameof(OpenApiPutTestingOnlyRequest)];
+            var schema = _document.Components.Schemas[nameof(OpenApiPutTestingOnlyRequest)];
             schema.Description.Should().BeNull();
             schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
@@ -362,14 +332,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHas201Response()
+        public void WhenFetchOpenApi_ThenResponseHas201Response()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
             operation.Responses["202"].Description.Should().Be("Accepted");
             operation.Responses["202"].Content.Count.Should().Be(2);
             operation.Responses["202"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -379,14 +344,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
+        public void WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
             operation.Responses.Count.Should().Be(11);
             VerifyGeneralErrorResponses(operation.Responses, "a custom conflict response");
         }
@@ -396,19 +356,24 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAPostMultiPartFormDataRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAPostMultiPartFormDataRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartFormData_ThenFieldsHaveDescriptions()
+        public void WhenFetchOpenApiForMultiPartFormData_ThenFieldsHaveDescriptions()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
 #if TESTINGONLY
             operation.Description.Should()
                 .Be($"(request type: {nameof(OpenApiPostMultiPartFormDataTestingOnlyRequest)})");
@@ -429,14 +394,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartFormData_ThenResponseHas201Response()
+        public void WhenFetchOpenApiForMultiPartFormData_ThenResponseHas201Response()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -446,14 +406,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartFormData_ThenResponseHasGeneralErrorResponses()
+        public void WhenFetchOpenApiForMultiPartFormData_ThenResponseHasGeneralErrorResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }
@@ -463,19 +418,24 @@ public class ApiDocSpec
     [Collection("API")]
     public class GivenAPostFormUrlEncodingRequest : WebApiSpec<Program>
     {
+        private static OpenApiDocument? _document;
+
         public GivenAPostFormUrlEncodingRequest(WebApiSetup<Program> setup) : base(setup)
         {
+            if (_document.NotExists())
+            {
+                var result = HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"))
+                    .GetAwaiter().GetResult();
+
+                var readAsStreamAsync = result.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                _document = new OpenApiStreamReader().Read(readAsStreamAsync, out _);
+            }
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenFieldsHaveDescriptions()
+        public void WhenFetchOpenApiForFormUrlEncoded_ThenFieldsHaveDescriptions()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
 #if TESTINGONLY
             operation.Description.Should().Be($"(request type: {nameof(OpenApiPostFormUrlEncodedTestingOnlyRequest)})");
 #endif
@@ -494,14 +454,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenResponseHas201Response()
+        public void WhenFetchOpenApiForFormUrlEncoded_ThenResponseHas201Response()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -511,14 +466,9 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenResponseHasGeneralErrorResponses()
+        public void WhenFetchOpenApiForFormUrlEncoded_ThenResponseHasGeneralErrorResponses()
         {
-            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
-
-            var openApi = new OpenApiStreamReader()
-                .Read(await result.Content.ReadAsStreamAsync(), out _);
-
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
+            var operation = _document!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }

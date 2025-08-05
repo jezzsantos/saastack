@@ -149,7 +149,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -229,7 +229,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -310,7 +310,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -392,7 +392,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -474,7 +474,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -556,7 +556,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -638,7 +638,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -724,7 +724,7 @@ public class MinimalApiGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
-                                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                 {
                                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
                 
@@ -810,7 +810,7 @@ public class MinimalApiGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                    {
                                        return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
                    
@@ -896,7 +896,7 @@ public class MinimalApiGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                    {
                                        return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -983,7 +983,7 @@ public class MinimalApiGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter>();
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                    {
                                        return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -1455,7 +1455,7 @@ public class MinimalApiGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
-                                   async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                   async (global::System.IServiceProvider serviceProvider, global::ANamespace.ARequest request) =>
                                    {
                                        return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 

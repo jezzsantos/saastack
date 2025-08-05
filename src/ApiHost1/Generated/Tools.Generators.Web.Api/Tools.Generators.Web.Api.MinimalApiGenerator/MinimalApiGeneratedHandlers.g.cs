@@ -30,7 +30,7 @@ namespace ApiHost1
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
             healthapiGroup.MapGet("/health",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.Health.HealthCheckRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.Health.HealthCheckRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -58,7 +58,7 @@ namespace ApiHost1
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authn/hmac/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithHMACTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithHMACTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -85,7 +85,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authn/interhost/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithPrivateInterHostTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithPrivateInterHostTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -105,7 +105,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authn/token/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithTokenOrAPIKeyTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetCallerWithTokenOrAPIKeyTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -132,7 +132,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authz/none/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByNothingTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByNothingTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -157,7 +157,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authz/feature/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByFeatureTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByFeatureTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -184,7 +184,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/authz/role/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByRoleTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.AuthorizeByRoleTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -211,7 +211,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/negotiations/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ContentNegotiationsTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ContentNegotiationsTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -261,7 +261,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/download",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.DownloadStreamTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.DownloadStreamTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -286,7 +286,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/errors/error",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ErrorsErrorTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ErrorsErrorTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -311,7 +311,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/errors/throws",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ErrorsThrowTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ErrorsThrowTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -361,7 +361,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/general/get/array",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetWithSimpleArrayTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetWithSimpleArrayTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -460,33 +460,58 @@ namespace ApiHost1
                     });
 #endif
 #if TESTINGONLY
-            testingwebapiGroup.MapPost("/testingonly/general/enum",
-                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostWithEnumTestingOnlyRequest request) =>
+            testingwebapiGroup.MapGet("/testingonly/general/get/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
-                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostWithEnumTestingOnlyRequest request, global::System.Threading.CancellationToken cancellationToken)
+                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetTestingOnlyRequest request, global::System.Threading.CancellationToken cancellationToken)
                     {
                         var callerFactory = services.GetRequiredService<Infrastructure.Interfaces.ICallerContextFactory>();
                         var serviceProvider = services.GetRequiredService<System.IServiceProvider>();
 
                         var api = new global::ApiHost1.Api.TestingOnly.TestingWebApi(callerFactory, serviceProvider);
-                        var result = await api.GeneralEnumPost(request, cancellationToken);
-                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
+                        var result = await api.GeneralGet(request, cancellationToken);
+                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                     }
                 })
-                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostWithEnumTestingOnlyRequest>>()
+                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetTestingOnlyRequest>>()
                 .WithOpenApi(op =>
                     {
-                        op.OperationId = "PostWithEnumTestingOnly";
-                        op.Description = "(request type: PostWithEnumTestingOnlyRequest)";
+                        op.OperationId = "GetTestingOnly";
+                        op.Description = "(request type: GetTestingOnlyRequest)";
                         op.Responses.Clear();
                         return op;
                     });
 #endif
 #if TESTINGONLY
-            testingwebapiGroup.MapGet("/testingonly/search",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.SearchTestingOnlyRequest request) =>
+            testingwebapiGroup.MapPost("/testingonly/general/post/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostTestingOnlyRequest request) =>
+                {
+                    return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
+
+                    static async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::System.IServiceProvider services, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostTestingOnlyRequest request, global::System.Threading.CancellationToken cancellationToken)
+                    {
+                        var callerFactory = services.GetRequiredService<Infrastructure.Interfaces.ICallerContextFactory>();
+                        var serviceProvider = services.GetRequiredService<System.IServiceProvider>();
+
+                        var api = new global::ApiHost1.Api.TestingOnly.TestingWebApi(callerFactory, serviceProvider);
+                        var result = await api.GeneralPost(request, cancellationToken);
+                        return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
+                    }
+                })
+                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ValidationFilter<Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostTestingOnlyRequest>>()
+                .WithOpenApi(op =>
+                    {
+                        op.OperationId = "PostTestingOnly";
+                        op.Description = "(request type: PostTestingOnlyRequest)";
+                        op.Responses.Clear();
+                        return op;
+                    });
+#endif
+#if TESTINGONLY
+            testingwebapiGroup.MapGet("/testingonly/general/search/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.SearchTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -511,7 +536,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/security/none",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetInsecureTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetInsecureTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -562,7 +587,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/openapi/{Id}",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.OpenApiGetTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.OpenApiGetTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -711,7 +736,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/redirect/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetWithRedirectTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.GetWithRedirectTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -761,7 +786,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/correlations/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.RequestCorrelationsTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.RequestCorrelationsTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -786,7 +811,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapDelete("/testingonly/statuses/delete1",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesDeleteTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesDeleteTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -811,7 +836,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapDelete("/testingonly/statuses/delete2",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesDeleteWithResponseTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesDeleteWithResponseTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -836,7 +861,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/statuses/get",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesGetTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesGetTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -959,7 +984,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/statuses/search",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesSearchTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.StatusesSearchTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -984,7 +1009,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/validations/unvalidated",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ValidationsUnvalidatedTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ValidationsUnvalidatedTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 
@@ -1009,7 +1034,7 @@ namespace ApiHost1
 #endif
 #if TESTINGONLY
             testingwebapiGroup.MapGet("/testingonly/validations/validated/{Id}",
-                async (global::System.IServiceProvider serviceProvider, [global::Microsoft.AspNetCore.Http.AsParameters] global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ValidationsValidatedGetTestingOnlyRequest request) =>
+                async (global::System.IServiceProvider serviceProvider, global::Infrastructure.Web.Api.Operations.Shared.TestingOnly.ValidationsValidatedGetTestingOnlyRequest request) =>
                 {
                     return await Handle(serviceProvider, request, global::System.Threading.CancellationToken.None);
 

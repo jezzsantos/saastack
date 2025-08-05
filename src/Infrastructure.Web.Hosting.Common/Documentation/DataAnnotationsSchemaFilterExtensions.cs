@@ -85,6 +85,19 @@ internal static class DataAnnotationsSchemaFilterExtensions
         }
     }
 
+    public static string? GetDescription(this PropertyInfo property)
+    {
+        var descriptionAttribute = property.GetCustomAttribute<DescriptionAttribute>();
+        if (descriptionAttribute.NotExists())
+        {
+            return null;
+        }
+
+        return descriptionAttribute.Description.HasValue()
+            ? descriptionAttribute.Description
+            : null;
+    }
+
     public static bool IsPropertyInRoute(this PropertyInfo property)
     {
         var requestDto = property.DeclaringType;

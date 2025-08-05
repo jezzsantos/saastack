@@ -5,6 +5,9 @@ namespace Infrastructure.Web.Interfaces;
 
 public static class HttpConstants
 {
+    public const string EmptyRequestJson = "{}";
+    public const char RouteSegmentDelimiter = '/';
+
     /// <summary>
     ///     Common HTTP MimeTypes
     /// </summary>

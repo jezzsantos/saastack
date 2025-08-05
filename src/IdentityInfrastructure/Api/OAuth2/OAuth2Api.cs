@@ -32,12 +32,12 @@ public class OAuth2Api : IWebApiService
             request.State,
             request.Nonce,
             request.CodeChallenge,
-            request.CodeChallengeMethod,
+            request.CodeChallengeMethod.ToEnumOrDefault(OpenIdConnectCodeChallengeMethod.Plain),
             cancellationToken);
 
         if (request.RedirectUri.HasNoValue())
         {
-            return () => Error.Validation("'RedirectUri' is missing"); //Should never get here
+            return () => Error.Validation(Resources.OAuth2Api_AuthorizeGet_RedirectUriMIssing); //Should never get here
         }
 
         var redirectUri = result.Match(response =>
@@ -81,7 +81,7 @@ public class OAuth2Api : IWebApiService
 
         if (request.RedirectUri.HasNoValue())
         {
-            return () => Error.Validation("'RedirectUri' is missing"); //Should never get here
+            return () => Error.Validation(Resources.OAuth2Api_AuthorizeGet_RedirectUriMIssing); //Should never get here
         }
 
         var redirectUri = result.Match(response =>

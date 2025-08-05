@@ -8,6 +8,12 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 /// <summary>
 ///     Authorizes the user to access the application in Open ID Connect
 /// </summary>
+/// <response code="302">
+///     The user is redirected to the redirect_uri with the authorization code.
+///     Or if failed, if unauthenticated, the redirected to the login website page,
+///     or if un-consented to the specified client, then redirected to the consent website page,
+///     or if an error occurred, then redirected to the redirect_uri with an error and description.
+/// </response>
 [Route("/oauth2/authorize", OperationMethod.Post)]
 public class AuthorizeOAuth2PostRequest : UnTenantedEmptyRequest<AuthorizeOAuth2PostRequest>,
     IHasFormUrlEncoded

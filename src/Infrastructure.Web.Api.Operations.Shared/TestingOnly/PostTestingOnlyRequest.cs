@@ -5,11 +5,12 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 /// <summary>
-///     Tests the use of reference types, values types, and enums anywhere in a SEARCH request
+///     Tests the use of reference types, values types, and enums anywhere in a POST request
 /// </summary>
-[Route("/testingonly/general/search/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
-    OperationMethod.Search, isTestingOnly: true)]
-public class SearchTestingOnlyRequest : UnTenantedSearchRequest<SearchTestingOnlyRequest, SearchTestingOnlyResponse>
+[Route("/testingonly/general/post/a/{AnEnumRouteProperty}/b/{AnIntRouteProperty}/c/{AStringRouteProperty}",
+    OperationMethod.Post, isTestingOnly: true)]
+public class
+    PostTestingOnlyRequest : WebRequest<PostTestingOnlyRequest, GeneralTestingOnlyResponse>
 {
     [JsonPropertyName("a_camel_enum")] public TestingOnlyEnum? ACamelEnumProperty { get; set; }
 
@@ -34,5 +35,13 @@ public class SearchTestingOnlyRequest : UnTenantedSearchRequest<SearchTestingOnl
     public string? AStringQueryProperty { get; set; }
 
     public string? AStringRouteProperty { get; set; }
+}
+
+public enum TestingOnlyEnum
+{
+    Value1,
+    Value2,
+    Value3,
+    Value4
 }
 #endif
