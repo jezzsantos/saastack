@@ -44,15 +44,16 @@ public class NativeIdentityServerSingleSignOnServiceSpec
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.NotAuthenticated("amessage"));
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, null, CancellationToken.None);
+            "anauthcode", null, null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _ssoProvidersService.Verify(sps =>
-            sps.AuthenticateUserAsync(_caller.Object, "aprovidername", "anauthcode", null,
+            sps.AuthenticateUserAsync(_caller.Object, "aprovidername", "anauthcode", null, null,
                 It.IsAny<CancellationToken>()));
     }
 
@@ -64,6 +65,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             CountryCodes.Default);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(authUserInfo);
@@ -107,7 +109,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, null, CancellationToken.None);
+            "anauthcode", null, null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _ssoProvidersService.Verify(sps =>
@@ -137,7 +139,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authUserInfo);
         var ssoUser = new SSOUser
         {
@@ -179,7 +181,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, null, CancellationToken.None);
+            "anauthcode", null, null, null, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityLocked, Resources.SingleSignOnApplication_AccountSuspended);
         _ssoProvidersService.Verify(sps =>
@@ -208,8 +210,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             CountryCodes.Australia);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authUserInfo);
         _ssoProvidersService.Setup(sps =>
                 sps.FindUserByProviderAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<SSOAuthUserInfo>(),
@@ -263,7 +264,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, null, CancellationToken.None);
+            "anauthcode", null, null, null, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Value.Should().Be("anaccesstoken");
@@ -292,8 +293,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             CountryCodes.Default);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(authUserInfo);
         var ssoUser = new SSOUser
         {
@@ -345,7 +345,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             });
 
         var result = await _service.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", null, null, CancellationToken.None);
+            "anauthcode", null, null, null, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.AccessToken.Value.Should().Be("anaccesstoken");

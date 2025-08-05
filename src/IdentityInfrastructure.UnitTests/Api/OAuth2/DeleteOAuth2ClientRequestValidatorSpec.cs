@@ -9,13 +9,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class DeleteOAuth2ClientRequestValidatorSpec
 {
-    private readonly DeleteOAuth2ClientRequest _request;
+    private readonly DeleteOAuth2ClientRequest _dto;
     private readonly DeleteOAuth2ClientRequestValidator _validator;
 
     public DeleteOAuth2ClientRequestValidatorSpec()
     {
         _validator = new DeleteOAuth2ClientRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new DeleteOAuth2ClientRequest
+        _dto = new DeleteOAuth2ClientRequest
         {
             Id = "anid"
         };
@@ -24,6 +24,6 @@ public class DeleteOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 }

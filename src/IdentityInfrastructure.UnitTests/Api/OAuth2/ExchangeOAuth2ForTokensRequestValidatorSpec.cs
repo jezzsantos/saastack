@@ -80,13 +80,13 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
     [Trait("Category", "Unit")]
     public class GivenAuthorizationCodeGrant
     {
-        private readonly ExchangeOAuth2ForTokensRequest _request;
+        private readonly ExchangeOAuth2ForTokensRequest _dto;
         private readonly ExchangeOAuth2ForTokensRequestValidator _validator;
 
         public GivenAuthorizationCodeGrant()
         {
             _validator = new ExchangeOAuth2ForTokensRequestValidator(new FixedIdentifierFactory("aclientid"));
-            _request = new ExchangeOAuth2ForTokensRequest
+            _dto = new ExchangeOAuth2ForTokensRequest
             {
                 ClientId = "aclientid",
                 ClientSecret = new TokensService().GenerateRandomToken(),
@@ -102,16 +102,16 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenAllPropertiesValid_ThenSucceeds()
         {
-            _validator.ValidateAndThrow(_request);
+            _validator.ValidateAndThrow(_dto);
         }
 
         [Fact]
         public void WhenCodeIsNull_ThenThrows()
         {
-            _request.Code = null;
+            _dto.Code = null;
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_InvalidCode);
         }
@@ -119,10 +119,10 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenRedirectUriIsNull_ThenThrows()
         {
-            _request.RedirectUri = null;
+            _dto.RedirectUri = null;
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_InvalidRedirectUri);
         }
@@ -130,10 +130,10 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenRedirectUriIsInvalid_ThenThrows()
         {
-            _request.RedirectUri = "aninvalidurl";
+            _dto.RedirectUri = "aninvalidurl";
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_InvalidRedirectUri);
         }
@@ -141,18 +141,26 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenCodeVerifierIsNull_ThenSucceeds()
         {
-            _request.CodeVerifier = null;
+            _dto.CodeVerifier = null;
 
-            _validator.ValidateAndThrow(_request);
+            _validator.ValidateAndThrow(_dto);
+        }
+
+        [Fact]
+        public void WhenCodeVerifierIsEmpty_ThenSucceeds()
+        {
+            _dto.CodeVerifier = string.Empty;
+
+            _validator.ValidateAndThrow(_dto);
         }
 
         [Fact]
         public void WhenCodeVerifierIsInvalid_ThenThrows()
         {
-            _request.CodeVerifier = "a";
+            _dto.CodeVerifier = "a";
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_InvalidCodeVerifier);
         }
@@ -160,34 +168,26 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenCodeVerifierIsValid_ThenSucceeds()
         {
-            _request.CodeVerifier = new string('a', 43); // Minimum valid length
+            _dto.CodeVerifier = new string('a', 43); // Minimum valid length
 
-            _validator.ValidateAndThrow(_request);
+            _validator.ValidateAndThrow(_dto);
         }
 
         [Fact]
         public void WhenCodeVerifierIsMaxLength_ThenSucceeds()
         {
-            _request.CodeVerifier = new string('a', 128); // Maximum valid length
+            _dto.CodeVerifier = new string('a', 128); // Maximum valid length
 
-            _validator.ValidateAndThrow(_request);
-        }
-
-        [Fact]
-        public void WhenCodeVerifierIsEmpty_ThenSucceeds()
-        {
-            _request.CodeVerifier = string.Empty; // Optional parameter
-
-            _validator.ValidateAndThrow(_request);
+            _validator.ValidateAndThrow(_dto);
         }
 
         [Fact]
         public void WhenScopeIsNotNull_ThenThrows()
         {
-            _request.Scope = "ascope";
+            _dto.Scope = "ascope";
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_ScopeMustBeNull);
         }
@@ -195,10 +195,10 @@ public class ExchangeOAuth2ForTokensRequestValidatorSpec
         [Fact]
         public void WhenRefreshTokenIsNotNull_ThenThrows()
         {
-            _request.RefreshToken = "arefreshtoken";
+            _dto.RefreshToken = "arefreshtoken";
 
             _validator
-                .Invoking(x => x.ValidateAndThrow(_request))
+                .Invoking(x => x.ValidateAndThrow(_dto))
                 .Should().Throw<ValidationException>()
                 .WithMessageLike(Resources.ExchangeOAuth2ForTokensRequestValidator_RefreshTokenMustBeNull);
         }

@@ -16,11 +16,11 @@ public class SingleSignOnApplication : ISingleSignOnApplication
     }
 
     public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller,
-        string? invitationToken, string providerName, string authCode, string? username,
+        string? invitationToken, string providerName, string authCode, string? codeVerifier, string? username,
         bool? termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         return await _identityServerProvider.SingleSignOnService.AuthenticateAsync(caller, invitationToken,
-            providerName, authCode, username, termsAndConditionsAccepted, cancellationToken);
+            providerName, authCode, codeVerifier, username, termsAndConditionsAccepted, cancellationToken);
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,

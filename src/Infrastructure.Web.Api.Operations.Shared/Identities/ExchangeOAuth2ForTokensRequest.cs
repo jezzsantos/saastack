@@ -9,6 +9,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Exchanges either an authorization code for new tokens, or a refresh_token for new tokens,
 ///     for the specified grant_type in Open ID Connect
 /// </summary>
+/// <response code="403">The user is not known, or not registered</response>
+/// <response code="423">The user's account is suspended or disabled, and cannot be used</response>
 [Route("/oauth2/token", OperationMethod.Post)]
 public class ExchangeOAuth2ForTokensRequest :
     UnTenantedRequest<ExchangeOAuth2ForTokensRequest, ExchangeOAuth2ForTokensResponse>, IHasFormUrlEncoded

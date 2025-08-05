@@ -75,6 +75,9 @@
     <data name="AuthenticateSingleSignOnRequestValidator_InvalidAuthCode" xml:space="preserve">
       <value>The 'AuthCode' is invalid or missing</value>
     </data>
+    <data name="AuthenticateSingleSignOnRequestValidator_InvalidCodeVerifier" xml:space="preserve">
+      <value>The 'CodeVerifier' is invalid</value>
+    </data>
     <data name="AnySSOAuthenticationProvider_MissingAuthCode" xml:space="preserve">
       <value>The 'AuthCode' must be provided for this authentication attempt</value>
     </data>

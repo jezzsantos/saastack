@@ -10,7 +10,7 @@ namespace IdentityApplication.ApplicationServices;
 public interface ISSOProvidersService
 {
     Task<Result<SSOAuthUserInfo, Error>> AuthenticateUserAsync(ICallerContext caller, string providerName,
-        string authCode, string? username, CancellationToken cancellationToken);
+        string authCode, string? codeVerifier, string? username, CancellationToken cancellationToken);
 
     Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByUserIdAsync(ICallerContext caller,
         string userId, string providerName, CancellationToken cancellationToken);

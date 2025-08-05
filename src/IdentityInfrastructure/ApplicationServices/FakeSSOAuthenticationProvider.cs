@@ -28,7 +28,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
     }
 
     public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
-        string? emailAddress, CancellationToken cancellationToken)
+        string? codeVerifier, string? emailAddress, CancellationToken cancellationToken)
     {
         authCode.ThrowIfNotValuedParameter(nameof(authCode),
             Resources.AnySSOAuthenticationProvider_MissingAuthCode);
@@ -40,7 +40,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
 
         var retrievedTokens =
             await _auth2Service.ExchangeCodeForTokensAsync(caller,
-                new OAuth2CodeTokenExchangeOptions(ServiceName, authCode, emailAddress),
+                new OAuth2CodeTokenExchangeOptions(ServiceName, authCode, codeVerifier, emailAddress),
                 cancellationToken);
         if (retrievedTokens.IsFailure)
         {

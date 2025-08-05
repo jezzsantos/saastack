@@ -10,13 +10,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class CreateOAuth2ClientRequestValidatorSpec
 {
-    private readonly CreateOAuth2ClientRequest _request;
+    private readonly CreateOAuth2ClientRequest _dto;
     private readonly CreateOAuth2ClientRequestValidator _validator;
 
     public CreateOAuth2ClientRequestValidatorSpec()
     {
         _validator = new CreateOAuth2ClientRequestValidator();
-        _request = new CreateOAuth2ClientRequest
+        _dto = new CreateOAuth2ClientRequest
         {
             Name = "aname",
             RedirectUri = "https://localhost/callback"
@@ -26,16 +26,16 @@ public class CreateOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenNameIsNull_ThenThrows()
     {
-        _request.Name = null;
+        _dto.Name = null;
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.CreateOAuth2ClientRequestValidator_InvalidName);
     }
@@ -43,18 +43,18 @@ public class CreateOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenRedirectUriIsNull_ThenSucceeds()
     {
-        _request.RedirectUri = null;
+        _dto.RedirectUri = null;
 
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenRedirectUriIsInvalid_ThenThrows()
     {
-        _request.RedirectUri = "notaurl";
+        _dto.RedirectUri = "notaurl";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.CreateOAuth2ClientRequestValidator_InvalidRedirectUri);
     }

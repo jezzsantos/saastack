@@ -9,13 +9,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class RevokeOAuth2ConsentRequestValidatorSpec
 {
-    private readonly RevokeOAuth2ClientConsentForCallerRequest _request;
+    private readonly RevokeOAuth2ClientConsentForCallerRequest _dto;
     private readonly RevokeOAuth2ConsentRequestValidator _validator;
 
     public RevokeOAuth2ConsentRequestValidatorSpec()
     {
         _validator = new RevokeOAuth2ConsentRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new RevokeOAuth2ClientConsentForCallerRequest
+        _dto = new RevokeOAuth2ClientConsentForCallerRequest
         {
             Id = "anid"
         };
@@ -24,6 +24,6 @@ public class RevokeOAuth2ConsentRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 }

@@ -12,13 +12,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class ConsentOAuth2ClientRequestValidatorSpec
 {
-    private readonly ConsentOAuth2ClientForCallerRequest _request;
+    private readonly ConsentOAuth2ClientForCallerRequest _dto;
     private readonly ConsentOAuth2ClientRequestValidator _validator;
 
     public ConsentOAuth2ClientRequestValidatorSpec()
     {
         _validator = new ConsentOAuth2ClientRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new ConsentOAuth2ClientForCallerRequest
+        _dto = new ConsentOAuth2ClientForCallerRequest
         {
             Id = "anid",
             Scope = $"{OpenIdConnectConstants.Scopes.OpenId}, {OAuth2Constants.Scopes.Profile}",
@@ -31,16 +31,16 @@ public class ConsentOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenScopesIsEmpty_ThenThrows()
     {
-        _request.Scope = string.Empty;
+        _dto.Scope = string.Empty;
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.ConsentToOAuth2ClientRequestValidator_InvalidScope);
     }
@@ -48,10 +48,10 @@ public class ConsentOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenScopesIsNull_ThenThrows()
     {
-        _request.Scope = null;
+        _dto.Scope = null;
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.ConsentToOAuth2ClientRequestValidator_InvalidScope);
     }
@@ -59,10 +59,10 @@ public class ConsentOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenScopesContainsInvalidScope_ThenThrows()
     {
-        _request.Scope = $"{OpenIdConnectConstants.Scopes.OpenId}, aninvalidscope";
+        _dto.Scope = $"{OpenIdConnectConstants.Scopes.OpenId}, aninvalidscope";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.ConsentToOAuth2ClientRequestValidator_InvalidScope);
     }
@@ -70,10 +70,10 @@ public class ConsentOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenRedirectUriIsInvalid_ThenThrows()
     {
-        _request.RedirectUri = "aninvaliduri";
+        _dto.RedirectUri = "aninvaliduri";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.ConsentToOAuth2ClientRequestValidator_InvalidRedirectUri);
     }
@@ -81,10 +81,10 @@ public class ConsentOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenStateIsInvalid_ThenThrows()
     {
-        _request.State = "^aninvalidstate^";
+        _dto.State = "^aninvalidstate^";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.ConsentToOAuth2ClientRequestValidator_InvalidState);
     }

@@ -20,7 +20,8 @@ public class AuthenticateSingleSignOnRequestValidatorSpec
         {
             Provider = "aprovider",
             AuthCode = "anauthcode",
-            Username = null
+            Username = null,
+            CodeVerifier = null
         };
     }
 
@@ -96,5 +97,48 @@ public class AuthenticateSingleSignOnRequestValidatorSpec
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.AuthenticateSingleSignOnRequestValidator_InvalidUsername);
+    }
+
+    [Fact]
+    public void WhenCodeVerifierIsNull_ThenSucceeds()
+    {
+        _dto.CodeVerifier = null;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenCodeVerifierIsEmpty_ThenSucceeds()
+    {
+        _dto.CodeVerifier = string.Empty;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenCodeVerifierIsInvalid_ThenThrows()
+    {
+        _dto.CodeVerifier = "a";
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.AuthenticateSingleSignOnRequestValidator_InvalidCodeVerifier);
+    }
+
+    [Fact]
+    public void WhenCodeVerifierIsValid_ThenSucceeds()
+    {
+        _dto.CodeVerifier = new string('a', 43); // Minimum valid length
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenCodeVerifierIsMaxLength_ThenSucceeds()
+    {
+        _dto.CodeVerifier = new string('a', 128); // Maximum valid length
+
+        _validator.ValidateAndThrow(_dto);
     }
 }

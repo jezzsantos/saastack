@@ -114,6 +114,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;CodeVerifier&apos; is invalid.
+        /// </summary>
+        internal static string AuthenticateSingleSignOnRequestValidator_InvalidCodeVerifier {
+            get {
+                return ResourceManager.GetString("AuthenticateSingleSignOnRequestValidator_InvalidCodeVerifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;InvitationToken&apos; is either missing or invalid.
         /// </summary>
         internal static string AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken {

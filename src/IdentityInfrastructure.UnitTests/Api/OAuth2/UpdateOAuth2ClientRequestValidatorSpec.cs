@@ -12,13 +12,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class UpdateOAuth2ClientRequestValidatorSpec
 {
-    private readonly UpdateOAuth2ClientRequest _request;
+    private readonly UpdateOAuth2ClientRequest _dto;
     private readonly UpdateOAuth2ClientRequestValidator _validator;
 
     public UpdateOAuth2ClientRequestValidatorSpec()
     {
         _validator = new UpdateOAuth2ClientRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new UpdateOAuth2ClientRequest
+        _dto = new UpdateOAuth2ClientRequest
         {
             Id = "anid",
             Name = "aclientname",
@@ -29,16 +29,16 @@ public class UpdateOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenIdIsInvalid_ThenThrows()
     {
-        _request.Id = "aninvalidid";
+        _dto.Id = "aninvalidid";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(CommonValidationResources.AnyValidator_InvalidId);
     }
@@ -46,10 +46,10 @@ public class UpdateOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenNameIsInvalid_ThenThrows()
     {
-        _request.Name = "aninvalidname^";
+        _dto.Name = "aninvalidname^";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.UpdateOAuth2ClientRequestValidator_InvalidName);
     }
@@ -57,26 +57,26 @@ public class UpdateOAuth2ClientRequestValidatorSpec
     [Fact]
     public void WhenNameIsNull_ThenSucceeds()
     {
-        _request.Name = null;
+        _dto.Name = null;
 
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenRedirectUriIsNull_ThenSucceeds()
     {
-        _request.RedirectUri = null;
+        _dto.RedirectUri = null;
 
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenRedirectUriIsInvalid_ThenThrows()
     {
-        _request.RedirectUri = "notaurl";
+        _dto.RedirectUri = "notaurl";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.UpdateOAuth2ClientRequestValidator_InvalidRedirectUri);
     }

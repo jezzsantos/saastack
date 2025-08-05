@@ -7,7 +7,7 @@ namespace IdentityApplication;
 public interface ISingleSignOnApplication
 {
     Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller, string? invitationToken,
-        string providerName, string authCode, string? username, bool? termsAndConditionsAccepted,
+        string providerName, string authCode, string? codeVerifier, string? username, bool? termsAndConditionsAccepted,
         CancellationToken cancellationToken);
 
     Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,

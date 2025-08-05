@@ -9,13 +9,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class GetOAuth2ConsentRequestValidatorSpec
 {
-    private readonly GetOAuth2ClientConsentForCallerRequest _request;
+    private readonly GetOAuth2ClientConsentForCallerRequest _dto;
     private readonly GetOAuth2ConsentRequestValidator _validator;
 
     public GetOAuth2ConsentRequestValidatorSpec()
     {
         _validator = new GetOAuth2ConsentRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new GetOAuth2ClientConsentForCallerRequest
+        _dto = new GetOAuth2ClientConsentForCallerRequest
         {
             Id = "anid"
         };
@@ -24,6 +24,6 @@ public class GetOAuth2ConsentRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 }

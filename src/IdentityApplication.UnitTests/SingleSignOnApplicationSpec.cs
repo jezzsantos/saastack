@@ -48,17 +48,17 @@ public class SingleSignOnApplicationSpec
         };
 
         _ssoService.Setup(sso => sso.AuthenticateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool?>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool?>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedTokens);
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", "ausername", true, CancellationToken.None);
+            "anauthcode", "acodeverifier", "ausername", true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Should().BeEquivalentTo(expectedTokens);
         _ssoService.Verify(sso => sso.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
-            "anauthcode", "ausername", true, CancellationToken.None), Times.Once);
+            "anauthcode", "acodeverifier", "ausername", true, CancellationToken.None), Times.Once);
     }
 
     [Fact]

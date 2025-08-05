@@ -79,8 +79,8 @@ public class FakeOAuth2Service : IOAuth2Service
         var accessToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims:
             [
-                new Claim(ClaimTypes.Email, options.CodeVerifier!),
-                new Claim(ClaimTypes.GivenName, options.CodeVerifier!),
+                new Claim(ClaimTypes.Email, options.Scope!),
+                new Claim(ClaimTypes.GivenName, options.Scope!),
                 new Claim(ClaimTypes.Surname, "asurname"),
                 new Claim(AuthenticationConstants.Claims.ForTimezone, Timezones.Default.ToString()),
                 new Claim(ClaimTypes.Country, CountryCodes.Default.ToString())

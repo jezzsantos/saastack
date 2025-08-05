@@ -16,7 +16,8 @@ public interface ISSOAuthenticationProvider
     ///     Returns the authenticated user with the specified <see cref="authCode" /> for the specified
     ///     <see cref="emailAddress" />
     /// </summary>
-    Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? emailAddress,
+    Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? codeVerifier,
+        string? emailAddress,
         CancellationToken cancellationToken);
 
     /// <summary>

@@ -38,7 +38,7 @@ public class SSOProvidersService : ISSOProvidersService
     }
 
     public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateUserAsync(ICallerContext caller, string providerName,
-        string authCode, string? username, CancellationToken cancellationToken)
+        string authCode, string? codeVerifier, string? username, CancellationToken cancellationToken)
     {
         var retrievedProvider = FindProviderByNameInternal(providerName);
         if (retrievedProvider.IsFailure)
@@ -52,7 +52,8 @@ public class SSOProvidersService : ISSOProvidersService
         }
 
         var provider = retrievedProvider.Value.Value;
-        var authenticated = await provider.AuthenticateAsync(caller, authCode, username, cancellationToken);
+        var authenticated =
+            await provider.AuthenticateAsync(caller, authCode, codeVerifier, username, cancellationToken);
         if (authenticated.IsFailure)
         {
             return Error.NotAuthenticated();

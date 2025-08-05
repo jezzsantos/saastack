@@ -12,13 +12,13 @@ namespace IdentityInfrastructure.UnitTests.Api.OAuth2;
 [Trait("Category", "Unit")]
 public class RegenerateOAuth2ClientSecretRequestValidatorSpec
 {
-    private readonly RegenerateOAuth2ClientSecretRequest _request;
+    private readonly RegenerateOAuth2ClientSecretRequest _dto;
     private readonly RegenerateOAuth2ClientSecretRequestValidator _validator;
 
     public RegenerateOAuth2ClientSecretRequestValidatorSpec()
     {
         _validator = new RegenerateOAuth2ClientSecretRequestValidator(new FixedIdentifierFactory("anid"));
-        _request = new RegenerateOAuth2ClientSecretRequest
+        _dto = new RegenerateOAuth2ClientSecretRequest
         {
             Id = "anid"
         };
@@ -27,16 +27,16 @@ public class RegenerateOAuth2ClientSecretRequestValidatorSpec
     [Fact]
     public void WhenAllPropertiesValid_ThenSucceeds()
     {
-        _validator.ValidateAndThrow(_request);
+        _validator.ValidateAndThrow(_dto);
     }
 
     [Fact]
     public void WhenIdIsInvalid_ThenThrows()
     {
-        _request.Id = "aninvalidid";
+        _dto.Id = "aninvalidid";
 
         _validator
-            .Invoking(x => x.ValidateAndThrow(_request))
+            .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(CommonValidationResources.AnyValidator_InvalidId);
     }

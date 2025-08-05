@@ -33,14 +33,14 @@ public class MicrosoftSSOAuthenticationProvider : ISSOAuthenticationProvider
     }
 
     public async Task<Result<SSOAuthUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
-        string? emailAddress, CancellationToken cancellationToken)
+        string? codeVerifier, string? emailAddress, CancellationToken cancellationToken)
     {
         authCode.ThrowIfNotValuedParameter(nameof(authCode),
             Resources.AnySSOAuthenticationProvider_MissingRefreshToken);
 
         var retrievedTokens =
             await _auth2Service.ExchangeCodeForTokensAsync(caller,
-                new OAuth2CodeTokenExchangeOptions(ServiceName, authCode), cancellationToken);
+                new OAuth2CodeTokenExchangeOptions(ServiceName, authCode, codeVerifier), cancellationToken);
         if (retrievedTokens.IsFailure)
         {
             return Error.NotAuthenticated();
