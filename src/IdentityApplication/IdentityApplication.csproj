@@ -24,7 +24,6 @@
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
         <ProjectReference Include="..\IdentityDomain\IdentityDomain.csproj" />
-        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

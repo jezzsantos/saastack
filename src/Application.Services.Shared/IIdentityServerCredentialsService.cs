@@ -18,8 +18,11 @@ public partial interface IIdentityServerCredentialsService
     Task<Result<PersonCredential, Error>> GetPersonCredentialForUserAsync(ICallerContext caller, string userId,
         CancellationToken cancellationToken);
 
+#if TESTINGONLY
+
     Task<Result<PersonCredentialEmailConfirmation, Error>> GetPersonRegistrationConfirmationForUserAsync(
         ICallerContext caller, string userId, CancellationToken cancellationToken);
+#endif
 
     Task<Result<PersonCredential, Error>> RegisterPersonAsync(ICallerContext caller, string? invitationToken,
         string firstName, string lastName, string emailAddress, string password, string? timezone, string? countryCode,
