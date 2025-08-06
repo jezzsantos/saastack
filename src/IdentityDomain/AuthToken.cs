@@ -46,11 +46,6 @@ public sealed class AuthToken : ValueObjectBase<AuthToken>
         return new AuthToken(type, encryptedValue, expiresOn);
     }
 
-    private static bool IsValidPlainTokenValue(string token)
-    {
-        return token.StartsWith("eyJ");
-    }
-
     public static Result<AuthToken, Error> Create(Domain.Events.Shared.Identities.ProviderAuthTokens.AuthToken token)
     {
         return Create(token.Type.ToEnumOrDefault(AuthTokenType.OtherToken), token.EncryptedValue, token.ExpiresOn);
@@ -89,5 +84,10 @@ public sealed class AuthToken : ValueObjectBase<AuthToken>
     public string GetDecryptedValue(IEncryptionService encryptionService)
     {
         return encryptionService.Decrypt(EncryptedValue);
+    }
+
+    private static bool IsValidPlainTokenValue(string token)
+    {
+        return token.StartsWith("eyJ");
     }
 }

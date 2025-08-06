@@ -16,10 +16,10 @@ namespace IdentityDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class OpenIdConnectAuthorizationRootSpec
 {
+    private readonly Mock<IEncryptionService> _encryptionService;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<ITokensService> _tokensService;
-    private readonly Mock<IEncryptionService> _encryptionService;
 
     public OpenIdConnectAuthorizationRootSpec()
     {

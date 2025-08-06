@@ -11,13 +11,13 @@ public class MfaAuthenticator : ReadModelEntity
 {
     public Optional<string> BarCodeUri { get; set; }
 
+    public Optional<string> CredentialId { get; set; }
+
     public bool IsActive { get; set; }
 
     public Optional<string> OobChannelValue { get; set; }
 
     public Optional<string> OobCode { get; set; }
-
-    public Optional<string> CredentialId { get; set; }
 
     public Optional<string> Secret { get; set; }
 

@@ -53,15 +53,6 @@ public class PersonCredentialRepository : IPersonCredentialRepository
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
-    public async Task<Result<Optional<PersonCredentialRoot>, Error>>
-        FindCredentialsByRegistrationVerificationTokenAsync(string token,
-            CancellationToken cancellationToken)
-    {
-        var query = Query.From<PersonCredentialAuth>()
-            .Where<string>(pc => pc.RegistrationVerificationToken, ConditionOperator.EqualTo, token);
-        return await FindFirstByQueryAsync(query, cancellationToken);
-    }
-
     public async Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialByUserIdAsync(Identifier userId,
         CancellationToken cancellationToken)
     {
@@ -75,6 +66,15 @@ public class PersonCredentialRepository : IPersonCredentialRepository
     {
         var query = Query.From<PersonCredentialAuth>()
             .Where<string>(pc => pc.UserEmailAddress, ConditionOperator.EqualTo, username);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<PersonCredentialRoot>, Error>>
+        FindCredentialsByRegistrationVerificationTokenAsync(string token,
+            CancellationToken cancellationToken)
+    {
+        var query = Query.From<PersonCredentialAuth>()
+            .Where<string>(pc => pc.RegistrationVerificationToken, ConditionOperator.EqualTo, token);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 

@@ -15,7 +15,7 @@ public sealed class Expired : DomainEvent
     {
     }
 
-    public required string UserId { get; set; }
-
     public required DateTime ExpiredOn { get; set; }
+
+    public required string UserId { get; set; }
 }

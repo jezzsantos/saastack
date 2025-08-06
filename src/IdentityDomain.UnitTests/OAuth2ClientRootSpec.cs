@@ -86,6 +86,7 @@ public class OAuth2ClientRootSpec
         client.Name.Value.Text.Should().Be("anewname");
         client.Events.Last().Should().BeOfType<NameChanged>();
     }
+
     [Fact]
     public void WhenRedirectUriChangedAndSameValues_ThenDoesNothing()
     {

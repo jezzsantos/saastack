@@ -12,7 +12,7 @@ public class OAuth2ClientConsent : ReadModelEntity
 
     public Optional<bool> IsConsented { get; set; }
 
-    public Optional<string> UserId { get; set; }
-
     public Optional<OAuth2Scopes> Scopes { get; set; }
+
+    public Optional<string> UserId { get; set; }
 }

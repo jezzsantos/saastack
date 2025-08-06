@@ -115,6 +115,16 @@ public sealed class OAuth2ClientConsentRoot : AggregateRootBase
         return RaiseChangeEvent(IdentityDomain.Events.OAuth2.ClientConsents.ConsentChanged(Id, isConsented, scopes));
     }
 
+    public Result<bool, Error> HasConsentedTo(OAuth2Scopes scopes)
+    {
+        if (!IsConsented)
+        {
+            return false;
+        }
+
+        return Scopes.HasAll(scopes);
+    }
+
     public Result<bool, Error> Revoke(Identifier revokerId)
     {
         if (!IsOwner(revokerId))
@@ -140,15 +150,5 @@ public sealed class OAuth2ClientConsentRoot : AggregateRootBase
     private bool IsOwner(Identifier userId)
     {
         return userId == UserId;
-    }
-
-    public Result<bool, Error> HasConsentedTo(OAuth2Scopes scopes)
-    {
-        if (!IsConsented)
-        {
-            return false;
-        }
-
-        return Scopes.HasAll(scopes);
     }
 }

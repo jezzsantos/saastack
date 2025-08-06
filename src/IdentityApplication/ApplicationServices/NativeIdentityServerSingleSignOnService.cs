@@ -128,7 +128,6 @@ public class NativeIdentityServerSingleSignOnService : IIdentityServerSingleSign
             user.ToLoginUserUsage(providerName, authUserInfo));
 
         return issued.Value;
-
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensForUserAsync(

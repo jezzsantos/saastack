@@ -22,16 +22,6 @@ public class MixpanelSetProfileRequest : UnTenantedRequest<MixpanelSetProfileReq
     [FromQuery]
     public int Verbose { get; set; } = 1;
 
-    public IEnumerator<MixpanelProfile> GetEnumerator()
-    {
-        return _events.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)_events).GetEnumerator();
-    }
-
     public void Add(MixpanelProfile item)
     {
         _events.Add(item);
@@ -52,28 +42,38 @@ public class MixpanelSetProfileRequest : UnTenantedRequest<MixpanelSetProfileReq
         _events.CopyTo(array, arrayIndex);
     }
 
-    public bool Remove(MixpanelProfile item)
-    {
-        return _events.Remove(item);
-    }
-
 #pragma warning disable SAASWEB035
     public int Count => _events.Count;
 #pragma warning restore SAASWEB035
 
+    public IEnumerator<MixpanelProfile> GetEnumerator()
+    {
+        return _events.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable)_events).GetEnumerator();
+    }
+
 #pragma warning disable SAASWEB035
     public bool IsReadOnly => ((ICollection<MixpanelProfile>)_events).IsReadOnly;
 #pragma warning restore SAASWEB035
+
+    public bool Remove(MixpanelProfile item)
+    {
+        return _events.Remove(item);
+    }
 }
 
 public class MixpanelProfile
 {
-    [JsonPropertyName("$token")] public string? Token { get; set; }
-
     [JsonPropertyName(MixpanelConstants.MetadataProperties.DistinctId)]
     public string? DistinctId { get; set; }
 
     [JsonPropertyName("$set")] public MixpanelProfileProperties? Set { get; set; }
+
+    [JsonPropertyName("$token")] public string? Token { get; set; }
 }
 
 public class MixpanelProfileProperties : Dictionary<string, object?>
@@ -90,25 +90,32 @@ public class MixpanelProfileProperties : Dictionary<string, object?>
         set => this[$"${nameof(Avatar).ToSnakeCase()}"] = value;
     }
 
+    [JsonPropertyName("$city")]
+    public string? City
+    {
+        get => (string?)this[$"${nameof(City).ToSnakeCase()}"];
+        set => this[$"${nameof(City).ToSnakeCase()}"] = value;
+    }
+
+    [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileCountryCodePropertyName)]
+    public string? CountryCode
+    {
+        get => (string?)this[$"${nameof(CountryCode).ToSnakeCase()}"];
+        set => this[$"${nameof(CountryCode).ToSnakeCase()}"] = value;
+    }
+
+    [JsonPropertyName("$created")]
+    public string? Created
+    {
+        get => (string?)this[$"${nameof(Created).ToSnakeCase()}"];
+        set => this[$"${nameof(Created).ToSnakeCase()}"] = value;
+    }
+
     [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileEmailAddressPropertyName)]
     public string? Email
     {
         get => (string?)this[$"${nameof(Email).ToSnakeCase()}"];
         set => this[$"${nameof(Email).ToSnakeCase()}"] = value;
-    }
-
-    [JsonPropertyName("$phone")]
-    public string? Phone
-    {
-        get => (string?)this[$"${nameof(Phone).ToSnakeCase()}"];
-        set => this[$"${nameof(Phone).ToSnakeCase()}"] = value;
-    }
-
-    [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileNamePropertyName)]
-    public string? Name
-    {
-        get => (string?)this[$"${nameof(Name).ToSnakeCase()}"];
-        set => this[$"${nameof(Name).ToSnakeCase()}"] = value;
     }
 
     [JsonPropertyName("$first_name")]
@@ -125,25 +132,18 @@ public class MixpanelProfileProperties : Dictionary<string, object?>
         set => this[$"${nameof(LastName).ToSnakeCase()}"] = value;
     }
 
-    [JsonPropertyName("$created")]
-    public string? Created
+    [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileNamePropertyName)]
+    public string? Name
     {
-        get => (string?)this[$"${nameof(Created).ToSnakeCase()}"];
-        set => this[$"${nameof(Created).ToSnakeCase()}"] = value;
+        get => (string?)this[$"${nameof(Name).ToSnakeCase()}"];
+        set => this[$"${nameof(Name).ToSnakeCase()}"] = value;
     }
 
-    [JsonPropertyName("$city")]
-    public string? City
+    [JsonPropertyName("$phone")]
+    public string? Phone
     {
-        get => (string?)this[$"${nameof(City).ToSnakeCase()}"];
-        set => this[$"${nameof(City).ToSnakeCase()}"] = value;
-    }
-
-    [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileCountryCodePropertyName)]
-    public string? CountryCode
-    {
-        get => (string?)this[$"${nameof(CountryCode).ToSnakeCase()}"];
-        set => this[$"${nameof(CountryCode).ToSnakeCase()}"] = value;
+        get => (string?)this[$"${nameof(Phone).ToSnakeCase()}"];
+        set => this[$"${nameof(Phone).ToSnakeCase()}"] = value;
     }
 
     [JsonPropertyName(MixpanelConstants.MetadataProperties.ProfileTimezonePropertyName)]

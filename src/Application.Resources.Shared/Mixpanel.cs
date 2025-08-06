@@ -12,15 +12,15 @@ public static class MixpanelConstants
         public const string InsertId = "$insert_id";
         public const string IpAddress = "ip";
         public const string OperatingSystem = "$os";
+        public const string ProfileAvatarPropertyName = "$avatar";
+        public const string ProfileCountryCodePropertyName = "$country_code";
+        public const string ProfileEmailAddressPropertyName = "$email";
+        public const string ProfileNamePropertyName = "$name";
+        public const string ProfileTimezonePropertyName = "$timezone";
         public const string ReferredBy = "Referred by";
         public const string TenantId = "TenantId";
         public const string Time = "time";
-        public const string Url = "URL";
         public const string UnsubscribedPropertyName = "$unsubscribed";
-        public const string ProfileEmailAddressPropertyName = "$email";
-        public const string ProfileNamePropertyName = "$name";
-        public const string ProfileCountryCodePropertyName = "$country_code";
-        public const string ProfileTimezonePropertyName = "$timezone";
-        public const string ProfileAvatarPropertyName = "$avatar";
+        public const string Url = "URL";
     }
 }

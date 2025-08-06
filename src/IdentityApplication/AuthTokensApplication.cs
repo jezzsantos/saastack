@@ -18,12 +18,12 @@ namespace IdentityApplication;
 public class AuthTokensApplication : IAuthTokensApplication
 {
     private readonly IEncryptionService _encryptionService;
-    private readonly ITokensService _tokensService;
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _idFactory;
     private readonly IJWTTokensService _jwtTokensService;
     private readonly IRecorder _recorder;
     private readonly IAuthTokensRepository _repository;
+    private readonly ITokensService _tokensService;
     private readonly IUserProfilesService _userProfilesService;
 
     public AuthTokensApplication(IRecorder recorder, IIdentifierFactory idFactory, IEncryptionService encryptionService,

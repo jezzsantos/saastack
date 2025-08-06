@@ -13,14 +13,14 @@ public interface IPersonCredentialRepository : IApplicationRepository
     Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialByPasswordResetTokenAsync(string token,
         CancellationToken cancellationToken);
 
-    Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialsByRegistrationVerificationTokenAsync(
-        string token,
-        CancellationToken cancellationToken);
-
     Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialByUserIdAsync(Identifier userId,
         CancellationToken cancellationToken);
 
     Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialByUsernameAsync(string username,
+        CancellationToken cancellationToken);
+
+    Task<Result<Optional<PersonCredentialRoot>, Error>> FindCredentialsByRegistrationVerificationTokenAsync(
+        string token,
         CancellationToken cancellationToken);
 
     Task<Result<PersonCredentialRoot, Error>> SaveAsync(PersonCredentialRoot personCredential,

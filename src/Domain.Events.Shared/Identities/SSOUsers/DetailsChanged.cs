@@ -23,7 +23,7 @@ public sealed class DetailsChanged : DomainEvent
 
     public string? LastName { get; set; }
 
-    public required string Timezone { get; set; }
-
     public required string ProviderUId { get; set; }
+
+    public required string Timezone { get; set; }
 }

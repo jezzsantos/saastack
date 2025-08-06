@@ -11,9 +11,10 @@ namespace IdentityApplication.UnitTests;
 [Trait("Category", "Unit")]
 public class SingleSignOnApplicationSpec
 {
-    private readonly Mock<IIdentityServerSingleSignOnService> _ssoService;
     private readonly SingleSignOnApplication _application;
     private readonly Mock<ICallerContext> _caller;
+    private readonly Mock<IIdentityServerSingleSignOnService> _ssoService;
+
     public SingleSignOnApplicationSpec()
     {
         _caller = new Mock<ICallerContext>();
@@ -96,6 +97,7 @@ public class SingleSignOnApplicationSpec
         _ssoService.Verify(sso => sso.GetTokensForUserAsync(_caller.Object, "acallerid", CancellationToken.None),
             Times.Once);
     }
+
     [Fact]
     public async Task WhenGetTokensOnBehalfOfUserAsync_ThenReturnsTokens()
     {

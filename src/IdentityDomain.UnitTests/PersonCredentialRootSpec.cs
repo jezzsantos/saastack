@@ -20,12 +20,12 @@ namespace IdentityDomain.UnitTests;
 public class PersonCredentialRootSpec
 {
     private const string Token = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
-    private readonly PersonCredentialRoot _personCredential;
     private readonly Mock<IEmailAddressService> _emailAddressService;
     private readonly Mock<IEncryptionService> _encryptionService;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IMfaService> _mfaService;
     private readonly Mock<IPasswordHasherService> _passwordHasherService;
+    private readonly PersonCredentialRoot _personCredential;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IConfigurationSettings> _settings;
     private readonly Mock<ITokensService> _tokensService;
@@ -1573,7 +1573,7 @@ public class PersonCredentialRootSpec
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.PersonCredentialRoot_MfaNotEnabled);
     }
-    
+
     [Fact]
     public async Task WhenChallengeMfaAuthenticatorAsyncAndUnknownAuthenticator_ThenReturnsError()
     {

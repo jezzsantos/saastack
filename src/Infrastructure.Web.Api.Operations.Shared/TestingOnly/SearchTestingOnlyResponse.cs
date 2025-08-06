@@ -7,8 +7,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 public class SearchTestingOnlyResponse : SearchResponse
 {
-    public List<TestResource> Items { get; set; } = [];
-
     [JsonPropertyName("a_camel_enum")] public TestingOnlyEnum? ACamelEnumProperty { get; set; }
 
     [JsonPropertyName("a_camel_int")] public int? ACamelIntProperty { get; set; }
@@ -32,5 +30,7 @@ public class SearchTestingOnlyResponse : SearchResponse
     public string? AStringQueryProperty { get; set; }
 
     public string? AStringRouteProperty { get; set; }
+
+    public List<TestResource> Items { get; set; } = [];
 }
 #endif

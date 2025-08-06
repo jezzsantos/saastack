@@ -497,7 +497,6 @@ public static class Events
                 AccessTokenExpiresOn = accessToken.ExpiresOn,
                 RefreshTokenDigest = refreshToken.DigestValue,
                 RefreshTokenExpiresOn = refreshToken.ExpiresOn
-
             };
         }
 

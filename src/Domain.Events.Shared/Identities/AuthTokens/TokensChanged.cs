@@ -25,9 +25,9 @@ public sealed class TokensChanged : DomainEvent
 
     public required string RefreshToken { get; set; }
 
+    public required string RefreshTokenDigest { get; set; }
+
     public DateTime? RefreshTokenExpiresOn { get; set; }
 
     public required string UserId { get; set; }
-
-    public required string RefreshTokenDigest { get; set; }
 }

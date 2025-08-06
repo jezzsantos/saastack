@@ -38,7 +38,7 @@ public class OAuth2ClientProjection : IReadModelProjection
 
             case SecretAdded _:
                 return true;
-            
+
             case Deleted e:
                 return await _clients.HandleDeleteAsync(e.RootId, cancellationToken);
 
