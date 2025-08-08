@@ -12,7 +12,7 @@ env:
   SOLUTION_PATH: 'src/SaaStack.sln'
   TESTINGONLY_BUILD_CONFIGURATION: 'Release'
   DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
-  DOTNET_VERSION: 8.0.302
+  DOTNET_VERSION: 8.0.413
   NODEJS_VERSION: '22'
 
 # We want failed commands to fail the pipeline on Windows

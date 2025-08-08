@@ -21,7 +21,7 @@
         <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.302.9" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
     </ItemGroup>
 
     <ItemGroup>

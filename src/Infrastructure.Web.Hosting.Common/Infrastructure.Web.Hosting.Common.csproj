@@ -19,12 +19,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
         <PackageReference Include="Amazon.Lambda.AspNetCoreServer.Hosting" Version="1.6.1" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="AWSXRayRecorder" Version="2.14.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19" />
         <PackageReference Include="NuDoq" Version="2.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     </ItemGroup>

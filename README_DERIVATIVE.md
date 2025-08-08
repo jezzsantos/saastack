@@ -14,7 +14,7 @@ You will need the following development tools to build, run, and test this proje
    * Note: If using Visual Studio, you will need to install the additional component `.NET Compiler Platform SDK` in order to run the built-in Roslyn source generators.
    * Note: if using Visual Studio, the built-in Roslyn analyzers will not work (due to .netstandard2.0 [restrictions between Visual Studio and Roslyn](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview))
 
-* Install the .NET8.0 SDK (specifically version 8.0.6). Available for [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
+* Install the .NET8.0 SDK (specifically version 8.0.19). Available for [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
 * Install NodeJs (22.12.0 LTS or later), available for [Download](https://nodejs.org/en/download/)
 
 > We have ensured that you won't need any other infrastructure running on your local machine (i.e., a Microsoft SQLServer database) unless you want to run infrastructure-specific integration tests. See [Optional Local Infrastructure](#Optional-Local-Infrastructure) below.

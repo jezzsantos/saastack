@@ -109,7 +109,7 @@ That documentation is intended to be part of the template itself that users of t
 
 * Windows or macOS.
 * Jetbrains Rider or Visual Studio (There is the most support for JetBrains dotUltimate)
-* Install the .NET8.0 SDK (specifically version `8.0.6`) installed on your system. [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
+* Install the .NET8.0 SDK (specifically version `8.0.19`) installed on your system. [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
 
 > Included in the codebase there are many formatting rules that need to be run before committing your code. These rules may not be supported by other developer tools.
 
