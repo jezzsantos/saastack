@@ -16,28 +16,30 @@ Yes, .NET offers the building blocks already—but you still need to know how to
 
 Skip the startup trap:
 
-- ❌ Reinventing the wheel
-- ❌ Rushing a fragile foundation
+- ❌ Reinventing the wheel, where we already have standard solutions
+- ❌ Rushing forward on a fragile foundation, that is insecure, and has no observability
 - ❌ Building a monolith destined for a rewrite next year
 
-SaaStack is opinionated but flexible and extensible. It’s already battle-tested in several live SaaS companies. You just inherited their hard fought lessons. It’s cloud-ready (Azure or AWS), easily extensible, and doesn’t lock you into someone else's framework. You own it from the start—with extensive docs and regression tests to guide your journey.
+SaaStack is opinionated but it is also flexible and extensible and real-world, not a sample. Since it is a codebase and not a nuget package, you never get boxed inside it waiting for someone else to improve for you.
+- ✅ It’s already battle-tested in several live SaaS companies -you benefit from their hard fought learnings.
+- ✅ It’s cloud-ready (Azure or AWS). It is easily extensible to work with your specific 3rd party providers
+- ✅ It does NOT lock you into someone else's framework. You own it from the start. With extensive docs and regression tests to guide you as you evolve it.
+- ✅ This isn’t a NuGet package. It’s not a toy demo, its not a sample. It’s a full launchpad for serious builders who want to have a full product from day one.
 
-This isn’t a NuGet package. It’s not a toy demo. It’s a launchpad for serious builders who want to do it right, from day one.
+To be useful now and into the future, and guard against the future problems of scalaing your business, the codebase employs and demonstrates several common architectural styles that you are going to need in your product, such as:
 
-The codebase demonstrates common architectural styles that you are going to need in your product, in the long run, such as:
-
-* [A Pluggable Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to microservices later when you need to
+* [A Pluggable Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to microservices later when, and if, you need to
 * [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) all have the same principles - low-coupling, high-cohesion, a shareable and protected domain at the center
-* Hosted behind a distributed REST API, or in a CLI, (or in another executable).
-* [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (with Aggregates and Domain Events) - modeling actual real-world behaviors, not modeling just anemic data
+* Hosted behind a distributed REST API, or in a CLI, (or in another executable) your choice.
+* [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (with Aggregates and Domain Events) - modeling actual real-world behaviors, not modeling just anemic data.
 * [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later, and when you do, will be stuck, also makes domain events a cinch. Domain events are already built in your aggregates, ES simply persists them as the master record.
-* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled, distributed, and asynchronous from each other, focused on meaningful events and sagas across your product.
+* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled, distributed, and asynchronous from each other, focused on meaningful events and sagas across your whole product.
 * [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - decouples you from infrastructure, makes your entire system easy to test, and then upgrades as your business scales later. No need to install any database locally, nor docker containers, for debugging and testing.
-* Extensive Test Automation (e.g., Unit, Integration, and E2E) so you can keep moving years into the future
+* Extensive Test Automation (e.g., Unit, Integration, and E2E) so you can confidently keep moving years into the future
 * B2B or B2C Multitenancy, you choose
-* Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows.
+* Extensibility for all integrations with any 3rd party providers (e.g., Stripe, Twilio, Auth0, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows.
 
-> The fundamental design principles behind this particular combination of architectural styles is to maximize change since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run. Minimizing that cost, and keeping it low, is key for any new product tech business's survival.
+> The fundamental design principles behind this particular combination of architectural styles is to "maximize change" since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run. Minimizing that cost, and keeping it low, is key for any new product tech business's survival.
 
 This starter template gives you most of the things all SaaS products will need from day one while maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).
 
