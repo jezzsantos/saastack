@@ -45,7 +45,7 @@ public class UserProfilesApi : IWebApiService
         var profile =
             await _userProfilesApplication.ChangeProfileAsync(_callerFactory.Create(), request.UserId!,
                 request.FirstName, request.LastName, request.DisplayName, request.PhoneNumber, request.Timezone,
-                cancellationToken);
+                request.Locale, cancellationToken);
 
         return () =>
             profile.HandleApplicationResult<UserProfile, GetProfileResponse>(pro => new GetProfileResponse

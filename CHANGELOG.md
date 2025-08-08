@@ -18,6 +18,23 @@
 
 ---
 
+## [1.0.0] - 2025-08-09
+
+### Non-breaking Changes
+- Added `Locale` to `UserProfile` resource and all associated APIs, as backwards compatible
+- Added `Locale` to `EndUserProfile` value object, but backwards compatible
+- Existing domain events that added `Locale`, but are backwards compatible with previous events:
+  - `Domain.Events.Shared.EndUsers.Registered`
+  - `IdentityDomain.Events.SSOUsers.DetailsChanged`
+- Added new domain event `Domain.Events.Shared.UserProfiles.LocaleChanged`
+
+### Breaking Changes
+- Read models tables have been added to the main SqlServer database, and will need to be updated:
+- (eventing-generic):
+  - `SSOUser` table added column `Locale`
+  - `UserProfile` table added column `Locale`
+
+---
 
 ## [1.0.0] - 2025-08-07
 

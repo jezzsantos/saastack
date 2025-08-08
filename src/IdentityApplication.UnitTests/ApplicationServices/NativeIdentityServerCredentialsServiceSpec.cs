@@ -490,6 +490,7 @@ public class NativeIdentityServerCredentialsServiceSpec
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                "alocale",
                 It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(registeredAccount);
@@ -503,7 +504,8 @@ public class NativeIdentityServerCredentialsServiceSpec
             .ReturnsAsync(Error.Unexpected());
 
         var result = await _service.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+            "alastname", "auser@company.com", "apassword", "atimezone", "alocale", "acountrycode", true,
+            CancellationToken.None);
 
         result.Should().BeError(ErrorCode.Unexpected);
         _repository.Verify(s => s.SaveAsync(It.IsAny<PersonCredentialRoot>(), It.IsAny<CancellationToken>()),
@@ -512,7 +514,7 @@ public class NativeIdentityServerCredentialsServiceSpec
             ns.NotifyPasswordRegistrationConfirmationAsync(_caller.Object, "auser@company.com", "afirstname",
                 "averificationtoken", It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            "auser@company.com", "afirstname", "alastname", "atimezone", "alocale", "acountrycode", true,
             It.IsAny<CancellationToken>()));
     }
 
@@ -525,6 +527,7 @@ public class NativeIdentityServerCredentialsServiceSpec
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                "alocale",
                 It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser);
@@ -533,13 +536,14 @@ public class NativeIdentityServerCredentialsServiceSpec
             .ReturnsAsync(credential.ToOptional());
 
         var result = await _service.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+            "alastname", "auser@company.com", "apassword", "atimezone", "alocale", "acountrycode", true,
+            CancellationToken.None);
 
         result.Value.User.Should().Be(endUser);
         _repository.Verify(s => s.SaveAsync(It.IsAny<PersonCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            "auser@company.com", "afirstname", "alastname", "atimezone", "alocale", "acountrycode", true,
             It.IsAny<CancellationToken>()));
         _notificationsService.Verify(
             ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -571,11 +575,13 @@ public class NativeIdentityServerCredentialsServiceSpec
                 {
                     CountryCode = "acountrycode"
                 },
-                Timezone = "atimezone"
+                Timezone = "atimezone",
+                Locale = "alocale"
             }
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                "alocale",
                 It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser);
@@ -589,13 +595,14 @@ public class NativeIdentityServerCredentialsServiceSpec
             .ReturnsAsync(Result.Ok);
 
         var result = await _service.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+            "alastname", "auser@company.com", "apassword", "atimezone", "alocale", "acountrycode", true,
+            CancellationToken.None);
 
         result.Value.User.Should().Be(endUser);
         _repository.Verify(s => s.SaveAsync(It.IsAny<PersonCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            "auser@company.com", "afirstname", "alastname", "atimezone", "alocale", "acountrycode", true,
             It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(_caller.Object, "auserid",
             "anotheruser@company.com", "afirstname", "atimezone", "acountrycode",
@@ -611,6 +618,7 @@ public class NativeIdentityServerCredentialsServiceSpec
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                "alocale",
                 It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(registeredAccount);
@@ -619,7 +627,8 @@ public class NativeIdentityServerCredentialsServiceSpec
                 .None);
 
         var result = await _service.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+            "alastname", "auser@company.com", "apassword", "atimezone", "alocale", "acountrycode", true,
+            CancellationToken.None);
 
         result.Value.User.Should().Be(registeredAccount);
         _repository.Verify(s => s.SaveAsync(It.Is<PersonCredentialRoot>(uc =>
@@ -636,7 +645,7 @@ public class NativeIdentityServerCredentialsServiceSpec
                 "averificationtoken", UserNotificationConstants.EmailTags.RegisterPerson,
                 It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            "auser@company.com", "afirstname", "alastname", "atimezone", "alocale", "acountrycode", true,
             It.IsAny<CancellationToken>()));
         _notificationsService.Verify(
             ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),

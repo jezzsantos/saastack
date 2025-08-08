@@ -40,9 +40,11 @@ public partial class PersonCredentialsApplication : IPersonCredentialsApplicatio
 
     public async Task<Result<PersonCredential, Error>> RegisterPersonAsync(ICallerContext caller,
         string? invitationToken, string firstName, string lastName, string emailAddress, string password,
-        string? timezone, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
+        string? timezone, string? locale, string? countryCode, bool termsAndConditionsAccepted,
+        CancellationToken cancellationToken)
     {
         return await _identityServerProvider.CredentialsService.RegisterPersonAsync(caller, invitationToken, firstName,
-            lastName, emailAddress, password, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
+            lastName, emailAddress, password, timezone, locale, countryCode, termsAndConditionsAccepted,
+            cancellationToken);
     }
 }

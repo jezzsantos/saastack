@@ -60,6 +60,33 @@ namespace Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The LanguageCode &apos;{0}&apos; is invalid.
+        /// </summary>
+        internal static string Bcp47Locale_InvalidLanguageCode {
+            get {
+                return ResourceManager.GetString("Bcp47Locale_InvalidLanguageCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The RegionCode &apos;{0}&apos; is invalid.
+        /// </summary>
+        internal static string Bcp47Locale_InvalidRegionCode {
+            get {
+                return ResourceManager.GetString("Bcp47Locale_InvalidRegionCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ScriptCode &apos;{0}&apos; is invalid.
+        /// </summary>
+        internal static string Bcp47Locale_InvalidScriptCode {
+            get {
+                return ResourceManager.GetString("Bcp47Locale_InvalidScriptCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Numeric &apos;{0}&apos; must be a 3 decimal number between 1 and 1000.
         /// </summary>
         internal static string CountryCodeIso3166_InvalidNumeric {

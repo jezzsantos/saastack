@@ -76,16 +76,17 @@ public class PersonCredentialsApplicationSpec
         _credentialsService.Setup(aks =>
                 aks.RegisterPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential);
 
         var result =
             await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname", "alastname",
-                "anemailaddress", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+                "anemailaddress", "apassword", "atimezone", "alocale", "acountrycode", true, CancellationToken.None);
 
         result.Value.Should().Be(credential);
         _credentialsService.Verify(aks => aks.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "anemailaddress", "apassword", "atimezone", "acountrycode", true, CancellationToken.None));
+            "alastname", "anemailaddress", "apassword", "atimezone", "alocale", "acountrycode", true,
+            CancellationToken.None));
     }
 
     [Fact]

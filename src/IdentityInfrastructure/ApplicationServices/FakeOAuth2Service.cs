@@ -68,9 +68,11 @@ public class FakeOAuth2Service : IOAuth2Service
         var lastName = claims.Single(c => c.Type == ClaimTypes.Surname).Value;
         var timezone =
             Timezones.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForTimezone).Value);
+        var locale =
+            Locales.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForLocale).Value);
         var country = CountryCodes.FindOrDefault(claims.Single(c => c.Type == ClaimTypes.Country).Value);
 
-        return new SSOAuthUserInfo(tokens, uid, emailAddress, firstName, lastName, timezone, country);
+        return new SSOAuthUserInfo(tokens, uid, emailAddress, firstName, lastName, timezone, locale, country);
     }
 
     private static AuthToken CreateAccessToken(OAuth2CodeTokenExchangeOptions options)
@@ -83,6 +85,7 @@ public class FakeOAuth2Service : IOAuth2Service
                 new Claim(ClaimTypes.GivenName, options.Scope!),
                 new Claim(ClaimTypes.Surname, "asurname"),
                 new Claim(AuthenticationConstants.Claims.ForTimezone, Timezones.Default.ToString()),
+                new Claim(AuthenticationConstants.Claims.ForLocale, Locales.Default.ToString()),
                 new Claim(ClaimTypes.Country, CountryCodes.Default.ToString())
             ], expires: expiresOn,
             issuer: options.ServiceName

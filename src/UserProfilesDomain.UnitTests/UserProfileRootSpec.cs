@@ -39,6 +39,7 @@ public class UserProfileRootSpec
         _profile.EmailAddress.HasValue.Should().BeFalse();
         _profile.Address.Should().Be(Address.Default);
         _profile.Timezone.Should().Be(Timezone.Default);
+        _profile.Locale.Should().Be(Locale.Default);
         _profile.Events.Last().Should().BeOfType<Created>();
     }
 
@@ -107,25 +108,47 @@ public class UserProfileRootSpec
     }
 
     [Fact]
-    public void WhenSetTimezoneAndNotOwner_ThenReturnsError()
+    public void WhenChangeTimezoneAndNotOwner_ThenReturnsError()
     {
         var timezone = Timezone.Create(Timezones.Default).Value;
 
-        var result = _profile.SetTimezone("anotheruserid".ToId(), timezone);
+        var result = _profile.ChangeTimezone("anotheruserid".ToId(), timezone);
 
         result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
-    public void WhenSetTimezone_ThenSets()
+    public void WhenChangeTimezone_ThenSets()
     {
         var timezone = Timezone.Create(Timezones.NewZealand).Value;
 
-        var result = _profile.SetTimezone("auserid".ToId(), timezone);
+        var result = _profile.ChangeTimezone("auserid".ToId(), timezone);
 
         result.Should().BeSuccess();
         _profile.Timezone.Code.Should().Be(Timezones.NewZealand);
         _profile.Events.Last().Should().BeOfType<TimezoneChanged>();
+    }
+
+    [Fact]
+    public void WhenChangeLocaleAndNotOwner_ThenReturnsError()
+    {
+        var timezone = Locale.Create(Locales.Default).Value;
+
+        var result = _profile.ChangeLocale("anotheruserid".ToId(), timezone);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
+    }
+
+    [Fact]
+    public void WhenChangeLocale_ThenSets()
+    {
+        var locale = Locale.Create(Locales.EnglishNz).Value;
+
+        var result = _profile.ChangeLocale("auserid".ToId(), locale);
+
+        result.Should().BeSuccess();
+        _profile.Locale.Code.Should().Be(Locales.EnglishNz);
+        _profile.Events.Last().Should().BeOfType<LocaleChanged>();
     }
 
     [Fact]

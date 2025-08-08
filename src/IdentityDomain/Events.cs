@@ -49,8 +49,7 @@ public static class Events
         }
 
         public static TokensRefreshed TokensRefreshed(Identifier id, Identifier userId, AuthToken accessToken,
-            AuthToken refreshToken,
-            Optional<AuthToken> idToken, string refreshTokenDigest)
+            AuthToken refreshToken, Optional<AuthToken> idToken, string refreshTokenDigest)
         {
             return new TokensRefreshed(id)
             {
@@ -378,7 +377,7 @@ public static class Events
         }
 
         public static DetailsChanged DetailsChanged(Identifier id, string providerUniqueId, EmailAddress emailAddress,
-            PersonName name, Timezone timezone, Address address)
+            PersonName name, Timezone timezone, Locale locale, Address address)
         {
             return new DetailsChanged(id)
             {
@@ -387,6 +386,7 @@ public static class Events
                 FirstName = name.FirstName,
                 LastName = name.LastName.ValueOrDefault?.Text,
                 Timezone = timezone.Code.ToString(),
+                Locale = locale.Code.ToString(),
                 CountryCode = address.CountryCode.ToString()
             };
         }
@@ -511,8 +511,7 @@ public static class Events
         }
 
         public static TokenRefreshed TokenRefreshed(Identifier id, OAuth2TokenMemento accessToken,
-            OAuth2TokenMemento refreshToken,
-            OAuth2Scopes refreshedScopes)
+            OAuth2TokenMemento refreshToken, OAuth2Scopes refreshedScopes)
         {
             return new TokenRefreshed(id)
             {

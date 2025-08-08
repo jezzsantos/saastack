@@ -73,6 +73,7 @@ public class FakeSSOAuthenticationProviderSpec
         result.Value.FirstName.Should().Be("anemailaddress");
         result.Value.LastName.Should().Be("asurname");
         result.Value.Timezone.Should().Be(Timezones.Default);
+        result.Value.Locale.Should().Be(Locales.Default);
         result.Value.CountryCode.Should().Be(CountryCodes.Default);
     }
 

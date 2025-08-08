@@ -42,6 +42,8 @@ public sealed class UserProfileRoot : AggregateRootBase
 
     public Optional<EmailAddress> EmailAddress { get; private set; }
 
+    public Locale Locale { get; private set; } = Locale.Default;
+
     public Optional<PersonName> Name { get; private set; }
 
     public Optional<PhoneNumber> PhoneNumber { get; private set; }
@@ -112,6 +114,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 Address = Address.Default;
                 EmailAddress = Optional<EmailAddress>.None;
                 Timezone = Timezone.Default;
+                Locale = Locale.Default;
                 Avatar = Optional<Avatar>.None;
                 return Result.Ok;
             }
@@ -154,6 +157,19 @@ public sealed class UserProfileRoot : AggregateRootBase
 
                 Timezone = timezone.Value;
                 Recorder.TraceDebug(null, "Profile {Id} changed timezone to {Timezone}", Id, changed.Timezone);
+                return Result.Ok;
+            }
+
+            case LocaleChanged changed:
+            {
+                var locale = Locale.Create(changed.Locale);
+                if (locale.IsFailure)
+                {
+                    return locale.Error;
+                }
+
+                Locale = locale.Value;
+                Recorder.TraceDebug(null, "Profile {Id} changed locale to {Locale}", Id, changed.Locale);
                 return Result.Ok;
             }
 
@@ -291,6 +307,22 @@ public sealed class UserProfileRoot : AggregateRootBase
         return RaiseChangeEvent(UserProfilesDomain.Events.DisplayNameChanged(Id, UserId, displayName));
     }
 
+    public Result<Error> ChangeLocale(Identifier modifierId, Locale locale)
+    {
+        if (IsNotOwner(modifierId))
+        {
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
+        }
+
+        var nothingHasChanged = locale == Locale;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(UserProfilesDomain.Events.LocaleChanged(Id, UserId, locale));
+    }
+
     public Result<Error> ChangeName(Identifier modifierId, PersonName name)
     {
         if (IsNotOwner(modifierId))
@@ -326,6 +358,22 @@ public sealed class UserProfileRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
+    }
+
+    public Result<Error> ChangeTimezone(Identifier modifierId, Timezone timezone)
+    {
+        if (IsNotOwner(modifierId))
+        {
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
+        }
+
+        var nothingHasChanged = timezone == Timezone;
+        if (nothingHasChanged)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged(Id, UserId, timezone));
     }
 
     public Result<Error> ForceRemoveAvatar(Identifier deleterId)
@@ -411,22 +459,6 @@ public sealed class UserProfileRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.EmailAddressChanged(Id, UserId, emailAddress));
-    }
-
-    public Result<Error> SetTimezone(Identifier modifierId, Timezone timezone)
-    {
-        if (IsNotOwner(modifierId))
-        {
-            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
-        }
-
-        var nothingHasChanged = timezone == Timezone;
-        if (nothingHasChanged)
-        {
-            return Result.Ok;
-        }
-
-        return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged(Id, UserId, timezone));
     }
 
 #if TESTINGONLY

@@ -35,7 +35,7 @@ partial class UserProfilesApplication
         var profile =
             await CreateProfileAsync(caller, classification, domainEvent.RootId, domainEvent.Username,
                 domainEvent.UserProfile.FirstName, domainEvent.UserProfile.LastName, domainEvent.UserProfile.Timezone,
-                domainEvent.UserProfile.CountryCode, cancellationToken);
+                domainEvent.UserProfile.Locale, domainEvent.UserProfile.CountryCode, cancellationToken);
         if (profile.IsFailure)
         {
             return profile.Error;
@@ -88,7 +88,7 @@ partial class UserProfilesApplication
 
     private async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
         UserProfileClassification classification, string userId, string? emailAddress, string firstName,
-        string? lastName, string? timezone, string? countryCode, CancellationToken cancellationToken)
+        string? lastName, string? timezone, string? locale, string? countryCode, CancellationToken cancellationToken)
     {
         if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
         {
@@ -176,10 +176,22 @@ partial class UserProfilesApplication
             return tz.Error;
         }
 
-        var timezoned = profile.SetTimezone(userId.ToId(), tz.Value);
+        var timezoned = profile.ChangeTimezone(userId.ToId(), tz.Value);
         if (timezoned.IsFailure)
         {
             return timezoned.Error;
+        }
+
+        var loc = Locale.Create(Locales.FindOrDefault(locale));
+        if (loc.IsFailure)
+        {
+            return loc.Error;
+        }
+
+        var localed = profile.ChangeLocale(userId.ToId(), loc.Value);
+        if (localed.IsFailure)
+        {
+            return localed.Error;
         }
 
         if (classification == UserProfileClassification.Person)
@@ -212,8 +224,7 @@ partial class UserProfilesApplication
     }
 
     private async Task<Result<Optional<UserProfile>, Error>> UpdateDefaultOrganizationAsync(ICallerContext caller,
-        string userId,
-        string defaultOrganizationId, CancellationToken cancellationToken)
+        string userId, string defaultOrganizationId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
         if (retrieved.IsFailure)

@@ -49,6 +49,8 @@ public sealed class SSOUserRoot : AggregateRootBase
 
     public Optional<Timezone> Timezone { get; private set; }
 
+    public Optional<Locale> Locale { get; private set; }
+
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
     [UsedImplicitly]
@@ -105,6 +107,13 @@ public sealed class SSOUserRoot : AggregateRootBase
                 }
 
                 Timezone = timezone.Value;
+                var locale = Domain.Shared.Locale.Create(changed.Locale);
+                if (locale.IsFailure)
+                {
+                    return locale.Error;
+                }
+
+                Locale = locale.Value;
                 var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(changed.CountryCode));
                 if (address.IsFailure)
                 {
@@ -122,13 +131,13 @@ public sealed class SSOUserRoot : AggregateRootBase
     }
 
     public Result<Error> ChangeDetails(string providerUniqueId, EmailAddress emailAddress,
-        PersonName name, Timezone timezone, Address address)
+        PersonName name, Timezone timezone, Locale locale, Address address)
     {
         if (DetailsHaveChanged())
         {
             var detailsUpdated = RaiseChangeEvent(
                 IdentityDomain.Events.SSOUsers.DetailsChanged(Id, providerUniqueId, emailAddress, name, timezone,
-                    address));
+                    locale, address));
             if (detailsUpdated.IsFailure)
             {
                 return detailsUpdated.Error;
@@ -142,6 +151,7 @@ public sealed class SSOUserRoot : AggregateRootBase
             return providerUniqueId != ProviderUId
                    || emailAddress != EmailAddress
                    || name != Name
+                   || locale != Locale
                    || timezone != Timezone
                    || address != Address;
         }

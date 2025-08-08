@@ -48,9 +48,9 @@ public class EndUsersInProcessServiceClient : IEndUsersService
 
     public async Task<Result<EndUserWithProfile, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
-        string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
+        string? locale, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         return await _endUsersApplication.RegisterPersonAsync(caller, invitationToken, emailAddress, firstName,
-            lastName, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
+            lastName, timezone, locale, countryCode, termsAndConditionsAccepted, cancellationToken);
     }
 }

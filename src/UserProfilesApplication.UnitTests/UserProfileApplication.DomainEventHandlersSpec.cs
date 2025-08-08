@@ -125,6 +125,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.PhoneNumber.HasValue == false
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
+            && up.Locale == Locales.Default
             && up.Avatar.HasValue == false
         ), It.IsAny<CancellationToken>()));
     }
@@ -152,6 +153,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.PhoneNumber.HasValue == false
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
+            && up.Locale == Locales.Default
             && up.Avatar.HasValue == false
         ), It.IsAny<CancellationToken>()));
     }
@@ -200,6 +202,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.PhoneNumber.HasValue == false
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
+            && up.Locale == Locales.Default
             && up.Avatar.Value.ImageId == "animageid"
             && up.Avatar.Value.Url == "aurl"
         ), It.IsAny<CancellationToken>()));

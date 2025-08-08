@@ -42,6 +42,9 @@
     <data name="RegisterAnyRequestValidator_InvalidCountryCode" xml:space="preserve">
       <value>The 'CountryCode' is not a valid ISO3166 alpha-2 or alpha-3 code or numeric</value>
     </data>
+    <data name="RegisterAnyRequestValidator_InvalidLocale" xml:space="preserve">
+      <value>The 'Locale' is not a valid locale</value>
+    </data>
     <data name="RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted" xml:space="preserve">
       <value>The 'TermsAndConditionsAccepted' must be True</value>
     </data>

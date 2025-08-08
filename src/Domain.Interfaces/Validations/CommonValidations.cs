@@ -16,6 +16,7 @@ public static class CommonValidations
     public static readonly Validation GuidN = new(@"^[0-9a-f]{32}$", 32, 32);
     public static readonly Validation Identifier = new(@"^[\w]{1,20}_[\d\w]{10,22}$", 12, 43);
     public static readonly Validation IdentifierPrefix = new(@"^[^\W_]*$", 1, 20);
+    public static readonly Validation Locale = new(Locales.Exists);
 
     /// <summary>
     ///     Validations for International

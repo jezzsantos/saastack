@@ -16,6 +16,8 @@ public class ChangeProfileRequest : UnTenantedRequest<ChangeProfileRequest, GetP
 
     public string? LastName { get; set; }
 
+    public string? Locale { get; set; }
+
     public string? PhoneNumber { get; set; }
 
     public string? Timezone { get; set; }

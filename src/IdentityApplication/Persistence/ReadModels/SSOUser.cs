@@ -15,6 +15,8 @@ public class SSOUser : ReadModelEntity
 
     public Optional<string> LastName { get; set; }
 
+    public Optional<string> Locale { get; set; }
+
     public Optional<string> ProviderName { get; set; }
 
     public Optional<string> ProviderUId { get; set; }

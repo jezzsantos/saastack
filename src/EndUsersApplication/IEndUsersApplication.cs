@@ -28,8 +28,8 @@ public partial interface IEndUsersApplication
         string? countryCode, CancellationToken cancellationToken);
 
     Task<Result<EndUserWithProfile, Error>> RegisterPersonAsync(ICallerContext caller, string? invitationToken,
-        string emailAddress,
-        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        string emailAddress, string firstName, string? lastName, string? timezone, string? locale, string? countryCode,
+        bool termsAndConditionsAccepted,
         CancellationToken cancellationToken);
 
     Task<Result<EndUser, Error>> UnassignPlatformRolesAsync(ICallerContext caller, string id, List<string> roles,

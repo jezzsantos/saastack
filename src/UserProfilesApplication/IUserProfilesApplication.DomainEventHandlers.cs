@@ -8,8 +8,7 @@ namespace UserProfilesApplication;
 partial interface IUserProfilesApplication
 {
     Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
-        DefaultMembershipChanged domainEvent,
-        CancellationToken cancellationToken);
+        DefaultMembershipChanged domainEvent, CancellationToken cancellationToken);
 
     Task<Result<Error>> HandleEndUserRegisteredAsync(ICallerContext caller, Registered domainEvent,
         CancellationToken cancellationToken);

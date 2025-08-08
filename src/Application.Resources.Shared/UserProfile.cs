@@ -15,6 +15,8 @@ public class UserProfile : IIdentifiableResource
 
     public string? EmailAddress { get; set; }
 
+    public string? Locale { get; set; }
+
     public required PersonName Name { get; set; }
 
     public string? PhoneNumber { get; set; }

@@ -132,6 +132,15 @@ namespace Domain.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Locale is invalid.
+        /// </summary>
+        internal static string Locale_InvalidLocale {
+            get {
+                return ResourceManager.GetString("Locale_InvalidLocale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Name is invalid.
         /// </summary>
         internal static string Name_InvalidName {

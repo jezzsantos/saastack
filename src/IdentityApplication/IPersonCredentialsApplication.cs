@@ -18,6 +18,7 @@ public partial interface IPersonCredentialsApplication
 #endif
 
     Task<Result<PersonCredential, Error>> RegisterPersonAsync(ICallerContext caller, string? invitationToken,
-        string firstName, string lastName, string emailAddress, string password, string? timezone, string? countryCode,
+        string firstName, string lastName, string emailAddress, string password, string? timezone, string? locale,
+        string? countryCode,
         bool termsAndConditionsAccepted, CancellationToken cancellationToken);
 }

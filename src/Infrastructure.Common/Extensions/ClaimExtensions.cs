@@ -196,6 +196,11 @@ public static class ClaimExtensions
                 claims.Add(new Claim(AuthenticationConstants.Claims.ForTimezone, profile.Timezone));
             }
 
+            if (profile.Locale.HasValue())
+            {
+                claims.Add(new Claim(AuthenticationConstants.Claims.ForLocale, profile.Locale));
+            }
+
             if (profile.AvatarUrl.HasValue())
             {
                 claims.Add(new Claim(AuthenticationConstants.Claims.ForPicture, profile.AvatarUrl));

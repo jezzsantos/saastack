@@ -25,6 +25,7 @@ public class RegisterPersonPasswordRequestValidatorSpec
             Password = "1Password!",
             Timezone = Timezones.Default.Id,
             CountryCode = CountryCodes.Default.Alpha3,
+            Locale = Locales.Default.ToString(),
             TermsAndConditionsAccepted = true
         };
     }
@@ -148,6 +149,25 @@ public class RegisterPersonPasswordRequestValidatorSpec
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.RegisterAnyRequestValidator_InvalidTimezone);
+    }
+
+    [Fact]
+    public void WhenLocaleIsMissing_ThenSucceeds()
+    {
+        _dto.Locale = null;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenLocaleIsInvalid_ThenThrows()
+    {
+        _dto.Locale = "aninvalidcountrycode^";
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.RegisterAnyRequestValidator_InvalidLocale);
     }
 
     [Fact]

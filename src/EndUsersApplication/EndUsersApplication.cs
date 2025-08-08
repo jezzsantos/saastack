@@ -296,7 +296,7 @@ public partial class EndUsersApplication : IEndUsersApplication
 
     public async Task<Result<EndUserWithProfile, Error>> RegisterPersonAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
-        string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
+        string? locale, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         if (!termsAndConditionsAccepted)
         {
@@ -389,7 +389,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             unregisteredUser = created.Value;
         }
 
-        var userProfile = EndUserProfile.Create(firstName, lastName, timezone, countryCode);
+        var userProfile = EndUserProfile.Create(firstName, lastName, timezone, locale, countryCode);
         if (userProfile.IsFailure)
         {
             return userProfile.Error;

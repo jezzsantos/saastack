@@ -30,6 +30,13 @@ public class SSOUserProjection : IReadModelProjection
                     {
                         dto.UserId = e.UserId;
                         dto.ProviderName = e.ProviderName;
+                        dto.ProviderUId = Optional<string>.None;
+                        dto.EmailAddress = Optional<string>.None;
+                        dto.FirstName = Optional<string>.None;
+                        dto.LastName = Optional<string>.None;
+                        dto.Timezone = Optional<string>.None;
+                        dto.Locale = Optional<string>.None;
+                        dto.CountryCode = Optional<string>.None;
                     },
                     cancellationToken);
 
@@ -41,6 +48,7 @@ public class SSOUserProjection : IReadModelProjection
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;
                     dto.Timezone = e.Timezone;
+                    dto.Locale = e.Locale;
                     dto.CountryCode = e.CountryCode;
                 }, cancellationToken);
 

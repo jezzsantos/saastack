@@ -208,6 +208,12 @@ public class SSOProvidersService : ISSOProvidersService
             return timezone.Error;
         }
 
+        var locale = Locale.Create(authUserInfo.Locale);
+        if (locale.IsFailure)
+        {
+            return locale.Error;
+        }
+        
         var address = Address.Create(authUserInfo.CountryCode);
         if (address.IsFailure)
         {
@@ -215,7 +221,7 @@ public class SSOProvidersService : ISSOProvidersService
         }
 
         var providerUniqueId = authUserInfo.UId;
-        var changed = user.ChangeDetails(providerUniqueId, emailAddress.Value, name.Value, timezone.Value,
+        var changed = user.ChangeDetails(providerUniqueId, emailAddress.Value, name.Value, timezone.Value, locale.Value,
             address.Value);
         if (changed.IsFailure)
         {

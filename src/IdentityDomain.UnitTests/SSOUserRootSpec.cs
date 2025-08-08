@@ -43,10 +43,10 @@ public class SSOUserRootSpec
     public void WhenChangeDetailsAndSameDetails_ThenDoesNothing()
     {
         _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
-            PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
+            PersonName.Create("afirstname", null).Value, Timezone.Default, Locale.Default, Address.Default);
 
         var result = _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
-            PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
+            PersonName.Create("afirstname", null).Value, Timezone.Default, Locale.Default, Address.Default);
 
         result.Should().BeSuccess();
         _user.Events.Count.Should().Be(2);
@@ -58,7 +58,7 @@ public class SSOUserRootSpec
     public void WhenChangeDetails_ThenAdds()
     {
         var result = _user.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
-            PersonName.Create("afirstname", null).Value, Timezone.Default, Address.Default);
+            PersonName.Create("afirstname", null).Value, Timezone.Default, Locale.Default, Address.Default);
 
         result.Should().BeSuccess();
         _user.ProviderUId.Should().Be("aprovideruid");
@@ -67,6 +67,7 @@ public class SSOUserRootSpec
         _user.Name.Value.FirstName.Text.Should().Be("afirstname");
         _user.Name.Value.LastName.Should().BeNone();
         _user.Timezone.Value.Code.Should().Be(Timezones.Default);
+        _user.Locale.Value.Code.Should().Be(Locales.Default);
         _user.Address.Value.CountryCode.Should().Be(CountryCodes.Default);
         _user.Events.Count.Should().Be(2);
         _user.Events[0].Should().BeOfType<Created>();

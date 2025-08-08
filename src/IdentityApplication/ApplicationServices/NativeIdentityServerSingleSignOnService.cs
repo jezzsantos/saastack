@@ -60,9 +60,8 @@ public class NativeIdentityServerSingleSignOnService : IIdentityServerSingleSign
         if (!existingUser.Value.HasValue)
         {
             var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(caller, invitationToken,
-                authUserInfo.EmailAddress,
-                authUserInfo.FirstName, authUserInfo.LastName, authUserInfo.Timezone.ToString(),
-                authUserInfo.CountryCode.ToString(),
+                authUserInfo.EmailAddress, authUserInfo.FirstName, authUserInfo.LastName,
+                authUserInfo.Timezone.ToString(), authUserInfo.Locale.ToString(), authUserInfo.CountryCode.ToString(),
                 !termsAndConditionsAccepted.HasValue || termsAndConditionsAccepted.Value,
                 cancellationToken);
             if (autoRegistered.IsFailure)

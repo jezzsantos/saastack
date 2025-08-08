@@ -56,7 +56,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenSaveInfoOnBehalfOfUserAsyncAndProviderNotRegistered_ThenReturnsError()
         {
             var userInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-                Timezones.Default, CountryCodes.Default);
+                Timezones.Default, Locales.Default, CountryCodes.Default);
 
             var result =
                 await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
@@ -70,8 +70,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenFindUserByProviderAsync_ThenReturnsError()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "anemailaddress", "afirstname",
-                "alastname",
-                Timezones.Default, CountryCodes.Default);
+                "alastname", Timezones.Default, Locales.Default, CountryCodes.Default);
 
             var result = await _service.FindUserByProviderAsync(_caller.Object, "aprovidername", authUserInfo,
                 CancellationToken.None);
@@ -130,8 +129,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenAuthenticateUserAndProviderReturnInfoWithoutUid_ThenReturnsError()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "", "auser@company.com", "afirstname",
-                "alastname",
-                Timezones.Default, CountryCodes.Default);
+                "alastname", Timezones.Default, Locales.Default, CountryCodes.Default);
             _provider.Setup(p => p.AuthenticateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -147,7 +145,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenAuthenticateUserAndProviderReturnInfoWithoutEmail_ThenReturnsError()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "", "afirstname", "alastname",
-                Timezones.Default, CountryCodes.Default);
+                Timezones.Default, Locales.Default, CountryCodes.Default);
             _provider.Setup(p => p.AuthenticateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -164,7 +162,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenAuthenticateUserAndProviderReturnInfoWithoutFirstNameThenReturnsError()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "", "alastname",
-                Timezones.Default, CountryCodes.Default);
+                Timezones.Default, Locales.Default, CountryCodes.Default);
             _provider.Setup(p => p.AuthenticateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -181,8 +179,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenAuthenticateUserAndProviderAuthenticates_ThenReturnsUserInfo()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname",
-                "alastname",
-                Timezones.Default, CountryCodes.Default);
+                "alastname", Timezones.Default, Locales.Default, CountryCodes.Default);
             _provider.Setup(p => p.AuthenticateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -199,8 +196,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenFindUserByProviderAsyncAndNoUser_ThenReturnsNone()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "anemailaddress", "afirstname",
-                "alastname",
-                Timezones.Default, CountryCodes.Default);
+                "alastname", Timezones.Default, Locales.Default, CountryCodes.Default);
             _repository.Setup(repo => repo.FindByProviderUIdAsync(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Optional<SSOUserRoot>.None);
@@ -216,13 +212,11 @@ public class SSOProvidersServiceSpec
         public async Task WhenFindUserByProviderAsync_ThenReturnsUser()
         {
             var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "anemailaddress", "afirstname",
-                "alastname",
-                Timezones.Default, CountryCodes.Default);
+                "alastname", Timezones.Default, Locales.Default, CountryCodes.Default);
             var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object, "aprovidername", "auserid".ToId())
                 .Value;
-            ssoUser.ChangeDetails("aprovideruid",
-                EmailAddress.Create("auser@company.com").Value,
-                PersonName.Create("afirstname", "alastname").Value, Timezone.Default,
+            ssoUser.ChangeDetails("aprovideruid", EmailAddress.Create("auser@company.com").Value,
+                PersonName.Create("afirstname", "alastname").Value, Timezone.Default, Locale.Default,
                 Address.Create(CountryCodes.Default).Value);
             _repository.Setup(repo => repo.FindByProviderUIdAsync(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -275,7 +269,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenSaveInfoOnBehalfOfUserAsyncAndProviderNotRegistered_ThenReturnsError()
         {
             var userInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-                Timezones.Default, CountryCodes.Default);
+                Timezones.Default, Locales.Default, CountryCodes.Default);
 
             var result =
                 await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
@@ -289,7 +283,7 @@ public class SSOProvidersServiceSpec
         public async Task WhenSaveInfoOnBehalfOfUserAsyncAndUserNotExists_ThenCreatesAndSavesDetails()
         {
             var userInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-                Timezones.Default, CountryCodes.Default);
+                Timezones.Default, Locales.Default, CountryCodes.Default);
             _repository.Setup(rep =>
                     rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
                         It.IsAny<CancellationToken>()))

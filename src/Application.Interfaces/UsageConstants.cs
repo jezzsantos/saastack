@@ -36,6 +36,7 @@ public static class UsageConstants
         public const string HttpStatusCode = "Status";
         public const string Id = ResourceId; // how we identify any resource, including users
         public const string IpAddress = "IpAddress";
+        public const string Locale = "Locale";
         public const string MetricEventName = "Metric";
         public const string MfaAuthenticatorType = "MfaAuthenticatorType";
         public const string Name = "Name";

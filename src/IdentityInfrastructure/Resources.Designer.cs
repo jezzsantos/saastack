@@ -539,6 +539,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Locale&apos; is not a valid locale.
+        /// </summary>
+        internal static string RegisterAnyRequestValidator_InvalidLocale {
+            get {
+                return ResourceManager.GetString("RegisterAnyRequestValidator_InvalidLocale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Timezone&apos; is not a valid IANA name.
         /// </summary>
         internal static string RegisterAnyRequestValidator_InvalidTimezone {

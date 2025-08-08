@@ -24,7 +24,7 @@ public class TimezonesSpec
     }
 
     [Fact]
-    public void WhenFindTimeZoneAndUnknown_ThenReturnsNull()
+    public void WhenFindForUnknown_ThenReturnsNull()
     {
         var result = Timezones.Find("notatimezone");
 
@@ -58,7 +58,7 @@ public class TimezonesSpec
     }
 
     [Fact]
-    public void WhenFindForEveryCountryCode_ThenReturnsCode()
+    public void WhenFindForEveryTimezone_ThenReturnsCode()
     {
         var timezones = DateTimeZoneProviders.Tzdb.Ids;
         foreach (var timezone in timezones)

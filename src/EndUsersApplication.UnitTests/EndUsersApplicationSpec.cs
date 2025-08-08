@@ -98,7 +98,7 @@ public class EndUsersApplicationSpec
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
             "afirstname",
             "alastname",
-            "atimezone", "acountrycode", false, CancellationToken.None);
+            "atimezone", "alocale", "acountrycode", false, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.EndUsersApplication_NotAcceptedTerms);
     }
@@ -141,7 +141,7 @@ public class EndUsersApplicationSpec
 
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
             "afirstname",
-            "alastname", null, null, true, CancellationToken.None);
+            "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -207,7 +207,7 @@ public class EndUsersApplicationSpec
             });
 
         var result = await _application.RegisterPersonAsync(_caller.Object, TestingToken, "auser@company.com",
-            "afirstname", "alastname", null, null, true, CancellationToken.None);
+            "afirstname", "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -262,7 +262,7 @@ public class EndUsersApplicationSpec
             });
 
         var result = await _application.RegisterPersonAsync(_caller.Object, "anunknowninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", null, null, true, CancellationToken.None);
+            "auser@company.com", "afirstname", "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -313,7 +313,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(invitee.ToOptional());
 
         var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "auser@company.com",
-            "afirstname", "alastname", null, null, true, CancellationToken.None);
+            "afirstname", "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EndUsersApplication_AcceptedInvitationWithExistingEmailAddress);
@@ -363,7 +363,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(endUser);
 
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
-            "afirstname", "alastname", null, null, true, CancellationToken.None);
+            "afirstname", "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -421,7 +421,7 @@ public class EndUsersApplicationSpec
 
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
             "afirstname",
-            "alastname", null, null, true, CancellationToken.None);
+            "alastname", null, "alocale", null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");

@@ -33,7 +33,7 @@ public interface ISSOAuthenticationProvider
 public class SSOAuthUserInfo
 {
     public SSOAuthUserInfo(IReadOnlyList<AuthToken> tokens, string uId, string emailAddress, string firstName,
-        string? lastName, TimezoneIANA timezone, CountryCodeIso3166 countryCode)
+        string? lastName, TimezoneIANA timezone, Bcp47Locale locale, CountryCodeIso3166 countryCode)
     {
         Tokens = tokens;
         UId = uId;
@@ -41,6 +41,7 @@ public class SSOAuthUserInfo
         FirstName = firstName;
         LastName = lastName;
         Timezone = timezone;
+        Locale = locale;
         CountryCode = countryCode;
     }
 
@@ -55,6 +56,8 @@ public class SSOAuthUserInfo
         : FirstName;
 
     public string? LastName { get; }
+
+    public Bcp47Locale Locale { get; }
 
     public TimezoneIANA Timezone { get; }
 

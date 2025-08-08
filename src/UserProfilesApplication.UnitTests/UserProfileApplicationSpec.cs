@@ -89,7 +89,7 @@ public class UserProfileApplicationSpec
             .ReturnsAsync(user.ToOptional());
 
         var result = await _application.ChangeProfileAsync(_caller.Object, "auserid", "afirstname", "alastname",
-            "adisplayname", "aphonenumber", "atimezone", CancellationToken.None);
+            "adisplayname", "aphonenumber", "atimezone", "alocale", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RoleViolation);
     }
@@ -101,8 +101,7 @@ public class UserProfileApplicationSpec
             .Returns("auserid");
 
         var result = await _application.ChangeProfileAsync(_caller.Object, "auserid", "afirstname", "alastname",
-            "adisplayname",
-            "aphonenumber", "atimezone", CancellationToken.None);
+            "adisplayname", "aphonenumber", "atimezone", "alocale", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
     }
@@ -118,8 +117,8 @@ public class UserProfileApplicationSpec
             .ReturnsAsync(user.ToOptional());
 
         var result = await _application.ChangeProfileAsync(_caller.Object, "auserid", "anewfirstname",
-            "anewlastname", "anewdisplayname",
-            "+6498876986", Timezones.Sydney.ToString(), CancellationToken.None);
+            "anewlastname", "anewdisplayname", "+6498876986", Timezones.Sydney.ToString(),
+            Locales.EnglishUs.ToString(), CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Name.FirstName.Should().Be("anewfirstname");
@@ -127,6 +126,7 @@ public class UserProfileApplicationSpec
         result.Value.DisplayName.Should().Be("anewdisplayname");
         result.Value.PhoneNumber.Should().Be("+6498876986");
         result.Value.Timezone.Should().Be(Timezones.Sydney.ToString());
+        result.Value.Locale.Should().Be(Locales.EnglishUs.ToString());
     }
 
     [Fact]

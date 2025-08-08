@@ -187,6 +187,7 @@ public class JWTTokensServiceSpec
             EmailAddress = "anemailaddress",
             PhoneNumber = "aphonenumber",
             Timezone = "atimezone",
+            Locale = "alocale",
             AvatarUrl = "anavatarurl",
             Classification = UserProfileClassification.Person
         };
@@ -252,7 +253,7 @@ public class JWTTokensServiceSpec
         idToken.Audiences.Should().OnlyContain(aud => aud == "aclientid");
         idToken.ValidTo.Should().BeNear(now.Add(AuthenticationConstants.Tokens.DefaultIdTokenExpiry),
             TimeSpan.FromMinutes(1));
-        idToken.Claims.Count().Should().Be(19);
+        idToken.Claims.Count().Should().Be(20);
         idToken.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForId && claim.Value == "anid");
         idToken.Claims.Should()
@@ -279,6 +280,8 @@ public class JWTTokensServiceSpec
                 claim.Type == AuthenticationConstants.Claims.ForPhoneNumber && claim.Value == "aphonenumber");
         idToken.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForTimezone && claim.Value == "atimezone");
+        idToken.Claims.Should()
+            .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForLocale && claim.Value == "alocale");
         idToken.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForPicture && claim.Value == "anavatarurl");
         idToken.Claims.Should()

@@ -33,6 +33,12 @@ public class UserProfileProjection : IReadModelProjection
                     dto.DisplayName = e.DisplayName;
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;
+                    dto.DisplayName = Optional<string>.None;
+                    dto.EmailAddress = Optional<string>.None;
+                    dto.PhoneNumber = Optional<string>.None;
+                    dto.Locale = Optional<string>.None;
+                    dto.Timezone = Optional<string>.None;
+                    dto.CountryCode = Optional<string>.None;
                 }, cancellationToken);
 
             case NameChanged e:
@@ -52,6 +58,10 @@ public class UserProfileProjection : IReadModelProjection
 
             case PhoneNumberChanged e:
                 return await _users.HandleUpdateAsync(e.RootId, dto => { dto.PhoneNumber = e.Number; },
+                    cancellationToken);
+
+            case LocaleChanged e:
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.Locale = e.Locale; },
                     cancellationToken);
 
             case TimezoneChanged e:

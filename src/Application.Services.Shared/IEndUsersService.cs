@@ -20,6 +20,6 @@ public interface IEndUsersService
         string? timezone, string? countryCode, CancellationToken cancellationToken);
 
     Task<Result<EndUserWithProfile, Error>> RegisterPersonPrivateAsync(ICallerContext caller, string? invitationToken,
-        string emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
+        string emailAddress, string firstName, string? lastName, string? timezone, string? locale, string? countryCode,
         bool termsAndConditionsAccepted, CancellationToken cancellationToken);
 }

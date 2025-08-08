@@ -23,6 +23,8 @@ public class UserProfile : ReadModelEntity
 
     public Optional<string> LastName { get; set; }
 
+    public Optional<string> Locale { get; set; }
+
     public Optional<string> PhoneNumber { get; set; }
 
     public Optional<string> Timezone { get; set; }

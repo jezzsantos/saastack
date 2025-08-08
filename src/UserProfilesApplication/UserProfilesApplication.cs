@@ -34,8 +34,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
     }
 
     public async Task<Result<UserProfile, Error>> ChangeContactAddressAsync(ICallerContext caller, string userId,
-        string? line1, string? line2,
-        string? line3, string? city, string? state, string? countryCode, string? zipCode,
+        string? line1, string? line2, string? line3, string? city, string? state, string? countryCode, string? zipCode,
         CancellationToken cancellationToken)
     {
         if (userId != caller.CallerId)
@@ -91,7 +90,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
     }
 
     public async Task<Result<UserProfile, Error>> ChangeProfileAsync(ICallerContext caller, string userId,
-        string? firstName, string? lastName, string? displayName, string? phoneNumber, string? timezone,
+        string? firstName, string? lastName, string? displayName, string? phoneNumber, string? timezone, string? locale,
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
@@ -152,7 +151,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
                 return phoned.Error;
             }
         }
-
+        
         if (timezone.HasValue())
         {
             var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
@@ -161,10 +160,25 @@ public partial class UserProfilesApplication : IUserProfilesApplication
                 return tz.Error;
             }
 
-            var timezoned = profile.SetTimezone(caller.ToCallerId(), tz.Value);
+            var timezoned = profile.ChangeTimezone(caller.ToCallerId(), tz.Value);
             if (timezoned.IsFailure)
             {
                 return timezoned.Error;
+            }
+        }
+
+        if (locale.HasValue())
+        {
+            var loc = Locale.Create(locale);
+            if (loc.IsFailure)
+            {
+                return loc.Error;
+            }
+
+            var localed = profile.ChangeLocale(caller.ToCallerId(), loc.Value);
+            if (localed.IsFailure)
+            {
+                return localed.Error;
             }
         }
 
@@ -438,6 +452,7 @@ internal static class UserProfileConversionExtensions
             PhoneNumber = profile.PhoneNumber.ValueOrDefault!,
             Address = profile.Address.ToAddress(),
             Timezone = profile.Timezone.Code.ToString(),
+            Locale = profile.Locale.Code.ToString(),
             AvatarUrl = profile.Avatar.HasValue
                 ? profile.Avatar.Value.Url
                 : null
@@ -453,6 +468,7 @@ internal static class UserProfileConversionExtensions
             [UsageConstants.Properties.Name] = profile.Name.Value.FullName.Text,
             [UsageConstants.Properties.Classification] = profile.Type.ToString(),
             [UsageConstants.Properties.Timezone] = profile.Timezone.Code.ToString(),
+            [UsageConstants.Properties.Locale] = profile.Locale.Code.ToString(),
             [UsageConstants.Properties.CountryCode] = profile.Address.CountryCode.ToString()
         };
         if (profile.EmailAddress.HasValue)

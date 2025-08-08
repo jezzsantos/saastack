@@ -36,6 +36,11 @@ public class RegisterPersonPasswordRequestValidator : AbstractValidator<Register
             .Matches(CommonValidations.Timezone)
             .WithMessage(Resources.RegisterAnyRequestValidator_InvalidTimezone)
             .When(req => req.Timezone.HasValue());
+        RuleFor(req => req.Locale)
+            .NotEmpty()
+            .Matches(CommonValidations.Locale)
+            .WithMessage(Resources.RegisterAnyRequestValidator_InvalidLocale)
+            .When(req => req.Locale.HasValue());
         RuleFor(req => req.CountryCode)
             .NotEmpty()
             .Matches(CommonValidations.CountryCode)

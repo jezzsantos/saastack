@@ -61,8 +61,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
     public async Task WhenAuthenticateAndPersonExistsButNotRegisteredYet_ThenIssuesToken()
     {
         var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-            Timezones.Default,
-            CountryCodes.Default);
+            Timezones.Default, Locales.Default, CountryCodes.Default);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
@@ -116,7 +115,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             sps.FindUserByProviderAsync(_caller.Object, "aprovidername", authUserInfo, It.IsAny<CancellationToken>()));
         _endUsersService.Verify(
             eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
             sps => sps.SaveInfoOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
@@ -134,8 +134,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
     public async Task WhenAuthenticateAndPersonIsSuspended_ThenIssuesToken()
     {
         var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-            Timezones.Default,
-            CountryCodes.Default);
+            Timezones.Default, Locales.Default, CountryCodes.Default);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(),
@@ -188,7 +187,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             sps.FindUserByProviderAsync(_caller.Object, "aprovidername", authUserInfo, It.IsAny<CancellationToken>()));
         _endUsersService.Verify(
             eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
             sps => sps.SaveInfoOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
@@ -206,8 +206,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
     public async Task WhenAuthenticateAndPersonNotExists_ThenRegistersPersonAndIssuesToken()
     {
         var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-            Timezones.Sydney,
-            CountryCodes.Australia);
+            Timezones.Sydney, Locales.Default, CountryCodes.Australia);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -218,6 +217,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             .ReturnsAsync(Optional.None<SSOUser>());
         _endUsersService.Setup(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EndUserWithProfile
             {
@@ -274,7 +274,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
         _ssoProvidersService.Verify(sps =>
             sps.FindUserByProviderAsync(_caller.Object, "aprovidername", authUserInfo, It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", null, Timezones.Sydney.ToString(), CountryCodes.Australia.ToString(),
+            "auser@company.com", "afirstname", null, Timezones.Sydney.ToString(), Locales.Default.ToString(),
+            CountryCodes.Australia.ToString(),
             true, It.IsAny<CancellationToken>()));
         _ssoProvidersService.Verify(sps => sps.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername",
             "aregistereduserid".ToId(),
@@ -289,8 +290,7 @@ public class NativeIdentityServerSingleSignOnServiceSpec
     public async Task WhenAuthenticateAndPersonExists_ThenIssuesToken()
     {
         var authUserInfo = new SSOAuthUserInfo(new List<AuthToken>(), "auid", "auser@company.com", "afirstname", null,
-            Timezones.Default,
-            CountryCodes.Default);
+            Timezones.Default, Locales.Default, CountryCodes.Default);
         _ssoProvidersService.Setup(sps =>
                 sps.AuthenticateUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -356,7 +356,8 @@ public class NativeIdentityServerSingleSignOnServiceSpec
             sps.FindUserByProviderAsync(_caller.Object, "aprovidername", authUserInfo, It.IsAny<CancellationToken>()));
         _endUsersService.Verify(
             eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(sps => sps.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername",
             "anexistinguserid".ToId(),

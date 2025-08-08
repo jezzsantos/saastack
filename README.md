@@ -20,13 +20,13 @@ Skip the startup trap:
 - ❌ Rushing forward on a fragile foundation, that is insecure, and has no observability
 - ❌ Building a monolith destined for a rewrite next year
 
-SaaStack is opinionated but it is also flexible and extensible and real-world, not a sample. Since it is a codebase and not a nuget package, you never get boxed inside it waiting for someone else to improve for you.
-- ✅ It’s already battle-tested in several live SaaS companies -you benefit from their hard fought learnings.
-- ✅ It’s cloud-ready (Azure or AWS). It is easily extensible to work with your specific 3rd party providers
-- ✅ It does NOT lock you into someone else's framework. You own it from the start. With extensive docs and regression tests to guide you as you evolve it.
-- ✅ This isn’t a NuGet package. It’s not a toy demo, its not a sample. It’s a full launchpad for serious builders who want to have a full product from day one.
+SaaStack is opinionated, but it is also flexible and extensible and real-world, not a sample. Since it is a codebase and not a nuget package, you never get boxed inside it waiting for someone else to improve for you.
+- ✅ It’s already battle-tested in several live SaaS companies - you benefit from their in-the-wild learnings.
+- ✅ It’s cloud-ready (Azure or AWS). It is easily extensible to work with your specific 3rd party providers, plug and play.
+- ✅ It does NOT lock you into someone else's framework, and you won't have to plea with them, nor send a PR to update it for you. You own it from the start. With extensive docs and regression tests to guide you as you evolve it, that ensure you don't break anything.
+- ✅ This isn’t a NuGet package. It’s not a toy demo, it's not a code sample. It’s a fully deployable product for serious builders who want to have a full system from day one.
 
-To be useful now and into the future, and guard against the future problems of scalaing your business, the codebase employs and demonstrates several common architectural styles that you are going to need in your product, such as:
+To be useful now and into the future, and guard against the future problems of scaling your business, the codebase employs and demonstrates several common architectural styles that you are going to need in your product, such as:
 
 * [A Pluggable Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to microservices later when, and if, you need to
 * [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) all have the same principles - low-coupling, high-cohesion, a shareable and protected domain at the center
@@ -63,7 +63,7 @@ Yes, 150 projects! Why? because the world has moved on.
 
 If you are used to cramming in all your code into one or three assemblies for your API, then you are not managing dependencies very well at all.
 
-Even if you think you are, your favorite IDE makes it far too easy to violate decoupling rules, just by adding a `using` statement to some type, you are inadvertently adding dangerous coupling. Then, later down the track, when scaling out becomes an issue, how will you factor out that code from that tight set of assemblies into another deployable unit, when the code is all tangled up with all the rest of that code? You can't. That's why we have automated tests, and a bunch Roslyn rules to stop you accidently creating *accidental complexity* for the sake of expediency.
+Even if you think you are, your favorite IDE makes it far too easy to violate decoupling rules, just by adding a `using` statement to some type, you are inadvertently adding dangerous coupling. Then, later down the track, when scaling out becomes an issue, how will you factor out that code from that tight set of assemblies into another deployable unit, when the code is all tangled up with all the rest of that code? You can't. That's why we have automated tests, and a bunch Roslyn rules to stop you accidentally creating *accidental complexity* for the sake of expediency.
 
 Instead, what you will want at that time is a codebase structure with a very intentional separation of "modules" and separate deployable units. That are designed to be separated. These "modules" are best contained across assemblies that are explicitly separated in layers, and backed by tooling to enforce that separation, and enforce the decoupling of types - to avoid the spaghetti code that is always ahead of your team today and tomorrow.
 

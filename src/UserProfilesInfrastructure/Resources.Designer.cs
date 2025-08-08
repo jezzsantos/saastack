@@ -150,6 +150,15 @@ namespace UserProfilesInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Locale&apos; is invalid.
+        /// </summary>
+        internal static string ChangeProfileRequestValidator_InvalidLocale {
+            get {
+                return ResourceManager.GetString("ChangeProfileRequestValidator_InvalidLocale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;PhoneNumber&apos; is invalid.
         /// </summary>
         internal static string ChangeProfileRequestValidator_InvalidPhoneNumber {

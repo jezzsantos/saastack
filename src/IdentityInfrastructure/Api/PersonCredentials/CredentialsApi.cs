@@ -75,8 +75,8 @@ public class CredentialsApi : IWebApiService
     {
         var credential = await _personCredentialsApplication.RegisterPersonAsync(_callerFactory.Create(),
             request.InvitationToken, request.FirstName!, request.LastName!, request.EmailAddress!, request.Password!,
-            request.Timezone,
-            request.CountryCode, request.TermsAndConditionsAccepted, cancellationToken);
+            request.Timezone, request.Locale, request.CountryCode, request.TermsAndConditionsAccepted,
+            cancellationToken);
 
         return () => credential.HandleApplicationResult<PersonCredential, RegisterPersonCredentialResponse>(creds =>
             new PostResult<RegisterPersonCredentialResponse>(new RegisterPersonCredentialResponse { Person = creds }));

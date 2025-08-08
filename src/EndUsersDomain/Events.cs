@@ -195,6 +195,7 @@ public static class Events
                 FirstName = userProfile.Name.FirstName,
                 LastName = userProfile.Name.LastName.ValueOrDefault!,
                 Timezone = userProfile.Timezone.ToString(),
+                Locale = userProfile.Locale.ToString(),
                 CountryCode = userProfile.Address.CountryCode.ToString()
             }
         };

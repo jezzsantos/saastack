@@ -120,12 +120,14 @@ internal static class MicrosoftSSOAuthenticationProviderExtensions
         var firstName = GetFirstNameFromClaims(claims);
         var lastName = GetLastNameFromClaims(claims);
         var timezone = Timezones.Gmt; // Note, we cannot reliably derive the users timezone from these claims!
+        var locale =
+            Locales.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForLocale).Value);
         var countryCode = claims.FirstOrDefault(c => c.Type == MicrosoftIdentityClaims.Country)?.Value
                           ?? claims.FirstOrDefault(c => c.Type == MicrosoftIdentityClaims.TenantCountry)?.Value
                           ?? CountryCodes.Default.ToString();
         var country = CountryCodes.FindOrDefault(countryCode);
 
-        return new SSOAuthUserInfo(tokens, oId, emailAddress, firstName, lastName, timezone, country);
+        return new SSOAuthUserInfo(tokens, oId, emailAddress, firstName, lastName, timezone, locale, country);
     }
 
     private static string GetFirstNameFromClaims(List<Claim> claims)

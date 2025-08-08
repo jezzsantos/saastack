@@ -81,6 +81,15 @@ public static class Events
         };
     }
 
+    public static LocaleChanged LocaleChanged(Identifier id, Identifier userId, Locale locale)
+    {
+        return new LocaleChanged(id)
+        {
+            UserId = userId,
+            Locale = locale.Code.ToString()
+        };
+    }
+
     public static NameChanged NameChanged(Identifier id, Identifier userId, PersonName name)
     {
         return new NameChanged(id)

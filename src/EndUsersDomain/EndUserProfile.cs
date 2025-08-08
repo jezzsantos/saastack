@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
@@ -9,8 +10,7 @@ namespace EndUsersDomain;
 public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
 {
     public static Result<EndUserProfile, Error> Create(string firstName, string? lastName = null,
-        string? timezone = null,
-        string? countryCode = null)
+        string? timezone = null, string? locale = null, string? countryCode = null)
     {
         var name = PersonName.Create(firstName, lastName);
         if (name.IsFailure)
@@ -24,23 +24,32 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
             return tz.Error;
         }
 
+        var loc = Locale.Create(Locales.FindOrDefault(locale));
+        if (loc.IsFailure)
+        {
+            return loc.Error;
+        }
+
         var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
         if (address.IsFailure)
         {
             return address.Error;
         }
 
-        return new EndUserProfile(name.Value, tz.Value, address.Value);
+        return new EndUserProfile(name.Value, tz.Value, loc.Value, address.Value);
     }
 
-    private EndUserProfile(PersonName name, Timezone timezone, Address address)
+    private EndUserProfile(PersonName name, Timezone timezone, Locale locale, Address address)
     {
         Name = name;
         Timezone = timezone;
+        Locale = locale;
         Address = address;
     }
 
     public Address Address { get; }
+
+    public Locale Locale { get; }
 
     public PersonName Name { get; }
 
@@ -54,12 +63,15 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
             var parts = RehydrateToList(property, false);
             return new EndUserProfile(PersonName.Rehydrate()(parts[0]!, container),
                 Timezone.Rehydrate()(parts[1]!, container),
+                parts[3].HasValue()
+                    ? Locale.Rehydrate()(parts[3]!, container)
+                    : Locale.Create(Locales.Default).Value, //for backwards compatibility
                 Address.Rehydrate()(parts[2]!, container));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Name, Timezone, Address };
+        return new object[] { Name, Timezone, Address, Locale };
     }
 }

@@ -32,6 +32,10 @@ public class ChangeProfileRequestValidator : AbstractValidator<ChangeProfileRequ
             .Matches(Validations.PhoneNumber)
             .When(req => req.PhoneNumber.HasValue())
             .WithMessage(Resources.ChangeProfileRequestValidator_InvalidPhoneNumber);
+        RuleFor(req => req.Locale)
+            .Matches(CommonValidations.Locale)
+            .When(req => req.Locale.HasValue())
+            .WithMessage(Resources.ChangeProfileRequestValidator_InvalidLocale);
         RuleFor(req => req.Timezone)
             .Matches(Validations.Timezone)
             .When(req => req.Timezone.HasValue())
