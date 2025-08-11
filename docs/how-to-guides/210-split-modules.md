@@ -24,13 +24,13 @@ Start by creating another API Host project in the solution (like `ApiHost1` proj
 
 Your new host project will be configured to run at `https://localhost:5002`.
 
-> If this is your third or more host project, you need to update this port to be different than all your other API Host projects.
+> If this is your third or more host project, you need to update this port to be different from all your other API Host projects.
 
 Review and change this port number in the `Properties/launchsettings.json` file of your new project, for all profiles.
 
 ### Host Type
 
-The first thing to do is open the `Program.cs` file and double check the `WebHostOptions.BackEndHostApi` setting, is right for you for this host.
+The first thing to do is open the `Program.cs` file and double-check the `WebHostOptions.BackEndHostApi` setting, is right for you for this host.
 
 > If you are simply splitting you API into different modules, then `WebHostOptions.BackEndHostApi` is the correct choice, as long as you are not splitting out the Ancillary submodule. Notice that the `Progra,.cs` of the `ApiHost1` project is `WebHostOptions.BackEndAncillaryApiHost`.
 
@@ -38,7 +38,7 @@ The first thing to do is open the `Program.cs` file and double check the `WebHos
 
 Next thing to do is to plug in your subdomain modules into the `HostedModules.cs` file.
 
-Extract out of the `ApiHost1` project and move them into you r new host project. 
+Extract out of the `ApiHost1` project and move them into your new host project. 
 
 > Ensure that you maintain the same ordering, as some of these modules have dependencies on others.
 
@@ -89,24 +89,23 @@ To ensure this mechanism is operational for your new host project, you need to m
 
 1. Your selected `WebHostOptions` (in `Program.cs`) has `UsesEventing=true`. 
 
-   1. During startup of your new host, the `IDomainEventingSubscriberService` will discover all `IDomainEventNotificationConsumer` implementations in all of the assemblies of all of your modules, and then those consumers will be automatically registered with the Message Bus dynamically.
+   1. During startup of your new host, the `IDomainEventingSubscriberService` will discover all `IDomainEventNotificationConsumer` implementations in all the assemblies of all of your modules, and then those consumers will be automatically registered with the Message Bus dynamically.
 
 2. You need to manually add the generated Azure Functions/AWS Lambdas triggers that have been generated for your new host project.
 
    1. These generated functions/lambdas are responsible for connecting to the Message Bus and relaying the notifications to your `EventingNotificationsModule` API that should be one of the modules in your new host project.
 
-   2. Edit the *.csproj file of either the `AzureFunctions.Api.WorkerHost` project (or the `AWSLambdas.Api.WorkerHost` project. Which ever one you are using) and add the following XML to alongside the existing XML for the existing ApiHost1 workers:
+   2. Edit the *.csproj file of either the `AzureFunctions.Api.WorkerHost` project (or the `AWSLambdas.Api.WorkerHost` project. Whichever one you are using) and add the following XML to alongside the existing XML for the existing ApiHost1 workers:
 
       ```xml
       <Compile Include="..\ApiHost2\Generated\Tools.Generators.Workers\Tools.Generators.Workers.WorkerGenerator\ApiHost2_DeliverDomainEvents.g.cs">
           <Link>Functions/ApiHost2_DeliverDomainEvents.g.cs</Link>
       </Compile>
       ```
-      
 
-3. You need to add configuration to the `appsettings.json` file of the `AzureFunctions.Api.WorkerHost` project (or the `AWSLambdas.Api.WorkerHost` project. 
+3. You need to add configuration to the `appsettings.json` file of the `AzureFunctions.Api.WorkerHost` project (or the `AWSLambdas.Api.WorkerHost` project). 
 
-   1. Edit `appsettings.json`, and add a new key to the `Hosts` section, and then add the name of the host to the key `Hosts:EventNotificationApi` in a semi-colon list. For example:
+   1. Edit `appsettings.json`, and add a new key to the `Hosts` section, and then add the name of the host to the key `Hosts:EventNotificationApi` in a semicolon list. For example:
 
    ```json
      "Hosts": {
@@ -122,4 +121,4 @@ To ensure this mechanism is operational for your new host project, you need to m
 
 ### CI/CD
 
-1. Edit the relevant `deploy-azure` (or `deploy-aws.yml`) scripts, and add your new host to the deploy steps.
+1. Edit the relevant `deploy-azure` (or `deploy-aws.yml`) scripts, and add your new host to the deployment steps.

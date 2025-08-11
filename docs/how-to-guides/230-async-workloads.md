@@ -2,9 +2,9 @@
 
 ## Why?
 
-In some use cases, we need to process a multi-step or long running workflow, and/or it involves 3rd party services (over HTTP) to process the data.
+In some use cases, we need to process a multistep or long-running workflow, and/or it involves 3rd party services (over HTTP) to process the data.
 
-Attempting to do these kinds of processing synchronously, and increasing up the API response times, and loading up servers memory and resources, and then risking handling unreliable calls over HTTP (with retries, and backoffs, and timeouts), trying to ignore the very real [Fallacies of Distributed Computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing), and doing that all within the span of a a few hundred milliseconds, is pretty risky in many cases.
+Attempting to do these kinds of processing synchronously, and increasing up the API response times, and loading up servers memory and resources, and then risking handling unreliable calls over HTTP (with retries, and back-offs, and timeouts), trying to ignore the very real [Fallacies of Distributed Computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing), and doing that all within the span of a few hundred milliseconds, is pretty risky in many cases.
 
 Where there are API calls that can be offloaded, they should be offloaded to asynchronous workloads, so that the API request can return as soon as possible AND as a bonus the asynchronous processing can be made "reliable".
 
@@ -33,7 +33,7 @@ In general, asynchronous workloads must be processed with reliable mechanisms, s
 
 Reliability is always critically important in asynchronous workloads. These workloads must handle failures properly, and they often deal with remote systems that may or may not be available at the time they are consumed.
 
-These reliable mechanisms need to both deal with intermittent faults (viz: [Fallacies of Distributed Computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing), and also deal with persistent failures too. For example, the current code has not been designed correctly, or is broken. Patterns like "poison queues/dead-lettering", and "[circuit breaker](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker)" are common considerations, so that errors can be reliably diagnosed and resolved properly without losing data.
+These reliable mechanisms need to both deal with intermittent faults (viz: [Fallacies of Distributed Computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing)), and also deal with persistent failures too. For example, the current code has not been designed correctly, or is broken. Patterns like "poison queues/dead-lettering", and "[circuit breaker](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker)" are common considerations, so that errors can be reliably diagnosed and resolved properly without losing data.
 
 The outcome of using these reliable mechanisms is that the data causing errors (transient or permanent) is preserved so that the messages that caused the problem can be attempted reliably again later, once a problem has been resolved. 
 
@@ -102,7 +102,7 @@ These workloads have these characteristics:
 * Order in delivery is critical. The consumers of these subscription MUST receive events in precisely the same order they were produced, since the overall state of the system depends exactly on the state before the event was raised.
 
 * Since order is so critical, if a single message fails, it cannot be sidelined into a poison-queue/dead letter queue, otherwise the messages behind it are then handled next, and this results in out of order delivery.
-* Events that occur in this workload will be subscribed to by multiple consumers, who all need to receive the same events, in the same order. Hence the use of topics and subscriptions, as opposed to using FIFO queues and multiple-consumers. When scaled-out, these consumers must still not compete.
+* Events that occur in this workload will be subscribed to by multiple consumers, who all need to receive the same events, in the same order. Hence, the use of topics and subscriptions, as opposed to using FIFO queues and multiple-consumers. When scaled-out, these consumers must still not compete.
 
 - Fault-tolerance is also critical, since many of the consumers participate in longer [sagas](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga). Errors in delivery and completion of workloads is non-negotiable, as otherwise the state of the whole system would easily become corrupted.
 - These workloads operate reliably in "peek-lock" mode, to ensure guaranteed delivery (with timeouts), and also requires mitigation against duplication.

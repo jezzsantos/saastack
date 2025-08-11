@@ -3,8 +3,9 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
+using SubscriptionsApplication;
 
-namespace SubscriptionsApplication.ApplicationServices;
+namespace SubscriptionsInfrastructure.ApplicationServices;
 
 public class SubscriptionsInProcessServiceClient : ISubscriptionsService
 {

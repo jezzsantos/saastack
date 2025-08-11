@@ -15,7 +15,7 @@ In a Terminal:
 Either:
 
 1. Create the new pattern & toolkit  by following the steps below, or,
-2. [Install and Use the toolkit](Toolkit.md#create-a-new-subdomain)  and start using it to create new subdomains in your codebase.
+2. [Install and Use the toolkit](#create-a-new-subdomain)  and start using it to create new subdomains in your codebase.
 
 # Create the Pattern & Toolkit
 
@@ -179,7 +179,7 @@ Each API, can have one or more "Service Operations".
 
 > A Service operation is essentially an HTTP endpoint (or a minimal API).
 
-An endpoint is defined by a request and a response, and has a route, and a HTTP method and some other attributes like authentication scheme and authorization rules, etc. Most service operations also require a request validator.
+An endpoint is defined by a request and a response, and has a route, and an HTTP method and some other attributes like authentication scheme and authorization rules, etc. Most service operations also require a request validator.
 
 Run these commands to define a "Service Operation", as a child of the Subdomain. 
 
@@ -310,7 +310,7 @@ When finished editing all the templates, just save the files.
 
 ## Build Toolkit
 
-Now that we have created the toolkit, its time to publish it for use by your team.
+Now that we have created the toolkit, it's time to publish it for use by your team.
 
 Execute this command:
 

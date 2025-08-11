@@ -22,7 +22,7 @@ Consider the following common scenario.
 5. At some point in time, one of the requests (lets say it is request #2) will try to persist its newly created events, and in order to persist them to the event store, they must be versioned (contiguously) starting with the version AFTER the last event that was loaded in the beginning.
    * In this example, that version is v.35 through to v.38, for the 4 events that request #2 produces.
 6. Now, those events will be persisted correctly to the event store, since they match the versions of the actual existing events already stored in the events store. Request #2 succeeds and exits successfully.
-7. Next, ~100ms later, request #1 tries to save its 3 new events to the event store, and in its case, these new events will need to be be versioned from v.35 through to v.37.
+7. Next, ~100ms later, request #1 tries to save its 3 new events to the event store, and in its case, these new events will need to be versioned from v.35 through to v.37.
    - Again, from the perspective of this request the last loaded event version was v.34.
 
 8. The event store will detect that the latest saved events in the store are now at v.38, not at v.35, and the event store will throw an exception and complain (quite rightly) that the new events will overwrite existing events, and the request #2 will fail with a concurrency problem.
@@ -39,16 +39,16 @@ What has to happen to maintain the integrity of the aggregate for request #1, is
 
 It is important that this concurrency issue is handled correctly and timely, since there are many ways in which this concurrency mechanism can be triggered. 
 
-A common way to reproduce this problem quite frequently is to have clients (of the API) send many requests in parallel. There are many known ways this can happen in a system of this architecture. most happen accidently, for example:
+A common way to reproduce this problem quite frequently is to have clients (of the API) send many requests in parallel. There are many known ways this can happen in a system of this architecture. most happen accidentally, for example:
 
 1. Badly behaved web clients POST at least two requests to affect the same aggregate at the same time. For example, incorrectly use asynchronous programming that inadvertently post HTTP requests for the same resource. i.e. poorly designed JavaScript promises.
 2.  When scaling-out message consumers. In a distributed system, the dreaded "[competing consumers](https://learn.microsoft.com/en-us/azure/architecture/patterns/competing-consumers)" can easily, and inadvertently, be created in all sorts of scenarios. These things will likely create parallel requests to the same resources at the same times. i.e. scaling-out azure functions on FIFO queues, or sometimes scaling out API instances. The combinations of scaling-out different components is sometimes unavoidable. 
 
  Either way, concurrency is a real problem in any system where state is persistence centrally.
 
-We need to take pre-cautions and provide fault tolerant mechanisms to deal with it whenever it happens. It cannot be avoided forever.
+We need to take pre-cautions and provide fault-tolerant mechanisms to deal with it whenever it happens. It cannot be avoided forever.
 
-> Interestingly, concurrency is not just a problem for event-sourced systems, it is also a problem for non-event-sourced systems. For example, in relational databases, concurrency is usually handled by optimistic locking, and can be dealt with with transactions. Nonetheless, errors can happen and need to be retried in some way.
+> Interestingly, concurrency is not just a problem for event-sourced systems, it is also a problem for non-event-sourced systems. For example, in relational databases, concurrency is usually handled by optimistic locking, and can be dealt  with transactions. Nonetheless, errors can happen and need to be retried in some way.
 
 ## Considered Options
 
@@ -61,7 +61,7 @@ The options are:
 `Detect and Fail`
 
 - This option is better than no detection at all. Where data can be corrupted
-- We succeed on the first thread, but fail any others coming after. The state of the system is protected. However the request fails and must be retried somehow, until it succeeds. For user-triggered changes this approach is generally poorly received.
+- We succeed on the first thread, but fail any others coming after. The state of the system is protected. However, the request fails and must be retried somehow, until it succeeds. For user-triggered changes this approach is generally poorly received.
 - It requires the least amount of work, not only in prevention, but also in ongoing maintenance.
 
 ### Consequences

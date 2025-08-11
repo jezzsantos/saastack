@@ -118,7 +118,7 @@ We need to switch from using `IEventSourcingDddCommandStore<TAggregateRoot>` to 
 
    > If your read model entity class is lacking some fields, and you need to add some, you have to figure out how to deal with that at runtime for existing records that already exist in that read model in your current `IDataStore`. 
 
-5. In the module file of your subdomain, it is likely you ned to change how your repository is registered in dependency injection. Before, you would have been registering it like this:
+5. In the module file of your subdomain, it is likely you need to change how your repository is registered in dependency injection. Before, you would have been registering it like this:
 
    ```c#
                    services.AddPerHttpRequest<IMyAggregateRepository, MyAggregateRepository>();

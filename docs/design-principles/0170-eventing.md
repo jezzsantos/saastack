@@ -8,7 +8,7 @@ When we refer to "Eventing" we are describing only the communication of informat
 
 ## Design Principles
 
-1. We want all DDD aggregates to utilize "domain events" to drive use cases. Irrespective of whether we they are persisting their state from events (a.k.a. Event Sourcing) or sourcing/capturing their current state from data snapshots (i.e. traditional record persistence in database tables).
+1. We want all DDD aggregates to utilize "domain events" to drive use cases. Irrespective of whether we are persisting their state from events (a.k.a. Event Sourcing) or sourcing/capturing their current state from data snapshots (i.e. traditional record persistence in database tables).
 2. For [event-sourcing persistence schemes](0070-persistence.md) (that are, by definition, "write models" only), we need to build associated "read models" so that we can query across multiple domain aggregates.
 3. We want the flexibility to add/change our "read models" at any time, as the software changes, and not have lost any original data, and ideally re-create views of the data that are not previously "seen" (nor persisted) in the past.
 4. We want to prioritize denormalized views of data to query for maximum efficiency (i.e., without requiring complex joins, only necessary for optimizing the writing of related data).
@@ -34,7 +34,7 @@ Lack of effective de-coupling (at the technical level) is the main reason most s
 
 There are several fundamental techniques for de-coupling your codebases, including:
 
-1. Separating code into horizontal layers, with well defined concerns (i.e. Infrastructure, Application, and Domain).
+1. Separating code into horizontal layers, with well-defined concerns (i.e. Infrastructure, Application, and Domain).
 2. Separating subdomains into Vertical Slices.
 3. Using ports and adapters and domain specific abstractions.
 4. Starting with a modular monolith, and then decomposing it into separately deployable units (a.k.a., microservices) later, when you need to scale out.

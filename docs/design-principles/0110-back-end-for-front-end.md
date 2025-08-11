@@ -181,7 +181,7 @@ Implementing CSRF protection correctly requires that the JS app adheres to the s
     ```
     var csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute("content");
     ```
-5. The JS app MUST NEVER store the value of the `csrf-token` anywhere in the browser. Neither in-memory, nor in local storage, nor any other cache or store in the JS app. It MUST read the value from the HTML of `index.html` on-demand, each and every time it makes an XHR call since the value of the this token WILL change every time `index.html` is requested from the BEFFE.
+5. The JS app MUST NEVER store the value of the `csrf-token` anywhere in the browser. Neither in-memory, nor in local storage, nor any other cache or store in the JS app. It MUST read the value from the HTML of `index.html` on-demand, each and every time it makes an XHR call since the value of this token WILL change every time `index.html` is requested from the BEFFE.
 
 6. MUST ensure that this `csrf-token` value is never included in any "safe" XHR call (e.g., `GET`, `HEAD`, or `OPTIONS`), and MUST never be exposed in any browser history.
 
