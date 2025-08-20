@@ -439,6 +439,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunctions.Api.WorkerHo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSLambdas.Api.WorkerHost.UnitTests", "AWSLambdas.Api.WorkerHost.UnitTests\AWSLambdas.Api.WorkerHost.UnitTests.csproj", "{CB4547D3-020F-419D-B205-F93A7EE7D45F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Events.Shared.UnitTests", "Domain.Events.Shared.UnitTests\Domain.Events.Shared.UnitTests.csproj", "{A0C12ADC-118B-44CE-B84D-36FBD4312535}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1394,6 +1396,12 @@ Global
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -1600,5 +1608,6 @@ Global
 		{0F4E5C4D-8E37-4542-98F8-CE1B837F2EB5} = {A25A3BA8-5602-4825-9595-2CF96B166920}
 		{A1CFACAA-D10E-4B60-8DF0-D3A07063A7C4} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
 		{CB4547D3-020F-419D-B205-F93A7EE7D45F} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
+		{A0C12ADC-118B-44CE-B84D-36FBD4312535} = {9B6B0235-BD3F-4604-8E93-B0112A241C63}
 	EndGlobalSection
 EndGlobal

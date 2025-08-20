@@ -799,7 +799,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Domain Event must be named in the past tense, as they occured in the past..
+        ///   Looks up a localized string similar to Domain Event should be named in the past tense, as they occured in the past..
         /// </summary>
         internal static string SAASDDD043Description {
             get {
@@ -808,7 +808,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Domain Event &apos;{0}&apos; must be named in the past tense.
+        ///   Looks up a localized string similar to Suspicious: Domain Event &apos;{0}&apos; should be named in the past tense.
         /// </summary>
         internal static string SAASDDD043MessageFormat {
             get {
@@ -817,7 +817,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Domain Event must be named in the past tense.
+        ///   Looks up a localized string similar to Domain Event should be named in the past tense.
         /// </summary>
         internal static string SAASDDD043Title {
             get {

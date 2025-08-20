@@ -8,6 +8,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Events.Shared\Domain.Events.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.External.Persistence.Kurrent\Infrastructure.External.Persistence.Kurrent.csproj" />

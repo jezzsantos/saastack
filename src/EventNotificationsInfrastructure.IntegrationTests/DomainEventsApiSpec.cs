@@ -42,10 +42,12 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
     public async Task WhenNotifyDomainEvent_ThenNotifies()
     {
 #if TESTINGONLY
+#pragma warning disable CS0618 // Type or member is obsolete
         var @event = new Happened
         {
             RootId = "arootid",
-            OccurredUtc = DateTime.UtcNow
+            OccurredUtc = DateTime.UtcNow,
+            Message1 = "amessage1"
         };
         var request = new NotifyDomainEventRequest
         {
@@ -74,6 +76,7 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
         result.Content.Value.IsSent.Should().BeTrue();
         _stubConsumerService.LastEventId.Should().Be("aneventid");
         _stubConsumerService.LastEventSubscriptionName.Should().Be("asubscriptionname");
+#pragma warning restore CS0618 // Type or member is obsolete
 #endif
     }
 

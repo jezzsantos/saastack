@@ -52,7 +52,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASDDD040: Error: DomainEvents must be public
 ///     SAASDDD041: Warning: DomainEvents should be sealed
 ///     SAASDDD042: Error: DomainEvents must have a parameterless constructor
-///     SAASDDD043: Information: DomainEvents must be named in the past tense
+///     SAASDDD043: Information: Domain Event should be named in the past tense
 ///     SAASDDD044: Error: DomainEvents must have at least one Create() class factory method
 ///     SAASDDD045: Error: Create() class factory methods must return correct types
 ///     SAASDDD046: Error: Properties must have public getters and setters
@@ -837,7 +837,7 @@ internal static class DomainDrivenDesignExtensions
         var name = typeSymbol.Name;
 
         //HACK: this will work when using a regular verb, but not when using irregular verbs
-        return name.EndsWith("ed", StringComparison.OrdinalIgnoreCase);
+        return name.IsMatchWith("(ed)([vV][0-9]*){0,1}$");
     }
 
     public static bool IsSingleValueValueObject(this SemanticModel semanticModel,

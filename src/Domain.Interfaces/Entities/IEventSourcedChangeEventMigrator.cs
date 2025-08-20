@@ -9,4 +9,6 @@ namespace Domain.Interfaces.Entities;
 public interface IEventSourcedChangeEventMigrator
 {
     Result<IDomainEvent, Error> Rehydrate(string eventId, string eventJson, string originalEventTypeName);
+
+    Result<IDomainEvent, Error> Rehydrate(string eventId, IDomainEvent domainEvent);
 }

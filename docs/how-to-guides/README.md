@@ -18,6 +18,7 @@
 * [Split your subdomain modules into multiple hosts](210-split-modules.md) - how to split your subdomain modules into multiple hosts and deploy them separately
 * [Convert an Event-Sourced aggregate to a Snapshotting aggregate](220-convert-event-sourced-aggregate-to-snapshot.md)
 * [Async Workloads](230-async-workloads.md) - offload an Asynchronous workload
+* [Migrating Domain Events](910-migrate-domain-events.md) - how to modify existing domain events safely and migrate from one version to another  
 
 ---
 

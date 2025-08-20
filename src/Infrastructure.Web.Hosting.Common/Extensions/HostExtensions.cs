@@ -44,7 +44,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-#if !TESTINGONLY
+#if TESTINGONLY
+using Domain.Events.Shared.TestingOnly;
+
+#else
 #if HOSTEDONAZURE
 using Infrastructure.External.Persistence.Azure.ApplicationServices;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
@@ -507,7 +510,16 @@ public static class HostExtensions
 
             services.AddSingleton<IMessageQueueMessageIdFactory, MessageQueueMessageIdFactory>();
             services.AddSingleton<IMessageBusTopicMessageIdFactory, MessageBusTopicMessageIdFactory>();
-            services.AddSingleton<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
+            services.AddSingleton<IEventSourcedChangeEventMigrator>(_ => new ChangeEventTypeMigrator(
+                new Dictionary<Type, Type>
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    //EXTEND: Add your other domain event migrations here
+#if TESTINGONLY
+                    { typeof(Happened), typeof(HappenedV2) }
+#endif
+#pragma warning restore CS0618 // Type or member is obsolete
+                }));
 #if TESTINGONLY
             TestingOnlyHostExtensions.RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else

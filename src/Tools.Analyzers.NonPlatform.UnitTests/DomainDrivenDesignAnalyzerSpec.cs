@@ -2,7 +2,7 @@ extern alias NonPlatformAnalyzers;
 using NonPlatformAnalyzers::Domain.Interfaces.ValueObjects;
 using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
-using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
+using NonPlatform_DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
@@ -22,7 +22,7 @@ public sealed class AClass : IWebApiService
 {
 }";
 
-            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ public sealed class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ public sealed class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ public sealed class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
         }
     }
 
@@ -103,8 +103,8 @@ public sealed class AClass : AggregateRootBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule010, input, 11,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule010, input, 11,
                     21,
                     "AClass");
             }
@@ -148,8 +148,8 @@ public sealed class AClass : AggregateRootBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule010, input, 11,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule010, input, 11,
                     21,
                     "AClass");
             }
@@ -212,7 +212,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -276,8 +276,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule011, input, 33,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule011, input, 33,
                     24,
                     "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -340,8 +340,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule011, input, 33,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule011, input, 33,
                     26,
                     "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -404,7 +404,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -465,7 +465,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -512,10 +512,10 @@ public sealed class AClass : AggregateRootBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule012, input, 32,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule012, input, 32,
                     26,
-                    "Create", DomainDrivenDesignAnalyzer.ConstructorMethodCall);
+                    "Create", NonPlatform_DomainDrivenDesignAnalyzer.ConstructorMethodCall);
             }
 
             [Fact]
@@ -576,7 +576,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -641,8 +641,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule013, input, 14,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule013, input, 14,
                     12, "AClass");
             }
 
@@ -704,7 +704,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -755,8 +755,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule014, input, 8,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule014, input, 8,
                     21,
                     "AClass");
             }
@@ -820,7 +820,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -887,8 +887,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule015, input, 14,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule015, input, 14,
                     21, "AClass");
             }
 
@@ -958,7 +958,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1030,8 +1030,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule016, input, 14,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule016, input, 14,
                     21,
                     "AClass");
             }
@@ -1102,7 +1102,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1169,8 +1169,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule017, input, 40,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule017, input, 40,
                     19, "AProperty");
             }
 
@@ -1234,7 +1234,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1297,7 +1297,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1360,7 +1360,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1427,8 +1427,8 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule018, input, 12,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule018, input, 12,
                     14, "AClass");
             }
 
@@ -1492,7 +1492,7 @@ public sealed class EventOccurred : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
     }
@@ -1526,8 +1526,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule020, input, 9,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule020, input, 9,
                     21, "AClass");
             }
 
@@ -1558,8 +1558,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule020, input, 9,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule020, input, 9,
                     21,
                     "AClass");
             }
@@ -1593,7 +1593,7 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1628,8 +1628,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule021, input, 21,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule021, input, 21,
                     24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1662,8 +1662,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule021, input, 21,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule021, input, 21,
                     26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1696,7 +1696,7 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1728,7 +1728,7 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1764,8 +1764,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule022, input, 12,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule022, input, 12,
                     12, "AClass");
             }
 
@@ -1798,7 +1798,7 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1849,8 +1849,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule023, input, 16,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule023, input, 16,
                     21, "AClass");
             }
 
@@ -1903,7 +1903,7 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1954,8 +1954,8 @@ public sealed class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule024, input, 16,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule024, input, 16,
                     21, "AClass");
             }
 
@@ -2007,7 +2007,7 @@ public sealed class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2061,8 +2061,8 @@ public sealed class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule025, input, 15,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule025, input, 15,
                     21,
                     "AClass");
             }
@@ -2115,7 +2115,7 @@ public sealed class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2154,8 +2154,8 @@ public sealed class AClass : EntityBase
     public string AProperty { get;set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule026, input, 27,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule026, input, 27,
                     19, "AProperty");
             }
 
@@ -2191,7 +2191,7 @@ public sealed class AClass : EntityBase
     public string AProperty { get; private set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2226,7 +2226,7 @@ public sealed class AClass : EntityBase
     public string AProperty => string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2261,7 +2261,7 @@ public sealed class AClass : EntityBase
     public string AProperty { get; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2300,8 +2300,8 @@ public class AClass : EntityBase
     public string AProperty { get; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule027, input, 11,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule027, input, 11,
                     14, "AClass");
             }
 
@@ -2337,7 +2337,7 @@ public sealed class AClass : EntityBase
     public string AProperty { get; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
     }
@@ -2381,8 +2381,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule030, input, 11,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule030, input, 11,
                     21, "AClass");
             }
 
@@ -2424,8 +2424,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule030, input, 11,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule030, input, 11,
                     21, "AClass");
             }
 
@@ -2468,7 +2468,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2513,8 +2513,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule031, input, 19,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule031, input, 19,
                     24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2557,8 +2557,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule031, input, 19,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule031, input, 19,
                     26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2601,7 +2601,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2643,7 +2643,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2689,8 +2689,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule032, input, 14,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule032, input, 14,
                     12, "AClass");
             }
 
@@ -2733,7 +2733,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2774,8 +2774,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule033, input, 12,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule033, input, 12,
                     21, "AClass");
             }
 
@@ -2819,7 +2819,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2866,8 +2866,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get;set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule034, input, 35,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule034, input, 35,
                     19, "AProperty");
             }
 
@@ -2911,7 +2911,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get; private set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2953,7 +2953,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty => string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2996,7 +2996,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     public string AProperty { get; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -3047,8 +3047,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule035, input, 37,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule035, input, 37,
                     17, "AMethod",
                     "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
@@ -3099,8 +3099,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule035, input, 37,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule035, input, 37,
                     19, "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
             }
@@ -3151,7 +3151,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3201,7 +3201,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3249,7 +3249,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3297,7 +3297,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -3349,8 +3349,8 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule036, input, 13,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule036, input, 13,
                     14, "AClass");
             }
 
@@ -3399,7 +3399,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -3453,8 +3453,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule037, input, 37,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule037, input, 37,
                     20, "AnotherProperty", "String");
             }
 
@@ -3505,7 +3505,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -3553,7 +3553,7 @@ public sealed class AClass : SingleValueObjectBase<AClass, string>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3609,7 +3609,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3659,7 +3659,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3709,8 +3709,8 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule038, input, 25,
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule038, input, 25,
                     45, "GetAtomicValues", "AnotherProperty");
             }
 
@@ -3768,7 +3768,7 @@ public enum AnEnum
 }
 ";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3825,7 +3825,7 @@ public static class ExtensionMethods
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3882,7 +3882,7 @@ public static class StaticMethods
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3937,7 +3937,7 @@ public class AType
 }
 ";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -3987,7 +3987,7 @@ public sealed class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
     }
@@ -4021,7 +4021,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -4051,8 +4051,8 @@ internal sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule040, input, 5, 23, "AClassed");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule040, input, 5, 23, "AClassed");
             }
         }
 
@@ -4082,8 +4082,8 @@ public class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule041, input, 5, 14, "AClassed");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule041, input, 5, 14, "AClassed");
             }
         }
 
@@ -4119,8 +4119,8 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
             }
 
             [Fact]
@@ -4152,8 +4152,8 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
             }
 
             [Fact]
@@ -4185,7 +4185,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -4215,8 +4215,61 @@ public sealed class AClass : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule043, input, 5, 21, "AClass");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule043, input, 5, 21, "AClass");
+            }
+
+            [Fact]
+            public async Task WhenNotNamedInThePastTenseAndVersioned_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassV2 : IDomainEvent
+{
+    public static AClassV2 Create()
+    {
+        return new AClassV2
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule043, input, 5, 21, "AClassV2");
+            }
+
+            [Fact]
+            public async Task WhenNamedInThePastTenseAndVersioned_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassedV2 : IDomainEvent
+{
+    public static AClassedV2 Create()
+    {
+        return new AClassedV2
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4242,7 +4295,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -4268,8 +4321,8 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule045, input, 7, 26, "Create", "ANamespace.AClassed");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule045, input, 7, 26, "Create", "ANamespace.AClassed");
             }
         }
 
@@ -4301,8 +4354,8 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule046, input, 20, 20, "AProperty", null);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule046, input, 20, 20, "AProperty", null);
             }
         }
 
@@ -4334,8 +4387,8 @@ public sealed class AClassed : IDomainEvent
     public string AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule047, input, 20, 19, "AProperty");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule047, input, 20, 19, "AProperty");
             }
 
             [Fact]
@@ -4364,7 +4417,7 @@ public sealed class AClassed : IDomainEvent
     public required string AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4392,7 +4445,7 @@ public sealed class AClassed : IDomainEvent
     public string AProperty { get; set; } = string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4420,7 +4473,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4449,7 +4502,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4477,7 +4530,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; } = string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4506,7 +4559,7 @@ public sealed class AClassed : IDomainEvent
     public required string AProperty { get; set; } = string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4534,7 +4587,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; } = string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4563,7 +4616,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; } = string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4591,8 +4644,8 @@ public sealed class AClassed : IDomainEvent
     public DateTime AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule047, input, 20, 21, "AProperty");
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule047, input, 20, 21, "AProperty");
             }
 
             [Fact]
@@ -4621,7 +4674,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4649,7 +4702,7 @@ public sealed class AClassed : IDomainEvent
     public DateTime AProperty { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4677,7 +4730,7 @@ public sealed class AClassed : IDomainEvent
     public DateTime? AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4706,7 +4759,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime? AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4734,7 +4787,7 @@ public sealed class AClassed : IDomainEvent
     public DateTime? AProperty { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4763,7 +4816,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime AProperty { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4791,7 +4844,7 @@ public sealed class AClassed : IDomainEvent
     public DateTime? AProperty { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4820,7 +4873,7 @@ public sealed class AClassed : IDomainEvent
     public required DateTime? AProperty { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4852,7 +4905,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4885,7 +4938,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4917,7 +4970,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4949,7 +5002,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -4982,7 +5035,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5014,7 +5067,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5047,7 +5100,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5079,7 +5132,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5112,7 +5165,7 @@ public enum AnEnum
     AValue
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -5146,9 +5199,9 @@ public sealed class AClassed : IDomainEvent
     public required Optional<string> AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(input,
-                    (DomainDrivenDesignAnalyzer.Rule048, 22, 38, "AProperty", null),
-                    (DomainDrivenDesignAnalyzer.Rule049, 22, 38, "AProperty", [GivenRule049.AllTypes]));
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input,
+                    (NonPlatform_DomainDrivenDesignAnalyzer.Rule048, 22, 38, "AProperty", null),
+                    (NonPlatform_DomainDrivenDesignAnalyzer.Rule049, 22, 38, "AProperty", [GivenRule049.AllTypes]));
             }
 
             [Fact]
@@ -5177,7 +5230,7 @@ public sealed class AClassed : IDomainEvent
     public string? AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -5213,8 +5266,8 @@ public sealed class AClassed : IDomainEvent
     public required char AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule049, input, 21, 26, "AProperty", AllTypes);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule049, input, 21, 26, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -5244,8 +5297,8 @@ public sealed class AClassed : IDomainEvent
     public required List<char> AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 32, "AProperty", AllTypes);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule049, input, 22, 32, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -5275,8 +5328,8 @@ public sealed class AClassed : IDomainEvent
     public required Dictionary<string, char> AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -5306,8 +5359,8 @@ public sealed class AClassed : IDomainEvent
     public required Dictionary<char, string> AProperty { get; set; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -5336,7 +5389,7 @@ public sealed class AClassed : IDomainEvent
     public required string AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5369,7 +5422,7 @@ public enum AnEnum
 }
 ";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5399,7 +5452,7 @@ public sealed class AClassed : IDomainEvent
     public required List<string> AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5429,7 +5482,7 @@ public sealed class AClassed : IDomainEvent
     public required Dictionary<string, int> AProperty { get; set; }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5467,7 +5520,7 @@ namespace Domain.Events.Shared
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5505,7 +5558,7 @@ namespace Domain.Events.Shared
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -5539,8 +5592,8 @@ public class ADto
     public string AProperty { get; }
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 26, "AProperty", AllTypes);
+                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
+                    NonPlatform_DomainDrivenDesignAnalyzer.Rule049, input, 22, 26, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -5582,7 +5635,7 @@ namespace AnOtherNamespace
     }
 }";
 
-                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
             }
         }
     }

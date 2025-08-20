@@ -17,6 +17,12 @@ public class ChangeEventTypeMigrator : IEventSourcedChangeEventMigrator
     {
     }
 
+    public ChangeEventTypeMigrator(Dictionary<Type, Type> typeNameMappings)
+    {
+        _typeNameMappings = typeNameMappings.ToDictionary(pair => pair.Key.AssemblyQualifiedName!,
+            pair => pair.Value.AssemblyQualifiedName!);
+    }
+
     public ChangeEventTypeMigrator(Dictionary<string, string> typeNameMappings)
     {
         _typeNameMappings = typeNameMappings;
@@ -40,5 +46,12 @@ public class ChangeEventTypeMigrator : IEventSourcedChangeEventMigrator
         }
 
         return new Result<IDomainEvent, Error>(eventJson.FromEventJson(eventType));
+    }
+
+    public Result<IDomainEvent, Error> Rehydrate(string eventId, IDomainEvent domainEvent)
+    {
+        var json = domainEvent.ToEventJson();
+        var typeName = domainEvent.GetType().AssemblyQualifiedName!;
+        return Rehydrate(eventId, json, typeName);
     }
 }

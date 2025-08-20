@@ -380,13 +380,13 @@
         <value>Missing property assignment</value>
     </data>
     <data name="SAASDDD043Description" xml:space="preserve">
-        <value>Domain Event must be named in the past tense, as they occured in the past.</value>
+        <value>Domain Event should be named in the past tense, as they occured in the past.</value>
     </data>
     <data name="SAASDDD043MessageFormat" xml:space="preserve">
-        <value>Domain Event '{0}' must be named in the past tense</value>
+        <value>Suspicious: Domain Event '{0}' should be named in the past tense</value>
     </data>
     <data name="SAASDDD043Title" xml:space="preserve">
-        <value>Domain Event must be named in the past tense</value>
+        <value>Domain Event should be named in the past tense</value>
     </data>
     <data name="SAASDDD044Description" xml:space="preserve">
         <value>DomainEvent must have at least one 'Create()' class factory method.</value>
