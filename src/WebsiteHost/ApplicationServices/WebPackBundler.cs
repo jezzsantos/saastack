@@ -8,7 +8,7 @@ namespace WebsiteHost.ApplicationServices;
 /// </summary>
 public class WebPackBundler : IWebPackBundler
 {
-    private const string WebPackOutputLocation = @"ClientApp\webpack.build.json";
+    private static readonly string WebPackOutputLocation = Path.Combine("ClientApp", "webpack.build.json");
 
     public string GetBundleName(string basePath)
     {
