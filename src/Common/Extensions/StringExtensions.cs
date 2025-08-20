@@ -27,7 +27,7 @@ using System.Text;
 using JetBrains.Annotations;
 #endif
 
-#if ANALYZERS_NONPLATFORM
+#if ANALYZERS_NONFRAMEWORK
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
@@ -53,7 +53,7 @@ namespace Common.Extensions;
 #endif
 public static class StringExtensions
 {
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Defines the casing used in JSON serialization
     /// </summary>
@@ -63,10 +63,10 @@ public static class StringExtensions
         Camel
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
@@ -75,7 +75,7 @@ public static class StringExtensions
         return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     /// <summary>
     ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
     /// </summary>
@@ -84,7 +84,7 @@ public static class StringExtensions
         return string.Equals(value, other, StringComparison.Ordinal);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Formats the <see cref="value" /> with the <see cref="arguments" />
     /// </summary>
@@ -114,7 +114,7 @@ public static class StringExtensions
             }
         });
     }
-#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     public static TObject FromJson<TObject>(this string json)
         where TObject : new()
     {
@@ -168,7 +168,7 @@ public static class StringExtensions
         });
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
@@ -189,7 +189,7 @@ public static class StringExtensions
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     /// <summary>
     ///     Whether the <see cref="value" /> matches the <see cref="pattern" />
     ///     Avoid potential DOS attacks where the regex may timeout if too complex
@@ -318,7 +318,7 @@ public static class StringExtensions
         return char.ToLowerInvariant(titleCase[0]) + titleCase.Substring(1);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     /// <summary>
     ///     Converts the <see cref="value" /> to a floating value
     /// </summary>
@@ -460,7 +460,7 @@ public static class StringExtensions
             }
         });
     }
-#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     public static string? ToJson<TObject>(this TObject? value, bool? prettyPrint = true, JsonCasing casing =
         JsonCasing.Pascal)
     {

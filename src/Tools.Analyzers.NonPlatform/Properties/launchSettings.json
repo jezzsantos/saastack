@@ -1,9 +1,0 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    "Tools-Analyzers-Platform-Development": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "../ApiHost1/ApiHost1.csproj"
-    }
-  }
-}

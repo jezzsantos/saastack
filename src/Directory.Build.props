@@ -61,11 +61,11 @@
     </PropertyGroup>
 
     <!-- Runs the analyzers (in memory) on build -->
-    <ItemGroup Condition="'$(IsPlatformProject)'=='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromPlatformAnalyzers)'!='true'">
-        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ItemGroup Condition="'$(IsFrameworkProject)'=='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromFrameworkAnalyzers)'!='true'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Framework\Tools.Analyzers.Framework.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
-    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromNonPlatformAnalyzers)'!='true'">
-        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.NonPlatform\Tools.Analyzers.NonPlatform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ItemGroup Condition="'$(IsFrameworkProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromNonFrameworkAnalyzers)'!='true'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.NonFramework\Tools.Analyzers.NonFramework.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <!-- Build configurations -->

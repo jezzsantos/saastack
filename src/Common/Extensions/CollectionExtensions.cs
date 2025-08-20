@@ -10,7 +10,7 @@ namespace Common.Extensions;
 
 public static class CollectionExtensions
 {
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
     /// </summary>
@@ -33,7 +33,7 @@ public static class CollectionExtensions
         return list[0];
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     /// <summary>
     ///     Joins all values separated by the <see cref="separator" />
     /// </summary>
@@ -47,7 +47,7 @@ public static class CollectionExtensions
         return string.Join(separator, stringCollection);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONFRAMEWORK
     /// <summary>
     ///     Whether the specified collection contains an item that matched the specified <see cref="predicate" />
     /// </summary>
@@ -64,7 +64,7 @@ public static class CollectionExtensions
         return !collection.ContainsIgnoreCase(target);
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || GENERATORS_WORKERS_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK || GENERATORS_WORKERS_PROJECT
     /// <summary>
     ///     Whether the collection contains any items
     /// </summary>

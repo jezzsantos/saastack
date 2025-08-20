@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <IsPlatformProject>true</IsPlatformProject>
+        <IsFrameworkProject>true</IsFrameworkProject>
         <DefineConstants>$(DefineConstants);COMMON_PROJECT</DefineConstants>
         <!-- Outputs the source generated files locally -->
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

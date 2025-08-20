@@ -5,7 +5,7 @@
         <DefineConstants>$(DefineConstants);GENERATORS_WEB_API_PROJECT</DefineConstants>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <IsPlatformProject>true</IsPlatformProject>
+        <IsFrameworkProject>true</IsFrameworkProject>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>

@@ -2,7 +2,7 @@ using System.Text;
 using Application.Interfaces;
 using Common.Extensions;
 using Domain.Interfaces.Authorization;
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
 using System.Runtime.Serialization;
 #endif
 
@@ -346,17 +346,17 @@ public class AuthorizeAttribute : Attribute
     /// <summary>
     ///     Provides a serializable class for storing policy names
     /// </summary>
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
     [DataContract]
 #endif
     public class PolicyName
     {
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
         [DataMember(Order = 1, EmitDefaultValue = false)]
 #endif
         public PolicyNameStage? Features { get; set; }
 
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
         [DataMember(Order = 2, EmitDefaultValue = false)]
 #endif
         public PolicyNameStage? Roles { get; set; }
@@ -365,16 +365,16 @@ public class AuthorizeAttribute : Attribute
     /// <summary>
     ///     Provides a serializable class for storing policy stages
     /// </summary>
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
     [DataContract]
 #endif
     public class PolicyNameStage
     {
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
         [DataMember(Order = 1, EmitDefaultValue = false)]
 #endif
         public List<string>? Platform { get; set; }
-#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONFRAMEWORK
         [DataMember(Order = 1, EmitDefaultValue = false)]
 #endif
         public List<string>? Tenant { get; set; }

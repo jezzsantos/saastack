@@ -42,7 +42,7 @@ Lastly, if you are using JetBrains Rider, we have baked in a set of common codin
 We also provide you with a number of project templates for adding the various projects for new subdomains.
 We also give you several macros in the text editor (a.k.a. Live Templates) for creating certain kinds of classes, like DDD ValueObjects and DDD AggregateRoots, and xUnit test classes.
 
-You can see all of these things in the Platform/Tools projects.
+You can see all of these things in the Framework/Tools projects.
 
 ## Deployment
 

@@ -801,7 +801,7 @@ In this mechanism, there are two sets of "roles" to manage access to any APIs an
 
 This is commonly referred to as [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control).
 
-1. For "Platform" APIs and subdomains that are untenanted (all tenants)
+1. For APIs and subdomains that are untenanted
 2. For "Tenant" APIs and subdomains that are specific to a tenant (or an organization).
 
 All `End-Users` should have, at least, a minimum level of access to all untenanted API's based on their role, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the `PlatformRoles.Standard` role, used for accessing all untenanted APIs, and some Tenanted APIs.
