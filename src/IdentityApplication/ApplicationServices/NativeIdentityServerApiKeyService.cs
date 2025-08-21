@@ -275,9 +275,7 @@ internal static class ANativeIdentityServerApiKeyServiceExtensions
         return new APIKey
         {
             Description = description,
-            ExpiresOnUtc = apiKey.ExpiresOn.HasValue
-                ? apiKey.ExpiresOn.Value
-                : null,
+            ExpiresOnUtc = apiKey.ExpiresOn.ToNullable(),
             Key = key,
             UserId = apiKey.UserId,
             Id = apiKey.Id
@@ -289,9 +287,7 @@ internal static class ANativeIdentityServerApiKeyServiceExtensions
         return new APIKey
         {
             Description = apiKey.Description,
-            ExpiresOnUtc = apiKey.ExpiresOn.HasValue
-                ? apiKey.ExpiresOn.Value
-                : null,
+            ExpiresOnUtc = apiKey.ExpiresOn.ToNullable<DateTime?, DateTime>(),
             Key = apiKey.KeyToken,
             UserId = apiKey.UserId,
             Id = apiKey.Id

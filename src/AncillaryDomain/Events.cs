@@ -24,9 +24,7 @@ public static class Events
             {
                 When = DateTime.UtcNow,
                 MessageId = messageId,
-                OrganizationId = organizationId.HasValue
-                    ? organizationId.Value.Text
-                    : null,
+                OrganizationId = organizationId.ToNullable(orgId => orgId.Text),
                 HostRegion = hostRegion.Code
             };
         }
@@ -93,9 +91,7 @@ public static class Events
             return new SendingSucceeded(id)
             {
                 When = when,
-                ReceiptId = receiptId.HasValue
-                    ? receiptId.Value
-                    : null
+                ReceiptId = receiptId.ToNullable()
             };
         }
     }
@@ -109,9 +105,7 @@ public static class Events
             {
                 When = DateTime.UtcNow,
                 MessageId = messageId,
-                OrganizationId = organizationId.HasValue
-                    ? organizationId.Value.Text
-                    : null,
+                OrganizationId = organizationId.ToNullable(orgId => orgId.Text),
                 HostRegion = hostRegion.Code
             };
         }
@@ -162,9 +156,7 @@ public static class Events
             return new Domain.Events.Shared.Ancillary.SmsDelivery.SendingSucceeded(id)
             {
                 When = when,
-                ReceiptId = receiptId.HasValue
-                    ? receiptId.Value
-                    : null
+                ReceiptId = receiptId.ToNullable()
             };
         }
 
@@ -188,9 +180,7 @@ public static class Events
         {
             return new Created(id)
             {
-                OrganizationId = organizationId.HasValue
-                    ? organizationId.Value.Text
-                    : null,
+                OrganizationId = organizationId.ToNullable(orgId => orgId.Text),
                 AgainstId = againstId,
                 AuditCode = auditCode,
                 MessageTemplate = messageTemplate.ValueOrDefault ?? string.Empty,

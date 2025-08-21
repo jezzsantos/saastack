@@ -453,9 +453,7 @@ internal static class UserProfileConversionExtensions
             Address = profile.Address.ToAddress(),
             Timezone = profile.Timezone.Code.ToString(),
             Locale = profile.Locale.Code.ToString(),
-            AvatarUrl = profile.Avatar.HasValue
-                ? profile.Avatar.Value.Url
-                : null
+            AvatarUrl = profile.Avatar.ToNullable(ava => ava.Url)
         };
     }
 

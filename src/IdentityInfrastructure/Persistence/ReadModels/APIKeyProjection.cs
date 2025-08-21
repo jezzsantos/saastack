@@ -38,9 +38,7 @@ public class APIKeyProjection : IReadModelProjection
                 return await _apiKeys.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.Description = e.Description;
-                    dto.ExpiresOn = e.ExpiresOn.HasValue
-                        ? e.ExpiresOn.Value
-                        : Optional<DateTime?>.None;
+                    dto.ExpiresOn = e.ExpiresOn ?? Optional<DateTime?>.None;
                 }, cancellationToken);
 
             case KeyVerified _:

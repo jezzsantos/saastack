@@ -181,7 +181,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
             && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
             && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
             && eu.GuestInvitation.IsInvited
-            && eu.GuestInvitation.InvitedById! == "aninviterid".ToId()
+            && eu.GuestInvitation.InvitedById == "aninviterid".ToId()
         ), It.IsAny<CancellationToken>()));
         _userProfilesService.Verify(ups =>
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",
@@ -237,7 +237,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
             && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
             && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
             && eu.GuestInvitation.IsInvited
-            && eu.GuestInvitation.InvitedById! == "aninviterid".ToId()
+            && eu.GuestInvitation.InvitedById == "aninviterid".ToId()
         ), It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname",

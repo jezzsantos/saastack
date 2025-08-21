@@ -660,9 +660,7 @@ internal static class OrganizationConversionExtensions
             CreatedById = organization.CreatedById,
             Ownership = organization.Ownership.ToEnumOrDefault(
                 Application.Resources.Shared.OrganizationOwnership.Shared),
-            AvatarUrl = organization.Avatar.HasValue
-                ? organization.Avatar.Value.Url
-                : null
+            AvatarUrl = organization.Avatar.ToNullable(org => org.Url)
         };
     }
 

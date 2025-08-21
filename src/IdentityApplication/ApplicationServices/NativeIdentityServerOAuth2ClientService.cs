@@ -443,9 +443,7 @@ public static class NativeIdentityServerOAuth2ClientServiceConversionExtensions
             Name = client.Name.ValueOrDefault!,
             RedirectUri = client.RedirectUri,
             Secret = secret.PlainSecret,
-            ExpiresOnUtc = secret.ExpiresOn.HasValue
-                ? secret.ExpiresOn.Value
-                : null
+            ExpiresOnUtc = secret.ExpiresOn.ToNullable()
         };
     }
 
@@ -458,9 +456,7 @@ public static class NativeIdentityServerOAuth2ClientServiceConversionExtensions
             RedirectUri = client.RedirectUri,
             Secrets = client.Secrets.Select(sec => new OAuthClientSecret
             {
-                ExpiresOnUtc = sec.ExpiresOn.HasValue
-                    ? sec.ExpiresOn.Value
-                    : null,
+                ExpiresOnUtc = sec.ExpiresOn.ToNullable(),
                 Reference = $"{sec.FirstFour}********************"
             }).ToList()
         };

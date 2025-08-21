@@ -63,10 +63,7 @@ public abstract class CSRFController : Controller
 
     private void WriteCSRFCookie(string signature, Optional<string> userId)
     {
-        var cookieValue = new CSRFMiddleware.CSRFCookie(
-            userId.HasValue
-                ? userId.Value
-                : null, signature).ToCookieValue();
+        var cookieValue = new CSRFMiddleware.CSRFCookie(userId.ToNullable(), signature).ToCookieValue();
         Response.Cookies.Append(CSRFConstants.Cookies.AntiCSRF, cookieValue, new CookieOptions
         {
             Secure = true,

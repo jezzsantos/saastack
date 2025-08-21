@@ -735,7 +735,7 @@ public static class NativeIdentityServerOpenIdConnectServiceConversionExtensions
         {
             AccessToken = accessToken.GetDecryptedValue(encryptionService),
             TokenType = OAuth2TokenType.Bearer,
-            ExpiresIn = (int)accessToken.ExpiresOn!.Value.Subtract(now).TotalSeconds,
+            ExpiresIn = (int)accessToken.ExpiresOn.Value.Subtract(now).TotalSeconds,
             RefreshToken = refreshToken.GetDecryptedValue(encryptionService),
             IdToken = idToken.GetDecryptedValue(encryptionService)
         };

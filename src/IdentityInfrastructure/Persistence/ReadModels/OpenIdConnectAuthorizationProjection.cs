@@ -57,13 +57,9 @@ public class OpenIdConnectAuthorizationProjection : IReadModelProjection
                         dto.AuthorizationExpiresAt = Optional<DateTime>.None;
                         dto.CodeExchangedAt = e.ExchangedAt;
                         dto.AccessTokenDigest = e.AccessTokenDigest;
-                        dto.AccessTokenExpiresAt = e.AccessTokenExpiresOn.HasValue
-                            ? e.AccessTokenExpiresOn.Value
-                            : Optional<DateTime>.None;
+                        dto.AccessTokenExpiresAt = e.AccessTokenExpiresOn ?? Optional<DateTime>.None;
                         dto.RefreshTokenDigest = e.RefreshTokenDigest;
-                        dto.RefreshTokenExpiresAt = e.RefreshTokenExpiresOn.HasValue
-                            ? e.RefreshTokenExpiresOn.Value
-                            : Optional<DateTime>.None;
+                        dto.RefreshTokenExpiresAt = e.RefreshTokenExpiresOn ?? Optional<DateTime>.None;
                     }, cancellationToken);
 
             case TokenRefreshed e:
@@ -72,13 +68,9 @@ public class OpenIdConnectAuthorizationProjection : IReadModelProjection
                     {
                         dto.LastRefreshedAt = e.RefreshedAt;
                         dto.AccessTokenDigest = e.AccessTokenDigest;
-                        dto.AccessTokenExpiresAt = e.AccessTokenExpiresOn.HasValue
-                            ? e.AccessTokenExpiresOn.Value
-                            : Optional<DateTime>.None;
+                        dto.AccessTokenExpiresAt = e.AccessTokenExpiresOn ?? Optional<DateTime>.None;
                         dto.RefreshTokenDigest = e.RefreshTokenDigest;
-                        dto.RefreshTokenExpiresAt = e.RefreshTokenExpiresOn.HasValue
-                            ? e.RefreshTokenExpiresOn.Value
-                            : Optional<DateTime>.None;
+                        dto.RefreshTokenExpiresAt = e.RefreshTokenExpiresOn ?? Optional<DateTime>.None;
                         dto.Scopes = OAuth2Scopes.Create(e.Scopes).Value;
                     }, cancellationToken);
 

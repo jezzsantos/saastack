@@ -28,11 +28,12 @@ public class InterHostServiceClientSpec
     public void WhenSetAuthorizationAndHMACAuthorization_ThenAuthorizes()
     {
         var message = new HttpRequestMessage();
-        var caller = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC, "avalue").ToOptional());
+        var caller = new Mock<ICallerContext>();
+        caller.Setup(cc => cc.Authorization)
+            .Returns(new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.HMAC, "avalue"))
+            .ToOptional();
 
-        InterHostServiceClient.SetAuthorization(message, caller, "asecret", "asecret");
+        InterHostServiceClient.SetAuthorization(message, caller.Object, "asecret", "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should()
             .OnlyContain(hdr => hdr == "sha256=2314af1b8cf6d257dfd692c335b91d4a5b6dbc8376abdee194b6032bee17aae7");
@@ -42,12 +43,12 @@ public class InterHostServiceClientSpec
     public void WhenSetAuthorizationAndPrivateInterHostAuthorizationAndCallerHasAuthorization_ThenAuthorizes()
     {
         var message = new HttpRequestMessage();
-        var caller = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost, "avalue")
-                .ToOptional());
+        var caller = new Mock<ICallerContext>();
+        caller.Setup(cc => cc.Authorization)
+            .Returns(new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
+                "avalue")).ToOptional();
 
-        InterHostServiceClient.SetAuthorization(message, caller, "asecret", "asecret");
+        InterHostServiceClient.SetAuthorization(message, caller.Object, "asecret", "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should()
             .OnlyContain(hdr => hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
@@ -59,13 +60,12 @@ public class InterHostServiceClientSpec
     public void WhenSetAuthorizationAndPrivateInterHostAuthorizationAndCallerHasNoAuthorization_ThenAuthorizes()
     {
         var message = new HttpRequestMessage();
-        var caller = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
-                    Optional<string>.None)
-                .ToOptional());
+        var caller = new Mock<ICallerContext>();
+        caller.Setup(cc => cc.Authorization)
+            .Returns(new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
+                Optional<string>.None)).ToOptional();
 
-        InterHostServiceClient.SetAuthorization(message, caller, "asecret", "asecret");
+        InterHostServiceClient.SetAuthorization(message, caller.Object, "asecret", "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.PrivateInterHostSignature).Should()
             .OnlyContain(hdr => hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
@@ -76,12 +76,12 @@ public class InterHostServiceClientSpec
     public void WhenSetAuthorizationAndTokenAuthorization_ThenAuthorizes()
     {
         var message = new HttpRequestMessage();
-        var caller = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost, "avalue")
-                .ToOptional());
+        var caller = new Mock<ICallerContext>();
+        caller.Setup(cc => cc.Authorization)
+            .Returns(new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.PrivateInterHost,
+                "avalue")).ToOptional();
 
-        InterHostServiceClient.SetAuthorization(message, caller, "asecret", "asecret");
+        InterHostServiceClient.SetAuthorization(message, caller.Object, "asecret", "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
             .OnlyContain(hdr => hdr == "Bearer avalue");
@@ -91,12 +91,12 @@ public class InterHostServiceClientSpec
     public void WhenSetAuthorizationAndApiKeyAuthorization_ThenAuthorizes()
     {
         var message = new HttpRequestMessage();
-        var caller = Mock.Of<ICallerContext>(cc =>
-            cc.Authorization
-            == new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, "avalue")
-                .ToOptional());
+        var caller = new Mock<ICallerContext>();
+        caller.Setup(cc => cc.Authorization)
+            .Returns(new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, "avalue"))
+            .ToOptional();
 
-        InterHostServiceClient.SetAuthorization(message, caller, "asecret", "asecret");
+        InterHostServiceClient.SetAuthorization(message, caller.Object, "asecret", "asecret");
 
         var base64Credential = Convert.ToBase64String(Encoding.UTF8.GetBytes("avalue:"));
         message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()

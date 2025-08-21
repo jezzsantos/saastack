@@ -1,3 +1,4 @@
+using Common.Extensions;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;
@@ -113,15 +114,6 @@ public class OptionalSpec
     }
 
     [Fact]
-    public void WhenToOptionalWithOptionalNone_ThenReturnsNone()
-    {
-        var optional = Optional<string>.None;
-        var result = optional.ToOptional();
-
-        result.Should().BeNone();
-    }
-
-    [Fact]
     public void WhenToOptionalWithOptionalOfSameType_ThenReturnsSome()
     {
         var optional = (string)new Optional<string>("avalue");
@@ -149,64 +141,231 @@ public class OptionalSpec
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputIsNullReferenceTypeAndNoConverter_ThenReturnsNone()
+    public void WhenToOptionalAndInputIsNullWithReferenceTypeAndNoConverter_ThenReturnsNone()
     {
-        var result = ((string?)null).FromValueOrNone<string, string>();
+        var value = (string?)null;
+
+        var result = value.ToOptional();
 
         result.Should().BeNone();
+        result.Should().Be(Optional<string>.None);
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputHasValueReferenceTypeAndNoConverter_ThenReturnsSome()
+    public void WhenToOptionalAndInputHasValueWithReferenceTypeAndNoConverter_ThenReturnsSome()
     {
-        var result = "avalue".FromValueOrNone<string, string>();
+        var result = "avalue".ToOptional();
 
         result.Should().BeSome("avalue");
+        result.Should().BeOfType<Optional<string>>();
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputIsNullReferenceTypeAndConverter_ThenReturnsNone()
+    public void WhenToOptionalAndInputIsNullWithReferenceTypeAndConverter_ThenReturnsNone()
     {
-        var result = ((string?)null).FromValueOrNone<string, string>(_ => "anewvalue");
+        var value = (string?)null;
+
+        var result = value.ToOptional(_ => "anewvalue");
 
         result.Should().BeNone();
+        result.Should().BeOfType<Optional<string>>();
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputHasValueReferenceTypeAndConverter_ThenReturnsConvertedSome()
+    public void WhenToOptionalAndInputHasValueWithReferenceTypeAndConverter_ThenReturnsConvertedSome()
     {
-        var result = "avalue".FromValueOrNone<string, string>(_ => "anewvalue");
+        var result = "avalue".ToOptional(_ => "anewvalue");
 
         result.Should().BeSome("anewvalue");
+        result.Should().BeOfType<Optional<string>>();
+
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputIsNullValueTypeAndNoConverter_ThenReturnsNone()
+    public void WhenToOptionalAndInputIsNullWithNullableValueTypeAndNoConverter_ThenReturnsNone()
     {
-        var result = ((DateTime?)null).FromValueOrNone<DateTime?, DateTime>();
+        var datum = (DateTime?)null;
+
+        var result = datum.ToOptional();
 
         result.Should().BeNone();
+        result.Should().BeOfType<Optional<DateTime>>();
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputHasValueValueTypeAndNoConverter_ThenReturnsSome()
+    public void WhenToOptionalAndInputHasValueWithNullableValueTypeAndNoConverter_ThenReturnsNone()
     {
-        var date = DateTime.UtcNow;
+        var datum = (DateTime?)DateTime.UtcNow;
 
-        var result = date.FromValueOrNone<DateTime, DateTime>();
+        var result = datum.ToOptional();
 
-        result.Should().BeSome(date);
+        result.Should().BeSome(datum.Value);
+        result.Should().BeOfType<Optional<DateTime>>();
     }
 
     [Fact]
-    public void WhenFromValueOrNoneAndInputHasValueValueTypeAndConverter_ThenReturnsConvertedSome()
+    public void WhenToOptionalAndInputHasValueWithValueTypeAndNoConverter_ThenReturnsSome()
     {
-        var date = DateTime.UtcNow;
-        var newDate = DateTime.UtcNow;
+        var datum = DateTime.UtcNow;
 
-        var result = date.FromValueOrNone(_ => newDate);
+        var result = datum.ToOptional();
+
+        result.Should().BeSome(datum);
+        result.Should().BeOfType<Optional<DateTime>>();
+    }
+
+    [Fact]
+    public void WhenToOptionalAndInputHasValueWithNullableValueTypeAndNoConverter_ThenReturnsSome()
+    {
+        var datum = (DateTime?)DateTime.UtcNow;
+
+        var result = datum.ToOptional();
+
+        result.Should().BeSome(datum.Value);
+        result.Should().BeOfType<Optional<DateTime>>();
+    }
+
+    [Fact]
+    public void WhenToOptionalAndInputHasValueWithNullableValueTypeAndConverter_ThenReturnsConvertedSome()
+    {
+        var datum = (DateTime?)DateTime.UtcNow.SubtractSeconds(1);
+        var newDate = DateTime.UtcNow.AddSeconds(1);
+
+        var result = datum.ToOptional<DateTime?, DateTime>(_ => newDate);
 
         result.Should().BeSome(newDate);
+        result.Should().BeOfType<Optional<DateTime>>();
+    }
+
+    [Fact]
+    public void WhenToOptionalAndInputHasValueWithValueTypeAndConverter_ThenReturnsConvertedSome()
+    {
+        var datum = DateTime.UtcNow.SubtractSeconds(1);
+        var newDate = DateTime.UtcNow.AddSeconds(1);
+
+        var result = datum.ToOptional<DateTime, DateTime>(_ => newDate);
+
+        result.Should().BeSome(newDate);
+        result.Should().BeOfType<Optional<DateTime>>();
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsNoneReferenceTypeAndNoConverter_ThenReturnsNull()
+    {
+        var optional = Optional<string>.None;
+
+        var result = optional.ToNullable();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsNoneNullableReferenceTypeAndNoConverter_ThenReturnsNull()
+    {
+        var optional = Optional<string?>.None;
+
+        var result = optional.ToNullable();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeReferenceTypeAndNoConverter_ThenReturnsSome()
+    {
+        var optional = new Optional<string>("avalue");
+
+        var result = optional.ToNullable();
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeReferenceTypeAndConverterForReferenceType_ThenReturnsSome()
+    {
+        var optional = new Optional<TestClass>(new TestClass
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
+        });
+
+        var result = optional.ToNullable(x => x.AStringProperty);
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeReferenceTypeAndConverterForValueType_ThenReturnsSome()
+    {
+        var datum = DateTime.UtcNow;
+        var optional = new Optional<TestClass>(new TestClass
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = datum
+        });
+
+        var result = optional.ToNullable<TestClass, DateTime>(x => x.ADateTimeProperty);
+
+        result.Should().Be(datum);
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsNoneValueTypeAndNoConverter_ThenReturnsNull()
+    {
+        var optional = Optional<DateTime>.None;
+
+        var result = optional.ToNullable();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsNoneNullableValueTypeAndNoConverter_ThenReturnsNull()
+    {
+        var optional = Optional<DateTime?>.None;
+
+        var result = optional.ToNullable();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeValueTypeAndNoConverter_ThenReturnsSome()
+    {
+        var datum = DateTime.UtcNow;
+        var optional = new Optional<DateTime>(datum);
+
+        var result = optional.ToNullable();
+
+        result.Should().Be(datum);
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeValueTypeAndConverterForReferenceType_ThenReturnsSome()
+    {
+        var optional = new Optional<TestStruct>(new TestStruct
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
+        });
+
+        var result = optional.ToNullable(x => x.AStringProperty);
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenToNullableAndInputIsSomeValueTypeAndConverterForValueType_ThenReturnsSome()
+    {
+        var datum = DateTime.UtcNow;
+        var optional = new Optional<TestStruct>(new TestStruct
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = datum
+        });
+
+        var result = optional.ToNullable<TestStruct, DateTime>(x => x.ADateTimeProperty);
+
+        result.Should().Be(datum);
     }
 }
 
@@ -263,7 +422,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenConstructedWithAnyValue_ThenHasValue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var result = new Optional<TestClass>(instance);
 
         result.HasValue.Should().BeTrue();
@@ -274,7 +437,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenConstructedWithAnyOptional_ThenHasValue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optional = new Optional<TestClass>(instance);
         var result = new Optional<TestClass>(optional);
 
@@ -286,7 +453,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenConstructedWithAnyOptionalOfOptional_ThenHasValue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass
+        {
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optionalInner = new Optional<TestClass>(instance);
         var optionalOuter = new Optional<Optional<TestClass>>(optionalInner);
         var result = new Optional<TestClass>(optionalOuter);
@@ -309,7 +480,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenGetValue_ThenReturnsValue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional.Value;
@@ -330,7 +501,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenGetValueOrDefault_ThenReturnsValue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional.ValueOrDefault;
@@ -382,14 +553,14 @@ public class OptionalOfTSpec
         result.Should().BeTrue();
     }
 
-    
     [Fact]
     public void WhenEqualsOperatorWithEmptyAndSome_ThenReturnsFalse()
     {
         var optional1 = new Optional<TestClass>();
         var optional2 = new Optional<TestClass>(new TestClass
         {
-            AProperty = "avalue"
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
         });
 
         var result = optional1 == optional2;
@@ -402,7 +573,8 @@ public class OptionalOfTSpec
     {
         var optional1 = new Optional<TestClass>(new TestClass
         {
-            AProperty = "avalue"
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
         });
         var optional2 = new Optional<TestClass>();
 
@@ -417,7 +589,8 @@ public class OptionalOfTSpec
         var optional1 = Optional<TestClass>.None;
         var optional2 = new Optional<TestClass>(new TestClass
         {
-            AProperty = "avalue"
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
         });
 
         var result = optional1 == optional2;
@@ -430,7 +603,8 @@ public class OptionalOfTSpec
     {
         var optional1 = new Optional<TestClass>(new TestClass
         {
-            AProperty = "avalue"
+            AStringProperty = "avalue",
+            ADateTimeProperty = DateTime.UtcNow
         });
         var optional2 = Optional<TestClass>.None;
 
@@ -442,7 +616,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsOperatorWithSameInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional1 = new Optional<TestClass>(instance);
         var optional2 = new Optional<TestClass>(instance);
 
@@ -465,7 +639,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         (instance == optional).Should().BeFalse();
@@ -474,7 +648,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsOperatorWithNull_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
 
         var result = instance == null!;
 
@@ -484,7 +658,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsOperatorOptionalOfInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         (optional == instance).Should().BeTrue();
@@ -493,7 +667,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         var result = instance != optional;
@@ -504,7 +678,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithNull_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
 
         var result = instance != null!;
 
@@ -514,7 +688,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorOptionalOfInstance_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional != instance;
@@ -525,7 +699,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsWithEmptyOptionalOfSameType_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         var result = optional.Equals(instance);
@@ -536,7 +710,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsWithNull_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
 
         var result = instance.Equals(null!);
 
@@ -546,7 +720,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenEqualsOptionalOfInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional.Equals(instance);
@@ -557,7 +731,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenObjectEqualsBetweenNullOptionalAndInstance_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>((TestClass)null!);
 
         // ReSharper disable once SuspiciousTypeConversion.Global
@@ -569,7 +743,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenObjectEqualsBetweenEmptyOptionalAndInstanceOfSameType_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         // ReSharper disable once SuspiciousTypeConversion.Global
@@ -581,7 +755,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenObjectEqualsBetweenOptionOfInstanceAndInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         // ReSharper disable once SuspiciousTypeConversion.Global
@@ -593,7 +767,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenObjectEqualsBetweenOptionalOfInstanceAndOptionalOfInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional.Equals((object?)optional);
@@ -614,7 +788,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithEmptyOptionalAndInstance_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         var result = optional != instance;
@@ -625,8 +799,16 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithOtherOptionalAndOtherInstance_ThenReturnsTrue()
     {
-        var instance1 = new TestClass { AProperty = "avalue1" };
-        var instance2 = new TestClass { AProperty = "avalue2" };
+        var instance1 = new TestClass
+        {
+            AStringProperty = "avalue1",
+            ADateTimeProperty = DateTime.UtcNow
+        };
+        var instance2 = new TestClass
+        {
+            AStringProperty = "avalue2",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optional = new Optional<TestClass>(instance1);
 
         var result = optional != instance2;
@@ -637,7 +819,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithOptionalOfInstanceAndInstance_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue1" };
+        var instance = new TestClass
+        {
+            AStringProperty = "avalue1",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optional = new Optional<TestClass>(instance);
 
         var result = optional != instance;
@@ -658,7 +844,7 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithInstanceAndEmptyOptional_ThenReturnsTrue()
     {
-        var instance = new TestClass { AProperty = "avalue" };
+        var instance = new TestClass { AStringProperty = "avalue", ADateTimeProperty = DateTime.UtcNow };
         var optional = new Optional<TestClass>();
 
         var result = instance != optional;
@@ -669,8 +855,16 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithInstanceAndOptionalOfOtherInstance_ThenReturnsTrue()
     {
-        var instance1 = new TestClass { AProperty = "avalue1" };
-        var instance2 = new TestClass { AProperty = "avalue2" };
+        var instance1 = new TestClass
+        {
+            AStringProperty = "avalue1",
+            ADateTimeProperty = DateTime.UtcNow
+        };
+        var instance2 = new TestClass
+        {
+            AStringProperty = "avalue2",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optional = new Optional<TestClass>(instance1);
 
         var result = instance2 != optional;
@@ -681,7 +875,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenNotEqualsOperatorWithInstanceAndOptionalOfInstance_ThenReturnsFalse()
     {
-        var instance = new TestClass { AProperty = "avalue1" };
+        var instance = new TestClass
+        {
+            AStringProperty = "avalue1",
+            ADateTimeProperty = DateTime.UtcNow
+        };
         var optional = new Optional<TestClass>(instance);
 
         var result = instance != optional;
@@ -734,6 +932,14 @@ public class OptionalOfTSpec
     }
 
     [Fact]
+    public void WhenImplicitCastFromOptionalNullableNoneToNullableReferenceType_ThenReturnsNull()
+    {
+        var result = (string?)Optional<string?>.None;
+
+        result.Should().Be(null);
+    }
+
+    [Fact]
     public void WhenImplicitCastFromOptionalNoneToReferenceType_ThenReturnsDefault()
     {
         var result = (string)Optional<string>.None;
@@ -753,6 +959,14 @@ public class OptionalOfTSpec
     public void WhenImplicitCastFromOptionalSomeToReferenceType_ThenReturnsValue()
     {
         var result = (string)new Optional<string>("avalue");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalNullableSomeToReferenceType_ThenReturnsValue()
+    {
+        var result = (string?)new Optional<string?>("avalue");
 
         result.Should().Be("avalue");
     }
@@ -784,6 +998,16 @@ public class OptionalOfTSpec
     }
 
     [Fact]
+    public void WhenImplicitCastFromOptionalNullableSomeToNullableValueType_ThenReturnsNull()
+    {
+        var datum = (DateTime?)DateTime.UtcNow;
+
+        var result = (DateTime?)new Optional<DateTime?>(datum);
+
+        result.Should().Be(datum);
+    }
+
+    [Fact]
     public void WhenImplicitCastFromOptionalSomeToValueType_ThenReturnsValue()
     {
         var datum = DateTime.UtcNow;
@@ -793,6 +1017,16 @@ public class OptionalOfTSpec
         result.Should().Be(datum);
     }
 
+    [Fact]
+    public void WhenImplicitCastFromOptionalNullableSomeToValueType_ThenReturnsValue()
+    {
+        var datum = (DateTime?)DateTime.UtcNow;
+
+        var result = (DateTime)new Optional<DateTime?>(datum)!;
+
+        result.Should().Be(datum);
+    }
+    
     [Fact]
     public void WhenValueOrNullAndNoneReferenceType_ThenReturnsNull()
     {
@@ -820,11 +1054,11 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenValueOrNullAndSomeValueType_ThenReturnsValue()
     {
-        var date = DateTime.UtcNow;
+        var datum = DateTime.UtcNow;
 
-        var result = Optional.Some(date).ValueOrNull;
+        var result = Optional.Some(datum).ValueOrNull;
 
-        result.Should().Be(date);
+        result.Should().Be(datum);
     }
 
     [Fact]
@@ -854,10 +1088,10 @@ public class OptionalOfTSpec
     [Fact]
     public void WhenToValueOrNullAndSomeValueType_ThenReturnsValue()
     {
-        var date = DateTime.UtcNow;
+        var datum = DateTime.UtcNow;
         var newDate = DateTime.UtcNow.AddDays(1);
 
-        var result = Optional.Some(date).ToValueOrNull(_ => newDate);
+        var result = Optional.Some(datum).ToValueOrNull(_ => newDate);
 
         result.Should().Be(newDate);
     }
@@ -865,6 +1099,22 @@ public class OptionalOfTSpec
 
 public class TestClass
 {
-    // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    public required string AProperty { get; set; }
+    public required DateTime ADateTimeProperty { get; set; }
+
+    public DateTime? ANullableDateTimeProperty { get; set; }
+
+    public string? ANullableStringProperty { get; set; }
+
+    public required string AStringProperty { get; set; }
+}
+
+public struct TestStruct
+{
+    public required string AStringProperty { get; set; }
+
+    public string? ANullableStringProperty { get; set; }
+
+    public required DateTime ADateTimeProperty { get; set; }
+
+    public DateTime? ANullableDateTimeProperty { get; set; }
 }

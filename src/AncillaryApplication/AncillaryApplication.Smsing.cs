@@ -269,34 +269,20 @@ public static class AncillaryMSmsingConversionExtensions
     {
         return new DeliveredSms
         {
-            Created = sms.Created.HasValue
-                ? sms.Created.Value!.Value
-                : DateTime.UtcNow,
-            Attempts = sms.Attempts.HasValue
-                ? sms.Attempts.Value.Attempts.ToList()
-                : new List<DateTime>(),
+            Created = sms.Created.ToNullable<DateTime?, DateTime>(x => x!.Value) ?? DateTime.UtcNow,
+            Attempts = sms.Attempts.ToNullable(att => att.Attempts.ToList()) ?? [],
             Body = sms.Body,
             IsSent = sms.Sent.HasValue,
-            SentAt = sms.Sent.HasValue
-                ? sms.Sent.Value
-                : null,
+            SentAt = sms.Sent.ToNullable<DateTime?, DateTime>(),
             ToPhoneNumber = sms.ToPhoneNumber,
             Id = sms.Id,
             OrganizationId = sms.OrganizationId,
             IsDelivered = sms.Delivered.HasValue,
-            DeliveredAt = sms.Delivered.HasValue
-                ? sms.Delivered.Value
-                : null,
+            DeliveredAt = sms.Delivered.ToNullable<DateTime?, DateTime>(),
             IsDeliveryFailed = sms.DeliveryFailed.HasValue,
-            FailedDeliveryAt = sms.DeliveryFailed.HasValue
-                ? sms.DeliveryFailed.Value
-                : null,
-            FailedDeliveryReason = sms.DeliveryFailedReason.HasValue
-                ? sms.DeliveryFailedReason.Value
-                : null,
-            Tags = sms.Tags.HasValue
-                ? sms.Tags.Value.FromJson<List<string>>()!
-                : new List<string>()
+            FailedDeliveryAt = sms.DeliveryFailed.ToNullable<DateTime?, DateTime>(),
+            FailedDeliveryReason = sms.DeliveryFailedReason.ToNullable(),
+            Tags = sms.Tags.ToNullable(tags => tags.FromJson<List<string>>()!) ?? []
         };
     }
 }

@@ -198,7 +198,7 @@ public class InvitationsApplicationSpec
         _repository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
             eu.Memberships.Count == 0
             && eu.GuestInvitation.IsInvited
-            && eu.GuestInvitation.InvitedById! == "aninviterid".ToId()
+            && eu.GuestInvitation.InvitedById == "aninviterid".ToId()
         ), It.IsAny<CancellationToken>()));
         result.Value.EmailAddress.Should().Be("aninvitee@company.com");
         result.Value.FirstName.Should().Be("Aninvitee");
@@ -248,7 +248,7 @@ public class InvitationsApplicationSpec
         _repository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
             eu.Memberships.Count == 0
             && eu.GuestInvitation.IsInvited
-            && eu.GuestInvitation.InvitedById! == "aninviterid".ToId()
+            && eu.GuestInvitation.InvitedById == "aninviterid".ToId()
         ), It.IsAny<CancellationToken>()));
         _userProfilesService.Verify(ups =>
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",

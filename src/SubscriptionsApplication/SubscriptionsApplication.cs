@@ -523,27 +523,17 @@ internal static class SubscriptionConversionExtensions
             Id = subscription.Id,
             OwningEntityId = subscription.OwningEntityId,
             BuyerId = subscription.BuyerId,
-            ProviderName = subscription.Provider.HasValue
-                ? subscription.Provider.Value.Name
-                : null,
-            ProviderState = subscription.Provider.HasValue
-                ? subscription.Provider.Value.State
-                : new Dictionary<string, string>(),
-            SubscriptionReference = providerSubscription.SubscriptionReference.HasValue
-                ? providerSubscription.SubscriptionReference.Value.ToString()
-                : null,
+            ProviderName = subscription.Provider.ToNullable(pro => pro.Name),
+            ProviderState = subscription.Provider.ToNullable(pro => pro.State) ?? new Dictionary<string, string>(),
+            SubscriptionReference = providerSubscription.SubscriptionReference.ToNullable(sr => sr.Text),
             BuyerReference = subscription.ProviderBuyerReference.ValueOrDefault!,
             Status = providerSubscription.Status.Status.ToEnumOrDefault(SubscriptionStatus.Unsubscribed),
-            CanceledDateUtc = providerSubscription.Status.CanceledDateUtc.HasValue
-                ? providerSubscription.Status.CanceledDateUtc.Value
-                : null,
+            CanceledDateUtc = providerSubscription.Status.CanceledDateUtc.ToNullable(),
             Plan = new SubscriptionPlan
             {
                 Id = providerSubscription.Plan.PlanId.ValueOrDefault,
                 IsTrial = providerSubscription.Plan.IsTrial,
-                TrialEndDateUtc = providerSubscription.Plan.TrialEndDateUtc.HasValue
-                    ? providerSubscription.Plan.TrialEndDateUtc.Value
-                    : null,
+                TrialEndDateUtc = providerSubscription.Plan.TrialEndDateUtc.ToNullable(),
                 Tier = providerSubscription.Plan.Tier.ToEnum<BillingSubscriptionTier, SubscriptionTier>()
             },
             Period = new PlanPeriod
@@ -555,17 +545,13 @@ internal static class SubscriptionConversionExtensions
             {
                 Amount = providerSubscription.Invoice.Amount,
                 Currency = providerSubscription.Invoice.CurrencyCode.Currency.Code,
-                NextUtc = providerSubscription.Invoice.NextUtc.HasValue
-                    ? providerSubscription.Invoice.NextUtc.Value
-                    : null
+                NextUtc = providerSubscription.Invoice.NextUtc.ToNullable()
             },
             PaymentMethod = new SubscriptionPaymentMethod
             {
                 Status = providerSubscription.PaymentMethod.Status.ToEnumOrDefault(PaymentMethodStatus.Invalid),
                 Type = providerSubscription.PaymentMethod.Type.ToEnumOrDefault(PaymentMethodType.None),
-                ExpiresOn = providerSubscription.PaymentMethod.ExpiresOn.HasValue
-                    ? providerSubscription.PaymentMethod.ExpiresOn.Value
-                    : null
+                ExpiresOn = providerSubscription.PaymentMethod.ExpiresOn.ToNullable()
             },
             CanBeUnsubscribed = providerSubscription.Status.CanBeUnsubscribed,
             CanBeCanceled = providerSubscription.Status.CanBeCanceled

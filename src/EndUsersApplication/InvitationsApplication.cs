@@ -107,7 +107,7 @@ public partial class InvitationsApplication : IInvitationsApplication
             new Dictionary<string, object>
             {
                 { nameof(EndUserRoot.Id), invitee.Id },
-                { nameof(UserProfile.EmailAddress), invitee.GuestInvitation.InviteeEmailAddress!.Address }
+                { nameof(UserProfile.EmailAddress), invitee.GuestInvitation.InviteeEmailAddress.Value.Address }
             });
 
         return Result.Ok;
@@ -235,7 +235,7 @@ public partial class InvitationsApplication : IInvitationsApplication
             return (invitee, null);
         }
 
-        var email = EmailAddress.Create(invitee.GuestInvitation.InviteeEmailAddress!.Address);
+        var email = EmailAddress.Create(invitee.GuestInvitation.InviteeEmailAddress.Value.Address);
         if (email.IsFailure)
         {
             return email.Error;
@@ -274,7 +274,7 @@ public partial class InvitationsApplication : IInvitationsApplication
             return inviterProfile.Error;
         }
 
-        var inviteeEmailAddress = invitee.GuestInvitation.InviteeEmailAddress!.Address;
+        var inviteeEmailAddress = invitee.GuestInvitation.InviteeEmailAddress.Value.Address;
         var inviteeName = invitee.GuessGuestInvitationName().FirstName;
         var inviterName = inviterProfile.Value.DisplayName;
         var notified =
@@ -306,7 +306,7 @@ internal static class InvitationConversionExtensions
         var assumedName = invitee.GuessGuestInvitationName();
         return new Invitation
         {
-            EmailAddress = invitee.GuestInvitation.InviteeEmailAddress!.Address,
+            EmailAddress = invitee.GuestInvitation.InviteeEmailAddress.Value.Address,
             FirstName = assumedName.FirstName,
             LastName = assumedName.LastName.ValueOrDefault!
         };

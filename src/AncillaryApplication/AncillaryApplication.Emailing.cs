@@ -342,36 +342,22 @@ public static class AncillaryEmailingConversionExtensions
     {
         return new DeliveredEmail
         {
-            Created = email.Created.HasValue
-                ? email.Created.Value!.Value
-                : DateTime.UtcNow,
-            Attempts = email.Attempts.HasValue
-                ? email.Attempts.Value.Attempts.ToList()
-                : new List<DateTime>(),
+            Created = email.Created.ToNullable<DateTime?, DateTime>(x => x!.Value) ?? DateTime.UtcNow,
+            Attempts = email.Attempts.ToNullable(att => att.Attempts.ToList()) ?? [],
             Body = email.Body,
             IsSent = email.Sent.HasValue,
-            SentAt = email.Sent.HasValue
-                ? email.Sent.Value
-                : null,
+            SentAt = email.Sent.ToNullable<DateTime?, DateTime>(),
             Subject = email.Subject,
             ToDisplayName = email.ToDisplayName,
             ToEmailAddress = email.ToEmailAddress,
             Id = email.Id,
             OrganizationId = email.OrganizationId,
             IsDelivered = email.Delivered.HasValue,
-            DeliveredAt = email.Delivered.HasValue
-                ? email.Delivered.Value
-                : null,
+            DeliveredAt = email.Delivered.ToNullable<DateTime?, DateTime>(),
             IsDeliveryFailed = email.DeliveryFailed.HasValue,
-            FailedDeliveryAt = email.DeliveryFailed.HasValue
-                ? email.DeliveryFailed.Value
-                : null,
-            FailedDeliveryReason = email.DeliveryFailedReason.HasValue
-                ? email.DeliveryFailedReason.Value
-                : null,
-            Tags = email.Tags.HasValue
-                ? email.Tags.Value.FromJson<List<string>>()!
-                : new List<string>()
+            FailedDeliveryAt = email.DeliveryFailed.ToNullable<DateTime?, DateTime>(),
+            FailedDeliveryReason = email.DeliveryFailedReason.ToNullable(),
+            Tags = email.Tags.ToNullable(tags => tags.FromJson<List<string>>()!) ?? []
         };
     }
 }
