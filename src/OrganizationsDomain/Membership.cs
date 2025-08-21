@@ -43,6 +43,6 @@ public sealed class Membership : ValueObjectBase<Membership>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[] { OrganizationId, UserId };
+        return [OrganizationId, UserId];
     }
 }

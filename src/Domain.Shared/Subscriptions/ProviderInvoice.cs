@@ -61,12 +61,12 @@ public sealed class ProviderInvoice : ValueObjectBase<ProviderPlanPeriod>
             var parts = RehydrateToList(property, false);
             return new ProviderInvoice(parts[0].ToDecimalOrDefault(0),
                 CurrencyCode.Rehydrate()(parts[1]!, container),
-                parts[2].FromValueOrNone(val => val.FromIso8601()));
+                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { Amount, CurrencyCode.ToString(), NextUtc.ValueOrNull };
+        return [Amount, CurrencyCode.ToString(), NextUtc];
     }
 }

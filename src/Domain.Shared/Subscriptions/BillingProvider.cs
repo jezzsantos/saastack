@@ -50,9 +50,9 @@ public sealed class BillingProvider : ValueObjectBase<BillingProvider>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Name, State.ToJson(casing: StringExtensions.JsonCasing.Pascal)! };
+        return [Name, State.ToJson(casing: StringExtensions.JsonCasing.Pascal)!];
     }
 
     public BillingProvider ChangeState(SubscriptionMetadata state)

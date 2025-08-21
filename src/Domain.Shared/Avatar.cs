@@ -44,6 +44,6 @@ public sealed class Avatar : ValueObjectBase<Avatar>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { ImageId, Url };
+        return [ImageId, Url];
     }
 }

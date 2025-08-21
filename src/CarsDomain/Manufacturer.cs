@@ -78,6 +78,6 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Year, Make, Model };
+        return [Year, Make, Model];
     }
 }

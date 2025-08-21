@@ -40,16 +40,13 @@ public sealed class ProviderPaymentMethod : ValueObjectBase<ProviderPaymentMetho
             return new ProviderPaymentMethod(
                 parts[0].ToEnumOrDefault(BillingPaymentMethodType.None),
                 parts[1].ToEnumOrDefault(BillingPaymentMethodStatus.Invalid),
-                parts[2].FromValueOrNone(value => value.FromIso8601DateOnly()));
+                parts[2].ToOptional<string?, DateOnly>(value => value.FromIso8601DateOnly()));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[]
-        {
-            Type, Status, ExpiresOn.ToValueOrNull(val => val.ToIso8601())
-        };
+        return [Type, Status, ExpiresOn];
     }
 }
 

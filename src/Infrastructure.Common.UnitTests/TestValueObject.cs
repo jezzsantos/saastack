@@ -17,8 +17,8 @@ public class TestValueObject : ValueObjectBase<TestValueObject>
         return (property, _) => new TestValueObject(property);
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { APropertyValue };
+        return [APropertyValue];
     }
 }

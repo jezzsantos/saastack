@@ -19,6 +19,6 @@ public class TestValueObject : ValueObjectBase<TestValueObject>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[] { Text };
+        return [Text];
     }
 }

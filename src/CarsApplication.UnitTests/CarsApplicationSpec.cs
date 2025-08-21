@@ -144,7 +144,7 @@ public class CarsApplicationSpec
             & (c.Unavailabilities[0].Slot!.To == toUtc)
             & (c.Unavailabilities[0].CarId! == "anid")
             & (c.Unavailabilities[0].CausedBy!.Reason == UnavailabilityCausedBy.Maintenance)
-            & (c.Unavailabilities[0].CausedBy!.Reference == null)
+            & (c.Unavailabilities[0].CausedBy!.Reference == Optional<string>.None)
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -428,7 +428,7 @@ public class CarsApplicationSpec
             & (c.Unavailabilities[0].Slot!.To == toUtc)
             & (c.Unavailabilities[0].CarId! == "anid")
             & (c.Unavailabilities[0].CausedBy!.Reason == UnavailabilityCausedBy.Offline)
-            & (c.Unavailabilities[0].CausedBy!.Reference == null)
+            & (c.Unavailabilities[0].CausedBy!.Reference == Optional<string>.None)
         ), It.IsAny<CancellationToken>()));
     }
 

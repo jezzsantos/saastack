@@ -844,9 +844,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
             return subscriptionReference.Error;
         }
 
-        var fromProviderName = Provider.HasValue
-            ? Provider.Value.Name
-            : null;
+        var fromProviderName = Provider.ToNullable(prov => prov.Name);
         return RaiseChangeEvent(SubscriptionsDomain.Events.ProviderChanged(Id, OwningEntityId, fromProviderName,
             translatedProvider.Value, buyerReference.Value, subscriptionReference.Value));
     }

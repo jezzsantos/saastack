@@ -64,7 +64,7 @@ public sealed class ProviderSubscription : ValueObjectBase<ProviderSubscription>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new ProviderSubscription(parts[0].FromValueOrNone(val => val.ToId()),
+            return new ProviderSubscription(parts[0].ToOptional(val => val.ToId()),
                 ProviderStatus.Rehydrate()(parts[1]!, container),
                 ProviderPlan.Rehydrate()(parts[2]!, container),
                 ProviderPlanPeriod.Rehydrate()(parts[3]!, container),
@@ -75,6 +75,6 @@ public sealed class ProviderSubscription : ValueObjectBase<ProviderSubscription>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { SubscriptionReference.ValueOrNull, Status, Plan, Period, Invoice, PaymentMethod };
+        return [SubscriptionReference, Status, Plan, Period, Invoice, PaymentMethod];
     }
 }

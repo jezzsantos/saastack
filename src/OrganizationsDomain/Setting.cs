@@ -70,9 +70,9 @@ public sealed class Setting : ValueObjectBase<Setting>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { Value, ValueType, IsEncrypted };
+        return [Value, ValueType, IsEncrypted];
     }
 
     public static Result<Setting, Error> From(string stringValue, SettingValueType valueType, bool isEncrypted,

@@ -37,12 +37,12 @@ public sealed class MfaCaller : ValueObjectBase<MfaCaller>
             return new MfaCaller(
                 parts[0]!.ToId(),
                 parts[1]!.ToBoolOrDefault(false),
-                parts[2].FromValueOrNone<string?, string>());
+                parts[2].ToOptional());
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { CallerId, IsAuthenticated, AuthenticationToken };
+        return [CallerId, IsAuthenticated, AuthenticationToken];
     }
 }

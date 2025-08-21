@@ -26,8 +26,8 @@ public sealed class Address : ValueObjectBase<Address>
     {
     }
 
-    private Address(string? line1, string? line2, string? line3, string? city, string? state,
-        CountryCodeIso3166 countryCode, string? zip)
+    private Address(Optional<string> line1, Optional<string> line2, Optional<string> line3, Optional<string> city,
+        Optional<string> state, CountryCodeIso3166 countryCode, Optional<string> zip)
     {
         Line1 = line1;
         Line2 = line2;
@@ -38,19 +38,19 @@ public sealed class Address : ValueObjectBase<Address>
         Zip = zip;
     }
 
-    public string? City { get; }
+    public Optional<string> City { get; }
 
     public CountryCodeIso3166 CountryCode { get; }
 
-    public string? Line1 { get; }
+    public Optional<string> Line1 { get; }
 
-    public string? Line2 { get; }
+    public Optional<string> Line2 { get; }
 
-    public string? Line3 { get; }
+    public Optional<string> Line3 { get; }
 
-    public string? State { get; }
+    public Optional<string> State { get; }
 
-    public string? Zip { get; }
+    public Optional<string> Zip { get; }
 
     [UsedImplicitly]
     public static ValueObjectFactory<Address> Rehydrate()
@@ -59,13 +59,12 @@ public sealed class Address : ValueObjectBase<Address>
         {
             var parts = RehydrateToList(property, false);
             return new Address(parts[0], parts[1], parts[2], parts[3], parts[4],
-                CountryCodes.FindOrDefault(parts[5]),
-                parts[6]);
+                CountryCodes.FindOrDefault(parts[5]), parts[6]);
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[] { Line1, Line2, Line3, City, State, CountryCode.Alpha3, Zip };
+        return [Line1, Line2, Line3, City, State, CountryCode.Alpha3, Zip];
     }
 }

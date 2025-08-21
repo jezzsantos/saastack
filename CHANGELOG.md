@@ -18,6 +18,19 @@
 
 ---
 
+## [1.0.0] - 2025-08-21
+
+### Non-breaking Changes
+- Added new methods for mapping Optionals to Nullables and vice versa, for ValuesObjects, Domain Events and Application Layer conversions
+- `ValueObjectBase<T>.RehydrateToList()` now returns `List<Optional<string>>` instead of `List<string?>` in order to make mapping simpler.
+
+### Breaking Changes
+
+### Fixed
+- Roslyn rule snow support C#12 syntax for new collections syntax
+
+---
+
 ## [1.0.0] - 2025-08-09
 
 ### Non-breaking Changes

@@ -3,7 +3,6 @@ using Domain.Common.ValueObjects;
 using Domain.Shared;
 using FluentAssertions;
 using UnitTesting.Common;
-using UnitTesting.Common.Validation;
 using Xunit;
 
 namespace EndUsersDomain.UnitTests;
@@ -27,13 +26,13 @@ public class GuestInvitationSpec
         invitation.IsInvited.Should().BeFalse();
         invitation.IsStillOpen.Should().BeFalse();
         invitation.IsAccepted.Should().BeFalse();
-        invitation.Token.Should().BeNull();
-        invitation.ExpiresOnUtc.Should().BeNull();
-        invitation.InvitedById.Should().BeNull();
-        invitation.InviteeEmailAddress.Should().BeNull();
-        invitation.InvitedAtUtc.Should().BeNull();
-        invitation.AcceptedEmailAddress.Should().BeNull();
-        invitation.AcceptedAtUtc.Should().BeNull();
+        invitation.Token.Should().BeNone();
+        invitation.ExpiresOnUtc.Should().BeNone();
+        invitation.InvitedById.Should().BeNone();
+        invitation.InviteeEmailAddress.Should().BeNone();
+        invitation.InvitedAtUtc.Should().BeNone();
+        invitation.AcceptedEmailAddress.Should().BeNone();
+        invitation.AcceptedAtUtc.Should().BeNone();
     }
 
     [Fact]
@@ -85,10 +84,10 @@ public class GuestInvitationSpec
         invitation.Token.Should().Be(TestingToken);
         invitation.ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(GuestInvitation.DefaultTokenExpiry));
         invitation.InvitedById.Should().Be("aninviterid".ToId());
-        invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");
+        invitation.InviteeEmailAddress.Value.Address.Should().Be("auser@company.com");
         invitation.InvitedAtUtc.Should().BeNear(DateTime.UtcNow);
-        invitation.AcceptedEmailAddress.Should().BeNull();
-        invitation.AcceptedAtUtc.Should().BeNull();
+        invitation.AcceptedEmailAddress.Should().BeNone();
+        invitation.AcceptedAtUtc.Should().BeNone();
     }
 
     [Fact]
@@ -139,10 +138,10 @@ public class GuestInvitationSpec
         invitation.Token.Should().Be(TestingToken);
         invitation.ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(GuestInvitation.DefaultTokenExpiry));
         invitation.InvitedById.Should().Be("aninviterid".ToId());
-        invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");
+        invitation.InviteeEmailAddress.Value.Address.Should().Be("auser@company.com");
         invitation.InvitedAtUtc.Should().BeNear(DateTime.UtcNow);
-        invitation.AcceptedEmailAddress.Should().BeNull();
-        invitation.AcceptedAtUtc.Should().BeNull();
+        invitation.AcceptedEmailAddress.Should().BeNone();
+        invitation.AcceptedAtUtc.Should().BeNone();
     }
 
     [Fact]
@@ -182,9 +181,9 @@ public class GuestInvitationSpec
         invitation.IsStillOpen.Should().BeFalse();
         invitation.IsAccepted.Should().BeTrue();
         invitation.Token.Should().Be(TestingToken);
-        invitation.ExpiresOnUtc.Should().BeNull();
+        invitation.ExpiresOnUtc.Should().BeNone();
         invitation.InvitedById.Should().Be("aninviterid".ToId());
-        invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");
+        invitation.InviteeEmailAddress.Value.Address.Should().Be("auser@company.com");
         invitation.InvitedAtUtc.Should().BeNear(DateTime.UtcNow);
         invitation.AcceptedAtUtc.Should().BeNear(DateTime.UtcNow);
     }

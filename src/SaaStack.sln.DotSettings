@@ -778,7 +778,7 @@ public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
 
     protected override IEnumerable&lt;object?&gt; GetAtomicValues()
     {
-        return new object[] { $param1$, $param2$, $param3$ };
+        return [ $param1$, $param2$, $param3$ ];
     }
 
     public $datatype$ $param1$ { get; }

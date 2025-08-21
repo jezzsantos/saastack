@@ -36,14 +36,10 @@ public static class Events
                 UserId = userId,
                 AccessToken = accessToken.EncryptedValue,
                 RefreshToken = refreshToken.EncryptedValue,
-                IdToken = idToken.HasValue
-                    ? idToken.Value.EncryptedValue
-                    : null,
+                IdToken = idToken.ToNullable(tok => tok.EncryptedValue),
                 AccessTokenExpiresOn = accessToken.ExpiresOn,
                 RefreshTokenExpiresOn = refreshToken.ExpiresOn,
-                IdTokenExpiresOn = idToken.HasValue
-                    ? idToken.Value.ExpiresOn
-                    : null,
+                IdTokenExpiresOn = idToken.ToNullable<AuthToken, DateTime>(tok => tok.ExpiresOn),
                 RefreshTokenDigest = refreshTokenDigest
             };
         }
@@ -56,14 +52,10 @@ public static class Events
                 UserId = userId,
                 AccessToken = accessToken.EncryptedValue,
                 RefreshToken = refreshToken.EncryptedValue,
-                IdToken = idToken.HasValue
-                    ? idToken.Value.EncryptedValue
-                    : null,
+                IdToken = idToken.ToNullable(tok => tok.EncryptedValue),
                 AccessTokenExpiresOn = accessToken.ExpiresOn,
                 RefreshTokenExpiresOn = refreshToken.ExpiresOn,
-                IdTokenExpiresOn = idToken.HasValue
-                    ? idToken.Value.ExpiresOn
-                    : null,
+                IdTokenExpiresOn = idToken.ToNullable<AuthToken, DateTime>(tok => tok.ExpiresOn),
                 RefreshTokenDigest = refreshTokenDigest
             };
         }
@@ -348,9 +340,7 @@ public static class Events
             return new ParametersChanged(id)
             {
                 Description = description,
-                ExpiresOn = expiresOn.HasValue
-                    ? expiresOn.Value
-                    : null
+                ExpiresOn = expiresOn.ToNullable()
             };
         }
 
@@ -433,9 +423,7 @@ public static class Events
                 {
                     SecretHash = secret.SecretHash,
                     FirstFour = secret.FirstFour,
-                    ExpiresOn = expiresOn.HasValue
-                        ? expiresOn.Value
-                        : null
+                    ExpiresOn = expiresOn.ToNullable()
                 };
             }
         }

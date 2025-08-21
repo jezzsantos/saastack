@@ -295,7 +295,7 @@ public class TestValueObject : ValueObjectBase<TestValueObject>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
         return [AStringProperty, AnIntName, ABooleanPropertyName];
     }

@@ -52,8 +52,8 @@ public sealed class Registration : ValueObjectBase<Registration>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { EmailAddress, Name };
+        return [EmailAddress, Name];
     }
 }

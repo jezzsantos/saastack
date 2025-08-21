@@ -56,12 +56,12 @@ public sealed class PersonName : ValueObjectBase<PersonName>
             var parts = RehydrateToList(property, false);
             return new PersonName(
                 Name.Rehydrate()(parts[0]!, container),
-                parts[1].FromValueOrNone(val => Name.Rehydrate()(val, container)));
+                parts[1].ToOptional(val => Name.Rehydrate()(val, container)));
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { FirstName, LastName };
+        return [FirstName, LastName];
     }
 }

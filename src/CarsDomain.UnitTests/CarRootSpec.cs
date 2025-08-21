@@ -145,7 +145,7 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Offline);
-        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
+        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNone();
         _car.Events.Last().Should().BeOfType<UnavailabilitySlotAdded>();
     }
 
@@ -191,7 +191,7 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Maintenance);
-        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
+        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNone();
         _car.Events.Last().Should().BeOfType<UnavailabilitySlotAdded>();
     }
 
@@ -343,7 +343,7 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Other);
-        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
+        _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNone();
         _car.Events.Last().Should().BeOfType<UnavailabilitySlotAdded>();
         _car.Events.Last().As<UnavailabilitySlotAdded>().UnavailabilityId.Should()
             .Be("anunavailbilityid1");

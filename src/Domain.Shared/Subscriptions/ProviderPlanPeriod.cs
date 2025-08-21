@@ -42,9 +42,9 @@ public sealed class ProviderPlanPeriod : ValueObjectBase<ProviderPlanPeriod>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Frequency, Unit };
+        return [Frequency, Unit];
     }
 }
 

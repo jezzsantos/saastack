@@ -52,6 +52,6 @@ public sealed class LicensePlate : ValueObjectBase<LicensePlate>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Jurisdiction, Number };
+        return [Jurisdiction, Number];
     }
 }

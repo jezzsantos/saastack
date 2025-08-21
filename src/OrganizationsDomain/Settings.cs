@@ -38,9 +38,9 @@ public sealed class Settings : ValueObjectBase<Settings>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { Properties.ToJson()! };
+        return [Properties.ToJson()!];
     }
 
     public Result<Settings, Error> AddOrUpdate(string name, object value, bool isEncrypted)

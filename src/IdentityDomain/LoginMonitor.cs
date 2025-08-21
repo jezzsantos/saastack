@@ -86,18 +86,14 @@ public sealed class LoginMonitor : ValueObjectBase<LoginMonitor>
             return new LoginMonitor(parts[0].ToIntOrDefault(0),
                 parts[1].ToTimeSpanOrDefault(TimeSpan.Zero),
                 parts[2].ToIntOrDefault(0),
-                parts[3].FromValueOrNone(val => val.FromIso8601()),
+                parts[3].ToOptional<string?, DateTime>(val => val.FromIso8601()),
                 parts[4].ToBool());
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[]
-        {
-            MaxFailedPasswordAttempts, CooldownPeriod, FailedPasswordAttempts,
-            LastAttemptUtc.ToValueOrNull(val => val.ToIso8601()), ToggledLocked
-        };
+        return [MaxFailedPasswordAttempts, CooldownPeriod, FailedPasswordAttempts, LastAttemptUtc, ToggledLocked];
     }
 
     public LoginMonitor AttemptedFailedLogin(DateTime attemptedUtc)

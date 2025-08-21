@@ -510,7 +510,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
 
     public PersonName GuessGuestInvitationName()
     {
-        return GuestInvitation.InviteeEmailAddress!.GuessPersonFullName();
+        return GuestInvitation.InviteeEmailAddress.Value.GuessPersonFullName();
     }
 
     public async Task<Result<Error>> InviteGuestAsync(ITokensService tokensService, Identifier inviterId,
@@ -569,7 +569,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
             return Error.RuleViolation(Resources.EndUserRoot_GuestInvitationHasExpired);
         }
 
-        return await InviteGuestAsync(tokensService, inviterId, GuestInvitation.InviteeEmailAddress!, onInvited);
+        return await InviteGuestAsync(tokensService, inviterId, GuestInvitation.InviteeEmailAddress, onInvited);
     }
 
     public Result<Error> RemoveMembership(EndUserRoot remover, Identifier organizationId)

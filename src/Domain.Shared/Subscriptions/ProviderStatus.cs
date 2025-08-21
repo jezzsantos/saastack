@@ -53,17 +53,14 @@ public sealed class ProviderStatus : ValueObjectBase<ProviderStatus>
             var parts = RehydrateToList(property, false);
             return new ProviderStatus(
                 parts[0].ToEnumOrDefault(BillingSubscriptionStatus.Unsubscribed),
-                parts[1].FromValueOrNone(val => val.FromIso8601()),
+                parts[1].ToOptional<string?, DateTime>(val => val.FromIso8601()),
                 parts[2].ToBool());
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[]
-        {
-            Status, CanceledDateUtc.ValueOrNull, CanBeUnsubscribed
-        };
+        return [Status, CanceledDateUtc.ValueOrNull, CanBeUnsubscribed];
     }
 }
 

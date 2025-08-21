@@ -310,7 +310,7 @@ public class ValueObjectSpec
 
         protected override IEnumerable<object?> GetAtomicValues()
         {
-            return new object[] { AStringValue, AnIntegerValue, ABooleanValue };
+            return [AStringValue, AnIntegerValue, ABooleanValue];
         }
 
         public new static List<string> RehydrateToList(string hydratedValue, bool isSingleValueObject,

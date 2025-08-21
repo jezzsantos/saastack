@@ -45,7 +45,7 @@ public sealed class BillingSubscriber : ValueObjectBase<BillingSubscriber>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { SubscriptionId, SubscriberId };
+        return [SubscriptionId, SubscriberId];
     }
 
     public BillingSubscriber ChangeSubscriber(Identifier subscriberId)

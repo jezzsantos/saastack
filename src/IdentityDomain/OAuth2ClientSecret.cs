@@ -64,13 +64,14 @@ public sealed class OAuth2ClientSecret : ValueObjectBase<OAuth2ClientSecret>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new OAuth2ClientSecret(parts[0]!, parts[1]!, parts[2].FromValueOrNone(val => val.FromIso8601()));
+            return new OAuth2ClientSecret(parts[0]!, parts[1]!,
+                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { SecretHash, FirstFour, ExpiresOn };
+        return [SecretHash, FirstFour, ExpiresOn];
     }
 
     [SkipImmutabilityCheck]

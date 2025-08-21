@@ -24,7 +24,7 @@ public class CausedBySpec
 
         result.Should().BeSuccess();
         result.Value.Reason.Should().Be(UnavailabilityCausedBy.Other);
-        result.Value.Reference.Should().BeNull();
+        result.Value.Reference.Should().BeNone();
     }
 
     [Fact]

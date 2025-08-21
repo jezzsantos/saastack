@@ -18,9 +18,7 @@ public static class Events
             ProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference.HasValue
-                ? subscriptionReference.Value
-                : null
+            SubscriptionReference = subscriptionReference.ToNullable()
         };
     }
 
@@ -60,9 +58,7 @@ public static class Events
             ToProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference.HasValue
-                ? subscriptionReference.Value
-                : null
+            SubscriptionReference = subscriptionReference.ToNullable()
         };
     }
 
@@ -86,9 +82,7 @@ public static class Events
             ProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference.HasValue
-                ? subscriptionReference.Value
-                : null,
+            SubscriptionReference = subscriptionReference.ToNullable(),
             PlanId = planId
         };
     }
@@ -103,9 +97,7 @@ public static class Events
             ProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference.HasValue
-                ? subscriptionReference.Value
-                : null,
+            SubscriptionReference = subscriptionReference.ToNullable(),
             PlanId = planId,
             FromBuyerId = transfererId,
             ToBuyerId = transfereeId

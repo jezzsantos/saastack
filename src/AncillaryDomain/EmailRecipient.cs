@@ -41,6 +41,6 @@ public sealed class EmailRecipient : ValueObjectBase<EmailRecipient>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { EmailAddress, DisplayName };
+        return [EmailAddress, DisplayName];
     }
 }

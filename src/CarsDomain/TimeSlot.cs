@@ -50,7 +50,7 @@ public sealed class TimeSlot : ValueObjectBase<TimeSlot>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { From.ToIso8601(), To.ToIso8601() };
+        return [From, To];
     }
 }
 

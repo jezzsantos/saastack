@@ -57,16 +57,16 @@ public sealed class ProviderPlan : ValueObjectBase<ProviderPlan>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new ProviderPlan(parts[0].FromValueOrNone<string?, string>(),
+            return new ProviderPlan(parts[0].ToOptional(),
                 parts[1].ToBool(),
-                parts[2].FromValueOrNone(val => val.FromIso8601()),
+                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()),
                 parts[3].ToEnumOrDefault(BillingSubscriptionTier.Unsubscribed));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[] { PlanId.ValueOrNull, IsTrial, TrialEndDateUtc.ToValueOrNull(val => val.ToIso8601()), Tier };
+        return [PlanId, IsTrial, TrialEndDateUtc, Tier];
     }
 }
 

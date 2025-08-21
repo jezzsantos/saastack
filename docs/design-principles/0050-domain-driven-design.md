@@ -948,7 +948,7 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
     // Note: we can provide our value objects
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Year, Make, Model };
+        return [ Year, Make, Model ];
     }
 
 	// Note: This method must exist on the value object

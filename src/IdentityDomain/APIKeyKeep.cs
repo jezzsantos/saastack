@@ -52,9 +52,9 @@ public sealed class APIKeyKeep : ValueObjectBase<APIKeyKeep>
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Token, KeyHash };
+        return [Token, KeyHash];
     }
 
     public Result<APIKeyKeep, Error> ChangeKey(IAPIKeyHasherService apiKeyHasherService, string token, string keyHash)

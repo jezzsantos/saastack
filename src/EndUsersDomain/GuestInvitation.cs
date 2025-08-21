@@ -20,17 +20,19 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 
     private GuestInvitation()
     {
-        Token = null;
-        InviteeEmailAddress = null;
-        ExpiresOnUtc = null;
-        InvitedById = null;
-        InvitedAtUtc = null;
-        AcceptedEmailAddress = null;
-        AcceptedAtUtc = null;
+        Token = Optional<string>.None;
+        InviteeEmailAddress = Optional<EmailAddress>.None;
+        ExpiresOnUtc = Optional<DateTime>.None;
+        InvitedById = Optional<Identifier>.None;
+        InvitedAtUtc = Optional<DateTime>.None;
+        AcceptedEmailAddress = Optional<EmailAddress>.None;
+        AcceptedAtUtc = Optional<DateTime>.None;
     }
 
-    private GuestInvitation(string? token, EmailAddress? inviteeEmailAddress, DateTime? expiresOnUtc,
-        Identifier? invitedById, DateTime? invitedAtUtc, EmailAddress? acceptedEmailAddress, DateTime? acceptedAtUtc)
+    private GuestInvitation(Optional<string> token, Optional<EmailAddress> inviteeEmailAddress,
+        Optional<DateTime> expiresOnUtc,
+        Optional<Identifier> invitedById, Optional<DateTime> invitedAtUtc, Optional<EmailAddress> acceptedEmailAddress,
+        Optional<DateTime> acceptedAtUtc)
     {
         Token = token;
         InviteeEmailAddress = inviteeEmailAddress;
@@ -41,27 +43,27 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         AcceptedAtUtc = acceptedAtUtc;
     }
 
-    public DateTime? AcceptedAtUtc { get; }
+    public Optional<DateTime> AcceptedAtUtc { get; }
 
-    public EmailAddress? AcceptedEmailAddress { get; }
+    public Optional<EmailAddress> AcceptedEmailAddress { get; }
 
     public bool CanAccept => IsInvited && !IsAccepted;
 
-    public DateTime? ExpiresOnUtc { get; }
+    public Optional<DateTime> ExpiresOnUtc { get; }
 
-    public DateTime? InvitedAtUtc { get; }
+    public Optional<DateTime> InvitedAtUtc { get; }
 
-    public Identifier? InvitedById { get; }
+    public Optional<Identifier> InvitedById { get; }
 
-    public EmailAddress? InviteeEmailAddress { get; }
+    public Optional<EmailAddress> InviteeEmailAddress { get; }
 
     public bool IsAccepted => IsInvited && AcceptedAtUtc.HasValue;
 
-    public bool IsInvited => Token.HasValue() && InviteeEmailAddress.Exists();
+    public bool IsInvited => Token.HasValue && InviteeEmailAddress.Exists();
 
-    public bool IsStillOpen => IsInvited && ExpiresOnUtc.HasValue() && ExpiresOnUtc > DateTime.UtcNow;
+    public bool IsStillOpen => IsInvited && ExpiresOnUtc.HasValue && ExpiresOnUtc > DateTime.UtcNow;
 
-    public string? Token { get; }
+    public Optional<string> Token { get; }
 
     [UsedImplicitly]
     public static ValueObjectFactory<GuestInvitation> Rehydrate()
@@ -69,22 +71,22 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new GuestInvitation(parts[0]!,
+            return new GuestInvitation(parts[0],
                 EmailAddress.Rehydrate()(parts[1]!, container),
-                parts[2]?.FromIso8601(),
+                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()),
                 Identifier.Rehydrate()(parts[3]!, container),
-                parts[4]?.FromIso8601(),
-                EmailAddress.Rehydrate()(parts[1]!, container),
-                parts[6]?.FromIso8601());
+                parts[4].ToOptional<string?, DateTime>(val => val.FromIso8601()),
+                EmailAddress.Rehydrate()(parts[5]!, container),
+                parts[6].ToOptional<string?, DateTime>(val => val.FromIso8601()));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[]
-        {
+        return
+        [
             Token, InviteeEmailAddress, ExpiresOnUtc, InvitedById, InvitedAtUtc, AcceptedEmailAddress, AcceptedAtUtc
-        };
+        ];
     }
 
     public Result<GuestInvitation, Error> Accept(EmailAddress acceptedWithEmail)
@@ -99,7 +101,8 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
             return Error.RuleViolation(Resources.GuestInvitation_AlreadyAccepted);
         }
 
-        return new GuestInvitation(Token, InviteeEmailAddress, null, InvitedById, InvitedAtUtc, acceptedWithEmail,
+        return new GuestInvitation(Token, InviteeEmailAddress, Optional<DateTime>.None, InvitedById, InvitedAtUtc,
+            acceptedWithEmail,
             DateTime.UtcNow);
     }
 
@@ -110,7 +113,7 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         {
             return error;
         }
-        
+
         if (IsInvited)
         {
             return Error.RuleViolation(Resources.GuestInvitation_AlreadyInvited);
@@ -122,7 +125,7 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         }
 
         return new GuestInvitation(token, inviteeEmailAddress, DateTime.UtcNow.Add(DefaultTokenExpiry), invitedById,
-            DateTime.UtcNow, null, null);
+            DateTime.UtcNow, Optional<EmailAddress>.None, Optional<DateTime>.None);
     }
 
     public Result<GuestInvitation, Error> Renew(string token, EmailAddress inviteeEmailAddress)
@@ -144,13 +147,14 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         }
 
         return new GuestInvitation(token, inviteeEmailAddress, DateTime.UtcNow.Add(DefaultTokenExpiry), InvitedById,
-            InvitedAtUtc, null, null);
+            InvitedAtUtc, Optional<EmailAddress>.None, Optional<DateTime>.None);
     }
 
 #if TESTINGONLY
     public GuestInvitation TestingOnly_ExpireNow()
     {
-        return new GuestInvitation(Token, InviteeEmailAddress, DateTime.UtcNow, InvitedById, InvitedAtUtc, null, null);
+        return new GuestInvitation(Token, InviteeEmailAddress, DateTime.UtcNow, InvitedById, InvitedAtUtc,
+            Optional<EmailAddress>.None, Optional<DateTime>.None);
     }
 #endif
 }

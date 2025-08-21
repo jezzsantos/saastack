@@ -56,16 +56,15 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
         {
             var parts = RehydrateToList(property, false);
             return new PasswordKeep(
-                parts[0].FromValueOrNone<string, string>(),
-                parts[1].FromValueOrNone<string, string>(),
-                parts[2].FromValueOrNone(val => val.FromIso8601()));
+                parts[0].ToOptional(),
+                parts[1].ToOptional(),
+                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
         };
     }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new[]
-            { PasswordHash.ValueOrNull, ResetToken.ValueOrNull, TokenExpires.ToValueOrNull(val => val.ToIso8601()) };
+        return [PasswordHash.ValueOrNull, ResetToken.ValueOrNull, TokenExpires];
     }
 
     public Result<PasswordKeep, Error> CompletePasswordReset(IPasswordHasherService passwordHasherService, string token,

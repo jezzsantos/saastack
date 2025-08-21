@@ -72,6 +72,6 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Name, Timezone, Address, Locale };
+        return [Name, Timezone, Address, Locale];
     }
 }
