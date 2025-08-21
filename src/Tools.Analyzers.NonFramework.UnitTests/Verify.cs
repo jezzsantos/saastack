@@ -4,6 +4,7 @@ using System.Reflection;
 using Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -21,11 +22,12 @@ public static class Verify
     ///     Provides references to code that we are using in the testing code snippets
     /// </summary>
     private static readonly Assembly[] AdditionalReferences =
-    {
+    [
         typeof(Verify).Assembly,
         typeof(AnalyzerConstants).Assembly,
         typeof(IQueryableEntity).Assembly
-    };
+    ];
+    private const LanguageVersion CSharpVersion = LanguageVersion.CSharp12; // Set the desired C# language version
 
     // HACK: we have to define the .NET 8.0 framework here,
     // because the current version of Microsoft.CodeAnalysis.Testing.ReferenceAssemblies
@@ -73,7 +75,7 @@ public static class Verify
                 {
                     var args = exp.messageArgs.Exists() && exp.messageArgs.Length != 0
                         ? new object[] { exp.argument }.Concat(exp.messageArgs)
-                        : new object[] { exp.argument };
+                        : [exp.argument];
                     return CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>
                         .Diagnostic(exp.descriptor)
                         .WithLocation(exp.locationX, exp.locationY)
@@ -93,7 +95,7 @@ public static class Verify
             .WithLocation(locationX, locationY)
             .WithArguments(arguments);
 
-        await RunCodeFixTest<TAnalyzer, TCodeFix>(problem, fix, equivalenceKey, new[] { expectation });
+        await RunCodeFixTest<TAnalyzer, TCodeFix>(problem, fix, equivalenceKey, [expectation]);
     }
 
     public static async Task DiagnosticExists<TAnalyzer>(DiagnosticDescriptor descriptor, string inputSnippet,
@@ -127,7 +129,7 @@ public static class Verify
             {
                 var args = exp.messageArgs.Exists() && exp.messageArgs.Length != 0
                     ? new object[] { exp.argument }.Concat(exp.messageArgs)
-                    : new object[] { exp.argument };
+                    : [exp.argument];
                 return CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>
                     .Diagnostic(exp.descriptor)
                     .WithLocation(exp.locationX, exp.locationY)
@@ -150,13 +152,13 @@ public static class Verify
     {
         var arguments = messageArgs.Exists() && messageArgs.Any()
             ? new object[] { expected1.argument }.Concat(messageArgs)
-            : new object[] { expected1.argument };
+            : [expected1.argument];
 
         var expectation = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(descriptor)
             .WithArguments(arguments.ToArray()!)
             .WithLocation(expected1.locationX, expected1.locationY);
 
-        await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation });
+        await RunAnalyzerTest<TAnalyzer>(inputSnippet, [expectation]);
     }
 
     private static async Task RunAnalyzerTest<TAnalyzer>(string inputSnippet, DiagnosticResult[]? expected)
@@ -169,6 +171,8 @@ public static class Verify
         }
 
         analyzerTest.ReferenceAssemblies = Net80;
+        analyzerTest.SolutionTransforms.Add((solution, projectId) => solution.WithProjectParseOptions(projectId,
+            new CSharpParseOptions(CSharpVersion)));
         analyzerTest.TestCode = inputSnippet;
         if (expected is not null && expected.Any())
         {
@@ -190,6 +194,8 @@ public static class Verify
         }
 
         codeFixTest.ReferenceAssemblies = Net80;
+        codeFixTest.SolutionTransforms.Add((solution, projectId) => solution.WithProjectParseOptions(projectId,
+            new CSharpParseOptions(CSharpVersion)));
         codeFixTest.TestCode = problem;
         codeFixTest.FixedCode = fix;
 

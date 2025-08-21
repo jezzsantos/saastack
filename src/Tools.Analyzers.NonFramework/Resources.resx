@@ -362,10 +362,10 @@
         <value>Method mutates ValueObject state</value>
     </data>
     <data name="SAASDDD037Description" xml:space="preserve">
-        <value>Property could be Optional&lt;T&gt;, rather than handling nulls.</value>
+        <value>Property should be Optional&lt;T&gt;, rather than handling nulls.</value>
     </data>
     <data name="SAASDDD037MessageFormat" xml:space="preserve">
-        <value>Consider making property '{0}' an Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls</value>
+        <value>Property '{0}' should be Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls</value>
     </data>
     <data name="SAASDDD037Title" xml:space="preserve">
         <value>Nullable declaration</value>

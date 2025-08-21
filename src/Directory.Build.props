@@ -56,7 +56,7 @@
     <!-- Analyzers -->
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn),1573,1574,1591,1712,1723,SAASDDD037</NoWarn>
+        <NoWarn>$(NoWarn),1573,1574,1591,1712,1723</NoWarn>
         <RoslynTargetFramework>8.0.19</RoslynTargetFramework> <!-- Update the RuntimeConstants.Dotnet versions also -->
     </PropertyGroup>
 

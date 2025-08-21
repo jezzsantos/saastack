@@ -46,7 +46,7 @@ namespace Tools.Analyzers.NonFramework;
 ///     SAASDDD035: Error: ValueObjects must only have immutable methods (or be overridden by the
 ///     <see cref="SkipImmutabilityCheckAttribute" />)
 ///     SAASDDD036: Warning: ValueObjects should be marked as sealed
-///     SAASDDD037: Info: Properties should be Optional{T} not nullable,
+///     SAASDDD037: Warning: Properties should be Optional{T} not nullable,
 ///     SAASDDD038: Error: Properties are all assigned in ValueObjectBase{T}.GetAtomicValues(),
 ///     DomainEvents:
 ///     SAASDDD040: Error: DomainEvents must be public
@@ -174,7 +174,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassShouldBeSealed),
         nameof(Resources.Diagnostic_Description_ClassShouldBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassShouldBeSealed));
-    internal static readonly DiagnosticDescriptor Rule037 = "SAASDDD037".GetDescriptor(DiagnosticSeverity.Info,
+    internal static readonly DiagnosticDescriptor Rule037 = "SAASDDD037".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD037Title), nameof(Resources.SAASDDD037Description),
         nameof(Resources.SAASDDD037MessageFormat));
     internal static readonly DiagnosticDescriptor Rule038 = "SAASDDD038".GetDescriptor(DiagnosticSeverity.Error,
@@ -477,7 +477,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     var returnType = property.GetGetterReturnType(context);
                     if (returnType.Exists())
                     {
-                        var propertyType = returnType.Name;
+                        var propertyType = returnType.WithoutNullable(context).Name;
                         context.ReportDiagnostic(Rule037, property, propertyType);
                     }
                 }
@@ -517,8 +517,14 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     .Select(acs => acs.Initializer)
                     .SelectMany(ies => ies.Expressions)
                     .ToList();
+                var collectionExpressions = body.Statements
+                    .OfType<ReturnStatementSyntax>()
+                    .Select(rs => rs.Expression)
+                    .OfType<CollectionExpressionSyntax>()
+                    .ToList();
                 var expressions = explicitExpressions
                     .Concat(implicitExpressions)
+                    .Concat(collectionExpressions)
                     .ToList();
 
                 var directAccess = expressions
@@ -545,11 +551,16 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     .Select(mae => mae.Expression)
                     .OfType<IdentifierNameSyntax>()
                     .Select(ins => ins.Identifier);
+                var collectionProperties = expressions
+                    .OfType<CollectionExpressionSyntax>()
+                    .SelectMany(ies => ies.Elements)
+                    .Select(ins => ins.GetFirstToken());
 
                 initializedProperties = directAccess
                     .Concat(memberAccessedProperties)
                     .Concat(memberFunctionProperties)
                     .Concat(extensionMethodFunctionProperties)
+                    .Concat(collectionProperties)
                     .ToList();
             }
 

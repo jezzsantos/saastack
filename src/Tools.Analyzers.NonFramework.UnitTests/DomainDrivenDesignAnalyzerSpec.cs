@@ -3989,6 +3989,61 @@ public sealed class AClass : ValueObjectBase<AClass>
 
                 await Verify.NoDiagnosticExists<NonFramework_DomainDrivenDesignAnalyzer>(input);
             }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesAsCollectionSyntax_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return [AnotherProperty, AProperty];
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public AType AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}
+public class AType
+{
+    public string AValue { get;set; }
+}
+";
+
+                await Verify.NoDiagnosticExists<NonFramework_DomainDrivenDesignAnalyzer>(input);
+            }
         }
     }
 

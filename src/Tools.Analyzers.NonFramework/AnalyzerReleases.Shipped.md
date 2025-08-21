@@ -56,7 +56,7 @@
  SAASDDD035 | SaaStackDDD         | Error    | ValueObjects must only have immutable methods                                                             
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
- SAASDDD037 | SaaStackDDD         | Info     | Properties should be Optional{T} not nullable                                                             
+ SAASDDD037 | SaaStackDDD         | Warning  | Properties should be Optional{T} not nullable                                                             
  SAASDDD038 | SaaStackDDD         | Error    | Properties are all assigned in ValueObjectBase{T}.GetAtomicValues()                                       
  SAASDDD040 | SaaStackDDD         | Error    | DomainEvents must be public                                                                               
  SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents should be sealed                                                                             

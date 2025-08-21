@@ -745,7 +745,7 @@ namespace Tools.Analyzers.NonFramework {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Property could be Optional&lt;T&gt;, rather than handling nulls..
+        ///   Looks up a localized string similar to Property should be Optional&lt;T&gt;, rather than handling nulls..
         /// </summary>
         internal static string SAASDDD037Description {
             get {
@@ -754,7 +754,7 @@ namespace Tools.Analyzers.NonFramework {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Consider making property &apos;{0}&apos; an Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls.
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; should be Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls.
         /// </summary>
         internal static string SAASDDD037MessageFormat {
             get {

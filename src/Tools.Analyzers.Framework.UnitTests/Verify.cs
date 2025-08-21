@@ -2,11 +2,12 @@ extern alias CommonAnalyzers;
 extern alias FrameworkAnalyzers;
 using System.Reflection;
 using Common;
+using FrameworkAnalyzers::Common.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using FrameworkAnalyzers::Common.Extensions;
 using NuGet.Frameworks;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
@@ -15,6 +16,7 @@ namespace Tools.Analyzers.Framework.UnitTests;
 
 public static class Verify
 {
+    private const LanguageVersion CSharpVersion = LanguageVersion.CSharp12; // Set the desired C# language version
     /// <summary>
     ///     Provides references to code that we are using in the testing code snippets
     /// </summary>
@@ -98,6 +100,8 @@ public static class Verify
         }
 
         analyzerTest.ReferenceAssemblies = Net80;
+        analyzerTest.SolutionTransforms.Add((solution, projectId) => solution.WithProjectParseOptions(projectId,
+            new CSharpParseOptions(CSharpVersion)));
         analyzerTest.TestCode = inputSnippet;
         if (expected is not null && expected.Any())
         {
