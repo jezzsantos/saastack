@@ -47,8 +47,9 @@ public sealed class Registration : ValueObjectBase<Registration>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new Registration(EmailAddress.Rehydrate()(parts[0]!, container),
-                PersonDisplayName.Rehydrate()(parts[1]!, container));
+            return new Registration(
+                EmailAddress.Rehydrate()(parts[0], container),
+                PersonDisplayName.Rehydrate()(parts[1], container));
         };
     }
 

@@ -1,7 +1,10 @@
+using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using FluentAssertions;
+using UnitTesting.Common;
 using Xunit;
 
 namespace Domain.Common.UnitTests.ValueObjects;
@@ -26,33 +29,43 @@ public class ValueObjectSpec
     }
 
     [Fact]
-    public void WhenDehydrateMultiPropertyValueWithNulls_ThenReturnsProperties()
+    public void WhenDehydrateMultiPropertyValueWithDefaults_ThenReturnsProperties()
     {
-        var result = new TestMultiValueObject(null!, 25, true).Dehydrate();
+        var result = new TestMultiValueObject(null!, 0, false, DateTime.MinValue, Optional<string>.None,
+            Optional<int>.None, Optional<bool>.None, Optional<DateTime>.None).Dehydrate();
 
-        result.Should().Be("{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true}");
+        result.Should()
+            .Be(
+                "{\"Val1\":\"NULL\",\"Val2\":0,\"Val3\":false,\"Val4\":\"0001-01-01T00:00:00\",\"Val5\":\"NULL\",\"Val6\":\"NULL\",\"Val7\":\"NULL\",\"Val8\":\"NULL\"}");
     }
 
     [Fact]
-    public void WhenDehydrateMultiPropertyValue_ThenReturnsProperties()
+    public void WhenDehydrateMultiPropertyValueWithValues_ThenReturnsProperties()
     {
-        var result = new TestMultiValueObject("astringvalue", 25, true).Dehydrate();
+        var datum1 = DateTime.UtcNow.AddSeconds(2);
+        var datum2 = DateTime.UtcNow.SubtractSeconds(2);
 
-        result.Should().Be("{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true}");
+        var result = new TestMultiValueObject("avalue1", 25, true, datum1, new Optional<string>("avalue2"),
+            new Optional<int>(75), new Optional<bool>(true), new Optional<DateTime>(datum2)).Dehydrate();
+
+        result.Should()
+            .Be(
+                $"{{\"Val1\":\"avalue1\",\"Val2\":25,\"Val3\":true,\"Val4\":\"{datum1.ToIso8601()}\",\"Val5\":\"avalue2\",\"Val6\":75,\"Val7\":true,\"Val8\":\"{datum2.ToIso8601()}\"}}");
     }
 
     [Fact]
-    public void WhenDehydrateSingleListStringValue_ThenReturnsProperties()
+    public void WhenDehydrateSingleListStringValues_ThenReturnsProperties()
     {
         var value = new List<string>
         {
             "avalue1",
-            "avalue2"
+            "avalue2",
+            null!
         };
 
         var result = new TestSingleListStringValueObject(value).Dehydrate();
 
-        result.Should().Be("[\"avalue1\",\"avalue2\"]");
+        result.Should().Be("[\"avalue1\",\"avalue2\",null]");
     }
 
     [Fact]
@@ -84,24 +97,40 @@ public class ValueObjectSpec
     }
 
     [Fact]
-    public void WhenRehydrateMultiValueWithNullValue_ThenReturnsInstance()
+    public void WhenRehydrateMultiValueWithDefaultValues_ThenReturnsInstance()
     {
-        var valueObject = TestMultiValueObject.Rehydrate()("{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true}", null!);
+        var valueObject = TestMultiValueObject.Rehydrate()(
+            "{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true,\"Val4\":\"0001-01-01T00:00:00\",\"Val5\":\"NULL\",\"Val6\":\"NULL\",\"Val7\":\"NULL\",\"Val8\":\"NULL\"}",
+            null!);
 
         valueObject.AStringValue.Should().BeNull();
         valueObject.AnIntegerValue.Should().Be(25);
         valueObject.ABooleanValue.Should().BeTrue();
+        valueObject.ADateTimeValue.Should().Be(DateTime.MinValue);
+        valueObject.AnOptionalStringValue.Should().BeNone();
+        valueObject.AnOptionalIntegerValue.Should().BeNone();
+        valueObject.AnOptionalBooleanValue.Should().BeNone();
+        valueObject.AnOptionalDateTimeValue.Should().BeNone();
     }
 
     [Fact]
     public void WhenRehydrateMultiValue_ThenReturnsInstance()
     {
-        var valueObject =
-            TestMultiValueObject.Rehydrate()("{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true}", null!);
+        var datum1 = DateTime.UtcNow.AddSeconds(2);
+        var datum2 = DateTime.UtcNow.SubtractSeconds(2);
 
-        valueObject.AStringValue.Should().Be("astringvalue");
+        var valueObject = TestMultiValueObject.Rehydrate()(
+            $"{{\"Val1\":\"avalue1\",\"Val2\":25,\"Val3\":true,\"Val4\":\"{datum1.ToIso8601()}\",\"Val5\":\"avalue2\",\"Val6\":75,\"Val7\":true,\"Val8\":\"{datum2.ToIso8601()}\"}}",
+            null!);
+
+        valueObject.AStringValue.Should().Be("avalue1");
         valueObject.AnIntegerValue.Should().Be(25);
         valueObject.ABooleanValue.Should().BeTrue();
+        valueObject.ADateTimeValue.Should().Be(datum1);
+        valueObject.AnOptionalStringValue.Should().BeSome("avalue2");
+        valueObject.AnOptionalIntegerValue.Should().BeSome(75);
+        valueObject.AnOptionalBooleanValue.Should().BeSome(true);
+        valueObject.AnOptionalDateTimeValue.Should().BeSome(datum2);
     }
 
     [Fact]
@@ -121,28 +150,44 @@ public class ValueObjectSpec
     }
 
     [Fact]
-    public void WhenRehydrateToListWithANullValue_ThenReturnsValues()
+    public void WhenRehydrateToListWithDefaultValues_ThenReturnsValues()
     {
-        var result = TestMultiValueObject.RehydrateToList("{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true}", false);
+        var datum1 = DateTime.UtcNow.AddSeconds(2);
 
-        result.Should().ContainInOrder(null, "25", "True");
+        var result = TestMultiValueObject.RehydrateToList(
+            $"{{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true,\"Val4\":\"{datum1.ToIso8601()}\",\"Val5\":\"NULL\",\"Val6\":\"NULL\",\"Val7\":\"NULL\",\"Val8\":\"NULL\"}}",
+            false);
+
+        result.Should().HaveCount(8);
+        result[0].Should().Be(Optional<string>.None);
+        result[1].Should().Be(new Optional<string>("25"));
+        result[2].Should().Be(new Optional<string>("True"));
+        result[3].Should().Be(new Optional<string>(datum1.ToIso8601()));
+        result[4].Should().Be(Optional<string>.None);
+        result[5].Should().Be(Optional<string>.None);
+        result[6].Should().Be(Optional<string>.None);
+        result[7].Should().Be(Optional<string>.None);
     }
 
     [Fact]
     public void WhenRehydrateToListWithAnEmptyValue_ThenReturnsValues()
     {
-        var result = TestMultiValueObject.RehydrateToList("{\"Val1\":\"\",\"Val2\":25,\"Val3\":true}", false);
+        var datum1 = DateTime.UtcNow.AddSeconds(2);
+        var datum2 = DateTime.UtcNow.SubtractSeconds(2);
 
-        result.Should().ContainInOrder(string.Empty, "25", "True");
-    }
+        var result = TestMultiValueObject.RehydrateToList(
+            $"{{\"Val1\":\"avalue1\",\"Val2\":25,\"Val3\":true,\"Val4\":\"{datum1.ToIso8601()}\",\"Val5\":\"avalue2\",\"Val6\":75,\"Val7\":true,\"Val8\":\"{datum2.ToIso8601()}\"}}",
+            false);
 
-    [Fact]
-    public void WhenRehydrateToListWithStringValue_ThenReturnsValues()
-    {
-        var result =
-            TestMultiValueObject.RehydrateToList("{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true}", false);
-
-        result.Should().ContainInOrder("astringvalue", "25", "True");
+        result.Should().HaveCount(8);
+        result[0].Should().Be(new Optional<string>("avalue1"));
+        result[1].Should().Be(new Optional<string>("25"));
+        result[2].Should().Be(new Optional<string>("True"));
+        result[3].Should().Be(new Optional<string>(datum1.ToIso8601()));
+        result[4].Should().Be(new Optional<string>("avalue2"));
+        result[5].Should().Be(new Optional<string>("75"));
+        result[6].Should().Be(new Optional<string>("True"));
+        result[7].Should().Be(new Optional<string>(datum2.ToIso8601()));
     }
 
     [Fact]
@@ -204,9 +249,10 @@ public class ValueObjectSpec
     [Fact]
     public void WhenRehydrateToListWithStringValueForSingleListValue_ThenReturnsValue()
     {
-        var result = TestMultiValueObject.RehydrateToList("[\"astringvalue\",\"25\",\"true\"]", true, true);
+        var result = TestMultiValueObject.RehydrateToList("[\"astringvalue\",\"25\",\"true\",\"0001-01-01T00:00:00\"]",
+            true, true);
 
-        result.Should().ContainInOrder("astringvalue", "25", "true");
+        result.Should().ContainInOrder("astringvalue", "25", "true", "0001-01-01T00:00:00");
     }
 
     public sealed class TestSingleListStringValueObject : SingleValueObjectBase<TestSingleListStringValueObject,
@@ -286,16 +332,45 @@ public class ValueObjectSpec
 
     public sealed class TestMultiValueObject : ValueObjectBase<TestMultiValueObject>
     {
-        public TestMultiValueObject(string @string, int integer, bool boolean)
+        public TestMultiValueObject(string @string, int integer, bool boolean, DateTime dateTime)
         {
             AStringValue = @string;
             AnIntegerValue = integer;
             ABooleanValue = boolean;
+            ADateTimeValue = dateTime;
+            AnOptionalStringValue = Optional<string>.None;
+            AnOptionalIntegerValue = Optional<int>.None;
+            AnOptionalBooleanValue = Optional<bool>.None;
+            AnOptionalDateTimeValue = Optional<DateTime>.None;
+        }
+
+        public TestMultiValueObject(string @string, int integer, bool boolean, DateTime dateTime,
+            Optional<string> optionalString, Optional<int> optionalInteger, Optional<bool> optionalBoolean,
+            Optional<DateTime> optionalDateTime)
+        {
+            AStringValue = @string;
+            AnIntegerValue = integer;
+            ABooleanValue = boolean;
+            ADateTimeValue = dateTime;
+            AnOptionalStringValue = optionalString;
+            AnOptionalIntegerValue = optionalInteger;
+            AnOptionalBooleanValue = optionalBoolean;
+            AnOptionalDateTimeValue = optionalDateTime;
         }
 
         public bool ABooleanValue { get; }
 
+        public DateTime ADateTimeValue { get; }
+
         public int AnIntegerValue { get; }
+
+        public Optional<bool> AnOptionalBooleanValue { get; }
+
+        public Optional<DateTime> AnOptionalDateTimeValue { get; }
+
+        public Optional<int> AnOptionalIntegerValue { get; }
+
+        public Optional<string> AnOptionalStringValue { get; }
 
         public string AStringValue { get; }
 
@@ -304,20 +379,32 @@ public class ValueObjectSpec
             return (property, _) =>
             {
                 var values = ValueObjectBase<TestMultiValueObject>.RehydrateToList(property, false);
-                return new TestMultiValueObject(values[0]!, values[1]!.ToInt(), values[2]!.ToBool());
+                return new TestMultiValueObject(
+                    values[0],
+                    values[1].Value.ToInt(),
+                    values[2].Value.ToBool(),
+                    values[3].Value.FromIso8601(),
+                    values[4],
+                    values[5].ToOptional(val => val.ToInt()),
+                    values[6].ToOptional(val => val.ToBool()),
+                    values[7].ToOptional(val => val.FromIso8601()));
             };
         }
 
         protected override IEnumerable<object?> GetAtomicValues()
         {
-            return [AStringValue, AnIntegerValue, ABooleanValue];
+            return
+            [
+                AStringValue, AnIntegerValue, ABooleanValue, ADateTimeValue, AnOptionalStringValue,
+                AnOptionalIntegerValue, AnOptionalBooleanValue, AnOptionalDateTimeValue
+            ];
         }
 
-        public new static List<string> RehydrateToList(string hydratedValue, bool isSingleValueObject,
+        public new static List<Optional<string>> RehydrateToList(string hydratedValue, bool isSingleValueObject,
             bool isSingleListValueObject = false)
         {
             return ValueObjectBase<TestMultiValueObject>.RehydrateToList(hydratedValue, isSingleValueObject,
-                isSingleListValueObject)!;
+                isSingleListValueObject);
         }
     }
 

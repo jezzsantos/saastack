@@ -59,9 +59,9 @@ public sealed class VerificationKeep : ValueObjectBase<VerificationKeep>
         {
             var parts = RehydrateToList(property, false);
             return new VerificationKeep(
-                parts[0].ToOptional(),
-                parts[1].ToOptional<string?, DateTime>(val => val.FromIso8601()),
-                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
+                parts[0],
+                parts[1].ToOptional(val => val.FromIso8601()),
+                parts[2].ToOptional(val => val.FromIso8601()));
         };
     }
 

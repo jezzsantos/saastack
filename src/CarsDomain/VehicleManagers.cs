@@ -32,7 +32,11 @@ public sealed class VehicleManagers : SingleValueObjectBase<VehicleManagers, Lis
         return (property, _) =>
         {
             var items = RehydrateToList(property, true, true);
-            return new VehicleManagers(items.Select(item => item.ToId()).ToList());
+            return new VehicleManagers(
+                items
+                    .Where(item => item.HasValue)
+                    .Select(item => item.Value.ToId())
+                    .ToList());
         };
     }
 

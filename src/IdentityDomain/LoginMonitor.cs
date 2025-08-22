@@ -83,11 +83,12 @@ public sealed class LoginMonitor : ValueObjectBase<LoginMonitor>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new LoginMonitor(parts[0].ToIntOrDefault(0),
-                parts[1].ToTimeSpanOrDefault(TimeSpan.Zero),
-                parts[2].ToIntOrDefault(0),
-                parts[3].ToOptional<string?, DateTime>(val => val.FromIso8601()),
-                parts[4].ToBool());
+            return new LoginMonitor(
+                parts[0].Value.ToIntOrDefault(0),
+                parts[1].Value.ToTimeSpanOrDefault(TimeSpan.Zero),
+                parts[2].Value.ToIntOrDefault(0),
+                parts[3].ToOptional(val => val.FromIso8601()),
+                parts[4].Value.ToBool());
         };
     }
 

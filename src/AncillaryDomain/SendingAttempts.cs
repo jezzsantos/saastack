@@ -8,7 +8,7 @@ namespace AncillaryDomain;
 
 public sealed class SendingAttempts : SingleValueObjectBase<SendingAttempts, List<DateTime>>
 {
-    public static readonly SendingAttempts Empty = new(new List<DateTime>());
+    public static readonly SendingAttempts Empty = new([]);
 
     public static Result<SendingAttempts, Error> Create(DateTime when)
     {
@@ -43,7 +43,7 @@ public sealed class SendingAttempts : SingleValueObjectBase<SendingAttempts, Lis
     public static Result<SendingAttempts, Error> Create(List<DateTime> previousAttempts, DateTime attempt)
     {
         var allAttempts = previousAttempts
-            .Concat(new[] { attempt })
+            .Concat([attempt])
             .ToList();
 
         return Create(allAttempts);
@@ -63,7 +63,11 @@ public sealed class SendingAttempts : SingleValueObjectBase<SendingAttempts, Lis
         return (property, _) =>
         {
             var items = RehydrateToList(property, true, true);
-            return new SendingAttempts(items.Select(item => item.FromIso8601()).ToList());
+            return new SendingAttempts(
+                items
+                    .Where(item => item.HasValue)
+                    .Select(item => item.Value.FromIso8601())
+                    .ToList());
         };
     }
 

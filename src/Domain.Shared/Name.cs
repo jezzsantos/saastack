@@ -30,7 +30,7 @@ public sealed class Name : SingleValueObjectBase<Name, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Name(parts[0]!);
+            return new Name(parts[0]);
         };
     }
 }

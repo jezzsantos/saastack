@@ -35,7 +35,9 @@ public sealed class EmailRecipient : ValueObjectBase<EmailRecipient>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new EmailRecipient(EmailAddress.Rehydrate()(parts[0]!, container), parts[1]!);
+            return new EmailRecipient(
+                EmailAddress.Rehydrate()(parts[0], container),
+                parts[1]);
         };
     }
 

@@ -177,7 +177,7 @@ public class DomainFactory : IDomainFactory
             return type;
         }
 
-        if (Optional.TryGetContainedType(type, out var optionalValueObjectType))
+        if (Optional.TryGetOptionalType(type, out var optionalValueObjectType))
         {
             return optionalValueObjectType!;
         }

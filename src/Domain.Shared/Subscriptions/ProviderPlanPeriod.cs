@@ -37,8 +37,9 @@ public sealed class ProviderPlanPeriod : ValueObjectBase<ProviderPlanPeriod>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new ProviderPlanPeriod(parts[0].ToIntOrDefault(0),
-                parts[1].ToEnumOrDefault(BillingFrequencyUnit.Eternity));
+            return new ProviderPlanPeriod(
+                parts[0].Value.ToIntOrDefault(0),
+                parts[1].Value.ToEnumOrDefault(BillingFrequencyUnit.Eternity));
         };
     }
 

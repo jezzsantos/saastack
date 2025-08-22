@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using JetBrains.Annotations;
@@ -57,10 +58,11 @@ public sealed class ProviderPlan : ValueObjectBase<ProviderPlan>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new ProviderPlan(parts[0].ToOptional(),
-                parts[1].ToBool(),
-                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()),
-                parts[3].ToEnumOrDefault(BillingSubscriptionTier.Unsubscribed));
+            return new ProviderPlan(
+                parts[0],
+                parts[1].Value.ToBool(),
+                parts[2].ToOptional(val => val.FromIso8601()),
+                parts[3].Value.ToEnumOrDefault(BillingSubscriptionTier.Unsubscribed));
         };
     }
 

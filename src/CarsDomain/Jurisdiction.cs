@@ -38,7 +38,7 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Jurisdiction(parts[0]!);
+            return new Jurisdiction(parts[0]);
         };
     }
 }

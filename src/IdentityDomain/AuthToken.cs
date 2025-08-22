@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
@@ -70,8 +71,10 @@ public sealed class AuthToken : ValueObjectBase<AuthToken>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new AuthToken(parts[0].ToEnumOrDefault(AuthTokenType.AccessToken), parts[1]!,
-                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
+            return new AuthToken(
+                parts[0].Value.ToEnumOrDefault(AuthTokenType.AccessToken),
+                parts[1],
+                parts[2].ToOptional(val => val.FromIso8601()));
         };
     }
 

@@ -32,7 +32,7 @@ public static class StoreExtensions
             {
                 if (propertyValue.Value.StartsWith("{") && propertyValue.Value.EndsWith("}"))
                 {
-                    var complexObjectType = Optional.IsOptionalType(targetPropertyType, out var containedType)
+                    var complexObjectType = Optional.TryGetOptionalType(targetPropertyType, out var containedType)
                         ? containedType!
                         : targetPropertyType;
                     var complexObject = propertyValue.Value.FromJson(complexObjectType);

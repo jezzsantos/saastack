@@ -1,3 +1,4 @@
+using Common;
 using Common.Extensions;
 using Domain.Interfaces.ValueObjects;
 
@@ -13,6 +14,15 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
 {
     internal const string NullValue = "NULL";
 
+    /// <summary>
+    ///     We dehydrate individual values using JSON serialization on each value, which ensures that the
+    ///     underlying type is serialized appropriately.
+    ///     For example:
+    ///     A <see cref="DateTime" /> value will be serialized as an ISO7801 string,
+    ///     An <see cref="Enum" /> type will be serialized to a string value,
+    ///     An <see cref="Optional{TValue}" /> type will be serialized to a string value
+    ///     Any missing value is serialized as <see cref="NullValue" />
+    /// </summary>
     private static string Dehydrate(object? value)
     {
         if (value.NotExists())
@@ -21,12 +31,9 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
         }
 
         var dehydrated = value.ToJson(false, StringExtensions.JsonCasing.Camel);
-        if (dehydrated.Exists())
-        {
-            return dehydrated;
-        }
-
-        return NullValue;
+        return dehydrated.Exists()
+            ? dehydrated
+            : NullValue;
     }
 
     private static TResult Rehydrate<TResult>(string? dehydrated)
@@ -38,12 +45,9 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
         }
 
         var rehydrated = dehydrated.FromJson<TResult>();
-        if (rehydrated.Exists())
-        {
-            return rehydrated;
-        }
-
-        return new TResult();
+        return rehydrated.Exists()
+            ? rehydrated
+            : new TResult();
     }
 
     protected abstract IEnumerable<object?> GetAtomicValues();
@@ -75,7 +79,7 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
                 return value.ToString() ?? NullValue;
             }
 
-            return Dehydrate(DehydrateInternal(parts[0]));
+            return Dehydrate(value);
         }
 
         var counter = 1;
@@ -90,7 +94,7 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
         return Dehydrate();
     }
 
-    protected static List<string?> RehydrateToList(string hydratedValue, bool isSingleValueObject,
+    protected static List<Optional<string>> RehydrateToList(string hydratedValue, bool isSingleValueObject,
         bool isSingleListValueObject = false)
     {
         if (isSingleValueObject)
@@ -99,8 +103,8 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
             {
                 return Rehydrate<List<string>>(hydratedValue)
                     .Select(value => value.Equals(NullValue)
-                        ? null
-                        : value)
+                        ? Optional<string>.None
+                        : new Optional<string>(value))
                     .ToList();
             }
 
@@ -110,7 +114,7 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
             }
 
             return hydratedValue.Equals(NullValue)
-                ? [null]
+                ? [Optional<string>.None]
                 : [hydratedValue];
         }
 
@@ -119,18 +123,18 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
             {
                 if (pair.Value.NotExists())
                 {
-                    return null;
+                    return Optional<string>.None;
                 }
 
                 var value = pair.Value.ToString();
                 if (value.NotExists())
                 {
-                    return null;
+                    return Optional<string>.None;
                 }
 
                 return value.Equals(NullValue)
-                    ? null
-                    : value;
+                    ? Optional<string>.None
+                    : new Optional<string>(value);
             })
             .ToList();
     }
@@ -142,6 +146,23 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
             return NullValue;
         }
 
+        if (value.IsOptional(out var descriptor))
+        {
+            if (descriptor.NotExists())
+            {
+                return NullValue;
+            }
+
+            if (descriptor.IsNone)
+            {
+                return NullValue;
+            }
+
+            //Unpack any Optional wrappers
+            return DehydrateInternal(descriptor.ContainedValue);
+        }
+        
+
         if (value is IDehydratableValueObject valueObject)
         {
             return valueObject.Dehydrate();
@@ -150,8 +171,8 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
         if (value is IEnumerable<IDehydratableValueObject> enumerable)
         {
             return enumerable
-                .Select(e => e.Exists()
-                    ? e.Dehydrate()
+                .Select(item => item.Exists()
+                    ? item.Dehydrate()
                     : default)
                 .ToList();
         }

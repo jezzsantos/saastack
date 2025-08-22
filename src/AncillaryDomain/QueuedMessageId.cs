@@ -39,7 +39,7 @@ public sealed class QueuedMessageId : SingleValueObjectBase<QueuedMessageId, str
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new QueuedMessageId(parts[0]!);
+            return new QueuedMessageId(parts[0]);
         };
     }
 }

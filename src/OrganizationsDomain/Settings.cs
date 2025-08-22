@@ -34,7 +34,7 @@ public sealed class Settings : ValueObjectBase<Settings>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new Settings(parts[0]!.FromJson<Dictionary<string, Setting>>()!);
+            return new Settings(parts[0].Value.FromJson<Dictionary<string, Setting>>()!);
         };
     }
 

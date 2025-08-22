@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Common.Extensions;
+using JetBrains.Annotations;
 
 namespace Common;
 
@@ -248,6 +249,7 @@ public readonly struct Result<TValue, TError>
     /// <summary>
     ///     Tries to return the contained <see cref="Value" />, if there is one
     /// </summary>
+    [ContractAnnotation("=> true, value: notnull; => false, value: null")]
     public bool TryGet(out TValue value)
     {
         if (IsSuccessful)
@@ -263,6 +265,7 @@ public readonly struct Result<TValue, TError>
     /// <summary>
     ///     Tries to return the contained <see cref="error" />, if it is faulted
     /// </summary>
+    [ContractAnnotation("=> true, error: notnull; => false, error: null")]
     public bool TryGetError(out TError? error)
     {
         if (IsFailure)

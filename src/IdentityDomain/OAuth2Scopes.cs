@@ -57,9 +57,10 @@ public sealed class OAuth2Scopes : SingleValueObjectBase<OAuth2Scopes, List<stri
         {
             var items = RehydrateToList(property, true, true);
             return new OAuth2Scopes(
-                items.Select(item => item)
-                    .Where(item => item.Exists())
-                    .ToList()!);
+                items
+                    .Where(item => item.HasValue)
+                    .Select(item => item.Value)
+                    .ToList());
         };
     }
 

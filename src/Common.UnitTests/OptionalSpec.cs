@@ -1,6 +1,7 @@
 using Common.Extensions;
 using FluentAssertions;
 using UnitTesting.Common;
+using UnitTesting.Common.Validation;
 using Xunit;
 
 namespace Common.UnitTests;
@@ -11,7 +12,7 @@ public class OptionalSpec
     [Fact]
     public void WhenTryGetContainedTypeAndNotOptionalType_ThenReturnsFalse()
     {
-        var result = Optional.TryGetContainedType(typeof(string), out var containedType);
+        var result = Optional.TryGetOptionalType(typeof(string), out var containedType);
 
         result.Should().BeFalse();
         containedType.Should().BeNull();
@@ -20,7 +21,7 @@ public class OptionalSpec
     [Fact]
     public void WhenTryGetContainedTypeAndOptionalType_ThenReturnsTrue()
     {
-        var result = Optional.TryGetContainedType(typeof(Optional<string>), out var containedType);
+        var result = Optional.TryGetOptionalType(typeof(Optional<string>), out var containedType);
 
         result.Should().BeTrue();
         containedType.Should().Be(typeof(string));
@@ -29,38 +30,47 @@ public class OptionalSpec
     [Fact]
     public void WhenIsOptionalAndValueIsNull_ThenReturnsFalse()
     {
-        var result = ((string?)null).IsOptional(out var contained);
+        var result = ((string?)null)
+            .IsOptional(out var descriptor);
 
         result.Should().BeFalse();
-        contained.Should().BeNull();
+        descriptor.Should().BeNull();
     }
 
     [Fact]
     public void WhenIsOptionalAndValueIsNotOptional_ThenReturnsFalse()
     {
-        var result = string.Empty.IsOptional(out var contained);
+        var result = string.Empty
+            .IsOptional(out var descriptor);
 
         result.Should().BeFalse();
-        contained.Should().BeNull();
+        descriptor.Should().BeNull();
     }
 
     [Fact]
-    public void WhenIsOptionalAndValueIsOptionalNone_ThenReturnsTrue()
+    public void WhenIsOptionalAndValueIsOptionalNone_ThenReturnsInfo()
     {
-        var result = Optional<object>.None.IsOptional(out var contained);
+        var result = Optional<object>.None
+            .IsOptional(out var descriptor);
 
         result.Should().BeTrue();
-        contained.Should().BeNull();
+        descriptor.Should().NotBeNull();
+        descriptor!.ContainedType.Should().Be(typeof(object));
+        descriptor.ContainedValue.Should().BeNull();
+        descriptor.IsNone.Should().BeTrue();
     }
 
     [Fact]
-    public void WhenIsOptionalAndValueIsOptionalString_ThenReturnsTrue()
+    public void WhenIsOptionalAndValueIsOptionalString_ThenReturnsInfo()
     {
         var result = new Optional<string>("avalue")
-            .IsOptional(out var contained);
+            .IsOptional(out var descriptor);
 
         result.Should().BeTrue();
-        contained.Should().Be("avalue");
+        descriptor.Should().NotBeNull();
+        descriptor!.ContainedType.Should().Be(typeof(string));
+        descriptor.ContainedValue.Should().Be("avalue");
+        descriptor.IsNone.Should().BeFalse();
     }
 
     [Fact]
@@ -72,37 +82,41 @@ public class OptionalSpec
     }
 
     [Fact]
-    public void WhenSomeWithNull_ThenThrows()
+    public void WhenSomeWithNull_ThenReturnsNone()
     {
-        FluentActions.Invoking(() => Optional.Some<string>(null!))
-            .Should().Throw<ArgumentNullException>();
+        var result = Optional.Some<string>(null);
+
+        result.Should().BeNone();
+        result.Should().BeOfType<Optional<string>>();
     }
 
     [Fact]
-    public void WhenSomeWithValue_ThenReturnsOptional()
+    public void WhenSomeWithAValue_ThenReturnsOptional()
     {
         var result = Optional.Some<string>("avalue");
 
         result.Should().BeSome("avalue");
+        result.Should().BeOfType<Optional<string>>();
     }
 
     [Fact]
-    public void WhenSomeWithOptionalOfSameType_ThenReturnsSome()
-    {
-        var optional = (string)new Optional<string>("avalue");
-        var result = Optional.Some(optional);
-
-        result.Should().BeSome("avalue");
-        result.Should().Be(optional);
-    }
-
-    [Fact]
-    public void WhenSomeWithWithOptionalOfDifferentType_ThenReturnsSome()
+    public void WhenSomeWithOptional_ThenThrows()
     {
         var optional = new Optional<string>("avalue");
-        var result = Optional.Some<object>(optional);
 
-        result.Should().BeSome("avalue");
+        FluentActions.Invoking(() => Optional.Some(optional))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.Optional_WrappingOptional);
+    }
+
+    [Fact]
+    public void WhenSomeWithWithOptionalNone_ThenThrows()
+    {
+        var optional = new Optional<string>();
+
+        FluentActions.Invoking(() => Optional.Some(optional))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.Optional_WrappingOptional);
     }
 
     [Fact]
@@ -124,12 +138,13 @@ public class OptionalSpec
     }
 
     [Fact]
-    public void WhenToOptionalWithWithOptionalOfDifferentType_ThenReturnsSome()
+    public void WhenToOptionalWithWithOptional_ThenThrows()
     {
         var optional = new Optional<string>("avalue");
-        var result = optional.ToOptional<object>();
 
-        result.Should().BeSome("avalue");
+        optional.Invoking(x => x.ToOptional<object>())
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.Optional_WrappingOptional);
     }
 
     [Fact]
@@ -178,7 +193,6 @@ public class OptionalSpec
 
         result.Should().BeSome("anewvalue");
         result.Should().BeOfType<Optional<string>>();
-
     }
 
     [Fact]
@@ -381,14 +395,13 @@ public class OptionalOfTSpec
     }
 
     [Fact]
-    public void WhenSomeWithOptional_ThenReturnsOptional()
+    public void WhenSomeWithOptional_ThenThrows()
     {
         var optional = new Optional<string>("avalue");
 
-        var result = Optional<string>.Some(optional);
-
-        result.Should().Be(optional);
-        result.Should().BeSome("avalue");
+        FluentActions.Invoking(() => Optional<Optional<string>>.Some(optional))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.Optional_WrappingOptional);
     }
 
     [Fact]
@@ -1026,7 +1039,7 @@ public class OptionalOfTSpec
 
         result.Should().Be(datum);
     }
-    
+
     [Fact]
     public void WhenValueOrNullAndNoneReferenceType_ThenReturnsNull()
     {

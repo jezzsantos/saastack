@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using JetBrains.Annotations;
@@ -64,12 +65,13 @@ public sealed class ProviderSubscription : ValueObjectBase<ProviderSubscription>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new ProviderSubscription(parts[0].ToOptional(val => val.ToId()),
-                ProviderStatus.Rehydrate()(parts[1]!, container),
-                ProviderPlan.Rehydrate()(parts[2]!, container),
-                ProviderPlanPeriod.Rehydrate()(parts[3]!, container),
-                ProviderInvoice.Rehydrate()(parts[4]!, container),
-                ProviderPaymentMethod.Rehydrate()(parts[5]!, container));
+            return new ProviderSubscription(
+                parts[0].ToOptional(val => val.ToId()),
+                ProviderStatus.Rehydrate()(parts[1], container),
+                ProviderPlan.Rehydrate()(parts[2], container),
+                ProviderPlanPeriod.Rehydrate()(parts[3], container),
+                ProviderInvoice.Rehydrate()(parts[4], container),
+                ProviderPaymentMethod.Rehydrate()(parts[5], container));
         };
     }
 

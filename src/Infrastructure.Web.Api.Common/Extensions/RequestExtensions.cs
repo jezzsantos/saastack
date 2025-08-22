@@ -7,6 +7,7 @@ using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IO;
 using RouteAttribute = Infrastructure.Web.Api.Interfaces.RouteAttribute;
@@ -24,20 +25,20 @@ public static class RequestExtensions
     public static RequestInfo GetRequestInfo(this IWebRequest request)
     {
         var requestType = request.GetType();
-        var attribute = TryGetRouteFromAttribute(requestType);
-        if (attribute.NotExists())
+
+        if (!TryGetRouteFromAttribute(requestType, out var attribute))
         {
             var requestTypeName = requestType.Name;
             throw new InvalidOperationException(
                 Resources.RequestExtensions_MissingRouteAttribute.Format(requestTypeName, nameof(RouteAttribute)));
         }
 
-        var (route, routeParams) = ExpandRouteTemplate(request, attribute);
+        var (route, routeParams) = ExpandRouteTemplate(request, attribute!);
 
         return new RequestInfo
         {
             Route = route,
-            Method = attribute.Method,
+            Method = attribute!.Method,
             IsTestingOnly = attribute.IsTestingOnly,
             RouteParams = routeParams
         };
@@ -48,8 +49,7 @@ public static class RequestExtensions
     /// </summary>
     public static Dictionary<string, Type> GetRouteTemplatePlaceholders(this Type requestType)
     {
-        var attribute = TryGetRouteFromAttribute(requestType);
-        if (attribute.NotExists())
+        if (!TryGetRouteFromAttribute(requestType, out var attribute))
         {
             return new Dictionary<string, Type>();
         }
@@ -60,7 +60,7 @@ public static class RequestExtensions
             return new Dictionary<string, Type>();
         }
 
-        var routeTemplate = attribute.RouteTemplate;
+        var routeTemplate = attribute!.RouteTemplate;
         var placeholders = GetPlaceholders(routeTemplate);
         if (placeholders.HasNone())
         {
@@ -175,7 +175,8 @@ public static class RequestExtensions
     ///     Note: We define the data to be hashed with HMAC as: {body}
     ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
     ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
-    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="HttpConstants.EmptyRequestJson" />
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters
+    ///     <see cref="HttpConstants.EmptyRequestJson" />
     /// </summary>
     private static string CreateHMACSignature(this IWebRequest request, string secret)
     {
@@ -209,13 +210,12 @@ public static class RequestExtensions
 
         static List<string> GetRouteFields(IWebRequest webRequest)
         {
-            var attribute = TryGetRouteFromAttribute(webRequest.GetType());
-            if (attribute.NotExists())
+            if (!TryGetRouteFromAttribute(webRequest.GetType(), out var attribute))
             {
                 return [];
             }
 
-            var placeholders = GetPlaceholders(attribute.RouteTemplate);
+            var placeholders = GetPlaceholders(attribute!.RouteTemplate);
             return placeholders
                 .Select(pair => pair.Key)
                 .ToList();
@@ -227,7 +227,8 @@ public static class RequestExtensions
     ///     Note: We define the data to be hashed with HMAC as: {body}
     ///     Where {body} for POST, PUTPATCH requests will be the JSON of its fields, except for body fields in the path,
     ///     or marked with [FromQuery], [FromRoute] or [JsonIgnore]
-    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters <see cref="HttpConstants.EmptyRequestJson" />
+    ///     Where {body} for GET, SEARCH, DELETE requests will always be the characters
+    ///     <see cref="HttpConstants.EmptyRequestJson" />
     /// </summary>
     private static string CreateHMACSignature(this HttpRequestMessage message, string secret)
     {
@@ -299,12 +300,12 @@ public static class RequestExtensions
         return request;
     }
 
-    private static RouteAttribute? TryGetRouteFromAttribute(Type requestType)
+    [ContractAnnotation("=> true, attribute: notnull; => false, attribute: null")]
+    private static bool TryGetRouteFromAttribute(Type requestType, out RouteAttribute? attribute)
     {
-        var attribute = requestType.GetCustomAttribute<RouteAttribute>();
-        return attribute.NotExists()
-            ? null
-            : attribute;
+        attribute = requestType.GetCustomAttribute<RouteAttribute>();
+
+        return attribute.Exists();
     }
 
     private static (string Route, Dictionary<string, object?> RouteParams) ExpandRouteTemplate(IWebRequest request,
@@ -568,8 +569,8 @@ public static class RequestExtensions
             }
 
             return lowercaseNames
-                    ? propInfo.Name.ToLowerInvariant()
-                    : propInfo.Name;
+                ? propInfo.Name.ToLowerInvariant()
+                : propInfo.Name;
         }
     }
 

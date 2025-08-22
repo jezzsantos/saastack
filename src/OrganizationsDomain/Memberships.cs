@@ -33,7 +33,7 @@ public sealed class Memberships : SingleValueObjectBase<Memberships, List<Member
         return (property, container) =>
         {
             var items = RehydrateToList(property, true, true);
-            var memberships = items.Select(item => Membership.Rehydrate()(item!, container));
+            var memberships = items.Select(item => Membership.Rehydrate()(item, container));
             return new Memberships(memberships);
         };
     }

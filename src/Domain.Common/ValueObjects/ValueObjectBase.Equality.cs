@@ -135,19 +135,19 @@ public abstract partial class ValueObjectBase<TValueObject> : IEqualityComparer,
     public override int GetHashCode()
     {
         return GetAtomicValues()
-            .Select(x =>
+            .Select(val =>
             {
-                if (x.NotExists())
+                if (val.NotExists())
                 {
                     return 0;
                 }
 
-                if (x is string stringValue)
+                if (val is string stringValue)
                 {
                     return GetDeterministicHashCode(stringValue);
                 }
 
-                return x.GetHashCode();
+                return val.GetHashCode();
             })
             .Aggregate((x, y) => x ^ y);
     }

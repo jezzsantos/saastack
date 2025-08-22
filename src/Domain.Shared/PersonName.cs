@@ -1,4 +1,5 @@
 ﻿using Common;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using JetBrains.Annotations;
@@ -55,7 +56,7 @@ public sealed class PersonName : ValueObjectBase<PersonName>
         {
             var parts = RehydrateToList(property, false);
             return new PersonName(
-                Name.Rehydrate()(parts[0]!, container),
+                Name.Rehydrate()(parts[0], container),
                 parts[1].ToOptional(val => Name.Rehydrate()(val, container)));
         };
     }

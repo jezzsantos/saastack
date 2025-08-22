@@ -9,7 +9,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToWithNullInstance_ThenReturnsBefore()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = (left as IComparable).CompareTo(right);
@@ -20,7 +20,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToWithWrongType_ThenReturnsBefore()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
         var right = new ValueObjectSpec.TestSingleStringValueObject("avalue");
 
         var result = (left as IComparable).CompareTo(right);
@@ -31,8 +31,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToWithDifferentValues_ThenReturnsBefore()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
 
         var result = (left as IComparable).CompareTo(right);
 
@@ -42,8 +42,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToWithSameValues_ThenReturnsEqual()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = (left as IComparable).CompareTo(right);
 
@@ -53,7 +54,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToTWithNullInstance_ThenReturnsUnComparable()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = (left as IComparable<ValueObjectSpec.TestMultiValueObject>).CompareTo(right);
@@ -64,8 +65,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToTWithDifferentValues_ThenReturnsBefore()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
 
         var result = (left as IComparable<ValueObjectSpec.TestMultiValueObject>).CompareTo(right);
 
@@ -75,8 +76,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenCompareToTWithSameValues_ThenReturnsSame()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = (left as IComparable<ValueObjectSpec.TestMultiValueObject>).CompareTo(right);
 
@@ -87,7 +89,7 @@ public class ValueObjectComparableSpec
     public void WhenGreaterThanOperatorWithNullInstanceAndInstance_ThenReturnsFalse()
     {
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = left > right;
 
@@ -97,7 +99,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOperatorWithInstanceAndNullInstance_ThenReturnsFalse()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = left > right;
@@ -108,8 +110,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOperatorWithDifferentValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
 
         var result = left > right;
 
@@ -119,8 +121,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOperatorWithSameValues_ThenReturnsFalse()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = left > right;
 
@@ -131,7 +134,7 @@ public class ValueObjectComparableSpec
     public void WhenGreaterThanOrEqualOperatorWithNullInstanceAndInstance_ThenReturnsFalse()
     {
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = left >= right;
 
@@ -141,7 +144,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOrEqualOperatorWithInstanceAndNullInstance_ThenReturnsFalse()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = left >= right;
@@ -152,8 +155,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOrEqualOperatorWithDifferentValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
 
         var result = left >= right;
 
@@ -163,8 +166,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenGreaterThanOrEqualOperatorWithSameValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = left >= right;
 
@@ -175,7 +179,7 @@ public class ValueObjectComparableSpec
     public void WhenLessThanOperatorWithNullInstanceAndInstance_ThenReturnsFalse()
     {
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = left < right;
 
@@ -185,7 +189,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOperatorWithInstanceAndNullInstance_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = left < right;
@@ -196,8 +200,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOperatorWithDifferentValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
 
         var result = left < right;
 
@@ -207,8 +211,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOperatorWithSameValues_ThenReturnsFalse()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = left < right;
 
@@ -219,7 +224,7 @@ public class ValueObjectComparableSpec
     public void WhenLessThanOrEqualOperatorWithNullInstanceAndInstance_ThenReturnsFalse()
     {
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = left <= right;
 
@@ -229,7 +234,7 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOrEqualOperatorWithInstanceAndNullInstance_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = left <= right;
@@ -240,8 +245,8 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOrEqualOperatorWithDifferentValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 0, false, DateTime.UtcNow);
 
         var result = left <= right;
 
@@ -251,8 +256,9 @@ public class ValueObjectComparableSpec
     [Fact]
     public void WhenLessThanOrEqualOperatorWithSameValues_ThenReturnsTrue()
     {
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = left <= right;
 

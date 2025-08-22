@@ -1,5 +1,4 @@
 using Common;
-using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
@@ -61,12 +60,13 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new EndUserProfile(PersonName.Rehydrate()(parts[0]!, container),
-                Timezone.Rehydrate()(parts[1]!, container),
-                parts[3].HasValue()
-                    ? Locale.Rehydrate()(parts[3]!, container)
+            return new EndUserProfile(
+                PersonName.Rehydrate()(parts[0], container),
+                Timezone.Rehydrate()(parts[1], container),
+                parts[3].HasValue
+                    ? Locale.Rehydrate()(parts[3], container)
                     : Locale.Create(Locales.Default).Value, //for backwards compatibility
-                Address.Rehydrate()(parts[2]!, container));
+                Address.Rehydrate()(parts[2], container));
         };
     }
 

@@ -8,6 +8,7 @@ namespace Infrastructure.Persistence.Interfaces;
 
 /// <summary>
 ///     Defines an entity that is persisted
+///     Maintains a collection of <see cref="HydrationProperties"/>
 /// </summary>
 public abstract class PersistedEntity
 {
@@ -77,12 +78,12 @@ public abstract class PersistedEntity
 
     public TValue? GetValueOrDefault<TValue>(string propertyName, TValue? defaultValue = default)
     {
-        if (!PropertyValues.ContainsKey(propertyName))
+        if (!PropertyValues.TryGetValue(propertyName, out var rawValue))
         {
             return defaultValue;
         }
 
-        var propertyValue = ConvertToDomainProperty(PropertyValues[propertyName], typeof(TValue));
+        var propertyValue = ConvertToDomainProperty(rawValue, typeof(TValue));
         if (!propertyValue.HasValue)
         {
             return defaultValue;
@@ -95,12 +96,12 @@ public abstract class PersistedEntity
 
     public TValue? GetValueOrDefault<TValue>(string propertyName, IDomainFactory domainFactory)
     {
-        if (!PropertyValues.ContainsKey(propertyName))
+        if (!PropertyValues.TryGetValue(propertyName, out var rawValue))
         {
             return default;
         }
 
-        var propertyValue = ConvertToDomainProperty(PropertyValues[propertyName], typeof(TValue), domainFactory);
+        var propertyValue = ConvertToDomainProperty(rawValue, typeof(TValue), domainFactory);
         if (!propertyValue.HasValue)
         {
             return default;
@@ -115,7 +116,7 @@ public abstract class PersistedEntity
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
 
-        var rawValue = ConvertFromDomainProperty(value);
+        var rawValue = ConvertToRaw(value);
         if (PropertyValues.ContainsKey(name))
         {
             PropertyValues.AddOrUpdate(name, rawValue);
@@ -152,7 +153,10 @@ public abstract class PersistedEntity
         return new HydrationProperties(properties);
     }
 
-    private static Optional<object> ConvertFromDomainProperty<TValue>(Optional<TValue> value)
+    /// <summary>
+    ///     Convert <see cref="Optional{TValue}" /> to <see cref="Optional{Object}" /> value
+    /// </summary>
+    private static Optional<object> ConvertToRaw<TValue>(Optional<TValue> value)
     {
         if (!value.HasValue)
         {
@@ -164,14 +168,14 @@ public abstract class PersistedEntity
             return new Optional<object>((object?)valueObject.Dehydrate());
         }
 
-        return value.ToOptional<object>();
+        return new Optional<object>((object?)value.Value);
     }
 
     private static Optional<object> ConvertToDomainProperty(Optional<object> rawValue, Type propertyType,
         IDomainFactory? domainFactory = null)
     {
         if (Optional.IsOptionalType(propertyType)
-            && Optional.TryGetContainedType(propertyType, out var containedType))
+            && Optional.TryGetOptionalType(propertyType, out var containedType))
         {
             if (containedType!.IsAssignableTo(typeof(IDehydratableValueObject)))
             {

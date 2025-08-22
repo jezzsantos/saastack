@@ -15,7 +15,7 @@ public sealed class OptionalConverterFactory : JsonConverterFactory
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        return Optional.TryGetContainedType(typeToConvert, out var containedType)
+        return Optional.TryGetOptionalType(typeToConvert, out var containedType)
             ? Activator.CreateInstance(typeof(OptionalConverter<>).MakeGenericType(containedType!)) as JsonConverter
             : null;
     }

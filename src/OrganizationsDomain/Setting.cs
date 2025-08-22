@@ -66,7 +66,10 @@ public sealed class Setting : ValueObjectBase<Setting>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new Setting(parts[0]!, parts[1].ToEnumOrDefault(SettingValueType.String), parts[2].ToBool());
+            return new Setting(
+                parts[0],
+                parts[1].Value.ToEnumOrDefault(SettingValueType.String),
+                parts[2].Value.ToBool());
         };
     }
 

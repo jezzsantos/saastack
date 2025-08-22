@@ -3548,7 +3548,7 @@ public sealed class AClass : SingleValueObjectBase<AClass, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new AClass(parts[0]!);
+            return new AClass(parts[0]);
         };
     }
 }";

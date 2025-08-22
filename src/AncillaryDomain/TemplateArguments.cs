@@ -1,5 +1,4 @@
 using Common;
-using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using JetBrains.Annotations;
@@ -31,9 +30,10 @@ public sealed class TemplateArguments : SingleValueObjectBase<TemplateArguments,
         {
             var items = RehydrateToList(property, true, true);
             return new TemplateArguments(
-                items.Select(item => item)
-                    .Where(item => item.Exists())
-                    .ToList()!);
+                items
+                    .Where(item => item.HasValue)
+                    .Select(item => item.Value)
+                    .ToList());
         };
     }
 }

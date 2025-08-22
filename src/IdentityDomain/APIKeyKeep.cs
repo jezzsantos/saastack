@@ -48,7 +48,9 @@ public sealed class APIKeyKeep : ValueObjectBase<APIKeyKeep>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new APIKeyKeep(parts[0]!, parts[1]!);
+            return new APIKeyKeep(
+                parts[0],
+                parts[1]);
         };
     }
 

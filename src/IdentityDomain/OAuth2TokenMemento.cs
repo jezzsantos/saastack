@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Services.Shared;
@@ -77,8 +78,10 @@ public sealed class OAuth2TokenMemento : ValueObjectBase<OAuth2TokenMemento>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new OAuth2TokenMemento(parts[0].ToEnumOrDefault(AuthTokenType.AccessToken), parts[1]!,
-                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()));
+            return new OAuth2TokenMemento(
+                parts[0].Value.ToEnumOrDefault(AuthTokenType.AccessToken),
+                parts[1],
+                parts[2].ToOptional(val => val.FromIso8601()));
         };
     }
 

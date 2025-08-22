@@ -33,7 +33,7 @@ public sealed class DisplayName : SingleValueObjectBase<DisplayName, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new DisplayName(parts[0]!);
+            return new DisplayName(parts[0]);
         };
     }
 }

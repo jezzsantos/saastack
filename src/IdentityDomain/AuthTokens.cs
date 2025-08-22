@@ -44,7 +44,7 @@ public sealed class AuthTokens : SingleValueObjectBase<AuthTokens, List<AuthToke
         return (property, container) =>
         {
             var items = RehydrateToList(property, true, true);
-            return new AuthTokens(items.Select(item => AuthToken.Rehydrate()(item!, container)).ToList());
+            return new AuthTokens(items.Select(item => AuthToken.Rehydrate()(item, container)).ToList());
         };
     }
 

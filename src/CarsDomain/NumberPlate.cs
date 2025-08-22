@@ -37,7 +37,7 @@ public sealed class NumberPlate : SingleValueObjectBase<NumberPlate, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new NumberPlate(parts[0]!);
+            return new NumberPlate(parts[0]);
         };
     }
 }

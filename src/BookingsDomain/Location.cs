@@ -30,7 +30,7 @@ public sealed class Location : SingleValueObjectBase<Location, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Location(parts[0]!);
+            return new Location(parts[0]);
         };
     }
 }

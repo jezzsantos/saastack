@@ -71,13 +71,14 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
         return (property, container) =>
         {
             var parts = RehydrateToList(property, false);
-            return new GuestInvitation(parts[0],
-                EmailAddress.Rehydrate()(parts[1]!, container),
-                parts[2].ToOptional<string?, DateTime>(val => val.FromIso8601()),
-                Identifier.Rehydrate()(parts[3]!, container),
-                parts[4].ToOptional<string?, DateTime>(val => val.FromIso8601()),
-                EmailAddress.Rehydrate()(parts[5]!, container),
-                parts[6].ToOptional<string?, DateTime>(val => val.FromIso8601()));
+            return new GuestInvitation(
+                parts[0],
+                EmailAddress.Rehydrate()(parts[1], container),
+                parts[2].ToOptional(val => val.FromIso8601()),
+                Identifier.Rehydrate()(parts[3], container),
+                parts[4].ToOptional(val => val.FromIso8601()),
+                EmailAddress.Rehydrate()(parts[5], container),
+                parts[6].ToOptional(val => val.FromIso8601()));
         };
     }
 

@@ -38,7 +38,7 @@ public sealed class Role : SingleValueObjectBase<Role, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Role(parts[0]!);
+            return new Role(parts[0]);
         };
     }
 

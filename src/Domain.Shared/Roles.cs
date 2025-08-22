@@ -67,7 +67,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         return (property, container) =>
         {
             var items = RehydrateToList(property, true, true);
-            var roles = items.Select(item => Role.Rehydrate()(item!, container));
+            var roles = items.Select(item => Role.Rehydrate()(item, container));
             return new Roles(roles);
         };
     }

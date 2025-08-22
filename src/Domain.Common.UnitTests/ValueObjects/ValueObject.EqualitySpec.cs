@@ -1,4 +1,5 @@
 using System.Collections;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using FluentAssertions;
 using Xunit;
@@ -11,7 +12,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithNullInstanceAndNullInstance_ThenReturnsTrue()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
@@ -23,9 +24,9 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithNullInstanceAndInstance_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = (instance as IEqualityComparer).Equals(left, right);
 
@@ -35,8 +36,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithInstanceAndNullInstance_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result = (instance as IEqualityComparer).Equals(left, right);
@@ -47,8 +48,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithDifferentTypes_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = new ValueObjectSpec.TestSingleStringValueObject("avalue");
 
         var result = (instance as IEqualityComparer).Equals(left, right);
@@ -59,7 +60,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithDifferentTypesThanValueObject_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var left = new ValueObjectSpec.TestSingleStringValueObject("avalue1");
         var right = new ValueObjectSpec.TestSingleStringValueObject("avalue2");
 
@@ -71,9 +72,9 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithDifferentValues_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true, DateTime.UtcNow);
 
         var result = (instance as IEqualityComparer).Equals(left, right);
 
@@ -83,9 +84,10 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityWithSameValues_ThenReturnsTrue()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result = (instance as IEqualityComparer).Equals(left, right);
 
@@ -95,7 +97,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerWithNullInstanceAndNullInstance_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
@@ -108,9 +110,9 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerWithNullInstanceAndInstance_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var left = (ValueObjectSpec.TestMultiValueObject)null!;
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result =
             (instance as IEqualityComparer<ValueObjectBase<ValueObjectSpec.TestMultiValueObject>>).Equals(left, right);
@@ -121,8 +123,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerWithInstanceAndNullInstance_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
         var right = (ValueObjectSpec.TestMultiValueObject)null!;
 
         var result =
@@ -134,9 +136,9 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerWithDifferentValues_ThenReturnsFalse()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true, DateTime.UtcNow);
 
         var result =
             (instance as IEqualityComparer<ValueObjectBase<ValueObjectSpec.TestMultiValueObject>>).Equals(left, right);
@@ -147,9 +149,10 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerWithSameValues_ThenReturnsTrue()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
-        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var left = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
+        var right = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, datum);
 
         var result =
             (instance as IEqualityComparer<ValueObjectBase<ValueObjectSpec.TestMultiValueObject>>).Equals(left, right);
@@ -199,8 +202,8 @@ public class ValueObjectEqualitySpec
     public void WhenEqualsWithDifferentValueInMultiValueObject_ThenReturnsFalse()
     {
         var result =
-            new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true).Equals(
-                new ValueObjectSpec.TestMultiValueObject("avalue2", 50, false));
+            new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow).Equals(
+                new ValueObjectSpec.TestMultiValueObject("avalue2", 50, false, DateTime.UtcNow));
 
         result.Should().BeFalse();
     }
@@ -209,8 +212,8 @@ public class ValueObjectEqualitySpec
     public void WhenEqualsWithNullInMultiValueObject_ThenReturnsFalse()
     {
         var result =
-            new ValueObjectSpec.TestMultiValueObject(null!, 25, true).Equals(
-                new ValueObjectSpec.TestMultiValueObject("avalue2", 50, false));
+            new ValueObjectSpec.TestMultiValueObject(null!, 25, true, DateTime.UtcNow).Equals(
+                new ValueObjectSpec.TestMultiValueObject("avalue2", 50, false, DateTime.UtcNow));
 
         result.Should().BeFalse();
     }
@@ -220,8 +223,8 @@ public class ValueObjectEqualitySpec
     {
         var result =
             // ReSharper disable once EqualExpressionComparison
-            new ValueObjectSpec.TestMultiValueObject(null!, 17, true).Equals(
-                new ValueObjectSpec.TestMultiValueObject(null!, 17, true));
+            new ValueObjectSpec.TestMultiValueObject(null!, 17, true, DateTime.MinValue).Equals(
+                new ValueObjectSpec.TestMultiValueObject(null!, 17, true, DateTime.MinValue));
 
         result.Should().BeTrue();
     }
@@ -229,10 +232,12 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualsWithSameValueInMultiValueObject_ThenReturnsTrue()
     {
+        var datum = DateTime.UtcNow;
+        
         var result =
             // ReSharper disable once EqualExpressionComparison
-            new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true).Equals(
-                new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true));
+            new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, datum).Equals(
+                new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, datum));
 
         result.Should().BeTrue();
     }
@@ -334,7 +339,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualsWithNullStringValue_ThenReturnsFalse()
     {
-        var result = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true).Equals(null!);
+        var result = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow).Equals(null!);
 
         result.Should().BeFalse();
     }
@@ -343,7 +348,8 @@ public class ValueObjectEqualitySpec
     public void WhenEqualsWithDifferentStringValue_ThenReturnsFalse()
     {
         // ReSharper disable once SuspiciousTypeConversion.Global
-        var result = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true).Equals("adifferentvalue");
+        var result =
+            new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow).Equals("adifferentvalue");
 
         result.Should().BeFalse();
     }
@@ -352,8 +358,9 @@ public class ValueObjectEqualitySpec
     public void WhenEqualsWithSameStringValue_ThenReturnsTrue()
     {
         // ReSharper disable once SuspiciousTypeConversion.Global
-        var result = new ValueObjectSpec.TestMultiValueObject("astringvalue", 25, true)
-            .Equals("{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true}");
+        var result = new ValueObjectSpec.TestMultiValueObject("astringvalue", 25, true, DateTime.MinValue)
+            .Equals(
+                "{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true,\"Val4\":\"0001-01-01T00:00:00\",\"Val5\":\"NULL\",\"Val6\":\"NULL\",\"Val7\":\"NULL\",\"Val8\":\"NULL\"}");
 
         result.Should().BeTrue();
     }
@@ -361,7 +368,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithNullString_ThenReturnsFalse()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = valueObject == (string)null!;
 
@@ -371,7 +378,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenNotOperatorEqualsWithNullString_ThenReturnsTrue()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = valueObject != (string)null!;
 
@@ -389,7 +396,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithDifferentString_ThenReturnsFalse()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = valueObject == "adifferentvalue";
 
@@ -399,9 +406,11 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithSameString_ThenReturnsTrue()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("astringvalue", 25, true);
+        var datum = DateTime.UtcNow;
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("astringvalue", 25, true, datum);
 
-        var result = valueObject == "{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true}";
+        var result = valueObject
+                     == $"{{\"Val1\":\"astringvalue\",\"Val2\":25,\"Val3\":true,\"Val4\":\"{datum.ToIso8601()}\",\"Val5\":\"NULL\",\"Val6\":\"NULL\",\"Val7\":\"NULL\",\"Val8\":\"NULL\"}}";
 
         result.Should().BeTrue();
     }
@@ -409,7 +418,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithNullValue_ThenReturnsFalse()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = valueObject == (ValueObjectSpec.TestMultiValueObject)null!;
 
@@ -419,7 +428,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenNotOperatorEqualsWithNullValue_ThenReturnsTrue()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.UtcNow);
 
         var result = valueObject != (ValueObjectSpec.TestMultiValueObject)null!;
 
@@ -437,8 +446,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithDifferentValue_ThenReturnsFalse()
     {
-        var result = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true)
-                     == new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true);
+        var result = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, DateTime.UtcNow)
+                     == new ValueObjectSpec.TestMultiValueObject("avalue2", 25, true, DateTime.UtcNow);
 
         result.Should().BeFalse();
     }
@@ -446,9 +455,11 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenOperatorEqualsWithSameValue_ThenReturnsTrue()
     {
+        var datum = DateTime.UtcNow;
+        
         // ReSharper disable once EqualExpressionComparison
-        var result = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true)
-                     == new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true);
+        var result = new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, datum)
+                     == new ValueObjectSpec.TestMultiValueObject("avalue1", 25, true, datum);
 
         result.Should().BeTrue();
     }
@@ -472,7 +483,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenObjectGetHashCode_ThenReturnsHash()
     {
-        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var valueObject = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.MinValue);
 
         var result = valueObject.GetHashCode();
 
@@ -482,8 +493,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerGetHashCode_ThenReturnsHash()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var other = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var other = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.MinValue);
 
         var result = (instance as IEqualityComparer).GetHashCode(other);
 
@@ -493,7 +504,7 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerGetHashCodeWithOtherType_ThenReturnsHash()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
         var other = new ValueObjectSpec.TestSingleStringValueObject("avalue");
 
         var result = (instance as IEqualityComparer).GetHashCode(other);
@@ -504,8 +515,8 @@ public class ValueObjectEqualitySpec
     [Fact]
     public void WhenEqualityComparerOfTGetHashCode_ThenReturnsHash()
     {
-        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false);
-        var other = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true);
+        var instance = new ValueObjectSpec.TestMultiValueObject("", 0, false, DateTime.MinValue);
+        var other = new ValueObjectSpec.TestMultiValueObject("avalue", 25, true, DateTime.MinValue);
 
         var result = (instance as IEqualityComparer<ValueObjectSpec.TestMultiValueObject>).GetHashCode(other);
 

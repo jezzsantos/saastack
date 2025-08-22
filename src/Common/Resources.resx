@@ -69,4 +69,7 @@
     <data name="Bcp47Locale_InvalidRegionCode" xml:space="preserve">
         <value>The RegionCode '{0}' is invalid</value>
     </data>
+    <data name="Optional_WrappingOptional" xml:space="preserve">
+        <value>Cannot wrap an Optional&lt;T&gt; within an Optional&lt;T&gt;</value>
+    </data>
 </root>

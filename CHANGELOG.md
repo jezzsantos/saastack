@@ -18,16 +18,22 @@
 
 ---
 
-## [1.0.0] - 2025-08-21
+## [1.0.0] - 2025-08-22
 
 ### Non-breaking Changes
-- Added new methods for mapping Optionals to Nullables and vice versa, for ValuesObjects, Domain Events and Application Layer conversions
-- `ValueObjectBase<T>.RehydrateToList()` now returns `List<Optional<string>>` instead of `List<string?>` in order to make mapping simpler.
-
+- Added new methods for mapping Optionals to Nullables and vice versa for ValuesObjects, Domain Events and Application Layer conversions.
+- Native support for `Optional<T>` properties in ValueObjects, wrt to `GetAtomicValues()` and `Rehydrate()` methods.
+- `ValueObjectBase<T>.RehydrateToList()` now returns `List<Optional<string>>` instead of `List<string?>` in order to simplify mapping values.
+  - Please update all the ValueObject `Rehydrate()` methods to use the new `Optional<string>` return type, utilizing the new syntax, and new extension methods
+  - Please update all the ValueObject `GetAtomicValues()` methods to use the new collection syntax, and no longer destruct the `Optional<T>` values, nor `DateTime` values anymore
+  
 ### Breaking Changes
 
+
 ### Fixed
-- Roslyn rule snow support C#12 syntax for new collections syntax
+- Roslyn rules now support C#12 syntax for new collections syntax in `ValueObjectBase<T>.GetAtomicValues()`
+- Fixed all ValueObjects to use Optionals instead of Nullables, and turned back on Roslyn rules that enforce that.
+- Simplified/eliminated the use of nested `Optional<T>` in `CommandEntity` and `QueryEntity` persistence classes.
 
 ---
 

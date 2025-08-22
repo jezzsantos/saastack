@@ -430,7 +430,8 @@ public static class StringExtensions
 #endif
 #if COMMON_PROJECT
     /// <summary>
-    ///     Converts the object to a json format
+    ///     Converts the object to a json format.
+    ///     Supports <see cref="Optional{TValue}" /> types, Enums as strings, and DateTime as ISO8601
     /// </summary>
     public static string? ToJson(this object? value, bool prettyPrint = true, JsonCasing casing = JsonCasing.Pascal,
         bool includeNulls = false)

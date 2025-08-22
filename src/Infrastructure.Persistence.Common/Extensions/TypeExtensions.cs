@@ -38,7 +38,7 @@ public static class TypeExtensions
             return false;
         }
 
-        if (Optional.IsOptionalType(type, out var containedType))
+        if (Optional.TryGetOptionalType(type, out var containedType))
         {
             if (typeof(IDehydratableValueObject).IsAssignableFrom(containedType))
             {
@@ -67,7 +67,7 @@ public static class TypeExtensions
             return false;
         }
 
-        if (Optional.TryGetContainedType(type, out var containedType))
+        if (Optional.TryGetOptionalType(type, out var containedType))
         {
             return containedType!.IsEnum;
         }

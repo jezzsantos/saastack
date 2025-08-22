@@ -46,7 +46,9 @@ public sealed class BillingProvider : ValueObjectBase<BillingProvider>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new BillingProvider(parts[0]!, parts[1]!.FromJson<SubscriptionMetadata>()!);
+            return new BillingProvider(
+                parts[0],
+                parts[1].Value.FromJson<SubscriptionMetadata>()!);
         };
     }
 

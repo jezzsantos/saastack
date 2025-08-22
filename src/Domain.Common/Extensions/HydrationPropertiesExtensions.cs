@@ -8,20 +8,23 @@ public static class HydrationPropertiesExtensions
 {
     /// <summary>
     ///     Returns the named value from the <see cref="properties" /> of the matching <see cref="TValue" />,
-    ///     or if not exists, returns the <see cref="defaultValue" />
+    ///     or if not exists, returns the <see cref="Optional{TValue}.None" />
     /// </summary>
-    public static Optional<TValue> GetValueOrDefault<TValue>(this HydrationProperties properties,
-        string propertyName)
-
+    public static Optional<TValue> GetValueOrDefault<TValue>(this HydrationProperties properties, string propertyName)
     {
         if (properties.TryGetValue(propertyName, out var propertyValue))
         {
             if (propertyValue.HasValue)
             {
                 var value = propertyValue.Value;
-                return value.IsOptional(out var optional)
-                    ? new Optional<TValue>((TValue?)optional)
-                    : new Optional<TValue>((TValue)value);
+
+                if (value.IsOptional(out var descriptor))
+                {
+                    var containedValue = descriptor!.ContainedValue;
+                    return new Optional<TValue>((TValue?)containedValue);
+                }
+
+                return new Optional<TValue>((TValue)value);
             }
 
             return Optional<TValue>.None;
@@ -36,25 +39,28 @@ public static class HydrationPropertiesExtensions
     /// </summary>
     public static Optional<TValue> GetValueOrDefault<TValue>(this HydrationProperties properties,
         string propertyName, TValue defaultValue)
-
     {
         if (properties.TryGetValue(propertyName, out var propertyValue))
         {
             if (propertyValue.HasValue)
             {
                 var value = propertyValue.Value;
-                return value.IsOptional(out var optional)
-                    ? new Optional<TValue>((TValue?)optional)
-                    : new Optional<TValue>((TValue)value);
+                if (value.IsOptional(out var descriptor))
+                {
+                    var containedValue = descriptor!.ContainedValue;
+                    return new Optional<TValue>((TValue?)containedValue);
+                }
+
+                return new Optional<TValue>((TValue)value);
             }
 
             return defaultValue.Exists()
-                ? defaultValue
+                ? new Optional<TValue>(defaultValue)
                 : Optional<TValue>.None;
         }
 
         return defaultValue.Exists()
-            ? defaultValue
-            : default!;
+            ? new Optional<TValue>(defaultValue)
+            : new Optional<TValue>(default(TValue));
     }
 }

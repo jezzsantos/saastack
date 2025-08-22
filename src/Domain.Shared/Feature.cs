@@ -38,7 +38,7 @@ public sealed class Feature : SingleValueObjectBase<Feature, string>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Feature(parts[0]!);
+            return new Feature(parts[0]);
         };
     }
 

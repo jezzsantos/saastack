@@ -114,6 +114,15 @@ namespace Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot wrap an Optional&lt;T&gt; within an Optional&lt;T&gt;.
+        /// </summary>
+        internal static string Optional_WrappingOptional {
+            get {
+                return ResourceManager.GetString("Optional_WrappingOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This action is not allowed.
         /// </summary>
         internal static string Permission_Disallowed {

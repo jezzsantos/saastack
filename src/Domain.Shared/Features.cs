@@ -67,7 +67,8 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         return (property, container) =>
         {
             var items = RehydrateToList(property, true, true);
-            var features = items.Select(item => Feature.Rehydrate()(item!, container));
+            var features = items
+                .Select(item => Feature.Rehydrate()(item, container));
             return new Features(features);
         };
     }
