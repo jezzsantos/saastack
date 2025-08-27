@@ -67,7 +67,7 @@ public sealed class VerificationKeep : ValueObjectBase<VerificationKeep>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return [Token.ValueOrNull, ExpiresUtc, VerifiedUtc];
+        return [Token, ExpiresUtc, VerifiedUtc];
     }
 
 #pragma warning disable CA1822

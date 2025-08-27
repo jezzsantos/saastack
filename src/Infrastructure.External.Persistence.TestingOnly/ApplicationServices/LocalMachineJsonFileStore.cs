@@ -487,7 +487,9 @@ internal static class LocalMachineFileStoreExtensions
         if (mappings.HasAny())
         {
             var containerPropertiesDictionary = containerProperties
-                .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrNull);
+                .ToDictionary(pair => pair.Key, pair => pair.Value.HasValue
+                    ? pair.Value.Value
+                    : (object?)null);
             foreach (var mapping in mappings)
             {
                 var mapResult = Try.Safely(() => mapping.Value(containerPropertiesDictionary));

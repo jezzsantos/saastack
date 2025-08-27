@@ -34,6 +34,9 @@
         <Compile Include="..\Common\Optional.cs">
             <Link>Reference\Common\Optional.cs</Link>
         </Compile>
+        <Compile Include="..\Common\CSharpTypeTags.cs">
+            <Link>Reference\Common\CSharpTypeTags.cs</Link>
+        </Compile>
         <Compile Include="..\Common\Extensions\CollectionExtensions.cs">
             <Link>Reference\Common\Extensions\CollectionExtensions.cs</Link>
         </Compile>

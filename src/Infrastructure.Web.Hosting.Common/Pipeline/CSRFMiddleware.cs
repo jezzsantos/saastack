@@ -203,7 +203,7 @@ public sealed class CSRFMiddleware
 
         recorder.TraceError(null,
             "Request contains an invalid CSRF cookie signature for the user {UserId}",
-            userId.ValueOrNull ?? "unauthenticated");
+            userId.ValueOrDefault ?? "unauthenticated");
         return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidSignature, CSRFViolation);
     }
 

@@ -61,7 +61,7 @@ public sealed class ProviderStatus : ValueObjectBase<ProviderStatus>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return [Status, CanceledDateUtc.ValueOrNull, CanBeUnsubscribed];
+        return [Status, CanceledDateUtc, CanBeUnsubscribed];
     }
 }
 

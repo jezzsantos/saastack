@@ -67,7 +67,10 @@ public class QueuedUsageReporter : IUsageReporter
         var properties = additional ?? new Dictionary<string, object>();
 
         properties[UsageConstants.Properties.CallId] = safeCall.CallId;
-        properties[UsageConstants.Properties.TenantId] = safeCall.TenantId.ValueOrNull!;
+        if (safeCall.TenantId.HasValue)
+        {
+            properties[UsageConstants.Properties.TenantId] = safeCall.TenantId.Value;
+        }
 
         var message = new UsageMessage
         {

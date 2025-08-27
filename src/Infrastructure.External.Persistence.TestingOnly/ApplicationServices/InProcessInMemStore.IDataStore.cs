@@ -176,7 +176,9 @@ partial class InProcessInMemStore : IDataStore
         if (mappings.HasAny())
         {
             var containerPropertiesDictionary = containerProperties
-                .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrNull);
+                .ToDictionary(pair => pair.Key, pair => pair.Value.HasValue
+                    ? pair.Value.Value
+                    : null);
             foreach (var mapping in mappings)
             {
                 var mapResult = Try.Safely(() => mapping.Value(containerPropertiesDictionary));

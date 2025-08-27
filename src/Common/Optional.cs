@@ -356,23 +356,18 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     public Optional(TValue? value)
     {
         ValueOrDefault = value;
-        ValueOrNull = value.NotExists()
-            ? null
-            : value;
         HasValue = value.Exists();
     }
 
     public Optional(Optional<TValue> value)
     {
         ValueOrDefault = value.ValueOrDefault;
-        ValueOrNull = value;
         HasValue = value.HasValue;
     }
 
     public Optional(Optional<Optional<TValue>> value)
     {
         ValueOrDefault = value.ValueOrDefault.ValueOrDefault;
-        ValueOrNull = value.ValueOrNull;
         HasValue = value.ValueOrDefault.HasValue;
     }
 
@@ -402,21 +397,6 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     ///     Returns the contained value
     /// </summary>
     public TValue? ValueOrDefault { get; }
-
-    /// <summary>
-    ///     Returns either the contained value, or null
-    /// </summary>
-    public object? ValueOrNull { get; }
-
-    /// <summary>
-    ///     Returns either the contained value, or null
-    /// </summary>
-    public object? ToValueOrNull(Func<TValue, object?> converter)
-    {
-        return HasValue
-            ? converter(Value)
-            : ValueOrNull;
-    }
 
     /// <summary>
     ///     Tries to obtain the value
@@ -567,24 +547,4 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
 
         return !(right == left);
     }
-}
-
-/// <summary>
-///     Defines a marker type for value types
-/// </summary>
-// ReSharper disable once UnusedTypeParameter
-[UsedImplicitly]
-public sealed class ValueTypeTag<T>
-    where T : struct
-{
-}
-
-/// <summary>
-///     Defines a marker type for reference types
-/// </summary>
-// ReSharper disable once UnusedTypeParameter
-[UsedImplicitly]
-public sealed class ReferenceTypeTag<T>
-    where T : class?
-{
 }
